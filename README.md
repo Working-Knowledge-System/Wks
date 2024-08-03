@@ -56,7 +56,7 @@ Also those information have no need to be excanged/transmitted/copied between in
 The Organization module collects all instances of companies/organizations, each with relevant basic and advanced information. This information does not need to be exchanged, transmitted, or copied between individuals or other organizations. It is maintained directly by members of each organization and referenced in real time by other parties.
 
 The process is as follows: "Once a Person becomes a User, with their Account, they enter their Organization and become a Member".
-As a member, they can create other objects such as *Documents*, write *Codes*, design *Agents*, etc., which are automatically recorded and tracked in the correct Context.
+As a member, they can now create other objects such as *Documents*, write *Codes*, design *Agents*, etc., which are automatically recorded and tracked in the correct *context*.
 There is no longer a need to organize materials in shared directories/folders or SharePoint sites.
 Assets and activities are created without needing to be manually organized; they are already in the appropriate context.
 
