@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 268
   Top = 107
   Caption = 'Highlighter demo'
-  ClientHeight = 446
-  ClientWidth = 688
+  ClientHeight = 442
+  ClientWidth = 628
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,8 +15,8 @@ object Form1: TForm1
   object SynEdit1: TSynEdit
     Left = 0
     Top = 0
-    Width = 688
-    Height = 446
+    Width = 628
+    Height = 442
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -51,8 +51,8 @@ object Form1: TForm1
         Width = 3
       end>
     SelectedColor.Alpha = 0.400000005960464500
-    ExplicitLeft = 40
-    ExplicitTop = 40
+    ExplicitWidth = 688
+    ExplicitHeight = 480
     RemovedKeystrokes = <
       item
         Command = ecCut
