@@ -1,0 +1,72 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{C34D67F9-DB7F-4B7F-9631-D4AA2739F524}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="WksTextEditorProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksJsonEditorProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksPythonEditorProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksSqlEditorProject.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="WksTextEditorProject">
+        <MSBuild Projects="WksTextEditorProject.dproj"/>
+    </Target>
+    <Target Name="WksTextEditorProject:Clean">
+        <MSBuild Projects="WksTextEditorProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksTextEditorProject:Make">
+        <MSBuild Projects="WksTextEditorProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksJsonEditorProject">
+        <MSBuild Projects="WksJsonEditorProject.dproj"/>
+    </Target>
+    <Target Name="WksJsonEditorProject:Clean">
+        <MSBuild Projects="WksJsonEditorProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksJsonEditorProject:Make">
+        <MSBuild Projects="WksJsonEditorProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksPythonEditorProject">
+        <MSBuild Projects="WksPythonEditorProject.dproj"/>
+    </Target>
+    <Target Name="WksPythonEditorProject:Clean">
+        <MSBuild Projects="WksPythonEditorProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksPythonEditorProject:Make">
+        <MSBuild Projects="WksPythonEditorProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksSqlEditorProject">
+        <MSBuild Projects="WksSqlEditorProject.dproj"/>
+    </Target>
+    <Target Name="WksSqlEditorProject:Clean">
+        <MSBuild Projects="WksSqlEditorProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksSqlEditorProject:Make">
+        <MSBuild Projects="WksSqlEditorProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="WksTextEditorProject;WksJsonEditorProject;WksPythonEditorProject;WksSqlEditorProject"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="WksTextEditorProject:Clean;WksJsonEditorProject:Clean;WksPythonEditorProject:Clean;WksSqlEditorProject:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="WksTextEditorProject:Make;WksJsonEditorProject:Make;WksPythonEditorProject:Make;WksSqlEditorProject:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
