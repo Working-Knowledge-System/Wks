@@ -424,9 +424,9 @@ object TextEditorForm: TTextEditorForm
           ExplicitHeight = 477
           object OptionGeneralJvScrollMaxBand: TJvScrollMaxBand
             Width = 206
-            Height = 191
+            Height = 195
             Caption = 'General'
-            ExpandedHeight = 191
+            ExpandedHeight = 195
             ButtonFont.Charset = DEFAULT_CHARSET
             ButtonFont.Color = clWindowText
             ButtonFont.Height = -12
@@ -435,87 +435,97 @@ object TextEditorForm: TTextEditorForm
             ParentButtonFont = False
             object OptionDirDefaultLabel: TLabel
               AlignWithMargins = True
-              Left = 11
+              Left = 19
               Top = 30
-              Width = 184
+              Width = 168
               Height = 15
-              Margins.Left = 8
-              Margins.Right = 8
+              Margins.Left = 16
+              Margins.Right = 16
               Align = alTop
               Caption = 'Default Directory'
               OnClick = OptionDirDefaultLabelClick
+              ExplicitLeft = 11
               ExplicitWidth = 89
             end
             object OptionTabWidthLabel: TLabel
               AlignWithMargins = True
-              Left = 11
+              Left = 19
               Top = 80
-              Width = 184
+              Width = 168
               Height = 15
-              Margins.Left = 8
-              Margins.Right = 8
+              Margins.Left = 16
+              Margins.Right = 16
               Align = alTop
               Caption = 'Tab width'
               OnClick = OptionDirDefaultLabelClick
+              ExplicitLeft = 11
               ExplicitWidth = 51
             end
             object OptionDirDefaultEdit: TEdit
               AlignWithMargins = True
-              Left = 11
+              Left = 19
               Top = 51
-              Width = 184
+              Width = 168
               Height = 23
-              Margins.Left = 8
-              Margins.Right = 8
+              Margins.Left = 16
+              Margins.Right = 16
               Align = alTop
               TabOrder = 0
               Text = 'OptionDirDefaultEdit'
+              ExplicitLeft = 11
+              ExplicitWidth = 184
             end
             object OptionTabWidthEdit: TEdit
               AlignWithMargins = True
-              Left = 11
+              Left = 19
               Top = 101
-              Width = 184
+              Width = 168
               Height = 23
-              Margins.Left = 8
-              Margins.Right = 8
+              Margins.Left = 16
+              Margins.Right = 16
               Align = alTop
               TabOrder = 1
               Text = 'OptionTabWidthEdit'
               OnChange = OptionTabWidthEditChange
+              ExplicitLeft = 11
+              ExplicitWidth = 184
             end
             object OptionSaveBeforeRunCheckBox: TCheckBox
               AlignWithMargins = True
-              Left = 11
+              Left = 19
               Top = 163
-              Width = 184
+              Width = 168
               Height = 17
-              Margins.Left = 8
+              Margins.Left = 16
               Margins.Top = 8
-              Margins.Right = 8
+              Margins.Right = 16
               Align = alTop
               Caption = 'Save before run'
               TabOrder = 2
+              ExplicitLeft = 11
+              ExplicitWidth = 184
             end
             object OptionFoldAfterOpenCheckBox: TCheckBox
               AlignWithMargins = True
-              Left = 11
+              Left = 19
               Top = 135
-              Width = 184
+              Width = 168
               Height = 17
-              Margins.Left = 8
+              Margins.Left = 16
               Margins.Top = 8
-              Margins.Right = 8
+              Margins.Right = 16
               Align = alTop
               Caption = 'Fold after open'
               TabOrder = 3
+              ExplicitLeft = 11
+              ExplicitWidth = 184
             end
           end
           object OptionPythonJvScrollMaxBand: TJvScrollMaxBand
             Width = 206
-            Height = 133
+            Height = 148
             Caption = 'Python'
-            ExpandedHeight = 133
+            ExpandedHeight = 148
             ButtonFont.Charset = DEFAULT_CHARSET
             ButtonFont.Color = clWindowText
             ButtonFont.Height = -12
@@ -524,56 +534,92 @@ object TextEditorForm: TTextEditorForm
             ParentButtonFont = False
             object OptionPythonVersionLabel: TLabel
               AlignWithMargins = True
-              Left = 11
+              Left = 19
               Top = 30
-              Width = 184
+              Width = 168
               Height = 15
-              Margins.Left = 8
-              Margins.Right = 8
+              Margins.Left = 16
+              Margins.Right = 16
               Align = alTop
               Caption = 'Version:'
+              ExplicitLeft = 11
               ExplicitWidth = 41
             end
-            object OptionPythonEngineResetSpeedButton: TSpeedButton
+            object OptionPythonEngineRecycleSpeedButton: TSpeedButton
               AlignWithMargins = True
-              Left = 6
-              Top = 108
-              Width = 194
+              Left = 19
+              Top = 113
+              Width = 168
               Height = 22
-              Margins.Bottom = 0
+              Margins.Left = 16
+              Margins.Top = 8
+              Margins.Right = 16
               Align = alTop
-              Caption = 'Reset Engine'
+              Caption = 'Recycle Engine'
               Flat = True
-              OnClick = OptionPythonEngineResetSpeedButtonClick
+              Glyph.Data = {
+                52030000424D5203000000000000520200002800000010000000100000000100
+                08000000000000010000C30E0000C30E00008700000087000000FFFFFF00E7F3
+                E500B7DFB30098D49400B2E1B500F2F9F300FEFEFE00A3D69B004BB33A004BB4
+                3B004BB53C0046B43B0050B14900CAE6CD00FDFEFD00F4F9F500B9DEB2004AB4
+                3A0047B33C0096D18F00AADBA30060BC520047B43A0042B244006BC2600043B9
+                540075C3660048B43B0089D29300ECF5EA0053B744004CB53B004AB63A0057C0
+                6300F1F8F000A4D4A300B4DBAF00F6FAF600A3D59A004DB43D004CB53C004AB5
+                3A0080C68200EEF6EB00A6D79D006FC063004FB53F0032B13900E4F3E70091CD
+                85006BC05E004FB43F0047B437009DD1A000DBEED7005BBA4D004BB53B003EB4
+                3B00A9DDB100F8FBF800E0EFDD00CEE7CE00ECF5ED00CFE9CB0049B43B0048B4
+                3A007BC27B00A9D7A20049B63A0058BD67008FCE86004AB539005CB85A006BBF
+                5F0068BE6F00D0E9CB0030B43B00DDF3E1007BC66F0047B43C0090D59C00FBFD
+                FB0050B53D0037B63B00B7E7C30081C8760047B53C0073CC8400AAD9A30082D1
+                8D00EDF6EB004CB43B003BB33A00CEE9D300B1DBAA004AB6390044B13F00D0E8
+                D100B2DDAD0050B65400F9FCF90089CB7E0049B4390054B45000FCFDFC00F7FB
+                F60066BF590047B23E0079C57200A8D8AC00D0E9CC004EB63D004AB63B004AB4
+                3C0059B84A004AB53B0048B23C00C3E0C100E7F4E60072C365004FB859004BB5
+                3A004AB53C0054B6450078C56F00CFE8CE00E1F0DE00CAE7C500EEF7EF0099D0
+                900039AF3A00EEF7EE009ED4950056BC5C00F3F9F40000000000000000000684
+                8586000000000000000E7E7F80068138828300000000000076772947782C797A
+                097B7C7D000000696A386B6C6D6E6F70717273747500005E5F60610000006229
+                6364656667680055565700000000005859005A5B5C5D004E4F50000000000000
+                00005152535400464748494A0000000000004B294C4D003F4009414200000000
+                0000434445063637380A393A00000000003B3C3D3E002B2C2D2E2F3000000E31
+                323334350000000000222324250000262728292A0000000000001A1B1C00001D
+                1E1F202100000000000010111213141516171819000000000000060708090A0B
+                0C0D0E0F000000000000000001020304050000000000}
+              OnClick = OptionPythonEngineRecycleSpeedButtonClick
+              ExplicitLeft = 6
               ExplicitTop = 99
               ExplicitWidth = 184
             end
             object OptionPythonRawOutputCheckBox: TCheckBox
               AlignWithMargins = True
-              Left = 11
+              Left = 19
               Top = 85
-              Width = 184
+              Width = 168
               Height = 17
-              Margins.Left = 8
+              Margins.Left = 16
               Margins.Top = 8
-              Margins.Right = 8
+              Margins.Right = 16
               Align = alTop
               Caption = 'Raw output'
               TabOrder = 0
               OnClick = OptionPythonRawOutputCheckBoxClick
+              ExplicitLeft = 11
+              ExplicitWidth = 184
             end
             object OptionPythonVersionComboBox: TComboBox
               AlignWithMargins = True
-              Left = 11
+              Left = 19
               Top = 51
-              Width = 184
+              Width = 168
               Height = 23
-              Margins.Left = 8
-              Margins.Right = 8
+              Margins.Left = 16
+              Margins.Right = 16
               Align = alTop
               Style = csDropDownList
               TabOrder = 1
               OnChange = OptionPythonVersionComboBoxChange
+              ExplicitLeft = 11
+              ExplicitWidth = 184
             end
           end
         end
@@ -607,19 +653,12 @@ object TextEditorForm: TTextEditorForm
       ExplicitWidth = 1358
       inherited LogPageControl: TPageControl
         Width = 1362
-        ExplicitWidth = 1362
+        ExplicitWidth = 1358
         inherited OutputTabSheet: TTabSheet
           ExplicitWidth = 1354
           inherited OutputRichEdit: TRichEdit
             Width = 1352
-            ExplicitWidth = 1262
-          end
-        end
-        inherited LogTabSheet: TTabSheet
-          ExplicitWidth = 1354
-          inherited LogRichEdit: TRichEdit
-            Width = 1352
-            ExplicitLeft = 1
+            ExplicitWidth = 1348
           end
         end
         inherited SoapTabSheet: TTabSheet
@@ -648,7 +687,6 @@ object TextEditorForm: TTextEditorForm
           end
         end
         inherited OptionTabSheet: TTabSheet
-          ExplicitWidth = 1354
           inherited OptionOutputLineWidthMaxLabel: TLabel
             Left = 9
             ExplicitLeft = 9
@@ -657,6 +695,17 @@ object TextEditorForm: TTextEditorForm
             Left = 37
             ExplicitLeft = 37
           end
+        end
+      end
+      inherited LogToolBar: TToolBar
+        inherited ClearToolButton: TToolButton
+          ExplicitWidth = 43
+        end
+        inherited ClearAutoToolButton: TToolButton
+          ExplicitWidth = 42
+        end
+        inherited WrapToolButton: TToolButton
+          ExplicitWidth = 44
         end
       end
     end
@@ -677,8 +726,6 @@ object TextEditorForm: TTextEditorForm
       item
         Width = 50
       end>
-    ExplicitTop = 739
-    ExplicitWidth = 1358
   end
   object MainImageList24: TImageList
     ColorDepth = cd32Bit

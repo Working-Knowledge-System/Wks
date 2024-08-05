@@ -64,8 +64,10 @@ uses
   , VirtualTrees
   , DTClientTree
   , DTDBTreeView
+  , PythonEngine, PythonVersions, Vcl.PythonGUIInputOutput
   , Wks000Unit
   , WksLogFrameUnit
+  , WksPythonUnit
   ;
 {$ENDREGION}
 
@@ -255,6 +257,11 @@ type
     OptionPasswordOnMaximizeCheckBox: TCheckBox;
     OptionPersistRootFolderEdit: TEdit;
     OptionPersistRootFolderLabel: TLabel;
+    OptionPythonEnvInitSpeedButton: TSpeedButton;
+    OptionPythonJvScrollMaxBand: TJvScrollMaxBand;
+    OptionPythonRawOutputCheckBox: TCheckBox;
+    OptionPythonVersionComboBox: TComboBox;
+    OptionPythonVersionLabel: TLabel;
     OptionSecurityJvScrollMaxBand: TJvScrollMaxBand;
     OptionShowInTrayCheckBox: TCheckBox;
     OptionShowJvScrollMaxBand: TJvScrollMaxBand;
@@ -375,12 +382,18 @@ type
     TopReplaceWholeCheckBox: TCheckBox;
     TopSearchTabSheet: TTabSheet;
     TopTextTabSheet: TTabSheet;
+    TopUtilsTabSheet: TTabSheet;
     UserAvatarImage: TImage;
     UserPasswordLabel2: TLabel;
     UserPasswordLabel: TLabel;
     UserTabSheet: TTabSheet;
     UserUsernameLabel2: TLabel;
     UserUsernameLabel: TLabel;
+    UtilsActionList: TActionList;
+    UtilsImageList: TImageList;
+    UtilsPythonExecAction: TAction;
+    UtilsPythonExecToolButton: TToolButton;
+    UtilsToolBar: TToolBar;
     WeekLabel: TLabel;
     WeekdayLabel: TLabel;
     YearLabel: TLabel;
@@ -444,6 +457,9 @@ type
     procedure ObjectNoteDBSynEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure OptionFoldingLineShowCheckBoxClick(Sender: TObject);
     procedure OptionFontSizeJvSpinEditChange(Sender: TObject);
+    procedure OptionPythonEnvInitSpeedButtonClick(Sender: TObject);
+    procedure OptionPythonRawOutputCheckBoxClick(Sender: TObject);
+    procedure OptionPythonVersionComboBoxChange(Sender: TObject);
     procedure OptionTabWidthJvSpinEditChange(Sender: TObject);
     procedure OptionWeekWorkOneStartJvDateTimePickerChange(Sender: TObject);
     procedure ReplaceButtonedEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -463,13 +479,14 @@ type
     procedure TextFoldingActionExecute(Sender: TObject);
     procedure TextGutterActionExecute(Sender: TObject);
     procedure TextLineNumbersActionExecute(Sender: TObject);
+    procedure TextReplaceActionExecute(Sender: TObject);
     procedure TextSearchActionExecute(Sender: TObject);
     procedure TextSearchNextActionExecute(Sender: TObject);
     procedure TextSearchPrevActionExecute(Sender: TObject);
     procedure TextSpecialCharsActionExecute(Sender: TObject);
     procedure TextTabToSpacesActionExecute(Sender: TObject);
-    procedure TextUtilsLinePrefixWithActionExecute(Sender: TObject);
     procedure TextUtilsLineNumbersActionExecute(Sender: TObject);
+    procedure TextUtilsLinePrefixWithActionExecute(Sender: TObject);
     procedure TextUtilsSortAscActionExecute(Sender: TObject);
     procedure TextUtilsSortDescActionExecute(Sender: TObject);
     procedure TextUtilsStatsActionExecute(Sender: TObject);
@@ -480,27 +497,31 @@ type
     procedure TopReplaceButtonClick(Sender: TObject);
     procedure TopReplaceNextButtonClick(Sender: TObject);
     procedure TopReplaceSwapLabelClick(Sender: TObject);
+    procedure UtilsPythonExecActionExecute(Sender: TObject);
     procedure WeekLabelClick(Sender: TObject);
-    procedure TextReplaceActionExecute(Sender: TObject);
   private
     { Private declarations }
-    FObject            : string;          // objectname
-    FObjectKind        : string;          // Root, Zzz, Person, ...
-    FContentKind       : string;          // Text, Sql, Py, Markdown, ...
-    FIdIni             : integer;         // idlastsaved
-    FIdGui             : integer;         // idlastduringguitreeclick (after a refresh FId is resetted on cdsafterscroll... so we use FIdGui that is set on treenode click)
-    FFromOrganization  : string;          //
-    FFromMember        : string;          //
-    FInSearchAndReplace: boolean;         // searchspeedup
-  //FXxxFieldRecArr    : TXxxFieldRecArr; // xxx variable/specific fields/values asked during new object creation (but in descendent forms!)
+    FObject             : string;          // objectname
+    FObjectKind         : string;          // Root, Zzz, Person, ...
+    FContentKind        : string;          // Text, Sql, Py, Markdown, ...
+    FIdIni              : integer;         // idlastsaved
+    FIdGui              : integer;         // idlastduringguitreeclick (after a refresh FId is resetted on cdsafterscroll... so we use FIdGui that is set on treenode click)
+    FFromOrganization   : string;          //
+    FFromMember         : string;          //
+    FInSearchAndReplace : boolean;         // searchspeedup
+  //FXxxFieldRecArr     : TXxxFieldRecArr; // xxx variable/specific fields/values asked during new object creation (but in descendent forms!)
     // synedit
-    FSynEditCaretPos   : TBufferCoord;    // syneditposcache
-    FSynEditTopLinePos : integer;         // syneditposcache
-    FSynEditIsDragging : boolean;         // syneditselectiondrag
-    FSynEditDragStartPos: TPoint;         // syneditselectiondrag
+    FSynEditCaretPos    : TBufferCoord;    // syneditposcache
+    FSynEditTopLinePos  : integer;         // syneditposcache
+    FSynEditIsDragging  : boolean;         // syneditselectiondrag
+    FSynEditDragStartPos: TPoint;          // syneditselectiondrag
     // text
     FTextUtilsLineBeginWith: string;
+    // python
+    FPythonEngine        : TPythonEngine;         // local
+    FPythonGUIInputOutput: TPythonGUIInputOutput; // local
     // routine
+    procedure SynEditsSetup;
     function  CdsCloseAll(var IvFbk: string): boolean;
     function  CdsOpenAll(var IvFbk: string): boolean;
     function  SoapRefresh(var IvFbk: string): boolean;
@@ -517,7 +538,6 @@ type
     procedure ObjectContentPersistInfo(var IvDir, IvId, IvName, IvFile: string);
     procedure ObjectContentPersist(IvReadOnly: boolean = true);
     procedure ObjectContentPersistOpen;
-    procedure SynEditsSetup;
   public
     { Public declarations }
     FObj               : string;          // Xxx, Account, Code, Person...
@@ -905,12 +925,18 @@ end;
 
 {$REGION 'Form'}
 procedure TBaseMainForm.FormCreate(Sender: TObject);
+
+  {$REGION 'var'}
 var
   suc: boolean; // success
   str, fbk: string;
   coi: TCoiRec; // contentitem (contentkind)
 //dai: TCoiRec; // dataitem (datakind)
   sti: TStiRec; // stateitem
+  pvs: TPythonVersions;
+  pve: TPythonVersion;
+  {$ENDREGION}
+
 begin
 
   {$REGION '*** LOGIN SESSION GOBJS ***'}
@@ -1099,6 +1125,20 @@ begin
 
     {$REGION 'xxx (specific/variable)'}
     // continue in discendent clients
+    {$ENDREGION}
+
+    {$REGION 'python'}
+  pvs := GetRegisteredPythonVersions;
+  for pve in pvs do
+    OptionPythonVersionComboBox.Items.Add(pve.DisplayName);
+  if OptionPythonVersionComboBox.Items.Count = 0 then
+    LogFrame.LogOne('No Python version(s) has been detected', fmWarning)
+  else begin
+    OptionPythonVersionComboBox.ItemIndex := 0;
+    OptionPythonVersionComboBoxChange(Self);
+    LogFrame.LogOne('Python version(s) detected, see Options', fmSuccess);
+  end;
+  OptionPythonRawOutputCheckBox.Checked := false;
     {$ENDREGION}
 
   {$ENDREGION}
@@ -1668,7 +1708,7 @@ begin
 end;
   {$ENDREGION}
 
-  {$REGION 'Replace'}
+  {$REGION 'Search'}
 procedure TBaseMainForm.TopReplaceSwapLabelClick(Sender: TObject);
 var
   buf: string;
@@ -1734,7 +1774,42 @@ begin
   key := vkF;
   gsyn.KeyUp(ObjectContentDBSynEdit, TCodRec.CodeKindEnumFromInt(ObjectContentDBSynEdit.Tag), key, [ssCtrl]);
 end;
-{$ENDREGION}
+  {$ENDREGION}
+
+  {$REGION 'Utils'}
+procedure TBaseMainForm.UtilsPythonExecActionExecute(Sender: TObject);
+var
+  cod: string;
+  wat: TStopwatch;
+begin
+  // codetoexecute
+  cod := gsyn.Focused.SelText;
+
+  // noselection
+  if cod.IsEmpty then
+    LogFrame.LogOne('Please select some python code to execute...', fmWarning)
+
+  // exec
+  else begin
+    Screen.Cursor := crHourGlass;
+    try
+      try
+        MaskFPUExceptions(true);
+        wat.StartNew;
+        FPythonEngine.ExecString(cod);
+        wat.Stop;
+        LogFrame.LogOne('Python code executed in %d ms', [wat.Elapsed.Milliseconds], fmSuccess);
+      except
+        on e: EPyException do begin
+          LogFrame.LogOne(e.Message, fmWarning);
+        end;
+      end;
+    finally
+      Screen.Cursor := crDefault;
+    end;
+  end;
+end;
+  {$ENDREGION}
 
   {$REGION 'Time'}
 procedure TBaseMainForm.WeekLabelClick(Sender: TObject);
@@ -2325,28 +2400,8 @@ end;
   {$ENDREGION}
 
   {$REGION 'Option'}
-procedure TBaseMainForm.OptionFontSizeJvSpinEditChange(Sender: TObject);
-var
-  siz: integer;
-begin
-  siz := Trunc(OptionFontSizeJvSpinEdit.Value);
-  ObjectContentPrevDBSynEdit.Font.Size := siz;
-  ObjectContentDBSynEdit.Font.Size     := siz;
-  ObjectDataDBSynEdit.Font.Size        := siz;
-  ObjectNoteDBSynEdit.Font.Size        := siz;
-end;
 
-procedure TBaseMainForm.OptionTabWidthJvSpinEditChange(Sender: TObject);
-var
-  tab: integer;
-begin
-  tab := Trunc(OptionTabWidthJvSpinEdit.Value);
-  ObjectContentPrevDBSynEdit.TabWidth := tab;
-  ObjectContentDBSynEdit.TabWidth     := tab;
-  ObjectDataDBSynEdit.TabWidth        := tab;
-  ObjectNoteDBSynEdit.TabWidth        := tab;
-end;
-
+    {$REGION 'DateTime'}
 procedure TBaseMainForm.OptionWeekWorkOneStartJvDateTimePickerChange(Sender: TObject);
 var
   dat: TDateTime;
@@ -2366,11 +2421,72 @@ begin
   OptionWorkWeekTimeEdit.Tag  := Trunc(tim * 24);
   OptionWorkWeekTimeEdit.Hint := OptionWorkWeekTimeEdit.Tag.ToString;
 end;
+    {$ENDREGION}
 
+    {$REGION 'Interface'}
+procedure TBaseMainForm.OptionTabWidthJvSpinEditChange(Sender: TObject);
+var
+  tab: integer;
+begin
+  tab := Trunc(OptionTabWidthJvSpinEdit.Value);
+  ObjectContentPrevDBSynEdit.TabWidth := tab;
+  ObjectContentDBSynEdit.TabWidth     := tab;
+  ObjectDataDBSynEdit.TabWidth        := tab;
+  ObjectNoteDBSynEdit.TabWidth        := tab;
+end;
+
+procedure TBaseMainForm.OptionFontSizeJvSpinEditChange(Sender: TObject);
+var
+  siz: integer;
+begin
+  siz := Trunc(OptionFontSizeJvSpinEdit.Value);
+  ObjectContentPrevDBSynEdit.Font.Size := siz;
+  ObjectContentDBSynEdit.Font.Size     := siz;
+  ObjectDataDBSynEdit.Font.Size        := siz;
+  ObjectNoteDBSynEdit.Font.Size        := siz;
+end;
+    {$ENDREGION}
+
+    {$REGION 'Show'}
 procedure TBaseMainForm.OptionFoldingLineShowCheckBoxClick(Sender: TObject);
 begin
   SynEditsSetup;
 end;
+    {$ENDREGION}
+
+    {$REGION 'Python'}
+procedure TBaseMainForm.OptionPythonVersionComboBoxChange(Sender: TObject);
+begin
+  if OptionPythonVersionComboBox.Items.Count <= 0 then
+    Exit;
+
+  OptionPythonEnvInitSpeedButton.Click;
+end;
+
+procedure TBaseMainForm.OptionPythonEnvInitSpeedButtonClick(Sender: TObject);
+var
+  okk: boolean;
+  fbk: string;
+begin
+  okk := TPytRec.PythonComponentsInit(Self, FPythonEngine, FPythonGUIInputOutput, TCustomMemo(LogFrame.OutputRichEdit), OptionPythonVersionComboBox.ItemIndex, fbk);
+  LogFrame.Log(fbk, okk);
+  if okk then begin
+    OptionPythonEnvInitSpeedButton.Caption := 'Python environment Ok';
+    OptionPythonEnvInitSpeedButton.Font.Color := clGreen;
+    LogFrame.LogOne('Python environment inizialized', fmSuccess);
+  end else begin
+    OptionPythonEnvInitSpeedButton.Caption := 'Python environment not initialized';
+    OptionPythonEnvInitSpeedButton.Font.Color := clWebDarkOrange;
+    LogFrame.LogOne('Unable to inizialize python environment', fmWarning);
+  end;
+end;
+
+procedure TBaseMainForm.OptionPythonRawOutputCheckBoxClick(Sender: TObject);
+begin
+  FPythonGUIInputOutput.RawOutput := OptionPythonRawOutputCheckBox.Checked;
+end;
+    {$ENDREGION}
+
   {$ENDREGION}
 
 {$ENDREGION}

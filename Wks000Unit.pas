@@ -76,6 +76,7 @@ uses
   , Vcl.Imaging.PNGImage          // tpngimage
   , Vcl.Forms                     // application, screen, form
   , Vcl.ComCtrls                  // tpagecontrol
+//, Vcl.Controls                  // tcontrol, twincontrol, crhourglass
   , Vcl.DBGrids                   // grid
   , Data.DB                       // dataset
   , Data.Win.ADODB                // adodb
@@ -779,6 +780,7 @@ type
   {$ENDREGION}
 
   TCnvRec = record // canvas
+    class function  CnvTextWidth(IvString: string; IvFont: TFont): integer; static;
     class procedure CnvFontSet(IvCanvas: TCanvas; IvFontName: string; IvFontSize: integer = 8; IvFontColor: TColor = clBlack; IvFontStyleSet: TFontStyles = []); static;
     class procedure CnvBrushSet(IvCanvas: TCanvas; IvBrushColor: TColor; IvBrushStyle: TBrushStyle); static;
     class procedure CnvPenSet(IvCanvas: TCanvas; IvPenColor: TColor; IvPenStyle: TPenStyle; IvPenWidth: integer); static;
@@ -2518,57 +2520,57 @@ type
   const
     MKD_ITEM_VEC: array [0..38] of TMkdItemRec = (
     // unichars
-      (Itm: 'Spaces'            ; Exa: ' ___ '                         ; Rex: '( [_]{1,10} )'                     ; Reo: [roMultiLine] ; New: '&nbsp;&nbsp;&nbsp;'                            )
-    , (Itm: 'Linebreaks'        ; Exa: ' '                             ; Rex: '^([ ]{1,6})$'                      ; Reo: [roMultiLine] ; New: '<br>'                                          )
-    , (Itm: 'Horizontal rule'   ; Exa: '*** or ---'                    ; Rex: '^([*-]{3})$' {3,10}                ; Reo: [roMultiLine] ; New: '<hr style="width:x%">'                         )
+      (Itm: 'Spaces'            ; Exa: ' ___ '                         ; Rex: '( [_]{1,10} )'                          ; Reo: [roMultiLine] ; New: '&nbsp;&nbsp;&nbsp;'                            )
+    , (Itm: 'Linebreaks'        ; Exa: ' '                             ; Rex: '^([ ]{1,6})$'                           ; Reo: [roMultiLine] ; New: '<br>'                                          )
+    , (Itm: 'Horizontal rule'   ; Exa: '*** or ---'                    ; Rex: '^([*-]{3})$' {3,10}                     ; Reo: [roMultiLine] ; New: '<hr style="width:x%">'                         )
     // headed
-    , (Itm: 'Header 1'          ; Exa: '# Header 1'                    ; Rex: '^[ \t]*(#{1}\s)(.*)$'              ; Reo: [roMultiLine] ; New: '<h1>%s</h1>'                                   )
-    , (Itm: 'Header 2'          ; Exa: '## Header 2'                   ; Rex: '^[ \t]*(#{2}\s)(.*)$'              ; Reo: [roMultiLine] ; New: '<h2>%s</h2>'                                   )
-    , (Itm: 'Header 3'          ; Exa: '### Header 3'                  ; Rex: '^[ \t]*(#{3}\s)(.*)$'              ; Reo: [roMultiLine] ; New: '<h3>%s</h3>'                                   )
-    , (Itm: 'Header 4'          ; Exa: '#### Header 4'                 ; Rex: '^[ \t]*(#{4}\s)(.*)$'              ; Reo: [roMultiLine] ; New: '<h4>%s</h4>'                                   )
-    , (Itm: 'Header 5'          ; Exa: '##### Header 5'                ; Rex: '^[ \t]*(#{5}\s)(.*)$'              ; Reo: [roMultiLine] ; New: '<h5>%s</h5>'                                   )
-    , (Itm: 'Header 6'          ; Exa: '###### Header 6'               ; Rex: '^[ \t]*(#{6}\s)(.*)$'              ; Reo: [roMultiLine] ; New: '<h6>%s</h6>'                                   )
+    , (Itm: 'Header 1'          ; Exa: '# Header 1'                    ; Rex: '^[ \t]*(#{1}\s)(.*)$'                   ; Reo: [roMultiLine] ; New: '<h1>%s</h1>'                                   )
+    , (Itm: 'Header 2'          ; Exa: '## Header 2'                   ; Rex: '^[ \t]*(#{2}\s)(.*)$'                   ; Reo: [roMultiLine] ; New: '<h2>%s</h2>'                                   )
+    , (Itm: 'Header 3'          ; Exa: '### Header 3'                  ; Rex: '^[ \t]*(#{3}\s)(.*)$'                   ; Reo: [roMultiLine] ; New: '<h3>%s</h3>'                                   )
+    , (Itm: 'Header 4'          ; Exa: '#### Header 4'                 ; Rex: '^[ \t]*(#{4}\s)(.*)$'                   ; Reo: [roMultiLine] ; New: '<h4>%s</h4>'                                   )
+    , (Itm: 'Header 5'          ; Exa: '##### Header 5'                ; Rex: '^[ \t]*(#{5}\s)(.*)$'                   ; Reo: [roMultiLine] ; New: '<h5>%s</h5>'                                   )
+    , (Itm: 'Header 6'          ; Exa: '###### Header 6'               ; Rex: '^[ \t]*(#{6}\s)(.*)$'                   ; Reo: [roMultiLine] ; New: '<h6>%s</h6>'                                   )
     // shelled1
-    , (Itm: 'Superscript'       ; Exa: '^text superscript^'            ; Rex: '(\^{1})(.*?)(\^{1})'               ; Reo: [roMultiLine] ; New: '<sup>%s</sup>'                                 )
-    , (Itm: 'Subscript'         ; Exa: '~text subscript~'              ; Rex: '(\~{1})(\w+?)(\~{1})'              ; Reo: [roMultiLine] ; New: '<sub>%s</sub>'                                 )
+    , (Itm: 'Superscript'       ; Exa: '^text superscript^'            ; Rex: '(\^{1})(.*?)(\^{1})'                    ; Reo: [roMultiLine] ; New: '<sup>%s</sup>'                                 )
+    , (Itm: 'Subscript'         ; Exa: '~text subscript~'              ; Rex: '(\~{1})(\w+?)(\~{1})'                   ; Reo: [roMultiLine] ; New: '<sub>%s</sub>'                                 )
     // shelled2
-    , (Itm: 'Text bold'         ; Exa: '**text bold**'                 ; Rex: '(\*{2})(.*?)(\*{2})'               ; Reo: [roMultiLine] ; New: '<b>%s</b>'                                     )
-    , (Itm: 'Text italic'       ; Exa: '//text italic//'               ; Rex: '(\/{2})(.*?)(\/{2})'               ; Reo: [roMultiLine] ; New: '<i>%s</i>'                                     )
-    , (Itm: 'Text underline'    ; Exa: '__text underline__'            ; Rex: '(\_{2})(.*?)(\_{2})'               ; Reo: [roMultiLine] ; New: '<u>%s</u>'                                     )
-    , (Itm: 'Text strikethrough'; Exa: '~~text strikethrough~~'        ; Rex: '(\~{2})(.*?)(\~{2})'               ; Reo: [roMultiLine] ; New: '<s>%s</s>'                                     )
-    , (Itm: 'Text added'        ; Exa: '++text added++'                ; Rex: '(\+{2})(.*?)(\+{2})'               ; Reo: [roMultiLine] ; New: '<ins>%s</ins>'                                 )
-    , (Itm: 'Text removed'      ; Exa: '--text removed--'              ; Rex: '(\-{2})((\S)*([ \t]*\S+)+?)(\-{2})'; Reo: [roMultiLine] ; New: '<del>%s</del>'                                 )
-    , (Itm: 'Text info'         ; Exa: '==text info=='                 ; Rex: '(\={2})(.*?)(\={2})'               ; Reo: [roMultiLine] ; New: '<kbd>%s</kbd>'                                 )
-    , (Itm: 'Text warning'      ; Exa: '%%text warning%%'              ; Rex: '(\%{2})(.*?)(\%{2})'               ; Reo: [roMultiLine] ; New: '<em>%s</em>'                                   )
-    , (Itm: 'Text highlight'    ; Exa: '!!text highlight!!'            ; Rex: '(\!{2})(.*?)(\!{2})'               ; Reo: [roMultiLine] ; New: '<mark>%s</mark>'                               )
-    , (Itm: 'Inline quote'      ; Exa: '""inline quote""'              ; Rex: '(\"{2})(.*?)(\"{2})'               ; Reo: [roMultiLine] ; New: '<q>%s</q>'                                     )
-    , (Itm: 'Inline code'       ; Exa: '``inline code``'               ; Rex: '(\`{2})(.*?)(\`{2})'               ; Reo: [roMultiLine] ; New: '<code>%s</code>'                               )
-    , (Itm: 'Citation'          ; Exa: ',,citation,, by Igi'           ; Rex: '(\,{2})(.*?)(\,{2})'               ; Reo: [roMultiLine] ; New: '<cite>%s</cite>'                               )
-    , (Itm: 'Abbreviation'      ; Exa: '..abbreviation..'              ; Rex: '(\.{2})(\w*?)(\.{2})'              ; Reo: [roMultiLine] ; New: '<abbr>%s</abbr>'                               )
-    , (Itm: 'Abbr with descr'   ; Exa: '..abbr:description..'          ; Rex: '(\.{2})(\w*?) : ([ \w]*?)(\.{2})'  ; Reo: [roMultiLine] ; New: '<abbr title="%s">%s</abbr>'                    ) // <acronym>
-    , (Itm: 'Font Awesome'      ; Exa: '::home:: ::arrow-top::'        ; Rex: '(\:{2})(\w*?[-\w]*?)(\:{2})'       ; Reo: [roMultiLine] ; New: '<i class="fa fa-%s"></i>'                      )
-    , (Itm: 'Progress bar'      ; Exa: '##60%##'                       ; Rex: '(\#{2})(\d{1,3})%(\#{2})'          ; Reo: [roMultiLine] ; New: '<progress value="%s" max="100">%s%%</progress>') // 0..100
-    , (Itm: 'Meter bar'         ; Exa: '##60##'                        ; Rex: '(\#{2})(\d+)(\#{2})'               ; Reo: [roMultiLine] ; New: '<meter value="%f">%s%%</meter>'                ) // value
-  //, (Itm: 'Meter bar 2'       ; Exa: '##0,60,100##'                  ; Rex: '(\#{2})(\d+,\d+,\d+)(\#{2})'       ; Reo: [roMultiLine] ; New: '<meter value="%f">%s%%</meter>'                ) // min,low,optimun,high,max , value
+    , (Itm: 'Text bold'         ; Exa: '**text bold**'                 ; Rex: '(\*{2})(.*?)(\*{2})'                    ; Reo: [roMultiLine] ; New: '<b>%s</b>'                                     )
+    , (Itm: 'Text italic'       ; Exa: '//text italic//'               ; Rex: '(\/{2})(.*?)(\/{2})'                    ; Reo: [roMultiLine] ; New: '<i>%s</i>'                                     )
+    , (Itm: 'Text underline'    ; Exa: '__text underline__'            ; Rex: '(\_{2})(.*?)(\_{2})'                    ; Reo: [roMultiLine] ; New: '<u>%s</u>'                                     )
+    , (Itm: 'Text strikethrough'; Exa: '~~text strikethrough~~'        ; Rex: '(\~{2})(.*?)(\~{2})'                    ; Reo: [roMultiLine] ; New: '<s>%s</s>'                                     )
+    , (Itm: 'Text added'        ; Exa: '++text added++'                ; Rex: '(\+{2})(.*?)(\+{2})'                    ; Reo: [roMultiLine] ; New: '<ins>%s</ins>'                                 )
+    , (Itm: 'Text removed'      ; Exa: '--text removed--'              ; Rex: '(\-{2})((\S)*([ \t]*\S+)+?)(\-{2})'     ; Reo: [roMultiLine] ; New: '<del>%s</del>'                                 )
+    , (Itm: 'Text info'         ; Exa: '==text info=='                 ; Rex: '(\={2})(.*?)(\={2})'                    ; Reo: [roMultiLine] ; New: '<kbd>%s</kbd>'                                 )
+    , (Itm: 'Text warning'      ; Exa: '%%text warning%%'              ; Rex: '(\%{2})(.*?)(\%{2})'                    ; Reo: [roMultiLine] ; New: '<em>%s</em>'                                   )
+    , (Itm: 'Text highlight'    ; Exa: '!!text highlight!!'            ; Rex: '(\!{2})(.*?)(\!{2})'                    ; Reo: [roMultiLine] ; New: '<mark>%s</mark>'                               )
+    , (Itm: 'Inline quote'      ; Exa: '""inline quote""'              ; Rex: '(\"{2})(.*?)(\"{2})'                    ; Reo: [roMultiLine] ; New: '<q>%s</q>'                                     )
+    , (Itm: 'Inline code'       ; Exa: '``inline code``'               ; Rex: '(\`{2})(.*?)(\`{2})'                    ; Reo: [roMultiLine] ; New: '<code>%s</code>'                               )
+    , (Itm: 'Citation'          ; Exa: ',,citation,, by Igi'           ; Rex: '(\,{2})(.*?)(\,{2})'                    ; Reo: [roMultiLine] ; New: '<cite>%s</cite>'                               )
+    , (Itm: 'Abbreviation'      ; Exa: '..abbreviation..'              ; Rex: '(\.{2})(\w*?)(\.{2})'                   ; Reo: [roMultiLine] ; New: '<abbr>%s</abbr>'                               )
+    , (Itm: 'Abbr with descr'   ; Exa: '..abbr:description..'          ; Rex: '(\.{2})(\w*?) : ([ \w]*?)(\.{2})'       ; Reo: [roMultiLine] ; New: '<abbr title="%s">%s</abbr>'                    ) // <acronym>
+    , (Itm: 'Font Awesome'      ; Exa: '::home:: ::arrow-top::'        ; Rex: '(\:{2})(\w*?[-\w]*?)(\:{2})'            ; Reo: [roMultiLine] ; New: '<i class="fa fa-%s"></i>'                      )
+    , (Itm: 'Progress bar'      ; Exa: '##60%##'                       ; Rex: '(\#{2})(\d{1,3})%(\#{2})'               ; Reo: [roMultiLine] ; New: '<progress value="%s" max="100">%s%%</progress>') // 0..100
+    , (Itm: 'Meter bar'         ; Exa: '##60##'                        ; Rex: '(\#{2})(\d+)(\#{2})'                    ; Reo: [roMultiLine] ; New: '<meter value="%f">%s%%</meter>'                ) // value
+  //, (Itm: 'Meter bar 2'       ; Exa: '##0,60,100##'                  ; Rex: '(\#{2})(\d+,\d+,\d+)(\#{2})'            ; Reo: [roMultiLine] ; New: '<meter value="%f">%s%%</meter>'                ) // min,low,optimun,high,max , value
     // mixed
-    , (Itm: 'Center'            ; Exa: '>>centered<<'                  ; Rex: '^[ \t]*>>(.*)<<[ \t]*$'            ; Reo: [roMultiLine] ; New: '<center>%s</center>'                           )
-    , (Itm: 'Left'              ; Exa: '<<left aligned<<'              ; Rex: '^[ \t]*<<(.*)<<[ \t]*$'            ; Reo: [roMultiLine] ; New: '<div class="w3-left-align">%s</div>'           )
-    , (Itm: 'Right'             ; Exa: '>>right aligned>>'             ; Rex: '^[ \t]*>>(.*)>>[ \t]*$'            ; Reo: [roMultiLine] ; New: '<div class="w3-right-align">%s</div>'          )
+    , (Itm: 'Center'            ; Exa: '>>centered<<'                  ; Rex: '^[ \t]*>>(.*)<<[ \t]*$'                 ; Reo: [roMultiLine] ; New: '<center>%s</center>'                           )
+    , (Itm: 'Left'              ; Exa: '<<left aligned<<'              ; Rex: '^[ \t]*<<(.*)<<[ \t]*$'                 ; Reo: [roMultiLine] ; New: '<div class="w3-left-align">%s</div>'           )
+    , (Itm: 'Right'             ; Exa: '>>right aligned>>'             ; Rex: '^[ \t]*>>(.*)>>[ \t]*$'                 ; Reo: [roMultiLine] ; New: '<div class="w3-right-align">%s</div>'          )
     // zoned
-    , (Itm: 'Block quote'       ; Exa: '>\n> blockquote\n>'            ; Rex: '((?:^(?:>|<br>>) ?.*?$\n)+)'       ; Reo: [roMultiLine, roSingleLine]; New: '<blockquote>%s</blockquote>'      )
-    , (Itm: 'List (unordered)'  ; Exa: '- item\n- item>'               ; Rex: '((?:^(?:[ \t]*[-\*•]) +.*?$\n)+)'  ; Reo: [roMultiLine, roSingleLine]; New: '<ul>%s</ul>'                      )
+    , (Itm: 'Block quote'       ; Exa: '>\n> blockquote\n>\n>'         ; Rex: '((?:^(?:>|<br>>) ?.*?$\n)+)'            ; Reo: [roMultiLine, roSingleLine]; New: '<br><blockquote>%s</blockquote>'  )
+    , (Itm: 'List (unordered)'  ; Exa: '- item\n- item>'               ; Rex: '((?:^(?:[ \t]*[-\*•]) +.*?$\n)+)'       ; Reo: [roMultiLine, roSingleLine]; New: '<ul>%s</ul>'                      )
     // notable
-    , (Itm: 'Url'               ; Exa: 'http://www.abc.com'            ; Rex: '\s((https:|http:|www\.)\S*)\s'     ; Reo: [roMultiLine] ; New: '<a href="%s">%s</a>'                           ) // reintroduceitself
-    , (Itm: 'Email'             ; Exa: 'abc@example.com'               ; Rex: '\s[\w-\.]+@([\w-]+\.)+[\w-]{2,4}\s'; Reo: [roMultiLine] ; New: '<a href="mailto:%s">%s</a>'                    ) // reintroduceitself
+    , (Itm: 'Url'               ; Exa: 'http://www.abc.com'            ; Rex: '(^| )((http:|https:)\S+)( |$)' {|www\.} ; Reo: [roMultiLine] ; New: '%s<a href="%s" target="_blank">%s</a>%s'       ) // warning: canreintroduceitself
+    , (Itm: 'Email'             ; Exa: 'abc@example.com'               ; Rex: '(^| )([-\w\.]+@[-\w]+\.[-\w]{2,4})( |$)'; Reo: [roMultiLine] ; New: '%s<a href="mailto:%s">%s</a>%s'                ) // warning: canreintroduceitself
     // special
-    , (Itm: 'Link (classic)'    ; Exa: '[Go](www.go.it "Title")'       ; Rex: '(\[.*\])(\(.*\))'                  ; Reo: [roMultiLine] ; New: '<a href="%s" title="%s">%s</a>'                )
-  //, (Itm: 'Link'              ; Exa: '(www.go.it|Go|Title|*)'        ; Rex: '\(([^)]+?\|)+(.+?)\)'              ; Reo: [roMultiLine] ; New: '<a href="%s" title="%s" target="%s">%s</a>'    )
-    , (Itm: 'Link'              ; Exa: '(www.go.it|Go|Title|*)'        ; Rex: '\((http|www|\/)(.+?)\)'            ; Reo: [roMultiLine] ; New: '<a href="%s" title="%s" target="%s">%s</a>'    )
-    , (Itm: 'Image (classic)'   ; Exa: '![Img](www.go.it/x.png)'       ; Rex: '!(\[.*\])(\(.*\))'                 ; Reo: [roMultiLine] ; New: '<img src="%s" alt="%s">'                       )
-  //, (Itm: 'Image'             ; Exa: '[/img/a.png|alt|w|h|card|torn]'; Rex: '\[(.+?\|)+(.+?)\]'                 ; Reo: [roMultiLine] ; New: '<img src="%s" alt="%s">'                       )
-    , (Itm: 'Image'             ; Exa: '[/img/a.png|alt|w|h|card|torn]'; Rex: '\[(http|www|\/)(.+?)\]'            ; Reo: [roMultiLine] ; New: '<img src="%s" alt="%s">'                       )
+    , (Itm: 'Link (classic)'    ; Exa: '[Go](www.go.it "Title")'       ; Rex: '(\[.*\])(\(.*\))'                       ; Reo: [roMultiLine] ; New: '<a href="%s" title="%s">%s</a>'                )
+  //, (Itm: 'Link'              ; Exa: '(www.go.it|Go|Title|*)'        ; Rex: '\(([^)]+?\|)+(.+?)\)'                   ; Reo: [roMultiLine] ; New: '<a href="%s" title="%s" target="%s">%s</a>'    )
+    , (Itm: 'Link'              ; Exa: '(www.go.it|Go|Title|*)'        ; Rex: '\((http|www|\/)(.+?)\)'                 ; Reo: [roMultiLine] ; New: '<a href="%s" title="%s" target="%s">%s</a>'    )
+    , (Itm: 'Image (classic)'   ; Exa: '![Img](www.go.it/x.png)'       ; Rex: '!(\[.*\])(\(.*\))'                      ; Reo: [roMultiLine] ; New: '<img src="%s" alt="%s">'                       )
+  //, (Itm: 'Image'             ; Exa: '[/img/a.png|alt|w|h|card|torn]'; Rex: '\[(.+?\|)+(.+?)\]'                      ; Reo: [roMultiLine] ; New: '<img src="%s" alt="%s">'                       )
+    , (Itm: 'Image'             ; Exa: '[/img/a.png|alt|w|h|card|torn]'; Rex: '\[(http|www|\/)(.+?)\]'                 ; Reo: [roMultiLine] ; New: '<img src="%s" alt="%s">'                       )
     // fenced
-  //, (Itm: 'Code block (fence)'; Exa: '```\n code block \n```' ;Rex: '^```[ \t]*(\w*)\r\n([\s\S]*?)```$'  ;Reo: [roMultiLine] ; New: '<pre><code class="%s">%s</code></pre>'                 )
+  //, (Itm: 'Code block (fence)'; Exa: '```\n code block \n```'        ;Rex: '^```[ \t]*(\w*)\r\n([\s\S]*?)```$'       ;Reo: [roMultiLine] ; New: '<pre><code class="%s">%s</code></pre>'          )
     );
   public
     class function  Process(IvContent: string): string; static;
@@ -3169,6 +3171,7 @@ type
     Text: string;
     procedure Clr;                                                                                                               // clear all
     procedure Anl(IvNl: integer = 1);                                                                                            // add newline
+    procedure Anp(IvStr   : string; IvIfTrue: boolean = true);                                                                   // no prefix
     procedure Add(IvStr   : string; IvIfTrue: boolean = true; IvNlPrefix: integer = 1); overload;                                // add at the bottom of current text with a newline before with optional one after
     procedure Add(IvFormat: string; IvVarRecVec: array of TVarRec; IvIfTrue: boolean = true; IvNlPrefix: integer = 1); overload; // format version
     procedure Aif(IvStrT, IvStrF: string; IvTest: boolean; IvIfTrue: boolean = true; IvNlPrefix: integer = 1); overload;         // add strt if test is true else add strf
@@ -3432,6 +3435,11 @@ type
   );
   {$ENDREGION}
 
+  TTblRec = record // htmtable
+  public
+    class function TblEditJsonStr(IvTable: string; IvKeyFieldVec: TArray<string>; IvEditFieldVec: TArray<string>): string; static;
+  end;
+
   TTheRec = record // theme [B]
   const
     // theme
@@ -3644,11 +3652,12 @@ type
     class function  VecNx(IvStringVec: array of string): boolean; static;                                                             // is not exists  = empty
     class function  VecEx(IvStringVec: array of string): boolean; static;                                                             // is existent    = not empty
     class function  VecHas(const IvString: string; IvStringVector: TStringVector; IvCaseSensitive: boolean = false): boolean; static; //
-    class function  VecFromStr(IvStr: string; IvDelimChars: string = ','; IvTrim: boolean = true): TArray<string>; static;            // This, is,A  ,Test        --> ['This', 'Is', 'A', 'Test']
-    class function  VecFromStrCamel(IvStr: string; IvCase: TCaseEnum = cAsIs): TArray<string>; static;                                // ThisIsATest              --> ['This', 'Is', 'A', 'Test']
-    class function  VecToList(IvStrVec: TArray<string>; IvDelimiter: string = ','): string; static;                                   // ['Aaa', 'Bbb', ...]      --> Aaa,Bbb,...
-    class function  VecCollapse(IvStrVec: TArray<string>): string; static;                                                            // ['Aaa', 'Bbb', ...]      --> AaaBbb...
-    class procedure VecRemoveWith(var IvStrVec: TArray<string>; IvStr: string); static;                                               // ['Aaa', '', ' ', 'Ccc']  --> ['Aaa', 'Ccc']
+    class function  VecFromStr(IvStr: string; IvDelimChars: string = ','; IvTrim: boolean = true): TArray<string>; static;            // This, is,A  ,Test                     --> ['This', 'Is', 'A', 'Test']
+    class function  VecFromStrCamel(IvStr: string; IvCase: TCaseEnum = cAsIs): TArray<string>; static;                                // ThisIsATest                           --> ['This', 'Is', 'A', 'Test']
+    class function  VecToList(IvStrVec: TArray<string>; IvDelimiter: string = ','; IvQuoted: boolean = false): string; static;        // ['Aaa', 'Bbb', ...]                   --> Aaa,Bbb,...
+    class function  VecToListFmt(IvStrVec: TArray<string>; IvDelimiter: string = ','; IvItemFmt: string = '%s'): string; static;      // ['Aaa', 'Bbb', ...],  '{"fld": "%s"}' --> {"fld": "Aaa"}, {"fld": "Bbb"}, ...
+    class function  VecCollapse(IvStrVec: TArray<string>): string; static;                                                            // ['Aaa', 'Bbb', ...]                   --> AaaBbb...
+    class procedure VecRemoveWith(var IvStrVec: TArray<string>; IvStr: string); static;                                               // ['Aaa', '', ' ', 'Ccc']               --> ['Aaa', 'Ccc']
   end;
 
   TVntRec = record
@@ -5669,6 +5678,19 @@ end;
   {$ENDREGION}
 
   {$REGION 'TCnvRec'}
+class function TCnvRec.CnvTextWidth(IvString: string; IvFont: TFont): integer;
+var
+  bmp: TBitmap;
+begin
+  bmp := TBitmap.Create;
+  try
+    bmp.Canvas.Font.Assign(IvFont);
+    Result := bmp.Canvas.TextWidth(IvString {+ 'W'});
+  finally
+    bmp.Free;
+  end;
+end;
+
 class procedure TCnvRec.CnvFontSet(IvCanvas: TCanvas; IvFontName: string; IvFontSize: integer; IvFontColor: TColor; IvFontStyleSet: TFontStyles);
 begin
   with IvCanvas do begin
@@ -9104,8 +9126,8 @@ class function  THtmRec.A(IvHref, IvCaption, IvTitle, IvTarget, IvClass, IvStyle
 var
   cap, tgt: string;
 begin
-  if not IvCaption.IsEmpty then cap := IvCaption else cap := 'Link';
-  if not IvTarget.IsEmpty  then tgt := 'target="_blank"'; // =samewindow, _blank=newwindow, _parent=parentframe, _top=fullbodywindow
+  if not IvCaption.IsEmpty then cap := IvCaption else cap := IvHref; // 'Link';
+  if IvTarget.IsEmpty      then tgt := 'target="_blank"';            // =samewindow, _blank=newwindow, _parent=parentframe, _top=fullbodywindow
 
   Result := Format('<a href="%s" class="%s" style="%s" title="%s" %s>%s</a>', [IvHref, IvClass, IvStyle, IvTitle, tgt, cap]);
 end;
@@ -9662,11 +9684,18 @@ if IvEditable then begin
   jso := TJSONObject.Create;
   try
     try
+      // i
       jso.Parse(BytesOf(IvEditJson), 0);
       tbl := jso.GetValue<string>('EditData.EditTable');
       fkv := jso.GetValue<TJSONArray>('EditData.EditKeyFieldList');
+
+      // ii
+      //jva := jso.ParseJSONValue(IvEditJson);
+      //tbl := jva.GetValue<string>('EditData.EditTable');
+      //fkv := jva.GetValue<TJSONArray>('EditData.EditKeyFieldList');
+
       for jva in fkv do begin
-        fke := jva.GetValue<string>;
+        fke := jva.GetValue<string>; // *** justone? ***
       end;
     except
       on e: Exception do begin
@@ -12905,32 +12934,33 @@ var
 
   function  MatchProcess(IvMkdItem: TMkdItemRec; IvMatch: TMatch): string;
   var
-    mva, tmp: string;    // matchval
-    grp: TGroup;         // rexgroup
-    grv: TArray<TGroup>; // rexgroupvec
-    arv: TArray<string>; // argsvec
-    grz: integer;        // grvlen
-    va0: string;         // mathc0
-    isc: boolean;        // iscard
-    tor: TImgTormEnum;   // imagetorn
+    mva, val, tmp: string; // matchval
+    grp: TGroup;           // rexgroup
+  //grv: TArray<TGroup>; // rexgroupvec
+    gvv: TArray<string>;   // rexgroupvaluevec
+    arv: TArray<string>;   // argsvec
+    grz: integer;          // gvvlen
+    isc: boolean;          // iscard
+    tor: TImgTormEnum;     // imagetorn
   begin
     mva := IvMatch.Value.Trim;
 
-    for grp in IvMatch.Groups do
-      TArray.Add<TGroup>(grv, grp);
-    grz := Length(grv);
+    for grp in IvMatch.Groups do begin
+    //TArray.Add<TGroup>(grv, grp);
+      TArray.Add<string>(gvv, grp.Value);
+    end;
+    grz := Length(gvv);
 
     if IvMkdItem.Itm = 'List (unordered)' then begin
 
       {$REGION 'groups of similar matches (like many blocks of unordered lines)'}
-    for grp in grv do begin
-      va0 := grp.Value;
-               if va0.StartsWith('* ') then begin                                                // list-dot
-        tmp := ListProcess(va0);
+    for val in gvv do begin
+               if val.StartsWith('* ') then begin                                             // list-dot
+        tmp := ListProcess(val);
         Result := Format('<ul style="margin:0px;">%s</ul>', [tmp]);
 
-      end else if va0.StartsWith('- ') then begin                                                // list-dash
-        tmp := ListProcess(va0);
+      end else if val.StartsWith('- ') then begin                                             // list-dash
+        tmp := ListProcess(val);
         Result := Format('<ul style="margin:0px; list-style-type: ''&ndash; '';">%s</ul>', [tmp]);
       end;
     end;
@@ -12939,71 +12969,69 @@ var
     end else begin
 
       {$REGION 'groups of one match'}
-      va0 := grv[0].Value;
-
-      if      TStrRec.StrIsChars(va0, ' ', chz) {and SameText(IvMkdItem.Itm, 'Linebreaks')} then // Linebreaks        -->   n<br>
+      if      TStrRec.StrIsChars(gvv[0], ' ', chz) {and SameText(IvMkdItem.Itm, 'Linebreaks')} then // Linebreaks        -->   n<br>
         Result := THtmRec.Br(chz)
 
-      else if SameText(IvMkdItem.Itm, 'Spaces') then                                             // spaces            -->   &nbsp;
-        Result := {itm.New}TStrRec.StrReplicate('&nbsp;', Length(grv[1].Value))
+      else if SameText(IvMkdItem.Itm, 'Spaces') then                                                // spaces            -->   &nbsp;
+        Result := {itm.New}TStrRec.StrReplicate('&nbsp;', Length(gvv[1]))
 
-      else if SameText(IvMkdItem.Itm, 'Horizontal rule') then                                    // asteriscks/dashes -->   <hr>
+      else if SameText(IvMkdItem.Itm, 'Horizontal rule') then                                       // asteriscks/dashes -->   <hr>
         Result := THtmRec.Hr
 
-      else if IvMkdItem.Itm.StartsWith('Header') then                                            // headers           -->   <h1>...</h1>
-        Result := Format(itm.New, [grv[2].Value.TrimRight])
+      else if IvMkdItem.Itm.StartsWith('Header') then                                               // headers           -->   <h1>...</h1>
+        Result := Format(itm.New, [gvv[2].TrimRight])
 
-      else if SameText(IvMkdItem.Itm, 'Center') then                                             // center            -->   <center>...</center>
-        Result := Format(itm.New, [grv[1].Value])
+      else if SameText(IvMkdItem.Itm, 'Center') then                                                // center            -->   <center>...</center>
+        Result := Format(itm.New, [gvv[1]])
 
-      else if SameText(IvMkdItem.Itm, 'Left') then                                               // left              -->   <div>...</div>
-        Result := Format(itm.New, [grv[1].Value])
+      else if SameText(IvMkdItem.Itm, 'Left') then                                                  // left              -->   <div>...</div>
+        Result := Format(itm.New, [gvv[1]])
 
-      else if SameText(IvMkdItem.Itm, 'Right') then                                              // right             -->   <div>...</div>
-        Result := Format(itm.New, [grv[1].Value])
+      else if SameText(IvMkdItem.Itm, 'Right') then                                                 // right             -->   <div>...</div>
+        Result := Format(itm.New, [gvv[1]])
 
-      else if SameText(IvMkdItem.Itm, 'Url') then                                                // url               -->   <a>...</a>
-        Result := Format(itm.New, [grv[1].Value, grv[1].Value])
+      else if SameText(IvMkdItem.Itm, 'Url') then                                                   // url               -->   <a>...</a>
+        Result := Format(itm.New, [gvv[1], gvv[2], gvv[2], gvv[4]])
 
-      else if SameText(IvMkdItem.Itm, 'Email') then                                              // email             -->   <a href="mailto:...">...</a>
-        Result := Format(itm.New, [va0.Trim, va0.Trim])
+      else if SameText(IvMkdItem.Itm, 'Email') then                                                 // email             -->   <a href="mailto:...">...</a>
+        Result := Format(itm.New, [gvv[1], gvv[2], gvv[2], gvv[3]])
 
-      else if va0.StartsWith('>') or va0.StartsWith('<br>>') then begin                          // blockquote        -->   <blockquote>...</blockquote>
-        tmp := BlockquoteProcess(va0);
+      else if gvv[0].StartsWith('>') or gvv[0].StartsWith('<br>>') then begin                       // blockquote        -->   <blockquote>...</blockquote>
+        tmp := BlockquoteProcess(gvv[0]);
         tmp := Process(tmp);
         tmp := StringReplace(tmp, sLineBreak, '<br>', [rfReplaceAll]);
         Result := Format(itm.New, [tmp]);
 
-      end else if TStrRec.StrIsShelledWith(va0, '..') and (grz = 5) then begin                   // abbrwithdescr     -->   <abbr title="...">...</abbr>
-        Result := Format(itm.New, [grv[3].Value, grv[2].Value]);
+      end else if TStrRec.StrIsShelledWith(gvv[0], '..') and (grz = 5) then begin                   // abbrwithdescr     -->   <abbr title="...">...</abbr>
+        Result := Format(itm.New, [gvv[3], gvv[2]]);
 
-      end else if TStrRec.StrShellThick(va0) = 1 then begin                                      // shelled 1         -->   <sup>...</sup> <sub>...</sub>
-        Result := Format(itm.New, [grv[2].Value])
+      end else if TStrRec.StrShellThick(gvv[0]) = 1 then begin                                      // shelled 1         -->   <sup>...</sup> <sub>...</sub>
+        Result := Format(itm.New, [gvv[2]])
 
-      end else if TStrRec.StrShellThick(va0) = 2 then begin                                      // shelled 2         -->   <b>...</b>, <kbd>...</kbd>, <abbr>...</abbr>, <i class="fa fa-%s"></i>
+      end else if TStrRec.StrShellThick(gvv[0]) = 2 then begin                                      // shelled 2         -->   <b>...</b>, <kbd>...</kbd>, <abbr>...</abbr>, <i class="fa fa-%s"></i>
         if SameText(IvMkdItem.Itm, 'Progress bar') then
-          Result := Format(itm.New, [grv[2].Value, grv[2].Value])
+          Result := Format(itm.New, [gvv[2], gvv[2]])
         else if SameText(IvMkdItem.Itm, 'Meter bar') then
-          Result := Format(itm.New, [StrToInt(grv[2].Value) / 100.0, grv[2].Value])
+          Result := Format(itm.New, [StrToInt(gvv[2]) / 100.0, gvv[2]])
         else
-          Result := Format(itm.New, [grv[2].Value])
+          Result := Format(itm.New, [gvv[2]])
 
-    //else if TStrRec.StrShellThick(va0) = 3 then begin                                          // shelled 3 fenced  -->   <pre><code>...</code></pre>   *** scodeblock ee preprocessor ***
-    //    Result := Format(itm.New, [iif.NxD(grv[1].Value, 'plaintext'), grv[2].Value.TrimRight])
+    //else if TStrRec.StrShellThick(gvv[0]) = 3 then begin                                          // shelled 3 fenced  -->   <pre><code>...</code></pre>   *** scodeblock ee preprocessor ***
+    //    Result := Format(itm.New, [iif.NxD(gvv[1], 'plaintext'), gvv[2].TrimRight])
     //  else
     //    Result := '{???}';
 
-      end else if TStrRec.StrShellThick(va0) >= 4 then                                           // shelledmulti      -->   <u><b>...</b><u>  __**...**__
-        Result := Format(itm.New, [grv[2].Value])
+      end else if TStrRec.StrShellThick(gvv[0]) >= 4 then                                           // shelledmulti      -->   <u><b>...</b><u>  __**...**__
+        Result := Format(itm.New, [gvv[2]])
 
-      else if TStrRec.StrIsBoxed(va0, alf, ome) then begin                                       // boxed             -->   () [] {}
-        tmp := va0;
+      else if TStrRec.StrIsBoxed(gvv[0], alf, ome) then begin                                       // boxed             -->   () [] {}
+        tmp := gvv[0];
         tmp := TStrRec.StrUnBox(tmp);
         arv := gvec.VecFromStr(tmp, '|', true);
-        if          alf = '(' then begin                                                         // link              -->   <a>...</a>
+        if          alf = '(' then begin                                                            // link              -->   <a>...</a>
           if Length(arv) < 4 then SetLength(arv, 4);
           Result := THtmRec.A(arv[0], arv[1], arv[2], arv[3]);
-        end else if alf = '[' then begin                                                         // image             -->   <img...>
+        end else if alf = '[' then begin                                                            // image             -->   <img...>
           if Length(arv) < 6 then SetLength(arv, 6);
           // card?
           isc := arv[4].Trim.Contains('card');
@@ -13014,7 +13042,7 @@ var
           else                                        tor := itNone;
 
           Result := THtmRec.Img(arv[0], arv[1], StrToIntDef(arv[2], 0), StrToIntDef(arv[3], 0), isc, tor);
-      //end else if alf = '{' then begin                                                         // unused            -->   <movie...>
+      //end else if alf = '{' then begin                                                            // unused            -->   <movie...>
         //if Length(arv) < 4 then SetLength(arv, 4);
         //Result := THtmRec.Img(arv[0], arv[1], arv[2], arv[3]);
         end else
@@ -13055,12 +13083,14 @@ begin
   for itm in MKD_ITEM_VEC do
     try
       tre := TRegEx.Create(itm.Rex, itm.Reo);
+//    if itm.Itm = 'Url' then begin // dbg
       mat := tre.Match(Result);
       while mat.Success do begin
         new := MatchProcess(itm, mat);
         Result := tre.Replace(Result, new, 1);
         mat := mat.NextMatch;
       end;
+//    end; // dbg
     except
       on e: Exception do
         Result := e.Message;
@@ -16244,7 +16274,7 @@ begin
   end;
 end;
 
-function TRvaRec.RvaRecord(IvString: string; const IvRecType: TRttiType; const IvRec: Pointer): string;
+function  TRvaRec.RvaRecord(IvString: string; const IvRecType: TRttiType; const IvRec: Pointer): string;
 var
   fld: TRttiField;
   val: TValue;
@@ -16380,6 +16410,11 @@ var
 begin
   for i := 1 to IvNl do
     Text := Text + sLineBreak;
+end;
+
+procedure TSbuRec.Anp(IvStr: string; IvIfTrue: boolean);
+begin
+  Add(IvStr, IvIfTrue, 0);
 end;
 
 procedure TSbuRec.Add(IvStr: string; IvIfTrue: boolean; IvNlPrefix: integer);
@@ -18138,6 +18173,43 @@ begin
 end;
 {$ENDREGION}
 
+  {$REGION 'TTblRec'}
+class function TTblRec.TblEditJsonStr(IvTable: string; IvKeyFieldVec: TArray<string>; IvEditFieldVec: TArray<string>): string;
+//const
+//  TEMPLATE     = '{'
+//  + sLineBreak + '  "EditData": {'
+//  + sLineBreak + '    "EditTable"       : "DbaAaa.dbo.TblAaa"'
+//  + sLineBreak + '  , "EditKeyFieldList": ["FldId"]'
+//  + sLineBreak + '  , "EditFieldList"   : ['
+//  + sLineBreak + '      {"Field": "FldA"}'
+//  + sLineBreak + '    , {"Field": "FldB"}'
+//  + sLineBreak + '    ]'
+//  + sLineBreak + '  }'
+//  + sLineBreak + '}';
+var
+  sbu: TSbuRec;
+  str, kfl, efl: string;
+begin
+  // keyfldlist
+  kfl := TVecRec.VecToList(IvKeyFieldVec, ',', true);
+
+  // editfldlist
+  efl := TVecRec.VecToListFmt(IvEditFieldVec, ',', '{"Field": "%s"}');
+
+  // build
+  sbu.Anp('{'                                      );
+  sbu.Add('  "EditData": {'                        );
+  sbu.Add('    "EditTable"       : "%s"', [IvTable]);
+  sbu.Add('  , "EditKeyFieldList": [%s]', [kfl]    );
+  sbu.Add('  , "EditFieldList"   : [%s]', [efl]    );
+  sbu.Add('  }'                                    );
+  sbu.Add('}'                                      );
+
+  // end
+  Result := sbu.Text;
+end;
+  {$ENDREGION}
+
   {$REGION 'TTheRec'}
 procedure TTheRec.Reset;
 begin
@@ -18801,21 +18873,32 @@ begin
       Result[i] := Result[i].Trim;
 end;
 
-class function  TVecRec.VecToList(IvStrVec: TArray<string>; IvDelimiter: string): string;
+class function  TVecRec.VecToList(IvStrVec: TArray<string>; IvDelimiter: string; IvQuoted: boolean): string;
+begin
+  if IvQuoted then
+    Result := VecToListFmt(IvStrVec, IvDelimiter, '"%s"')
+  else
+    Result := VecToListFmt(IvStrVec, IvDelimiter, '%s');
+end;
+
+class function TVecRec.VecToListFmt(IvStrVec: TArray<string>; IvDelimiter, IvItemFmt: string): string;
 var
   i: integer;
+  val: string;
 begin
   Result := '';
   if Length(IvStrVec) = 0 then
     Exit;
-  Result := IvStrVec[0].Trim;
-  for i := 1 to High(IvStrVec) do
-    Result := Result + IvDelimiter + IvStrVec[i].Trim;
+  Result := Format(IvItemFmt, [IvStrVec[0].Trim]);
+  for i := 1 to High(IvStrVec) do begin
+    val := Format(IvItemFmt, [IvStrVec[i].Trim]);
+    Result := Result + IvDelimiter + val;
+  end;
 end;
 
 class function  TVecRec.VecCollapse(IvStrVec: TArray<string>): string;
 begin
-  Result := VecToList(IvStrVec, '');     
+  Result := VecToList(IvStrVec, '');
 end;
 
 class function  TVecRec.VecFromStrCamel(IvStr: string; IvCase: TCaseEnum): TArray<string>;
@@ -19791,7 +19874,7 @@ end;
 
 class function  TWksRec.Copyright: string;
 begin
-  Result := Format('%s %d', [ACRONYM, WWW]);
+  Result := Format('%s %s', [ACRONYM, WWW]);
 end;
 
 class procedure TWksRec.WksWebFilesGenerate;
@@ -20746,7 +20829,7 @@ begin
 end;
   {$ENDREGION}
 
-{$REGION 'TZipRec'}
+  {$REGION 'TZipRec'}
 class procedure TZipRec.ZipFile(IvZipFileSpec, IvFileToZipSpec: string);
 var
   zip: TZipFile;
@@ -20771,7 +20854,7 @@ begin
     zip.Free;
   end;
 end;
-{$ENDREGION}
+  {$ENDREGION}
 
   {$REGION 'new'}
   {$ENDREGION}

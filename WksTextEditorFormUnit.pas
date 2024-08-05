@@ -89,7 +89,7 @@ type
     OptionDirDefaultLabel: TLabel;
     OptionGeneralJvScrollMaxBand: TJvScrollMaxBand;
     OptionJvScrollMax: TJvScrollMax;
-    OptionPythonEngineResetSpeedButton: TSpeedButton;
+    OptionPythonEngineRecycleSpeedButton: TSpeedButton;
     OptionPythonJvScrollMaxBand: TJvScrollMaxBand;
     OptionPythonRawOutputCheckBox: TCheckBox;
     OptionPythonVersionComboBox: TComboBox;
@@ -207,7 +207,7 @@ type
     procedure TreeExpandActionExecute(Sender: TObject);
     procedure JsonFormatActionExecute(Sender: TObject);
     procedure RunActionExecute(Sender: TObject);
-    procedure OptionPythonEngineResetSpeedButtonClick(Sender: TObject);
+    procedure OptionPythonEngineRecycleSpeedButtonClick(Sender: TObject);
     procedure OptionPythonRawOutputCheckBoxClick(Sender: TObject);
     procedure OptionPythonVersionComboBoxChange(Sender: TObject);
     procedure FoldingActionExecute(Sender: TObject);
@@ -738,6 +738,9 @@ end;
 
 {$REGION 'Form'}
 procedure TTextEditorForm.FormCreate(Sender: TObject);
+var
+  pvs: TPythonVersions;
+  pve: TPythonVersion;
 begin
   // form
   TFrmRec.FormInit(Sender as TForm);
@@ -768,6 +771,18 @@ begin
 
   // optionpython *** this will be activated in descendent python editor ***
   OptionPythonJvScrollMaxBand.Visible := false;
+  // but versions discovery appens here *** optionally move directly to python editor formoncreate *** | *** duplicated in BaseClient ***
+  OptionPythonJvScrollMaxBand.Visible := true;
+  pvs := GetRegisteredPythonVersions;
+  for pve in pvs do
+    OptionPythonVersionComboBox.Items.Add(pve.DisplayName);
+  if OptionPythonVersionComboBox.Items.Count = 0 then
+    MessageDlg('No Python version has been detected', mtWarning, [mbOk], 0)
+  else begin
+    OptionPythonVersionComboBox.ItemIndex := 0;
+    OptionPythonVersionComboBoxChange(Self);
+  end;
+  OptionPythonRawOutputCheckBox.Checked := false;
 
   // codetype *** set the form tag to be equal to the standard defined codeid ***
        if Name = 'TextEditorForm'   then Tag := Ord(TCodKindEnum.ckTxt )
@@ -1620,10 +1635,10 @@ end;
 
 procedure TTextEditorForm.OptionPythonVersionComboBoxChange(Sender: TObject);
 begin
-  OptionPythonEngineResetSpeedButton.Click;
+  OptionPythonEngineRecycleSpeedButton.Click;
 end;
 
-procedure TTextEditorForm.OptionPythonEngineResetSpeedButtonClick(Sender: TObject);
+procedure TTextEditorForm.OptionPythonEngineRecycleSpeedButtonClick(Sender: TObject);
 begin
   PythonComponentsReset;
 end;

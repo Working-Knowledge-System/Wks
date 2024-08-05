@@ -22,6 +22,7 @@ uses
   , Vcl.ExtCtrls
   , JvExExtCtrls
   , JvNetscapeSplitter
+  , Wks000Unit
   ;
 {$ENDREGION}
 
@@ -50,8 +51,9 @@ type
     SoapRequestLabel: TLabel;
     SoapResponseRichEdit: TRichEdit;
     OptionSaveButton: TButton;
-    LogOneLabel: TLabel;
     LogTabSheet: TTabSheet;
+    LogOneStaticText: TStaticText;
+    LogOneTimer: TTimer;
     procedure ClearToolButtonClick(Sender: TObject);
     procedure ClearAllToolButtonClick(Sender: TObject);
     procedure WrapToolButtonClick(Sender: TObject);
@@ -59,6 +61,7 @@ type
     procedure OptionSoapShowCheckBoxClick(Sender: TObject);
     procedure OptionSaveButtonClick(Sender: TObject);
     procedure ConsoleSplitterMoved(Sender: TObject);
+    procedure LogOneTimerTimer(Sender: TObject);
   private
     { Private declarations }
     FOptionOutputLineWidthMax: integer;
@@ -83,8 +86,8 @@ type
     procedure Output(IvVarRecVector: array of TVarRec; IvColor: TColor = clWindowText); overload;
     procedure OutputDs(IvDs: TDataSet; IvFldVec: TArray<string>);
     // logone
-    procedure LogOne(IvString: string); overload;
-    procedure LogOne(IvFormatString: string; IvVarRecVector: array of TVarRec); overload;
+    procedure LogOne(IvString: string; IvFbkMode: TFbkModeEnum = fmNone; IvMs: integer = 5000); overload;
+    procedure LogOne(IvFormatString: string; IvVarRecVector: array of TVarRec; IvFbkMode: TFbkModeEnum = fmNone; IvMs: integer = 5000); overload;
     // soap
     procedure LogSoapShow(IvShow: boolean);
     procedure LogSoapRequest(IvStream: TStream);
@@ -100,7 +103,6 @@ implementation
 uses
     System.UITypes
   , System.TypInfo
-  , Wks000Unit
   ;
 {$ENDREGION}
 
@@ -113,7 +115,7 @@ begin
   OutputRichEdit.Clear;
   SoapRequestRichEdit.Clear;
   SoapResponseRichEdit.Clear;
-  LogOneLabel.Caption := '';
+  LogOneStaticText.Caption          := '';
 //LogRichEdit.Width                 := gini.IntGet('Log/Width'                   , 800    ); *** does not work, see BaseClient FormOnShow ***
   WrapToolButton.Down               := gini.BooGet('Log/Wrap'                    , false  );
   ClearAutoToolButton.Down          := gini.BooGet('Log/ClearAuto'               , false  );
@@ -275,14 +277,74 @@ end;
 {$ENDREGION}
 
 {$REGION 'LogOne'}
-procedure TLogFrame.LogOne(IvString: string);
+procedure TLogFrame.LogOne(IvString: string; IvFbkMode: TFbkModeEnum; IvMs: integer);
 begin
-  LogOneLabel.Caption := IvString;
+  // timer
+  LogOneTimer.Enabled := false;
+
+  // toast
+  with LogOneStaticText do begin
+    if IvString.IsEmpty then
+      Caption := ''
+    else
+      Caption := Format(' %s  %s ', [FormatDateTime('hh:nn:ss', Time), IvString]);
+    Width := TCnvRec.CnvTextWidth(Caption, Font);
+
+    // fbkmode
+    case IvFbkMode of
+    fmNone   : begin // transparent
+                 Color      := clBtnFace;
+                 Font.Color := clWindowText;
+               end;
+
+    fmInfo   : begin // blue
+                 Color      := clWhite;
+                 Font.Color := clBlue;
+               end;
+
+    fmSuccess: begin // green
+                 Color      := clWebMediumAquamarine;
+                 Font.Color := clWhite;
+               end;
+
+    fmWarning: begin // orange
+                 Color      := clWebOrange;
+                 Font.Color := clWhite;
+               end;
+
+    fmDanger : begin // red
+                 Color      := clWebCrimson;
+                 Font.Color := clWhite;
+               end;
+
+    fmError  : begin // black
+                 Color      := clWebDarkSlategray;
+                 Font.Color := clWhite;
+               end;
+
+    else       begin // transparent
+                 Color      := clBtnFace;
+                 Font.Color := clWindowText;
+               end;
+    end;
+
+    if IvMs <= 0 then
+      Exit
+    else if IvMs < 1000 then
+      IvMs := 1000;
+    LogOneTimer.Interval := IvMs;
+    LogOneTimer.Enabled := true;
+  end;
 end;
 
-procedure TLogFrame.LogOne(IvFormatString: string; IvVarRecVector: array of TVarRec);
+procedure TLogFrame.LogOne(IvFormatString: string; IvVarRecVector: array of TVarRec; IvFbkMode: TFbkModeEnum; IvMs: integer);
 begin
-  LogOneLabel.Caption := Format(IvFormatString, IvVarRecVector);
+  LogOne(Format(IvFormatString, IvVarRecVector), IvFbkMode, IvMs);
+end;
+
+procedure TLogFrame.LogOneTimerTimer(Sender: TObject);
+begin
+  LogOne('', fmNone, 0);
 end;
 {$ENDREGION}
 

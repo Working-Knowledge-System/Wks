@@ -251,9 +251,6 @@ end;
 
 {$REGION 'Form'}
 procedure TPythonEditorForm.FormCreate(Sender: TObject);
-var
-  pvs: TPythonVersions;
-  pve: TPythonVersion; // record
 begin
   inherited;
 
@@ -268,19 +265,6 @@ begin
   User4ToolButton.Visible           := true; User4ToolButton.Caption := 'Type'   ; User4ToolButton.Hint := 'Print Type of currently selected object'  ;
   User5ToolButton.Visible           := true; User5ToolButton.Caption := 'Inspect'; User5ToolButton.Hint := 'Inspect currently selected object'        ;
 //PythonEngineResetToolButton.Visible := true;
-
-  // optionpython *** move to python editor oncreate event ***
-  OptionPythonJvScrollMaxBand.Visible := true;
-  pvs := GetRegisteredPythonVersions;
-  for pve in pvs do
-    OptionPythonVersionComboBox.Items.Add(pve.DisplayName);
-  if OptionPythonVersionComboBox.Items.Count = 0 then
-    MessageDlg('No Python version has been detected', mtWarning, [mbOk], 0)
-  else begin
-    OptionPythonVersionComboBox.ItemIndex := 0;
-    OptionPythonVersionComboBoxChange(Self);
-  end;
-  OptionPythonRawOutputCheckBox.Checked := false;
 end;
 {$ENDREGION}
 
@@ -346,7 +330,7 @@ begin
     Exit;
 
   // reset
-  OptionPythonEngineResetSpeedButton.Click;
+  OptionPythonEngineRecycleSpeedButton.Click;
   SynEditCurrentFlash(500);
 end;
 

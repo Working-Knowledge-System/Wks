@@ -1,26 +1,18 @@
 inherited PythonEditorForm: TPythonEditorForm
   Caption = 'PythonEditorForm'
-  ClientHeight = 762
-  ClientWidth = 1368
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
-    Height = 508
     ExplicitHeight = 507
   end
   inherited RightJvNetscapeSplitter: TJvNetscapeSplitter
-    Left = 1135
-    Height = 508
     ExplicitLeft = 1155
     ExplicitHeight = 507
   end
   inherited BottomJvNetscapeSplitter: TJvNetscapeSplitter
-    Top = 590
-    Width = 1368
     ExplicitTop = 589
     ExplicitWidth = 1388
   end
   inherited TopPageControl: TPageControl
-    Width = 1362
     inherited TopMainTabSheet: TTabSheet
       inherited TopMainToolBar: TToolBar
         Width = 1281
@@ -57,7 +49,6 @@ inherited PythonEditorForm: TPythonEditorForm
     end
   end
   inherited LeftPanel: TPanel
-    Height = 508
     inherited LeftPageControl: TPageControl
       inherited JsonTabSheet: TTabSheet
         inherited TreeSplitter: TSplitter
@@ -66,43 +57,9 @@ inherited PythonEditorForm: TPythonEditorForm
       end
     end
   end
-  inherited MainPanel: TPanel
-    Height = 508
-  end
-  inherited RightPanel: TPanel
-    Left = 1145
-    Height = 508
-    inherited RightPageControl: TPageControl
-      Height = 508
-      inherited OptionTabSheet: TTabSheet
-        ExplicitHeight = 478
-        inherited OptionJvScrollMax: TJvScrollMax
-          Height = 478
-          inherited OptionGeneralJvScrollMaxBand: TJvScrollMaxBand
-            inherited OptionDirDefaultLabel: TLabel
-              Width = 184
-            end
-            inherited OptionTabWidthLabel: TLabel
-              Width = 184
-            end
-          end
-        end
-      end
-    end
-  end
   inherited BottomPanel: TPanel
-    Top = 600
-    Width = 1362
     inherited LogFrame: TLogFrame
-      Width = 1362
       inherited LogPageControl: TPageControl
-        Width = 1362
-        inherited OutputTabSheet: TTabSheet
-          ExplicitWidth = 1354
-          inherited OutputRichEdit: TRichEdit
-            Width = 1352
-          end
-        end
         inherited SoapTabSheet: TTabSheet
           inherited SoapGridPanel: TGridPanel
             ControlCollection = <
@@ -130,10 +87,6 @@ inherited PythonEditorForm: TPythonEditorForm
         end
       end
     end
-  end
-  inherited StatusBar: TStatusBar
-    Top = 740
-    Width = 1362
   end
   inherited MainImageList24: TImageList
     Bitmap = {

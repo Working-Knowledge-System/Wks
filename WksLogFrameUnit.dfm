@@ -6,13 +6,6 @@ object LogFrame: TLogFrame
   ParentShowHint = False
   ShowHint = True
   TabOrder = 0
-  object LogOneLabel: TLabel
-    Left = 400
-    Top = 4
-    Width = 70
-    Height = 15
-    Caption = 'LogOneLabel'
-  end
   object LogPageControl: TPageControl
     Left = 0
     Top = 0
@@ -301,5 +294,21 @@ object LogFrame: TLogFrame
       Style = tbsCheck
       OnClick = WrapToolButtonClick
     end
+  end
+  object LogOneStaticText: TStaticText
+    Left = 400
+    Top = 4
+    Width = 97
+    Height = 15
+    AutoSize = False
+    Caption = 'LogOneStaticText'
+    TabOrder = 2
+    Transparent = False
+  end
+  object LogOneTimer: TTimer
+    Interval = 5000
+    OnTimer = LogOneTimerTimer
+    Left = 44
+    Top = 66
   end
 end

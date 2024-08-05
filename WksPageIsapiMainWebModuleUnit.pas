@@ -243,9 +243,19 @@ end;
 
 procedure TMainWebModule.MainWebModuleTestWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 var
-  con: string;
+  jes, con: string;
 begin
-  con := THtmRec.TableFromSql('select * From DbaAaa.dbo.TblTest order by 1 desc', NO_DATA_STR, 'w3-table-all w3-hoverable', '', true, '{"EditData":{"EditTable":"DbaAaa.dbo.TblTest"}}', hvHorizontal);
+  jes := TTblRec.TblEditJsonStr('DbaAaa.dbo.TblTest', ['FldId'], ['FldA', 'FldB', 'FldC', 'FldD']);
+
+  con := THtmRec.TableFromSql(
+    'select * From DbaAaa.dbo.TblTest order by 1 desc' // sql
+  , NO_DATA_STR                                        // default
+  , 'w3-table-all w3-hoverable'                        // class
+  , ''                                                 // style
+  , true                                               // editable
+  , jes                                                // jsoneditstr
+  , hvHorizontal                                       // dir
+  );
   con := THtmRec.Page('Test', con);
 
   TWrsRec.ResponseSet(Response, con);

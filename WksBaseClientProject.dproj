@@ -189,6 +189,7 @@
             <Form>SqlEditorForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="WksPythonUnit.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
