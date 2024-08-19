@@ -374,26 +374,42 @@ begin
   inherited;
 
   if TAskRec.Yes('Would ypu like to generate the "GDPR Data Processing Agreement" document for %s ?', [ObjectDBEdit.Text]) then begin
-    fil := gper.FileNameGenerate(PersonDBEdit.Text, 'GdprDataProcessingAgreement', 'pdf');
+    fil := gper.FileSpecWithTags(['GdprDataProcessingAgreement'], 'pdf');
     TMesRec.I('GDPR document saved to %s', [fil]);
   end;
 end;
 
 procedure TPersonMainForm.PersonPictureSaveLabelClick(Sender: TObject);
 var
-  dir, fil, fbk: string;
+  nam, sur, dir, fna, ext, fbk: string;
+  {boo: boolean;}
 begin
   inherited;
 
-  dir := Format('C:\$Per\%s\%s', [PersonSurnameDBEdit.Text[1], PersonDBEdit.Text]);
-  if not TFsyRec.DirForce(dir, fbk) then begin
-    TMesRec.W('Unable to create output directory %s, picture not saved', [dir]);
+  nam := PersonNameDBEdit.Text;
+  if nam.IsEmpty then begin
+    TMesRec.W('Please insert the Name');
     Exit;
   end;
 
-  fil := Format('%s\%s%s.png', [dir, PersonSurnameDBEdit.Text, PersonNameDBEdit.Text]);
-  PersonPictureDBImage.Picture.SaveToFile(fil);
-  TMesRec.I('Picture saved to %s', [fil]);
+  sur := PersonSurnameDBEdit.Text;
+  if sur.IsEmpty then begin
+    TMesRec.W('Please insert the Name');
+    Exit;
+  end;
+
+  dir := gper.HomePath;
+  if not TFsyRec.DirForce(dir, fbk) then begin
+    TMesRec.W('Unable to create person''s home directory %s, picture not saved', [dir]);
+    Exit;
+  end;
+
+  fna := gper.PictureFile;
+  ext := '.png';
+
+  {boo :=} TGraRec.PictureDlgSave(PersonPictureDBImage.Picture.Graphic, fna, ext, fbk);
+  TMesRec.I('Picture saved to %s', [fna]);
+  LogFrame.Log(fbk);
 end;
 
 procedure TPersonMainForm.UserUsernameSetLabelClick(Sender: TObject);
@@ -424,6 +440,27 @@ begin
     UserPasswordDBEdit.PasswordChar := '*';
 end;
 
+procedure TPersonMainForm.UserAvatarSaveLabelClick(Sender: TObject);
+var
+  dir, fna, ext, fbk: string;
+  {boo: boolean;}
+begin
+  inherited;
+
+  dir := gper.HomePath;
+  if not TFsyRec.DirForce(dir, fbk) then begin
+    TMesRec.W('Unable to create person''s home directory %s, avatar not saved', [dir]);
+    Exit;
+  end;
+
+  fna := gusr.AvatarFile;
+  ext := '.png';
+
+  {boo :=} TGraRec.PictureDlgSave(UserAvatarDBImage.Picture.Graphic, fna, ext, fbk);
+  TMesRec.I('Avatar saved to %s', [fna]);
+  LogFrame.Log(fbk);
+end;
+
 procedure TPersonMainForm.UserAvatarGenerateLabelClick(Sender: TObject);
 var
   bmp: TBitmap;
@@ -440,23 +477,6 @@ begin
   finally
     bmp.Free;
   end;
-end;
-
-procedure TPersonMainForm.UserAvatarSaveLabelClick(Sender: TObject);
-var
-  dir, fil, fbk: string;
-begin
-  inherited;
-
-  dir := Format('C:\$Per\%s\%s', [PersonSurnameDBEdit.Text[1], PersonDBEdit.Text]);
-  if not TFsyRec.DirForce(dir, fbk) then begin
-    TMesRec.W('Unable to create output directory %s, avatar not saved', [dir]);
-    Exit;
-  end;
-
-  fil := Format('%s\%sAvatar.png', [dir, PersonDBEdit.Text]);
-  UserAvatarDBImage.Picture.SaveToFile(fil);
-  LogFrame.Log('Avatar saved to %s', [fil]);
 end;
 {$ENDREGION}
 

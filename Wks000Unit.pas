@@ -1,3 +1,22 @@
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           //
+//                          __      __  _  __                                //
+//                          \  \/\/  / | |/ /  ___                           //
+//                           \      /  |   <  (_-<                           //
+//                            \_/\_/   |_|\_\ /__/                           //
+//                                                                           //
+//                         Working Knowledge System                          //
+//                                                                           //
+//                      Copyright © 2010-present Wks inc.                    //
+//                           All Rights Reserved.                            //
+//                                                                           //
+//                           https://www.wks.cloud                           //
+//                              info@wks.cloud                               //
+//                                                                           //
+//                                                                           //
+//                 see LICENSE file for license information                  //
+///////////////////////////////////////////////////////////////////////////////
+
 unit Wks000Unit;
 
 interface
@@ -50,6 +69,15 @@ interface
   ------
   [O] = Object         = Obj (ex Xxx)
   [B] = usinessobjects = Person, User, Organization, Theme, Member
+
+
+  Objects        Bmp
+  -----------------------------
+  Object         Image
+  Person         Picture
+  User           Avatar
+  Organization   Logo, LogoLong
+  Member         Avatar
 *)
 {$ENDREGION}
 
@@ -68,6 +96,7 @@ uses
   , System.Generics.Collections   // json.getpairs, tdictionary
   , System.RegularExpressions     // regex
   , System.RegularExpressionsCore // regex
+//, System.Diagnostics            // tstopwatch --> TProfiler
   , System.IniFiles               // tinifile
   , System.JSON                   // json
   , Vcl.Graphics                  // tgraphic
@@ -115,6 +144,7 @@ uses
 //, AggColor                      // aggcolors
   , AggPixelFormat                // aggblendmode ...
 //, AggWin32Bmp                   // tpixelmap
+  , Profiler                      // tprofiler delphiarea
   , WksSynHighlighterRUnit        // wks synedit highlighter for R lang
   ;
 {$ENDREGION}
@@ -147,7 +177,7 @@ const
   CHARS_SPECIAL           = '~!@#$%^&*()_+=-';
   LICENSE_MIT             = 'MIT License'
              + sLineBreak + ''
-             + sLineBreak + 'Copyright (c) [RvDatNowYear()] [RvWks()]'
+             + sLineBreak + 'Copyright © 2010-[RvDatNowYear()] [RvWks()]'
              + sLineBreak + ''
              + sLineBreak + 'Permission is hereby granted, free of charge, to any person obtaining a copy'
              + sLineBreak + 'of this software and associated documentation files (the "Software"), to deal'
@@ -213,7 +243,7 @@ const
              + sLineBreak + ''
              + sLineBreak + 'Thank you for trusting [RvWks()] with your data.'
              + sLineBreak + ''
-             + sLineBreak + '12/20/2023';
+             + sLineBreak + '12/20/2010';
   USER_AGENT_WKS          = '';
   USER_AGENT_BROWSER      = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.78';
 
@@ -447,6 +477,7 @@ type
     procedure RecToRem(var IvObjRem: TObjRem);
   private
   public
+          function  ObjObjectSafe: string;
     class function  ObjPropertyVector(): TArray<string>; static;
     class function  ObjKindVector(): TArray<string>; static;
     class function  HasProperty(const IvProperty: string): boolean; static;
@@ -830,7 +861,7 @@ type
 
   TCodRec = record // code(kind) --> contentkind
   const
-    BAT   : TCoiRec = (Tag: TCodKindEnum.ckBat ; Lang: 'BAT'     ; Kind: 'Bat' ; Comm: '::'; Comm1: ''    ; Comm2: ''   ; DlgDefaultExt: '.bat' ; DlgFilter: 'BAT files (*.bat)|*.bat'
+    BAT   : TCoiRec = (Tag: TCodKindEnum.ckBat ; Lang: 'BAT'     ; Kind: 'Bat' ; Comm: '::'; Comm1: '::'  ; Comm2: '::' ; DlgDefaultExt: '.bat' ; DlgFilter: 'BAT files (*.bat)|*.bat'
           ; ContentTemplate: '/* bat-template */'
           + sLineBreak     + ''
           ; JsonTemplate   : ''
@@ -949,7 +980,7 @@ type
           ; Test           : '-- test'
           + sLineBreak     + '');
 
-    YAML  : TCoiRec = (Tag: TCodKindEnum.ckHtml; Lang: 'YAML'    ; Kind: 'Yaml'; Comm: '#' ; Comm1: ''    ; Comm2: ''   ; DlgDefaultExt: '.yaml'; DlgFilter: 'YAML files (*.yaml)|*.yaml'
+    YAML  : TCoiRec = (Tag: TCodKindEnum.ckHtml; Lang: 'YAML'    ; Kind: 'Yaml'; Comm: '#' ; Comm1: '/*'  ; Comm2: '*/' ; DlgDefaultExt: '.yaml'; DlgFilter: 'YAML files (*.yaml)|*.yaml'
           ; ContentTemplate: '<!-- yaml-template -->'
           + sLineBreak     + ''
           ; JsonTemplate   : ''
@@ -964,7 +995,7 @@ type
              + sLineBreak  + '~~ '
              + sLineBreak  + '~~ author     :  [RvUsername()]'
              + sLineBreak  + '~~ created    :  [RvDatNow()]'
-             + sLineBreak  + '~~ copyright  :  (c) [RvOrganization()] [RvDatNowYear()]'
+             + sLineBreak  + '~~ copyright  :  © [RvOrganization()] [RvDatNowYear()]'
              + sLineBreak  + '~~ licence    :  BDS'
              + sLineBreak  + '~~ -----------------------------------------------------------------------------'
              + sLineBreak  + '~~[ENDREGION]'
@@ -984,9 +1015,14 @@ type
     OutputFileName : string ; // FldOutputFileName
     RunCommand     : string ; // FldRunCommand
     class function  Vector(): TCoiRecVec; static;
-    class function  CommentStr(IvKind: string): string; static;
-    class function  CommentStr2(IvCodKind: TCodKindEnum): string; static;
-    class function  CodeKindEnumFromInt(CodeKindInt: integer): TCodKindEnum; static;
+    class function  CommentStr(IvCodKindEnum: TCodKindEnum): string; overload; static;  // rowcomment
+    class function  CommentStr(IvCodKindStr: string): string; overload; static;         // bystr
+    class function  Comment1Str(IvCodKindEnum: TCodKindEnum): string; overload; static; // blockcommentbegin, like: /* or <!--
+    class function  Comment1Str(IvCodKindStr: string): string; overload; static;        // bystr
+    class function  Comment2Str(IvCodKindEnum: TCodKindEnum): string; overload; static; // blockcommentend  , like: */ or -->
+    class function  Comment2Str(IvCodKindStr: string): string; overload; static;        // bystr
+    class function  CodeKindEnumFromInt(IvCodeKindInt: integer): TCodKindEnum; static;  //   0 --> ckBat
+    class function  CodeKindEnumFromStr(IvCodeKindStr: string): TCodKindEnum; static;   // Bat --> ckBat
           procedure Reset(IvResetObjAlso: boolean = false);
           function  InitDba(IvId: integer; var IvFbk: string): boolean;
   //      function  InitRio(IvId: integer; var IvFbk: string): boolean;
@@ -994,13 +1030,15 @@ type
 
   TColRec = record // color
     class function  TColToColorRef(IvColor: TColor): TColorRef; static;
-    
-    class function  TColDarken(IvColor: TColor; IvPercentage: integer): TColor; static;
-    class function  TColLighten(IvColor: TColor; IvPercentage: integer): TColor; static;
-    
-    class function  TColAnti(IvColor: TColor): TColor; static;                                         // invert a color
-    class function  TColAntiBw(IvColor: TColor): TColor; static;                                       // black or white on a bg color
-    
+
+    class function  TColIsDark(IvColor: TColor): boolean; static;                                      // brightness < 128
+
+    class function  TColDarken(IvColor: TColor; IvPercentage: integer): TColor; static;                //
+    class function  TColLighten(IvColor: TColor; IvPercentage: integer): TColor; static;               //
+
+    class function  TColAnti(IvColor: TColor): TColor; static;                                         // complementary, inverted color
+    class function  TColAntiBw(IvColor: TColor): TColor; static;                                       // black or white for a given color
+
     class function  TColToHtmlHexStr(IvColor: TColor): string; static;                                 // clRed     -> '#rrggbb'
     class function  TColFromHtmlHexStr(IvHColor: string; IvDefault: TColor = clNone): TColor; static;  // '#rrggbb' -> clRed
 
@@ -1027,8 +1065,8 @@ type
     class function  ToStr(IvColor: TColor): string; static;                   // tcolor to 'clRed'
     class function  FromStr(IvString: string): TColor; static;                // 'clRed' to tcolor
 
-    class function  ToHexStr(IvColor: TColor): string; static;                                     // 
-    class function  FromHexStr(IvHexString: string; IvDefault: string = '808080'): TColor; static; // 
+    class function  ToHexStr(IvColor: TColor): string; static;                                     //
+    class function  FromHexStr(IvHexString: string; IvDefault: string = '808080'): TColor; static; //
 
     class function  TColorRnd(IvStart: byte = 127): TColor; static;                                // for red green and blue byte, select $00, $33, $66, $99, $cc or $ff or rather: random(6) * $33 so the resulting 216 possible combinations will not look dark
     class function  TColorRnd2(const IvMix: TColor = clWhite): TColor; static;                     //
@@ -1481,6 +1519,7 @@ type
   TEnuRec = record // enum
     class function EnumToInt<T>(const IvEnumValue: T): integer; static; // simply use Ord() ?
     class function EnumToStr<T>(IvEnumValue: T; IvRootRemove: boolean = true): string; static; // rrDddddd (rr = root, does not vary, Dddddd = Desinence, does vary)
+    class function EnumFromInt<T>(IvEnumInt: integer; IvDefault: T): T; static;
     class function EnumFromStr<T>(IvEnumStr: string; IvDefault: T): T; static;
   end;
 
@@ -1606,7 +1645,7 @@ type
   THtmRec = record // html
   const
     HTM_TAG_SINGLE_CSV   = 'doctype,track,source,param,meta,link,area,input,img,iframe,hr,base,basefont,col,br,wbr';
-    HTM_INPUT_MONO_CSV   = 'color,date,datetime,email,file,hidden,image,month,number,password,range,search,tel,text,textarea,time,url,week';
+    HTM_INPUT_MONO_CSV   = 'color,date,datetime,email,file,hidden,image,month,number,password,range,search,tel,text,textarea,time,url,week'; // <input type="text">
     HTM_INPUT_MULTI_CSV  = 'checkbox,radio,select'; // datalist ?
     HTM_INPUT_BUTTON_CSV = 'button,reset,search,submit';
   type
@@ -1627,20 +1666,13 @@ type
     class function  AttrStyleFromVec(IvStyleVec: TStringVector): string; static;                                                // returns style="st1 st2 ..." from ['st1', 'st2', '...']
     class procedure ValAdd(var IvValuesCurr: string; IvValuesToAdd: string; IvSep: string; IvIfTrue: boolean = true); static;   // presuppone 'cls1 cls2' or 'sty1:aaa;sty2:bbb;'
     class function  IdName(IvCoName: string = ''): string; static;                                                              // id="Co1234" name="Co1234" transform to a THatRec
-    class function  Elem(IvTag, IvType, IvCoName: string; IvTitle: string = ''; IvValue: string = ''; IvClass: string = ''; IvStyle: string = ''; IvTail: string = ''; IvReadOnly: boolean = false; IvDisabled: boolean = false): string; static;
-    class function  Input(      IvType, IvCoName: string; IvTitle: string = ''; IvValue: string = ''; IvClass: string = ''; IvStyle: string = ''; IvTail: string = ''; IvReadOnly: boolean = false; IvDisabled: boolean = false): string; static;
-    class function  Select(     IvType, IvCoName        , IvTitle: string     ; IvItemVec, IvValueVec: TArray<string>; IvSelectedVec: TArray<string> = {$IF CompilerVersion < 32.0}nil{$ELSE}[]{$ENDIF}; IvDisabledVec: TArray<string> = {$IF CompilerVersion < 32.0}nil{$ELSE}[]{$ENDIF}; IvClass: string = ''; IvStyle: string = ''; IvTail: string = ''): string; static;
     class function  A(IvHref, IvCaption: string; IvTitle: string = ''; IvTarget: string = ''; IvClass: string = ''; IvStyle: string = ''): string; static;
     class function  H(IvLevel: integer; IvTitle: string; IvClass: string = ''; IvStyle: string = ''): string; static;
     class function  P(IvContent: string; IvDimmed: boolean = false; IvItalic: boolean = false): string; static;
     class function  Br(IvCount: integer): string; static;
     class function  Hr(IvWidthPerc: integer = 100; IvColor: string = '#eee'): string; static;
-    class function  Btn(IvCaption: string; IvTitle: string = ''; IvClass: string = ''; IvStyle: string = ''; IvOnClick: string = ''): string; static; // no <form> necessary)
-    class function  BtnX(IvCoName: string; IvFollowLink: string = ''; IvFbkMode: TFbkModeEnum = fmNone): string; static;        // close just the panel/modal and optionally go to the given link
-    class function  BtnOk(IvCoModalName: string): string; static;                                                               // standard buttons Ok that close the passed modalpanel
-    class function  BtnStd(IvKind: string; IvRedirectToPageId: integer = 0; IvData: string = ''): string; static;               // standard buttons like Close, Home, Back, ...
     class function  Space(IvPx: integer = 8; IvKind: string = 'H'): string; static;                                             // H : <span style="width:%dpx"></span> | V : <div style="height:%dpx"></div>
-    class function  Img(IvSrc: string; IvAlt: string = ''; IvW: integer = 0; IvH: integer = 0; IvIsCard: boolean = false; IvTorn: TImgTormEnum = itNone): string; static;
+    class function  Img(IvSrc: string; IvAlt: string = ''; IvW: integer = 0; IvH: integer = 0; IvIsCard: boolean = false; IvTorn: TImgTormEnum = itNone{, IvClass, IvStyle: string}): string; static;
     class function  Code(IvCode: string; IvLanguage: string = 'plaintext'): string; static;
     class function  Panel(IvFbk: TFbkRec; IvDismisible: boolean = true): string; static;  // *** MERGE WITH THtmRec.Collapse ***
     class function  Collapse(IvTitle, IvSubtitle, IvBody: string; IvHhLevel: integer = 1; IvCoName: string = ''; IvTitlesCenter: boolean = false; IvPanelOn: boolean = true; IvPanelClosed: boolean = false): string; static;
@@ -1650,13 +1682,22 @@ type
     class function  AlertW(IvTitle: string; IvText: string = ''): string; static;
     class function  AlertD(IvTitle: string; IvText: string = ''): string; static;
     class function  AlertE(IvTitle: string; IvText: string = ''): string; static;
-    class function  Modal   (IvShow: boolean; IvCoName, IvBody: string; IvHeader: string = ''; IvFooter: string = ''; IvFbkMode: TFbkModeEnum = fmNone): string; static;
-    class function  ModalBtn(IvBtnCaption   , IvCoName, IvBody: string; IvHeader: string = ''; IvFooter: string = ''; IvFbkMode: TFbkModeEnum = fmNone): string; static;
-    class function  GridRow(IvValueVec, IvClassVec, IvStyleVec: TArray<string>): string; static;
-    class function  FormLine(IvLabel, IvHelp, IvKind, IvCoName, IvTitle, IvValue: string; IvClass: string = ''; IvStyle: string = ''; IvTail: string = ''; IvLabelWidth: integer = 200; IvHelpWidth: integer = 200): string; static;
+    class function  Modal   (IvShow: boolean; IvCoName, IvBody: string; IvHeader: string = ''; IvFooter: string = ''; IvFbkMode: TFbkModeEnum = fmNone; IvCopyButtonOn: boolean = false): string; static;
+    class function  ModalBtn(IvBtnCaption   , IvCoName, IvBody: string; IvHeader: string = ''; IvFooter: string = ''; IvFbkMode: TFbkModeEnum = fmNone; IvCopyButtonOn: boolean = false): string; static;
+    class function  GridRow(IvValueVec, IvClassVec, IvStyleVec: TArray<string>; IvBorderDgOn: boolean = false): string; static;
+    class function  Btn(IvCaption: string; IvTitle: string = ''; IvClass: string = ''; IvStyle: string = ''; IvOnClick: string = ''): string; static; // no <form> necessary)
+    class function  BtnX(IvCoName: string; IvFollowLink: string = ''; IvFbkMode: TFbkModeEnum = fmNone): string; static;        // close just the panel/modal and optionally go to the given link
+    class function  BtnOk(IvCoModalName: string): string; static;                                                               // standard buttons Ok that close the passed modalpanel
+    class function  BtnStd(IvKind: string; IvRedirectToPageId: integer = 0; IvData: string = ''): string; static;               // standard buttons like Close, Home, Back, ...
+    class function  Elem(IvTag, IvKind, IvCoName: string; IvTitle: string = ''                 ; IvValue: string = ''         ; IvClass: string = ''; IvStyle: string = ''; IvTail: string = ''                                                                               ; IvDisabled: boolean = false                                                     ; IvReadOnly: boolean = false): string; static;
+    class function  Choice  (   IvKind, IvCoName        , IvTitle: string     ; IvOptCaptionVec, IvOptValueVec: TArray<string>; IvClass: string = ''; IvStyle: string = ''; IvTail: string = ''; IvValueVec: TArray<string> = {$IF CompilerVersion < 32.0}nil{$ELSE}[]{$ENDIF}; IvDisabledVec: TArray<string> = {$IF CompilerVersion < 32.0}nil{$ELSE}[]{$ENDIF}; IvReadOnly: boolean = false): string; static;
+    class function  Select  (           IvCoName        , IvTitle: string     ; IvOptCaptionVec, IvOptValueVec: TArray<string>; IvClass: string = ''; IvStyle: string = ''; IvTail: string = ''; IvValueVec: TArray<string> = {$IF CompilerVersion < 32.0}nil{$ELSE}[]{$ENDIF}; IvDisabledVec: TArray<string> = {$IF CompilerVersion < 32.0}nil{$ELSE}[]{$ENDIF}; IvReadOnly: boolean = false): string; static;
+    class function  Radio   (           IvCoName        , IvTitle: string     ; IvOptCaptionVec, IvOptValueVec: TArray<string>; IvClass: string = ''; IvStyle: string = ''; IvTail: string = ''; IvValueVec: TArray<string> = {$IF CompilerVersion < 32.0}nil{$ELSE}[]{$ENDIF}; IvDisabledVec: TArray<string> = {$IF CompilerVersion < 32.0}nil{$ELSE}[]{$ENDIF}; IvReadOnly: boolean = false): string; static;
+    class function  Checkbox(           IvCoName        , IvTitle: string     ; IvOptCaptionVec, IvOptValueVec: TArray<string>; IvClass: string = ''; IvStyle: string = ''; IvTail: string = ''; IvValueVec: TArray<string> = {$IF CompilerVersion < 32.0}nil{$ELSE}[]{$ENDIF}; IvDisabledVec: TArray<string> = {$IF CompilerVersion < 32.0}nil{$ELSE}[]{$ENDIF}; IvReadOnly: boolean = false): string; static;
+    class function  FormLine(   IvKind, IvCoName        , IvTitle: string     ; IvOptCaptionVec, IvOptValueVec: TArray<string>; IvClass: string = ''; IvStyle: string = ''; IvTail: string = ''; IvValueVec: TArray<string> = {$IF CompilerVersion < 32.0}nil{$ELSE}[]{$ENDIF}; IvDisabledVec: TArray<string> = {$IF CompilerVersion < 32.0}nil{$ELSE}[]{$ENDIF}; IvReadOnly: boolean = false; IvLabel: string = ''; IvHelp: string = ''; IvLabelWidth: integer = 200; IvHelpWidth: integer = 200): string; static;
     class function  Form(                                                                 IvCoName, IvAction, IvMethod, IvBody: string                                                                                                                                                                                                  ; IvClass: string = ''; IvStyle: string = ''; IvEnctype: string = ''; IvValidatorCsv: string = ''): string; overload; static;
-    class function  Form(                                                                 IvCoName, IvAction, IvMethod, IvSubmitCaption: string; IvLabelWidth, IvHelpWidth: integer; IvLabelVec, IvKindVec, IvCoNameVec, IvValueVec, IvPlaceholderVec, IvClassVec, IvStyleVec, IvTailVec: TArray<string>; IvRequiredVec: TArray<boolean>; IvClass: string = ''; IvStyle: string = ''; IvEnctype: string = ''; IvValidatorCsv: string = ''): string; overload; static;
-    class function  FormModal(IvTitle, IvFaIcon: string; IvCtrlButtonVec: TArray<string>; IvCoName, IvAction, IvMethod, IvSubmitCaption: string; IvLabelWidth, IvHelpWidth: integer; IvLabelVec, IvKindVec, IvCoNameVec, IvValueVec, IvPlaceholderVec, IvClassVec, IvStyleVec, IvTailVec: TArray<string>; IvRequiredVec: TArray<boolean>; IvClass: string = ''; IvStyle: string = ''; IvEnctype: string = ''; IvValidatorCsv: string = ''): string; static;
+    class function  Form(                                                                 IvCoName, IvAction, IvMethod, IvSubmitCaption: string; IvLabelWidth, IvHelpWidth: integer; IvTitleVec, IvKindVec, IvCoNameVec, IvValueVec, IvPlaceholderVec, IvClassVec, IvStyleVec, IvTailVec: TArray<string>; IvRequiredVec: TArray<boolean>; IvClass: string = ''; IvStyle: string = ''; IvEnctype: string = ''; IvValidatorCsv: string = ''): string; overload; static;
+    class function  FormModal(IvTitle, IvFaIcon: string; IvCtrlButtonVec: TArray<string>; IvCoName, IvAction, IvMethod, IvSubmitCaption: string; IvLabelWidth, IvHelpWidth: integer; IvTitleVec, IvKindVec, IvCoNameVec, IvValueVec, IvPlaceholderVec, IvClassVec, IvStyleVec, IvTailVec: TArray<string>; IvRequiredVec: TArray<boolean>; IvClass: string = ''; IvStyle: string = ''; IvEnctype: string = ''; IvValidatorCsv: string = ''): string; static;
     class function  List(IvItemVec: TArray<string>; IvMode: TListModeEnum = lmUnordered): string; static;
     class function  TableFromDs(IvDs: TDataset; IvDefault: string = ''; IvClass: string = ''; IvStyle: string = ''; IvEditable: boolean = false; IvEditJson: string = ''; IvDir: THvDirEnum = hvHorizontal; IvDsHeaderOff: boolean = false; IvDsRecordCountOff: boolean = false): string; static;
     class function  TableFromSql(IvSql: string; IvDefault: string = ''; IvClass: string = ''; IvStyle: string = ''; IvEditable: boolean = false; IvEditJson: string = ''; IvDir: THvDirEnum = hvHorizontal; IvDsHeaderOff: boolean = false; IvDsRecordCountOff: boolean = false): string; static;
@@ -2421,9 +2462,11 @@ type
     procedure Reset(IvResetObjAlso: boolean = false);
     function  InitDba(IvOrganization, IvUsername: string; var IvFbk: string): boolean; // a user after a login (username available) become a member
     function  InitRio(IvOrganization, IvUsername: string; var IvFbk: string): boolean;
-    function  HomePath: string;                                                     // C:\$Per\I\IarussiFedericoCarloBrian
-    function  HomeUrl(IvRelative: boolean = true): string;                          // /Person/I/IarussiFedericoCarloBrian
-    function  BadgeUrl(IvRelative: boolean = true): string;                         // /Person/I/IarussiFedericoCarloBrian/IarussiFedericoCarloBrianWksBadge.png
+    function  IsAdmin: boolean;                                                        // jobgrade >= 70
+    function  HomePath: string;                                                        // C:\$Per\I\IarussiFedericoCarloBrian
+    function  BadgeFile: string;                                                       // C:\$Per\I\IarussiFedericoCarloBrian\FCBIarussi_Wks_Badge.png
+    function  HomeUrl(IvRelative: boolean = true): string;                             // /Person/I/IarussiFedericoCarloBrian
+    function  BadgeUrl(IvRelative: boolean = true): string;                            // /Person/I/IarussiFedericoCarloBrian/FCBIarussi_Wks_Badge.png
     procedure BadgeGenerate(var IvBadge: TBitmap; IvOrganization, IvSite, IvUsername: string);
   end;
 
@@ -2473,7 +2516,7 @@ type
   // - synopse SynTaskDialog
   // if you need plain winapi dialog use the WksDlgWinApiUnit
   public
-    class procedure MsgShow(IvMessage: string; IvTitle: string = ''; IvType: string = ''); static; // type: '', iI, wW, eE
+    class procedure MsgShow(IvMessage: string; IvTitle: string = ''; IvKind: string = ''); static; // type: '', iI, wW, eE
     class procedure I(IvMessage: string; IvTitle: string = ''); overload; static;
     class procedure I(IvMessageFormatStr: string; IvVarRecVector: array of TVarRec; IvTitle: string = ''); overload; static;
     class procedure W(IvMessage: string; IvTitle: string = ''); overload; static;
@@ -2663,10 +2706,10 @@ type
     {
       naming conventions
       --------------------------
-      pascal:   GiovanniIarussi
-      camel:    giovanniIarussi
-      snake:    giovanni_iarussi
-      const:    GIOVANNI_IARUSSI
+      pascal:   FedericoIarussi
+      camel:    federicoIarussi
+      snake:    federico_iarussi
+      const:    FEDERICO_IARUSSI
     }
     {$ENDREGION}
 
@@ -2732,10 +2775,12 @@ type
     function  TreeDir(IvOrganization: string = ''): string;                // Root/Organization/W
     function  TreePath(IvOrganization: string = ''): string;               // Root/Organization/W/Wks
     function  HomePath: string;                                            // C:\$Org\W\Wks
+    function  LogoFile: string;                                            // C:\$Org\W\Wks\Wks_Logo.png
+    function  LogoLongFile: string;                                        // C:\$Org\W\Wks\Wks_LogoLong.png
     function  HomeUrl(IvRelative: boolean = true): string;                 // /Organization/W/Wks
-    function  LogoUrl(IvRelative: boolean = true): string;                 // /Organization/W/Wks/WksLogo.png
-    function  LogoLongUrl(IvRelative: boolean = true): string;             // /Organization/W/Wks/WksLogoLong.png
-    function  IconUrl(IvRelative: boolean = true): string;                 // /Organization/W/Wks/WksIcon.ico
+    function  LogoUrl(IvRelative: boolean = true; IvInverted: boolean = false): string; // /Organization/W/Wks/Wks_Logo.png
+    function  LogoLongUrl(IvRelative: boolean = true): string;                          // /Organization/W/Wks/Wks_LogoLong.png
+    function  IconUrl(IvRelative: boolean = true): string;                              // /Organization/W/Wks/Wks_Icon.ico
   end;
 
   TOrgRem = class(TRemotable)
@@ -2799,17 +2844,18 @@ type
     // derived
     // ...
   public
-    function  Info: string;
+    function  Info(IvSurnameName: boolean = false): string;
     procedure Free;
     procedure Reset(IvResetObjAlso: boolean = false);
     function  InitDba(IvPerson: string; var IvFbk: string): boolean;
     function  InitRio(IvPerson: string; var IvFbk: string): boolean;
-    function  HomePath: string;                                                     // C:\$Per\I\IarussiFedericoCarloBrian
-    function  HomeUrl(IvRelative: boolean = true): string;                          // /Person/I/IarussiFedericoCarloBrian
-    function  PictureUrl(IvRelative: boolean = true): string;                       // /Person/I/IarussiFedericoCarloBrian/IarussiFedericoCarloBrianPicture.png
-    function  SurnameNamesCollapsed: string;                                        // IarussiFedericoCarloBrian
-    function  NameCompact: string;                                                  // Federico Carlo Brian --> Federico C.B.
-    function  FileNameGenerate(IvPerson, IvSubject: string; IvExt: string): string; // generic file to store under C:\$Per\G\giarussi
+    function  NameCompact: string;                                               // Federico Carlo Brian --> Federico C.B.
+    function  SurnameNameSafe: string;                                           // Federico Carlo Brian Iarussi --> IarussiFedericoCarloBrian - Alfonso D'Anna --> DAnnaAlfonso
+    function  FileSpecWithTags(IvTagVec: TArray<string>; IvExt: string): string; // C:\$Per\I\IarussiFedericoCarloBrian\IarussiFedericoCarloBrian_Tag0_Tag1_[...].png
+    function  HomePath: string;                                                  // C:\$Per\I\IarussiFedericoCarloBrian
+    function  PictureFile: string;                                               // C:\$Per\I\IarussiFedericoCarloBrian\IarussiFedericoCarloBrian_Picture.png
+    function  HomeUrl(IvRelative: boolean = true): string;                       // /Person/I/IarussiFedericoCarloBrian
+    function  PictureUrl(IvRelative: boolean = true): string;                    // /Person/I/IarussiFedericoCarloBrian/IarussiFedericoCarloBrian_Picture.png
   end;
 
   TPerRem = class(TRemotable)
@@ -2905,7 +2951,7 @@ type
   //UpdatedField     : string ; // updated field
   //EnabledStateList : string ; // will update records only in these states (Active, OnHold, ...
   public
-    procedure LoadFrom(IvEditable: boolean; IvSelect, IvInsert, IvUpdate, IvDelete{, IvEditIni}, IvJson: string);
+    procedure LoadFrom(IvEditable: boolean; IvSelect, IvInsert, IvUpdate, IvDelete{, IvEditIni}, IvJson: string); // ?
   end;
     {$ENDREGION}
 
@@ -2930,9 +2976,12 @@ type
     OptionQuery   : string ; // get option values/captions from a query if exist and append to the previous one (select aaa FldValue, bbb FldCaptions from ...)
     ConnStr       : string ; // used to run the optionquery, if empty use the default system connstr
     ConnLib       : string ; // ADO | FD
-    Classs        : string ; //
-    Style         : string ; //
-  //Switch        : string ; // +P...
+    &Class        : string ;
+    Style         : string ;
+  //Format        : string ;
+  //ReadOnly      : boolean;
+  //AjaxValidate  : string ;
+  //Switch        : string ;
   //ToOrganization: string ;
   //ToDepartment  : string ;
   //ToArea        : string ;
@@ -3328,14 +3377,18 @@ type
     class function  StrBetween(IvTagLeft, IvTagRight, IvString: string; IvCaseSensitive: boolean = true): string; static;                                         // or Inside s1 = '[', s2 = ']', s3 = 'abc[xxx]def' -> 'xxx'
     class function  StrDel(IvStr, IvStrOrCharToDelete: string): string; static;                                          //
     class function  StrReplicate(IvStr: string; IvN: integer): string; static;                                           // repear a string n times
-  //class function  StrSplitB(IvString: string; IvDelimiters: string = ','): TStringDynArray; static;                     // DUP see TVecRecVecFromStr() returning a TArray<string>
+  //class function  StrSplitB(IvString: string; IvDelimiters: string = ','): TStringDynArray; static;                    // DUP see TVecRecVecFromStr() returning a TArray<string>
     class function  StrWordAppend(IvStr, IvWord: string): string; static;                                                // src + ' ' + word
     class function  StrKeep(IvStr: string; const IvCharToKeepSet: TSysCharSet): string; static;                          //
     class function  StrClean(IvStr: string): string; static;                                                             // remove any char not in [A..Z][a..z]
     class function  StrCoalesce(IvStrVector: TArray<string>; IvDefault: string = ''): string; static;                    // return the 1st non empty value in vector
+    class function  StrConcat(IvStrVector: TArray<string>; IvDelimiter: string = ''): string; static;                    // ['aaa', 'BbB']   --> aaa_BbB
     class procedure StrInsertAt(var IvStr: string; const IvStrToInsert: string; IvAtPos: integer); static;               // insert str into a string at given position
     class function  StrCommentHas(IvStr, IvComment: string; out IvBlanks: integer): boolean; static;                     // return true if str is like '# aaa' or '  # aaa' , return how many blanks at the beginning of the string
     class function  StrCommentToggle(IvStr, IvComment: string; IvAtBegin: boolean = false; IvReplace: boolean = false): string; static;
+    class function  StrSafe(IvStr: string): string; static;                                                              // camelcase removing spaces and punctuation chars
+    class function  StrRemoveFirst(IvStr: string; IvCharCount: integer): string; static;                                 //
+    class function  StrRemoveLast(IvStr: string; IvCharCount: integer): string; static;                                  //
   end;
 
   TTxtRec = record // text
@@ -3438,6 +3491,13 @@ type
   TTblRec = record // htmtable
   public
     class function TblEditJsonStr(IvTable: string; IvKeyFieldVec: TArray<string>; IvEditFieldVec: TArray<string>): string; static;
+  end;
+
+  TThiRec = record // themeitem
+    Theme: string; // name
+    P60  : string; // 60% primary
+    S30  : string; // 30% secondary
+    A10  : string; // 10% accent
   end;
 
   TTheRec = record // theme [B]
@@ -3619,10 +3679,12 @@ type
     function  IsActiveRio(IvUsername: string; var IvFbk: string): boolean;
     function  IsAuthenticated(IvUsername, IvPassword: string; var IvFbk: string): boolean;
     function  IsAuthenticatedRio(IvUsername, IvPassword: string; var IvFbk: string): boolean;
-    function  HomePath: string;                                        // C:\$Per\U\UnknowPerson
-    function  HomeUrl(IvRelative: boolean = true): string;             // /Person/U/UnknowPerson
-    function  AvatarUrl(IvRelative: boolean = true): string;           // /Person/U/UnknowPerson/UnknowPersonAvatar.png
+    function  HomePath: string;                                        // C:\$Per\I\IarussiFedericoCarloBrian
+    function  AvatarFile: string;                                      // C:\$Per\I\IarussiFedericoCarloBrian\IarussiFedericoCarloBrian_Avatar.png | fcbiarussi_Avatar.png
+    function  HomeUrl(IvRelative: boolean = true): string;             // /Person/I/IarussiFedericoCarloBrian
+    function  AvatarUrl(IvRelative: boolean = true): string;           // /Person/I/IarussiFedericoCarloBrian/IarussiFedericoCarloBrian_Avatar.png | fcbiarussi_Avatar.png
     procedure AvatarGenerate(var IvAvatar: TBitmap; IvSize: integer = 200);
+    procedure AvatarGenerateAI(var IvAvatar: TBitmap; IvSize: integer = 200; IvAiInstructions: string = '');
   end;
 
   TUsrRem = class(TRemotable)
@@ -3704,49 +3766,47 @@ type
     }
     {$ENDREGION}
 
-//type
-//  T631Rec = record
-//    N: string; // name
-//    P: string; // 60% primary
-//    S: string; // 30% secondary
-//    A: string; // 10% accent
-//  end;
   const
-  //FILE_VEC:          array [0..3] of string = ('C:\$Inc\w3\w3.js', 'C:\$Inc\w3\w3color.js', 'C:\$Inc\w3\w3.css', 'C:\$Inc\w3\w3-theme-%s.css');
-    FILE_VEC                 : TArray<string> = ['C:\$Inc\w3\w3.js', 'C:\$Inc\w3\w3color.js', 'C:\$Inc\w3\w3.css', 'C:\$Inc\w3\w3-theme-%s.css'];
-    THEME_NAME_VEC           : TArray<string> = ['amber'      ,'black'      ,'blue'       ,'blue-grey'  ,'brown'      ,'cyan'       ,'dark-grey'  ,'deep-orange','deep-purple','green'      ,'grey'       ,'indigo'     ,'khaki'      ,'light-blue' ,'light-green','light-grey' ,'lime'       ,'orange'     ,'pink'       ,'purple'     ,'red'        ,'silver'     ,'teal'       ,'white'      ,'yellow'     ];
-{60}THEME_PRIMARY_COLOR_VEC  : TArray<string> = ['#ffc107'    ,'#0f0f0f'    ,'#2196f3'    ,'#607d8b'    ,'#795548'    ,'#00bcd4'    ,'#616161'    ,'#ff5722'    ,'#673ab7'    ,'#4caf50'    ,'#9e9e9e'    ,'#3f51b5'    ,'#f0e68c'    ,'#87ceeb'    ,'#8bc34a'    ,'#e7e7e7'    ,'#cddc39'    ,'#ffa500'    ,'#e91e63'    ,'#9c27b0'    ,'#f44336'    ,'#c0c0c0'    ,'#009688'    ,'#ffffff'    ,'#ffeb3b'    ];
-{30}THEME_SECONDARY_COLOR_VEC: TArray<string> = ['#000000'    ,'#ffffff'    ,'#ffffff'    ,'#ffffff'    ,'#ffffff'    ,'#000000'    ,'#ffffff'    ,'#ffffff'    ,'#ffffff'    ,'#ffffff'    ,'#ffffff'    ,'#ffffff'    ,'#000000'    ,'#000000'    ,'#000000'    ,'#000000'    ,'#000000'    ,'#ffffff'    ,'#000000'    ,'#ffffff'    ,'#ffffff'    ,'#000000'    ,'#ffffff'    ,'#ffffff'    ,'#000000'    ];
-{10}THEME_ACCENT_COLOR_VEC   : TArray<string> = ['#ffa500'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ];
-//  THEME_PRIMARY_COLOR_KV_VEC: array [0..24] of T631Rec = (
-//    (N: 'amber'      P; : '#ffc107'; S: '#000000'; A: '#ff0000')
-//  , (N: 'black'      P; : '#0f0f0f'; S: '#ffffff'; A: '#ff0000')
-//  , (N: 'blue'       P; : '#2196f3'; S: '#ffffff'; A: '#ff0000')
-//  , (N: 'blue-grey'  P; : '#607d8b'; S: '#ffffff'; A: '#ff0000')
-//  , (N: 'brown'      P; : '#795548'; S: '#ffffff'; A: '#ff0000')
-//  , (N: 'cyan'       P; : '#00bcd4'; S: '#000000'; A: '#ff0000')
-//  , (N: 'dark-grey'  P; : '#616161'; S: '#ffffff'; A: '#ff0000')
-//  , (N: 'deep-orange'P; : '#ff5722'; S: '#ffffff'; A: '#ff0000')
-//  , (N: 'deep-purple'P; : '#673ab7'; S: '#ffffff'; A: '#ff0000')
-//  , (N: 'green'      P; : '#4caf50'; S: '#ffffff'; A: '#ff0000')
-//  , (N: 'grey'       P; : '#9e9e9e'; S: '#ffffff'; A: '#ff0000')
-//  , (N: 'indigo'     P; : '#3f51b5'; S: '#ffffff'; A: '#ff0000')
-//  , (N: 'khaki'      P; : '#f0e68c'; S: '#000000'; A: '#ff0000')
-//  , (N: 'light-blue' P; : '#87ceeb'; S: '#000000'; A: '#ff0000')
-//  , (N: 'light-green'P; : '#8bc34a'; S: '#000000'; A: '#ff0000')
-//  , (N: 'light-grey' P; : '#e7e7e7'; S: '#000000'; A: '#ff0000')
-//  , (N: 'lime'       P; : '#cddc39'; S: '#000000'; A: '#ff0000')
-//  , (N: 'orange'     P; : '#ffa500'; S: '#ffffff'; A: '#ff0000')
-//  , (N: 'pink'       P; : '#e91e63'; S: '#000000'; A: '#ff0000')
-//  , (N: 'purple'     P; : '#9c27b0'; S: '#ffffff'; A: '#ff0000')
-//  , (N: 'red'        P; : '#f44336'; S: '#ffffff'; A: '#ff0000')
-//  , (N: 'silver'     P; : '#c0c0c0'; S: '#000000'; A: '#ff0000')
-//  , (N: 'teal'       P; : '#009688'; S: '#ffffff'; A: '#ff0000')
-//  , (N: 'white'      P; : '#ffffff'; S: '#000000'; A: '#ff0000')
-//  , (N: 'yellow'     P; : '#ffeb3b'; S: '#000000'; A: '#ff0000')
+  //FILE_VEC:             array [0..3] of string = ('C:\$Inc\w3\w3.js', 'C:\$Inc\w3\w3color.js', 'C:\$Inc\w3\w3.css', 'C:\$Inc\w3\w3-theme-%s.css');
+    FILE_VEC                    : TArray<string> = ['C:\$Inc\w3\w3.js', 'C:\$Inc\w3\w3color.js', 'C:\$Inc\w3\w3.css', 'C:\$Inc\w3\w3-theme-%s.css'];
+
+    THEME_NAME_VEC              : TArray<string> = ['amber'      ,'black'      ,'blue'       ,'blue-grey'  ,'brown'      ,'cyan'       ,'dark-grey'  ,'deep-orange','deep-purple','green'      ,'grey'       ,'indigo'     ,'khaki'      ,'light-blue' ,'light-green','light-grey' ,'lime'       ,'orange'     ,'pink'       ,'purple'     ,'red'        ,'silver'     ,'teal'       ,'white'      ,'yellow'     ];
+    THEME_COLOR_VEC             : TArray<string> = ['#ffc107'    ,'#0f0f0f'    ,'#2196f3'    ,'#607d8b'    ,'#795548'    ,'#00bcd4'    ,'#616161'    ,'#ff5722'    ,'#673ab7'    ,'#4caf50'    ,'#9e9e9e'    ,'#3f51b5'    ,'#f0e68c'    ,'#87ceeb'    ,'#8bc34a'    ,'#e7e7e7'    ,'#cddc39'    ,'#ffa500'    ,'#e91e63'    ,'#9c27b0'    ,'#f44336'    ,'#c0c0c0'    ,'#009688'    ,'#ffffff'    ,'#ffeb3b'    ];
+
+    THEME_PRIMARY_60_COLOR_VEC  : TArray<string> = ['#ffc107'    ,'#0f0f0f'    ,'#2196f3'    ,'#607d8b'    ,'#795548'    ,'#00bcd4'    ,'#616161'    ,'#ff5722'    ,'#673ab7'    ,'#4caf50'    ,'#9e9e9e'    ,'#3f51b5'    ,'#f0e68c'    ,'#87ceeb'    ,'#8bc34a'    ,'#e7e7e7'    ,'#cddc39'    ,'#ffa500'    ,'#e91e63'    ,'#9c27b0'    ,'#f44336'    ,'#c0c0c0'    ,'#009688'    ,'#ffffff'    ,'#ffeb3b'    ];
+    THEME_SECONDARY_30_COLOR_VEC: TArray<string> = ['#000000'    ,'#ffffff'    ,'#ffffff'    ,'#ffffff'    ,'#ffffff'    ,'#000000'    ,'#ffffff'    ,'#ffffff'    ,'#ffffff'    ,'#ffffff'    ,'#ffffff'    ,'#ffffff'    ,'#000000'    ,'#000000'    ,'#000000'    ,'#000000'    ,'#000000'    ,'#ffffff'    ,'#000000'    ,'#ffffff'    ,'#ffffff'    ,'#000000'    ,'#ffffff'    ,'#ffffff'    ,'#000000'    ];
+    THEME_ACCENT_10_COLOR_VEC   : TArray<string> = ['#ffa500'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ,'#ff0000'    ];
+
+//  THEME_VEC: array [0..24] of TThiRec = (
+//    (Theme: 'amber'      ; P60: '#ffc107'; S30: '#000000'; A10: '#ff0000')
+//  , (Theme: 'black'      ; P60: '#0f0f0f'; S30: '#ffffff'; A10: '#ff0000')
+//  , (Theme: 'blue'       ; P60: '#2196f3'; S30: '#ffffff'; A10: '#ff0000')
+//  , (Theme: 'blue-grey'  ; P60: '#607d8b'; S30: '#ffffff'; A10: '#ff0000')
+//  , (Theme: 'brown'      ; P60: '#795548'; S30: '#ffffff'; A10: '#ff0000')
+//  , (Theme: 'cyan'       ; P60: '#00bcd4'; S30: '#000000'; A10: '#ff0000')
+//  , (Theme: 'dark-grey'  ; P60: '#616161'; S30: '#ffffff'; A10: '#ff0000')
+//  , (Theme: 'deep-orange'; P60: '#ff5722'; S30: '#ffffff'; A10: '#ff0000')
+//  , (Theme: 'deep-purple'; P60: '#673ab7'; S30: '#ffffff'; A10: '#ff0000')
+//  , (Theme: 'green'      ; P60: '#4caf50'; S30: '#ffffff'; A10: '#ff0000')
+//  , (Theme: 'grey'       ; P60: '#9e9e9e'; S30: '#ffffff'; A10: '#ff0000')
+//  , (Theme: 'indigo'     ; P60: '#3f51b5'; S30: '#ffffff'; A10: '#ff0000')
+//  , (Theme: 'khaki'      ; P60: '#f0e68c'; S30: '#000000'; A10: '#ff0000')
+//  , (Theme: 'light-blue' ; P60: '#87ceeb'; S30: '#000000'; A10: '#ff0000')
+//  , (Theme: 'light-green'; P60: '#8bc34a'; S30: '#000000'; A10: '#ff0000')
+//  , (Theme: 'light-grey' ; P60: '#e7e7e7'; S30: '#000000'; A10: '#ff0000')
+//  , (Theme: 'lime'       ; P60: '#cddc39'; S30: '#000000'; A10: '#ff0000')
+//  , (Theme: 'orange'     ; P60: '#ffa500'; S30: '#ffffff'; A10: '#ff0000')
+//  , (Theme: 'pink'       ; P60: '#e91e63'; S30: '#000000'; A10: '#ff0000')
+//  , (Theme: 'purple'     ; P60: '#9c27b0'; S30: '#ffffff'; A10: '#ff0000')
+//  , (Theme: 'red'        ; P60: '#f44336'; S30: '#ffffff'; A10: '#ff0000')
+//  , (Theme: 'silver'     ; P60: '#c0c0c0'; S30: '#000000'; A10: '#ff0000')
+//  , (Theme: 'teal'       ; P60: '#009688'; S30: '#ffffff'; A10: '#ff0000')
+//  , (Theme: 'white'      ; P60: '#ffffff'; S30: '#000000'; A10: '#ff0000')
+//  , (Theme: 'yellow'     ; P60: '#ffeb3b'; S30: '#000000'; A10: '#ff0000')
 //  );
   public
-    class function  W3ThemeCssGenerate(IvName, IvH60PrimaryBgColor, IvH30SecondaryFgColor, IvH10AccentColor: string): string; static; // https://blog.logrocket.com/building-color-palette-css
+    class function  W3ColorFromTheme(IvTheme: string): string; static;
+    class function  W3ThemeCssGenerate(IvTheme, IvH60PrimaryBgColor, IvH30SecondaryFgColor, IvH10AccentColor: string): string; static; // https://blog.logrocket.com/building-color-palette-css
     class function  W3ThemeTestHtmlGenerate: string; static;
     class procedure W3WebFilesGenerate; static;
   end;
@@ -3800,7 +3860,7 @@ type
     ACRONYM                = 'WKS';
     NAME                   = 'Working Knowledge System';
     DESCRIPTION            = 'Cloud integrated knowledge management system';
-  //COPYRIGHT              = '(c) 2024 Wks';
+  //COPYRIGHT              = '© 2010-present Wks';
     SLOGAN                 = 'Programmed for progress';
     WWW                    = 'www.wks.cloud';
     PHONE                  = '348/5904744';
@@ -3826,7 +3886,7 @@ type
     LONG_PAUSE_MS          = 3000;                  // pause after a failure (ie unsuccessful login attempt)
   public
     class function  Info: string; static;                        // returns 'WKS www.wks.cloud'
-    class function  Copyright: string; static;                   // returns '(c) 2024 Wks' with current year
+    class function  Copyright: string; static;                   // returns '© 2010-2024 Wks'
     class procedure WksWebFilesGenerate; static;                 // generate wks.js (not wks.css) from DbaCode + Default.htm directly
     class function  InitDba(var IvFbk: string): boolean; static; // *** not implemented but used in LoginForm ***
     class function  InitRio(var IvFbk: string): boolean; static; // *** not implemented but used in LoginForm ***
@@ -3912,7 +3972,6 @@ type
 
   TZipRec = record
     class procedure ZipFile(IvZipFileSpec, IvFileToZipSpec: string); static;
-
   end;
   {$ENDREGION}
 
@@ -3940,18 +3999,16 @@ const
 {$REGION 'GlobalVars'}
 var
   // globalvar
-  glo_z: cardinal;                 // profilecounter
   glo_h: cardinal;                 // handle
   glo_i: byte;                     // count
-
-  // profileusage
-//Inc(glo_z);                             // put this in the function to be profiled
-//glog.Log('profile calls: %d', [glo_z]); // put this in a place to report the counter
 
   // globaljachlogobjects
   gjlog : TjachLog;                // jachlog
   gjldsk: TjachLogToDisk;          // jachlogdisk
   gjludp: TjachLogToSysLogIndyUDP; // jachlogsysudp
+
+  // globalprofiler
+  gpro: TProfiler;                 // tprofiler
 
   // globalclassutils
   gini: TIniCls;                   // inifile
@@ -5396,7 +5453,7 @@ begin
   Result := Format('%s %s %s - %s', [Obj.ToUpper, Role, Ver, BitnessAsText]);
 end;
 
-class function TBynRec.ClientExists(IvClient: string; var IvFbk: string): boolean;
+class function  TBynRec.ClientExists(IvClient: string; var IvFbk: string): boolean;
 var
   cli, sql: string;
 begin
@@ -5408,7 +5465,7 @@ begin
   IvFbk := TFbkRec.ExistsStr('Client', IvClient, Result);
 end;
 
-class function TBynRec.ClientExistsRio(var IvFbk: string): boolean;
+class function  TBynRec.ClientExistsRio(var IvFbk: string): boolean;
 begin
   Result := (grio.HttpRio as ISystemSoapMainService).SystemClientExistsSoap(BinaryTag, IvFbk);
 end;
@@ -5759,12 +5816,48 @@ begin
   ];
 end;
 
-class function  TCodRec.CodeKindEnumFromInt(CodeKindInt: integer): TCodKindEnum;
+class function  TCodRec.CodeKindEnumFromInt(IvCodeKindInt: integer): TCodKindEnum;
 begin
-  Result := TCodKindEnum(CodeKindInt);
+  Result := TCodKindEnum(IvCodeKindInt);
 end;
 
-class function  TCodRec.CommentStr(IvKind: string): string;
+class function  TCodRec.CodeKindEnumFromStr(IvCodeKindStr: string): TCodKindEnum;
+begin
+  Result := TEnuRec.EnumFromStr<TCodKindEnum>('ck'+IvCodeKindStr, ckSql);
+end;
+
+class function  TCodRec.CommentStr(IvCodKindEnum: TCodKindEnum): string;
+begin
+  case IvCodKindEnum of
+    ckBat : Result := Bat.Comm ; // 0
+    ckCss : Result := CSS.Comm ; // 1
+    ckCsv : Result := CSV.Comm ; // 2
+    ckDws : Result := DWS.Comm ; // 3
+    ckHtml: Result := HTML.Comm; // 4
+    ckIni : Result := INI.Comm ; // 5
+    ckJava: Result := JAVA.Comm; // 6
+    ckJs  : Result := JS.Comm  ; // 7
+    ckJsl : Result := JSL.Comm ; // 8
+    ckJson: Result := JSON.Comm; // 9
+    ckMd  : Result := MD.Comm  ; // 10
+    ckPas : Result := PAS.Comm ; // 11
+    ckPy  : Result := PY.Comm  ; // 12
+    ckR   : Result := R.Comm   ; // 13
+    ckSql : Result := SQL.Comm ; // 14
+    ckTxt : Result := TXT.Comm ; // 15
+    ckXml : Result := XML.Comm ; // 16
+    ckYaml: Result := YAML.Comm; // 17
+  else
+            Result := SQL.Comm ;
+  end;
+
+end;
+
+class function  TCodRec.CommentStr(IvCodKindStr: string): string;
+begin
+  Result := CommentStr(TCodRec.CodeKindEnumFromStr(IvCodKindStr));
+
+{class function  TCodRec.CommentStr(IvKind: string): string;
 begin
        if SameText(IvKind, BAT.Kind ) then Result := BAT.Comm  // 0
   else if SameText(IvKind, CSS.Kind ) then Result := CSS.Comm  // 1
@@ -5786,30 +5879,69 @@ begin
   else if SameText(IvKind, YAML.Kind) then Result := YAML.Comm // 17
                                       else Result := SQL.Comm
   ;
+end;}
 end;
 
-class function  TCodRec.CommentStr2(IvCodKind: TCodKindEnum): string;
+class function  TCodRec.Comment1Str(IvCodKindEnum: TCodKindEnum): string;
 begin
-  case IvCodKind of
-    ckBat : Result := Bat.Comm;  // 0
-    ckCss : Result := CSS.Comm;  // 1
-    ckCsv : Result := CSV.Comm;  // 2
-    ckDws : Result := DWS.Comm;  // 3
-    ckHtml: Result := HTML.Comm; // 4
-    ckIni : Result := INI.Comm;  // 5
-    ckJava: Result := JAVA.Comm; // 6
-    ckJs  : Result := JS.Comm;   // 7
-    ckJsl : Result := JSL.Comm;  // 8
-    ckJson: Result := JSON.Comm; // 9
-    ckMd  : Result := MD.Comm;   // 10
-    ckPas : Result := PAS.Comm;  // 11
-    ckPy  : Result := PY.Comm;   // 12
-    ckR   : Result := R.Comm;    // 13
-    ckSql : Result := SQL.Comm;  // 14
-    ckTxt : Result := TXT.Comm;  // 15
-    ckXml : Result := XML.Comm;  // 16
-    ckYaml: Result := YAML.Comm; // 17
+  case IvCodKindEnum of
+    ckBat : Result := Bat.Comm1 ; // 0
+    ckCss : Result := CSS.Comm1 ; // 1
+    ckCsv : Result := CSV.Comm1 ; // 2
+    ckDws : Result := DWS.Comm1 ; // 3
+    ckHtml: Result := HTML.Comm1; // 4
+    ckIni : Result := INI.Comm1 ; // 5
+    ckJava: Result := JAVA.Comm1; // 6
+    ckJs  : Result := JS.Comm1  ; // 7
+    ckJsl : Result := JSL.Comm1 ; // 8
+    ckJson: Result := JSON.Comm1; // 9
+    ckMd  : Result := MD.Comm1  ; // 10
+    ckPas : Result := PAS.Comm1 ; // 11
+    ckPy  : Result := PY.Comm1  ; // 12
+    ckR   : Result := R.Comm1   ; // 13
+    ckSql : Result := SQL.Comm1 ; // 14
+    ckTxt : Result := TXT.Comm1 ; // 15
+    ckXml : Result := XML.Comm1 ; // 16
+    ckYaml: Result := YAML.Comm1; // 17
+  else
+            Result := SQL.Comm1 ;
   end;
+end;
+
+class function  TCodRec.Comment1Str(IvCodKindStr: string): string;
+begin
+  Result := Comment1Str(TCodRec.CodeKindEnumFromStr(IvCodKindStr));
+end;
+
+class function  TCodRec.Comment2Str(IvCodKindEnum: TCodKindEnum): string;
+begin
+  case IvCodKindEnum of
+    ckBat : Result := Bat.Comm2 ; // 0
+    ckCss : Result := CSS.Comm2 ; // 1
+    ckCsv : Result := CSV.Comm2 ; // 2
+    ckDws : Result := DWS.Comm2 ; // 3
+    ckHtml: Result := HTML.Comm2; // 4
+    ckIni : Result := INI.Comm2 ; // 5
+    ckJava: Result := JAVA.Comm2; // 6
+    ckJs  : Result := JS.Comm2  ; // 7
+    ckJsl : Result := JSL.Comm2 ; // 8
+    ckJson: Result := JSON.Comm2; // 9
+    ckMd  : Result := MD.Comm2  ; // 10
+    ckPas : Result := PAS.Comm2 ; // 11
+    ckPy  : Result := PY.Comm2  ; // 12
+    ckR   : Result := R.Comm2   ; // 13
+    ckSql : Result := SQL.Comm2 ; // 14
+    ckTxt : Result := TXT.Comm2 ; // 15
+    ckXml : Result := XML.Comm2 ; // 16
+    ckYaml: Result := YAML.Comm2; // 17
+  else
+            Result := SQL.Comm2 ;
+  end;
+end;
+
+class function  TCodRec.Comment2Str(IvCodKindStr: string): string;
+begin
+  Result := Comment2Str(TCodRec.CodeKindEnumFromStr(IvCodKindStr));
 end;
 
 procedure TCodRec.Reset(IvResetObjAlso: boolean);
@@ -5831,7 +5963,7 @@ begin
   // ...
 end;
 
-function TCodRec.InitDba(IvId: integer; var IvFbk: string): boolean;
+function  TCodRec.InitDba(IvId: integer; var IvFbk: string): boolean;
 var
   sql: string;
   dst: TDataset;
@@ -6017,6 +6149,25 @@ begin
     Result := IvColor; // ColorToRGB()
 end;
 
+class function  TColRec.TColIsDark(IvColor: TColor): boolean;
+var
+  sum: integer;
+  red, gre, blu: byte;
+begin
+  red := R(IvColor);
+  gre := G(IvColor);
+  blu := B(IvColor);
+
+  // i
+  //sum := red + gre + blu;
+  //Result := sum < 3 * 128;
+
+  // ii based on formula: brightness = sqrt( .241 * R^2 + .691 * G^2 + .068 * B^2 )
+  sum := Round(Sqrt(red * red * 0.241 + gre * gre * 0.691 + blu * blu * 0.068));
+  Result := sum < 128;
+end;
+
+
 class function  TColRec.TColLighten(IvColor: TColor; IvPercentage: integer): TColor;
 var
 //r: TColorRef;
@@ -6043,30 +6194,29 @@ begin
   Result := TColFromHsl(h, l, s);
 end;
 
+
 class function  TColRec.TColAnti(IvColor: TColor): TColor;
 var
-  r, g, b: byte;
+  red, gre, blu: byte;
 begin
   IvColor := ColorToRGB(IvColor);
-  r := GetRValue(IvColor);
-  g := GetGValue(IvColor);
-  b := GetBValue(IvColor);
+  red := R(IvColor);
+  gre := G(IvColor);
+  blu := B(IvColor);
 
   // i - naive approach
-  Result := TColor( Winapi.Windows.RGB( 255 - r
-                                      , 255 - g
-                                      , 255 - b ));
+  Result := TColor( Winapi.Windows.RGB(255 - red, 255 - gre, 255 - blu) );
 end;
 
 class function  TColRec.TColAntiBw(IvColor: TColor): TColor;
-var
-  i: integer;
-  r, g, b: byte;
+//var
+  //i: integer;
+  //r, g, b: byte;
 begin
   IvColor := ColorToRGB(IvColor);
-  r := GetRValue(IvColor);
-  g := GetGValue(IvColor);
-  b := GetBValue(IvColor);
+//r := GetRValue(IvColor);
+//g := GetGValue(IvColor);
+//b := GetBValue(IvColor);
 
   // i
 //if (r + g + b) > 384 then
@@ -6081,15 +6231,11 @@ begin
 //, IfThen(b > $40, $00, $FF)
 //);
 
-  // iii - based on formula: brightness = sqrt( .241 * R^2 + .691 * G^2 + .068 * B^2 )
-  i := Round(Sqrt(
-        r * r * 0.241
-      + g * g * 0.691
-      + b * b * 0.068 ));
-  if (i > 128) then   // treshold seems good in wide range
-    Result := clBlack
+  // iii
+  if TColIsDark(IvColor) then
+    Result := clWhite  // IvColor is rather "dark" ---> return white bg
   else
-    Result := clWhite;
+    Result := clBlack; // IvColor is rather "bright" --> return black bg
 end;
 
 
@@ -6240,21 +6386,23 @@ end;
 
 class function  TColRec.FromHexStr(IvHexString, IvDefault: string): TColor;
 var
-  s: string;
+  str: string;
 begin
-  s := IvHexString.Trim;
-  if s = '' then
-    s := IvDefault;
-  if Length(s) < 6 then
-    s := s + StringOfChar('0', 6 - Length(s));
-  if Length(s) > 6 then
-    s := LeftStr(s, 6);
+  str := IvHexString.Trim;
+  if str = '' then
+    str := IvDefault;
+  if str.StartsWith('#') then
+    str := str.Substring(1);
+  if Length(str) < 6 then
+    str := str + StringOfChar('0', 6 - Length(str));
+  if Length(str) > 6 then
+    str := LeftStr(str, 6);
 
   try
     Result := RGB(
-      StrToInt('$' + Copy(s, 1, 2)) // red value
-    , StrToInt('$' + Copy(s, 3, 2)) // green value
-    , StrToInt('$' + Copy(s, 5, 2)) // blue value
+      StrToInt('$' + Copy(str, 1, 2)) // red value
+    , StrToInt('$' + Copy(str, 3, 2)) // green value
+    , StrToInt('$' + Copy(str, 5, 2)) // blue value
     );
   except
     Result := FromHexStr(IvDefault); // if colorname is mispelled, like skyblu (should be skyblue), than 1) will not trigger and 2) will fail
@@ -7170,7 +7318,7 @@ var
   sbu: TSbuRec;
   dst: TDataSet;
   oid, pid, ord: integer;
-  tbl, sta, cki, con, ona, com, cro, oty, a, b: string; // table, state, contentkind, content, objname, comment, commentrow, outputtype
+  tbl, sta, cki, con, ona, com, co1, co2, csr, oty, a, b: string; // table, state, contentkind, content, objname, comment, comnt1, comnt2, comntseprow, outputtype
 begin
   // start
   tik.Init;
@@ -7239,15 +7387,22 @@ begin
 
       // commentcharsandrow
       com := TCodRec.CommentStr(cki);
-      if com.IsEmpty then com := '--';
-      cro := StringOfChar(com.Chars[0], 80);                 // not good for /**/ or <!---->
+      co1 := TCodRec.Comment1Str(cki);
+      co2 := TCodRec.Comment2Str(cki);
+      if Sametext('Html', cki) then
+        csr := co1 + StringOfChar(com.Chars[0], 73) + co2   // <!------------->
+      else
+        csr := StringOfChar(com.Chars[0], 80);              // ////////////////
 
       // head
       a := Format('%s', [ona]);
       b := Format('(oid:%d, pid:%d, ord:%d)', [oid, pid, ord]);
-      sbu.Add(cro, true, ifthen(i = 0, 0, 2));
-      sbu.Add('%s %-40s%37s', [com, a, b]);
-      sbu.Add(cro);
+      sbu.Add(csr, true, ifthen(i = 0, 0, 2));
+      if Sametext('Html', cki) then
+        sbu.Add('%s %-34s%37s %s', [co1, a, b, co2])
+      else
+        sbu.Add('%s %-40s%37s', [com, a, b]);
+      sbu.Add(csr);
 
       // add
       con := grva.Rva(con, false, false, true);
@@ -7263,9 +7418,12 @@ begin
     // tail
     a := Format('END', []);
     b := Format('(generated by wks @ %s in %d ms)', [DateTimeToStr(Now), tik.ElapsedMs]);
-    sbu.Add(cro, true, 2);
-    sbu.Add('%s %-20s%57s', [com, a, b]);
-    sbu.Add(cro);
+    sbu.Add(csr, true, 2);
+    if Sametext('Html', cki) then
+      sbu.Add('%s %-14s%57s %s', [co1, a, b, co2])
+    else
+      sbu.Add('%s %-20s%57s', [com, a, b]);
+    sbu.Add(csr);
 
     // return
     IvObjName      := ona;
@@ -7281,7 +7439,7 @@ begin
   Result := (grio.HttpRio as ISystemSoapMainService).SystemObjectTreeContent(IvObj, IvIdOrPath, IvWithChild, IvAffected, IvObjName, IvHTreeContent, IvFbk);
 end;
 
-class function TDbaRec.ObjTreeContentRioSave(const IvObj, IvIdOrPath: string; IvWithChild: boolean; IvFileSpec: string; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean;
+class function  TDbaRec.ObjTreeContentRioSave(const IvObj, IvIdOrPath: string; IvWithChild: boolean; IvFileSpec: string; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean;
 begin
   Result := (grio.HttpRio as ISystemSoapMainService).SystemObjectTreeContentSave(IvObj, IvIdOrPath, IvWithChild, IvFileSpec, IvAffected, IvObjName, IvHTreeContent, IvFbk);
 end;
@@ -8202,7 +8360,7 @@ begin
   // end
   IvDst.First;
 end;
-   {$ENDREGION}
+    {$ENDREGION}
 
   {$ENDREGION}
 
@@ -8222,6 +8380,15 @@ begin
     repeat
       Delete(Result, 1, 1);
     until Result[1].IsUpper;
+end;
+
+class function TEnuRec.EnumFromInt<T>(IvEnumInt: integer; IvDefault: T): T;
+begin
+//try
+  //Result := T(IvEnumInt);
+//except
+    Result := IvDefault;
+//end;
 end;
 
 class function TEnuRec.EnumFromStr<T>(IvEnumStr: string; IvDefault: T): T;
@@ -8888,7 +9055,7 @@ class function  THtmRec.Attr(IvAttr, IvValue: string; IvIfTrue: boolean): string
   {$REGION 'help'}
   {
    name="Co..."
-   it is used for form controls (such as <input>, <select>, <radio>)
+   it is used for form controls (such as <input>, <select>, <checkbox>, <radio>)
    as that's the identifier used in the POST or GET call that happens on form submission
 
    id="Co..."
@@ -8981,145 +9148,13 @@ end;
 
 class procedure THtmRec.ValAdd(var IvValuesCurr: string; IvValuesToAdd: string; IvSep: string; IvIfTrue: boolean);
 begin
-  if IvIfTrue and not IvValuesCurr.Contains(IvValuesToAdd) then
+  if IvIfTrue and not TStrRec.StrHas(IvValuesCurr, IvValuesToAdd) then
     IvValuesCurr := IvValuesCurr + IvSep + IvValuesToAdd;
 end;
 
 class function  THtmRec.IdName(IvCoName: string): string;
 begin
   Result := Attr('nameid', TNamRec.Co(IvCoName));
-end;
-
-class function  THtmRec.Elem(IvTag, IvType, IvCoName, IvTitle, IvValue, IvClass, IvStyle, IvTail: string; IvReadOnly, IvDisabled: boolean): string;
-const
-  ELEMENTS_WITHOUT_VALUE_ATTR = 'textarea';
-var
-  tag: string;
-begin
-  // zip
-  tag := IvTag.Trim.ToLower;
-
-  // open
-  Result := '<'
-          + tag
-          + Attr('type'  , IvType)   // if tag=input
-          + Attr('nameid', IvCoName)
-          + Attr('title' , IvTitle)
-          + Attr('value' , IvValue, not ELEMENTS_WITHOUT_VALUE_ATTR.Contains(IvTag) )
-          + Attr('class' , IvClass)
-          + Attr('style' , IvStyle)
-          + giif.ExP(IvTail, ' ') // something like 'attr1="value1" attr2="value2" required onclick="" ...'
-          + '>';
-
-  // close
-  if not (','+HTM_TAG_SINGLE_CSV+',').Contains(','+tag+',') then
-    Result := Result + IvValue + '</' + tag + '>';
-end;
-
-class function  THtmRec.Input(IvType, IvCoName, IvTitle, IvValue, IvClass, IvStyle, IvTail: string; IvReadOnly, IvDisabled: boolean): string;
-
-  {$REGION 'help'}
-{
-  form elements
-  -------------
-  <form>     defines an html form for user input
-  <label>    defines a label for an <input> element
-  <fieldset> groups related elements in a form
-  <legend>   defines a caption for a <fieldset> element
-  <output>   defines the result of a calculation
-
-  form controls
-  -------------
-  <button>   defines a clickable button
-  <input>    defines an input control
-  <datalist> specifies a list of pre-defined options for input controls
-  <select>   defines a drop-down list
-  <option>   defines an option in a drop-down list
-  <optgroup> defines a group of related options in a drop-down list
-  <textarea> defines a multiline input control (text area)
-
-  input types
-  -----------
-  <input type="button">
-  <input type="checkbox">
-  <input type="color">
-  <input type="date">
-  <input type="datetime-local">
-  <input type="email">
-  <input type="file">
-  <input type="hidden">
-  <input type="image">
-  <input type="month">
-  <input type="number">
-  <input type="password">
-  <input type="radio">
-  <input type="range">
-  <input type="reset">
-  <input type="search">
-  <input type="submit">
-  <input type="tel">
-  <input type="text">
-  <input type="time">
-  <input type="url">
-  <input type="week">
-}
-  {$ENDREGION}
-
-begin
-  if not TStrRec.StrHas(HTM_INPUT_MONO_CSV {+ ',' + HTM_INPUT_MULTI_CSV} + ',' + HTM_INPUT_BUTTON_CSV, IvType) then
-    Result := Elem('input'   , 'text', IvCoName, IvTitle, IvValue, IvClass+' w3-input', IvStyle, IvTail, IvReadOnly, IvDisabled)
-
-  else if SameText('textarea', IvType) then
-    Result := Elem('textarea', ''    , IvCoName, IvTitle, IvValue, IvClass+' w3-input', IvStyle, IvTail, IvReadOnly, IvDisabled)
-
-  else
-    Result := Elem('input'   , IvType, IvCoName, IvTitle, IvValue, IvClass+' w3-input', IvStyle, IvTail, IvReadOnly, IvDisabled);
-end;
-
-class function  THtmRec.Select(IvType, IvCoName, IvTitle: string; IvItemVec, IvValueVec, IvSelectedVec, IvDisabledVec: TArray<string>; IvClass, IvStyle, IvTail: string): string;
-var
-  i: integer;
-  sbu: TSbuRec;
-  nam, ids, ida, cap, val, sel, chk, dis: string;
-begin
-  // items
-  for i := Low(IvItemVec) to High(IvItemVec) do begin
-    // zip
-    nam := Format('name="%s"', [IvCoName]);
-    ids := Format('%s%d', [IvCoName, i]);
-    ida := Format('id="%s"', [ids]);
-    cap := IvItemVec[i];
-    val := IvValueVec[i];
-    sel := giif.Str(TArray.Contains<string>(IvSelectedVec, val), 'selected'         , '');
-    chk := giif.Str(TArray.Contains<string>(IvSelectedVec, val), 'checked="checked"', '');
-    dis := giif.Str(TArray.Contains<string>(IvDisabledVec, val), 'disabled'         , '');
-
-    // select
-    if SameText(IvType, 'select') then
-      sbu.Add('<option %s class="w3-input" value="%s" %s %s>%s</option>'                                                   , [{nam,} ida, val, sel, dis, cap]) // <option value="Ie">Internet Explorer</option>
-
-    // checkbox
-    else if SameText(IvType, 'checkbox') then
-      sbu.Add('<input type="checkbox" %s %s class="w3-check" value="%s" %s %s>&nbsp;<label for="%s">%s</label>&nbsp;&nbsp;', [ nam,  ida, val, chk, dis, ids, cap]) // <input type="checkbox" class="w3-check" value="Aaa" checked="checked" diisabled>
-
-    // radio
-    else if SameText(IvType, 'radio') then
-      sbu.Add('<input type="radio" %s %s class="w3-radio" value="%s" %s %s>&nbsp;<label for="%s">%s</label>&nbsp;&nbsp;'   , [ nam,  ida, val, chk, dis, ids, cap]) // <input type="checkbox" class="w3-check" value="Aaa" checked="checked" diisabled>
-     ;
-  end;
-
-  // select
-  if SameText(IvType, 'select') then
-    Result := Format('<select %s title="%s" class="w3-select %s" style="%s" %s>', [IdName(IvCoName), IvTitle, IvClass, IvStyle, IvTail])
-      + sLineBreak + sbu.Text
-      + sLineBreak + '</select>'
-
-  // checkboxradio
-  else
-    Result := Format('<p title="%s" class="w3-select %s" style="%s" %s>', [IvTitle, IvClass, IvTitle, IvStyle, IvTail])
-      + sLineBreak + sbu.Text
-      + sLineBreak + '</p>'
-  ;
 end;
 
 class function  THtmRec.A(IvHref, IvCaption, IvTitle, IvTarget, IvClass, IvStyle: string): string;
@@ -9174,64 +9209,7 @@ begin
     Result := Format('<div style="height:%dpx"></div>', [IvPx]);
 end;
 
-class function  THtmRec.Btn(IvCaption, IvTitle, IvClass, IvStyle, IvOnClick: string): string;
-begin
-  Result := Format('<button type="button" class="w3-button %s" style="%s" title="%s" onclick="%s">%s</button>', [IvClass, IvStyle, IvTitle, IvOnClick, IvCaption]);
-end;
-
-class function  THtmRec.BtnOk(IvCoModalName: string): string;
-var
-  {rid, }ock, tit, cla, sty: string; // redirectid, onclick, title, class, style
-begin
-  ock := 'document.getElementById(''' + IvCoModalName + ''').style.display=''none'';'; tit := 'Dismiss the dialog panel'; cla := 'w3-theme-d5 w3-round-xxlarge w3-right';
-  sty := 'margin: 8px;';
-  Result := Btn('Ok', tit, cla, sty, ock);
-end;
-
-class function  THtmRec.BtnStd(IvKind: string; IvRedirectToPageId: integer; IvData: string): string; // *** magari gli standard li mettiamo rounded ***
-var
-  rid, ock, tit, cla, sty: string; // redirectid, onclick, title, class, style
-begin
-  if IvRedirectToPageId > 0 then
-    rid := Format('?CoRedirectToPageId=%d', [IvRedirectToPageId])
-  else
-    rid := '';
-
-       if SameText(IvKind, 'Close')          then begin ock := 'document.getElementById('''+IvData+''').style.display=''none'''         ; tit := 'Close modal panel'       ; cla := 'w3-theme-d5 w3-round-xxlarge' end
-  else if SameText(IvKind, 'Back')           then begin ock := 'window.history.go(-1)'                                                  ; tit := 'Go to previous page'     ; cla := 'w3-theme-d5 w3-round-xxlarge' end
-  else if SameText(IvKind, 'Home')           then begin ock := 'window.location.href=''' + gwrq.ScriptNameUrl + ''''                    ; tit := 'Go to home page'         ; cla := 'w3-theme-d5 w3-round-xxlarge' end
-  else if SameText(IvKind, 'Login')          then begin ock := 'window.location.href=''/WksPageIsapiProject.dll/Login'+rid+''''         ; tit := 'Go to login page'        ; cla := '' end
-  else if SameText(IvKind, 'LoginTry')       then begin ock := 'window.location.href=''/WksPageIsapiProject.dll/LoginTry'+rid+''''      ; tit := 'Try to login'            ; cla := '' end
-  else if SameText(IvKind, 'AccountCreate')  then begin ock := 'window.location.href=''/WksPageIsapiProject.dll/AccountCreate'+rid+'''' ; tit := 'Create your new account' ; cla := 'w3-theme-l5 w3-right' end
-  else if SameText(IvKind, 'AccountRecover') then begin ock := 'window.location.href=''/WksPageIsapiProject.dll/AccountRecover'+rid+''''; tit := 'Recover your account'    ; cla := 'w3-theme-l5 w3-right' end
-  else                                            begin ock := 'alert(''Unknown standard button'');'                                    ; tit := 'Unknow standard button'  ; cla := '' end;
-
-  sty := 'margin: 8px;';
-
-  Result := Btn(TStrRec.StrExpand(IvKind), tit, cla, sty, ock);
-end;
-
-class function  THtmRec.BtnX(IvCoName: string; IvFollowLink: string; IvFbkMode: TFbkModeEnum): string;
-var
-  ock: string;
-  cla: string;
-begin
-  // class
-  if IvFbkMode = fmNone then
-    cla := 'w3-theme-l2'
-  else
-    cla := Format('w3-%s', [TColRec.HColW3(IvFbkMode)]);
-
-  // js
-  ock := 'document.getElementById(''' + IvCoName + ''').style.display=''none'''; // remove also w3-show ?
-  if not IvFollowLink.IsEmpty then
-    ock := ock + ';window.location.href=''' + IvFollowLink + '''';
-
-  // end
-  Result := Format('<span class="w3-button w3-large w3-display-topright %s" title="Close Modal" onclick="%s">&times;</span>', [cla, ock]);
-end;
-
-class function  THtmRec.Img(IvSrc, IvAlt: string; IvW, IvH: integer; IvIsCard: boolean; IvTorn: TImgTormEnum): string;
+class function  THtmRec.Img(IvSrc, IvAlt: string; IvW, IvH: integer; IvIsCard: boolean; IvTorn: TImgTormEnum{, IvClass, IvStyle: string}): string;
 var
   a, w, h, c: string;
 begin
@@ -9333,7 +9311,7 @@ begin
   Result := Alert(IvTitle, IvText, 'w3-gray');
 end;
 
-class function  THtmRec.Modal(IvShow: boolean; IvCoName, IvBody, IvHeader, IvFooter: string; IvFbkMode: TFbkModeEnum): string;
+class function  THtmRec.Modal(IvShow: boolean; IvCoName, IvBody, IvHeader, IvFooter: string; IvFbkMode: TFbkModeEnum; IvCopyButtonOn: boolean): string;
   // buttons to open/close the modal
   // '<button class="w3-button" onclick="document.getElementById(''' + IvCoName + ''').style.display=''block''">Open Modal</button>'
   // '<button class="w3-button" onclick="document.getElementById(''' + IvCoName + ''').style.display=''none''">Close Modal</button>'
@@ -9365,9 +9343,11 @@ begin
 
   // body
   if not IvBody.IsEmpty then begin  // '<button class="w3-btn" onclick="copyToClipboard(''%sBody'');">Copy</button>'
-  sbu.Add(    '<div class="w3-center" style="margin-top: 16px;">', [IvCoName]);
+    if IvCopyButtonOn then begin
+  sbu.Add(    '<div class="w3-center" style="margin-top: 16px;border: 1 px solid red;">', [IvCoName]);
   sbu.Add(      Btn('Copy', 'Copy the text to the clipboard', '', '', Format('copyToClipboard(''%sBody'');', [IvCoName])));
   sbu.Add(    '</div>');
+    end;
   sbu.Add(    '<div id="%sBody" class="w3-container">', [IvCoName]);
   sbu.Add(       IvBody);
   sbu.Add(    '</div>');
@@ -9390,50 +9370,330 @@ begin
   Result := sbu.Text;
 end;
 
-class function  THtmRec.ModalBtn(IvBtnCaption, IvCoName, IvBody, IvHeader, IvFooter: string; IvFbkMode: TFbkModeEnum): string;
+class function  THtmRec.ModalBtn(IvBtnCaption, IvCoName, IvBody, IvHeader, IvFooter: string; IvFbkMode: TFbkModeEnum; IvCopyButtonOn: boolean): string;
 begin
-  Result := Modal(false, IvCoName, IvBody, IvHeader, IvFooter, IvFbkMode)
+  Result := Modal(false, IvCoName, IvBody, IvHeader, IvFooter, IvFbkMode, IvCopyButtonOn)
           + '<button class="w3-button" onclick="document.getElementById(''' + IvCoName + ''').style.display=''block''">' + IvBtnCaption + '</button> ';
 end;
 
-class function  THtmRec.GridRow(IvValueVec, IvClassVec, IvStyleVec: TArray<string>): string;
+class function  THtmRec.GridRow(IvValueVec, IvClassVec, IvStyleVec: TArray<string>; IvBorderDgOn: boolean): string;
 var
   i: integer;
+  sbu: TSbuRec;
+  rdg, cdb: string;
 begin
-  Result := '<div class="w3-row">';
+  // debug
+  if IvBorderDgOn then begin
+    rdg := 'style="border:1px solid green;"';
+    cdb := 'border:1px solid red;';
+  end;
+
+  // row
+  sbu.Add('<div class="w3-row" %s>', [rdg]);
   for i := Low(IvValueVec) to High(IvValueVec) do
-    Result := Result + sLineBreak + Format('<div class="%s" style="%s">%s</div>', [IvClassVec[i], IvStyleVec[i], IvValueVec[i]]);
-  Result := Result + sLineBreak + '</div>';
+    sbu.Add('<div class="%s" style="%s%s">%s</div>', [IvClassVec[i], IvStyleVec[i], cdb, IvValueVec[i]]);
+  sbu.Add('</div>');
+  Result := sbu.Text;
 end;
 
-class function  THtmRec.FormLine(IvLabel, IvHelp, IvKind, IvCoName, IvTitle, IvValue, IvClass, IvStyle, IvTail: string; IvLabelWidth, IvHelpWidth: integer): string;
+class function  THtmRec.Elem(IvTag, IvKind, IvCoName, IvTitle, IvValue, IvClass, IvStyle, IvTail: string; IvDisabled, IvReadOnly: boolean): string;
+const
+  ELEMENTS_WITHOUT_VALUE_ATTR = 'textarea';
+var
+  tag: string;
+begin
+  // zip
+  tag := IvTag.Trim.ToLower;
+
+  // open
+  Result := '<'
+          + tag
+          + Attr('type'  , IvKind)   // if tag=input
+          + Attr('nameid', IvCoName)
+          + Attr('title' , IvTitle)
+          + Attr('value' , IvValue, not TStrRec.StrHas(ELEMENTS_WITHOUT_VALUE_ATTR, IvTag) )
+          + Attr('class' , IvClass)
+          + Attr('style' , IvStyle)
+        //+ disabled ?
+        //+ readonly ?
+          + giif.ExP(IvTail, ' ')    // something like 'attr1="value1" attr2="value2" required onclick="" ...'
+          + '>';
+
+  // close
+  if not TStrRec.StrHas(','+HTM_TAG_SINGLE_CSV+',', ','+tag+',') then
+    Result := Result + IvValue + '</' + tag + '>';
+end;
+
+class function  THtmRec.Choice(     IvKind, IvCoName, IvTitle: string; IvOptCaptionVec, IvOptValueVec: TArray<string>; IvClass, IvStyle, IvTail: string; IvValueVec, IvDisabledVec: TArray<string>; IvReadOnly: boolean): string;
+begin
+  // select
+  if SameText(IvKind, 'select') then
+    Result := Select  (IvCoName, IvTitle, IvOptCaptionVec, IvOptValueVec, IvClass, IvStyle, IvTail, IvValueVec, IvDisabledVec)
+
+  // checkbox
+  else if SameText(IvKind, 'checkbox') then
+    Result := Checkbox(IvCoName, IvTitle, IvOptCaptionVec, IvOptValueVec, IvClass, IvStyle, IvTail, IvValueVec, IvDisabledVec)
+
+  // radio
+  else if SameText(IvKind, 'radio') then
+    Result := Radio   (IvCoName, IvTitle, IvOptCaptionVec, IvOptValueVec, IvClass, IvStyle, IvTail, IvValueVec, IvDisabledVec)
+  ;
+end;
+
+class function  THtmRec.Select(             IvCoName, IvTitle: string; IvOptCaptionVec, IvOptValueVec: TArray<string>; IvClass, IvStyle, IvTail: string; IvValueVec, IvDisabledVec: TArray<string>; IvReadOnly: boolean): string;
+var
+  i: integer;
+  sbu: TSbuRec;
+  cna, ona, oid, oik, oca, ova, sek, dis: string; // ctrlname, optname, optid, optidkv, optcaption, optvalue, selected|checked, disabled
+begin
+  // zip
+  cna := IdName(IvCoName);
+
+  // items
+  for i := Low(IvOptCaptionVec) to High(IvOptCaptionVec) do begin
+    // zip
+    ona := Format('name="%s"', [IvCoName]);
+    oid := Format('%s%d'     , [IvCoName, i]);
+    oik := Format('id="%s"'  , [oid]);
+    oca := IvOptCaptionVec[i];
+    ova := IvOptValueVec[i];
+    dis := giif.Str(TArray.Contains<string>(IvDisabledVec, ova), 'disabled', '');
+    sek := giif.Str(TArray.Contains<string>(IvValueVec   , ova), 'selected', '');
+
+    // build <option id="CoAaa0" class="w3-input" value="Ie" selected disabled>Internet Explorer</option>
+    sbu.Add('<option class="w3-input" %s %s value="%s" %s %s>%s</option>', [ona, oik, ova, sek, dis, oca]);
+  end;
+
+  // pack
+  Result := Format('<select %s title="%s" class="w3-select %s" style="%s" %s>', [cna, IvTitle, IvClass, IvStyle, IvTail])
+    + sLineBreak + sbu.Text
+    + sLineBreak + '</select>';
+end;
+
+class function  THtmRec.Checkbox(           IvCoName, IvTitle: string; IvOptCaptionVec, IvOptValueVec: TArray<string>; IvClass, IvStyle, IvTail: string; IvValueVec, IvDisabledVec: TArray<string>; IvReadOnly: boolean): string;
+var
+  i: integer;
+  sbu: TSbuRec;
+  cna, ona, oid, oik, oca, ova, sek, dis: string;
+begin
+  // zip
+  cna := IdName(IvCoName);
+
+  // items
+  for i := Low(IvOptCaptionVec) to High(IvOptCaptionVec) do begin
+    // zip
+    ona := Format('name="%s"', [IvCoName]);
+    oid := Format('%s%d'     , [IvCoName, i]);
+    oik := Format('id="%s"'  , [oid]);
+    oca := IvOptCaptionVec[i];
+    ova := IvOptValueVec[i];
+    dis := giif.Str(TArray.Contains<string>(IvDisabledVec, ova), 'disabled'         , '');
+    sek := giif.Str(TArray.Contains<string>(IvValueVec   , ova), 'checked="checked"', '');
+
+    // build <input type="checkbox" class="w3-check" name="CoAaa" id="CoAaa0" value="Aaa" checked="checked" disabled><label for="CoAaa0">Aaa</label>
+    sbu.Add('<input type="checkbox" class="w3-check" %s %s value="%s" %s %s>&nbsp;<label for="%s">%s</label>&nbsp;&nbsp;', [ona, oik, ova, sek, dis, oid, oca]);
+  end;
+
+  // pack
+  Result := Format('<p %s title="%s" class="%s" style="%s" %s>', [cna, IvTitle, IvClass, IvStyle, IvTail])
+    + sLineBreak + sbu.Text
+    + sLineBreak + '</p>';
+end;
+
+class function  THtmRec.Radio(              IvCoName, IvTitle: string; IvOptCaptionVec, IvOptValueVec: TArray<string>; IvClass, IvStyle, IvTail: string; IvValueVec, IvDisabledVec: TArray<string>; IvReadOnly: boolean): string;
+var
+  i: integer;
+  sbu: TSbuRec;
+  cna, ona, oid, oik, oca, ova, sek, dis: string;
+begin
+  // zip
+  cna := IdName(IvCoName);
+
+  // items
+  for i := Low(IvOptCaptionVec) to High(IvOptCaptionVec) do begin
+    // zip
+    ona := Format('name="%s"', [IvCoName]);
+    oid := Format('%s%d'     , [IvCoName, i]);
+    oik := Format('id="%s"'  , [oid]);
+    oca := IvOptCaptionVec[i];
+    ova := IvOptValueVec[i];
+    dis := giif.Str(TArray.Contains<string>(IvDisabledVec, ova), 'disabled'         , '');
+    sek := giif.Str(TArray.Contains<string>(IvValueVec   , ova), 'checked="checked"', '');
+
+    // build <input type="radio" class="w3-radio" name="CoAaa" id="CoAaa0" value="Aaa" checked="checked" disabled>
+    sbu.Add('<input type="radio" class="w3-radio" %s %s value="%s" %s %s>&nbsp;<label for="%s">%s</label>&nbsp;&nbsp;', [ona, oik, ova, sek, dis, oid, oca]);
+  end;
+
+  // pack
+  Result := Format('<p %s title="%s" class="%s" style="%s" %s>', [cna, IvTitle, IvClass, IvStyle, IvTail])
+    + sLineBreak + sbu.Text
+    + sLineBreak + '</p>';
+end;
+
+class function  THtmRec.Btn(IvCaption, IvTitle, IvClass, IvStyle, IvOnClick: string): string;
+begin
+  Result := Format('<button type="button" class="w3-button %s" style="%s" title="%s" onclick="%s">%s</button>', [IvClass, IvStyle, IvTitle, IvOnClick, IvCaption]);
+end;
+
+class function  THtmRec.BtnOk(IvCoModalName: string): string;
+var
+  {rid, }ock, tit, cla, sty: string; // redirectid, onclick, title, class, style
+begin
+  ock := {'document.getElementById(''' + IvCoModalName + ''').style.display=''none'';'} 'window.history.go(-1);';
+  tit := 'Dismiss the dialog panel';
+  cla := 'w3-theme-d5 w3-round-xxlarge w3-right';
+  sty := 'margin: 8px;';
+  Result := Btn('Ok', tit, cla, sty, ock);
+end;
+
+class function  THtmRec.BtnStd(IvKind: string; IvRedirectToPageId: integer; IvData: string): string; // *** magari gli standard li mettiamo rounded ***
+var
+  rid, ock, tit, cla, sty: string; // redirectid, onclick, title, class, style
+begin
+  if IvRedirectToPageId > 0 then
+    rid := Format('?CoRedirectToPageId=%d', [IvRedirectToPageId])
+  else
+    rid := '';
+
+       if SameText(IvKind, 'Close')          then begin ock := 'document.getElementById('''+IvData+''').style.display=''none'''         ; tit := 'Close modal panel'       ; cla := 'w3-theme-d5 w3-round-xxlarge' end
+  else if SameText(IvKind, 'Back')           then begin ock := 'window.history.go(-1)'                                                  ; tit := 'Go to previous page'     ; cla := 'w3-theme-d5 w3-round-xxlarge' end
+  else if SameText(IvKind, 'Home')           then begin ock := 'window.location.href=''' + gwrq.ScriptNameUrl + ''''                    ; tit := 'Go to home page'         ; cla := 'w3-theme-d5 w3-round-xxlarge' end
+  else if SameText(IvKind, 'Login')          then begin ock := 'window.location.href=''/WksPageIsapiProject.dll/Login'+rid+''''         ; tit := 'Go to login page'        ; cla := '' end
+  else if SameText(IvKind, 'LoginTry')       then begin ock := 'window.location.href=''/WksPageIsapiProject.dll/LoginTry'+rid+''''      ; tit := 'Try to login'            ; cla := '' end
+  else if SameText(IvKind, 'AccountCreate')  then begin ock := 'window.location.href=''/WksPageIsapiProject.dll/AccountCreate'+rid+'''' ; tit := 'Create your new account' ; cla := 'w3-theme-l5 w3-right' end
+  else if SameText(IvKind, 'AccountRecover') then begin ock := 'window.location.href=''/WksPageIsapiProject.dll/AccountRecover'+rid+''''; tit := 'Recover your account'    ; cla := 'w3-theme-l5 w3-right' end
+  else                                            begin ock := 'alert(''Unknown standard button'');'                                    ; tit := 'Unknow standard button'  ; cla := '' end;
+
+  sty := 'margin: 8px;';
+
+  Result := Btn(TStrRec.StrExpand(IvKind), tit, cla, sty, ock);
+end;
+
+class function  THtmRec.BtnX(IvCoName: string; IvFollowLink: string; IvFbkMode: TFbkModeEnum): string;
+var
+  ock: string;
+  cla: string;
+begin
+  // class
+  if IvFbkMode = fmNone then
+    cla := 'w3-theme-l2'
+  else
+    cla := Format('w3-%s', [TColRec.HColW3(IvFbkMode)]);
+
+  // js
+  ock := 'document.getElementById(''' + IvCoName + ''').style.display=''none'''; // remove also w3-show ?
+  if IvFollowLink.IsEmpty then
+    ock := ock + ';window.history.go(-1)'
+  else
+    ock := ock + ';window.location.href=''' + IvFollowLink + '''';
+
+  // end
+  Result := Format('<span class="w3-button w3-large w3-display-topright %s" title="Close Modal" onclick="%s">&times;</span>', [cla, ock]);
+end;
+
+class function  THtmRec.FormLine( IvKind, IvCoName, IvTitle: string; IvOptCaptionVec, IvOptValueVec: TArray<string>; IvClass, IvStyle, IvTail: string; IvValueVec, IvDisabledVec: TArray<string>; IvReadOnly: boolean; IvLabel, IvHelp: string; IvLabelWidth, IvHelpWidth: integer): string;
 
   {$REGION 'help'}
 {
+  form elements
+  -------------
+  <form>     defines an html form for user input
+  <label>    defines a label for an <input> element
+  <fieldset> groups related elements in a form
+  <legend>   defines a caption for a <fieldset> element
+  <output>   defines the result of a calculation
+
+  form controls
+  -------------
+  <button>   defines a clickable button
+  <input>    defines an input control
+  <datalist> specifies a list of pre-defined options for input controls
+  <select>   defines a drop-down list
+  <option>   defines an option in a drop-down list
+  <optgroup> defines a group of related options in a drop-down list
+  <textarea> defines a multiline input control (text area)
+
+  HTM_INPUT_MONO_CSV
+  ------------------
+  <input type="color">
+  <input type="date">
+  <input type="datetime-local">
+  <input type="email">
+  <input type="file">
+  <input type="hidden">
+  <input type="image">
+  <input type="month">
+  <input type="number">
+  <input type="password">
+  <input type="range">
+  <input type="search">
+  <input type="tel">
+  <input type="text">
+  <textarea>
+  <input type="time">
+  <input type="url">
+  <input type="week">
+
+  HTM_INPUT_MULTI_CSV
+  -------------------
+  <input type="checkbox">
+  <input type="radio">
+  <select>
+  <datalist>
+
+  HTM_INPUT_BUTTON_CSV
+  --------------------
+  <input type="button">
+  <input type="reset">
+  <input type="search">
+  <input type="submit">
+
+  wksstyle (full width)
    ---------------------------------------------------------------------------------------------------------------------
   |                       |   ----------------------------------------------------------------   |                      |
   | Label /LabelWidth     |  | inputctrl: Kind / CoName / Title / Value / Class / Style, Tail |  | Help(*) / HelpWidth  |  (*) or additional controls
   |                       |   ----------------------------------------------------------------   |                      |
    ---------------------------------------------------------------------------------------------------------------------
+
+  ymsstyle (full width)
+   ---------------------------------------------------------------------------------------------------------------------
+  |                       |   ---------------------------------------------------------------------------------------   |
+  | Label /LabelWidth     |  | inputctrl: Kind / CoName / Title / Value / Class / Style, Tail                        |  |
+  |                       |   ---------------------------------------------------------------------------------------   |
+   ---------------------------------------------------------------------------------------------------------------------
+
+  googlestyle (width/centered)
+                           ----------------------------------------------------------------------
+                          |   ----------------------------------------------------------------   |
+                          |  | inputctrl: Kind / CoName / Title / Value / Class / Style, Tail |  |
+                          |   ----------------------------------------------------------------   |
+                           ----------------------------------------------------------------------
 }
   {$ENDREGION}
 
 var
-  lab, ctr, hlp: string; // labelstr, htmlcontrol, helpstr/htmlcontrol2
+  lab{, val}, ctr, hlp: string; // label, value, htmlcontrol, helpstr/htmlcontrol2
 begin
+  // default
+  if IvKind.Trim.IsEmpty then
+    IvKind := 'text';
+  if Length(IvValueVec) = 0 then begin
+    SetLength(IvValueVec, 1);
+    IvValueVec[0] := '';
+  end;
 
   {$REGION 'username'}
-           if SameText(IvKind, 'Username') then begin
+           if SameText(IvKind, 'username') then begin
     lab := {IvLabel}'Username';
-    ctr := Input('text', IvCoName, IvTitle, IvValue, IvClass+' w3-input', IvStyle+' text-transform: lowercase', IvTail + ' oninput="this.value=this.value.strSpaceRemove()"');
+    ctr := Elem('input'   , 'text', IvCoName, IvTitle, IvValueVec[0], IvClass+' w3-input', IvStyle+' text-transform: lowercase', IvTail + ' oninput="this.value=this.value.strSpaceRemove()"');
     hlp := Btn('Generate', 'Generate your username', 'w3-padding-small', 'overflow:visible', 'var n = prompt(''What is your name?'');var s = prompt(''What is your surnamer?'');document.getElementById(''' + IvCoName + ''').value=(n.charAt(0)+s).toLowerCase();');
   //hlp := {IvHelp}'&nbsp;';
   {$ENDREGION}
 
   {$REGION 'password'}
-  end else if SameText(IvKind, 'Password') then begin
+  end else if SameText(IvKind, 'password') then begin
     lab := {IvLabel}'Password';
-    ctr := Input('password', IvCoName, IvTitle, IvValue, IvClass+' w3-input', IvStyle, IvTail);
+    ctr := Elem('input'   , 'password', IvCoName, IvTitle, IvValueVec[0], IvClass+' w3-input', IvStyle, IvTail);
     hlp :=         '<div style="display: flex;">'
     + sLineBreak + Btn('Generate', 'Generate a password', 'w3-padding-small', 'overflow:visible', 'document.getElementById(''' + IvCoName + ''').value=rndStr(6, ''AN'', '''')')
     + sLineBreak + Btn('Show'    , 'Show password'      , 'w3-padding-small', 'overflow:visible', 'wksInputPasswordShow(''' + IvCoName + ''')'                                 )
@@ -9442,24 +9702,53 @@ begin
   {$ENDREGION}
 
   {$REGION 'organization'}
-  end else if SameText(IvKind, 'Organization') then begin
+  end else if SameText(IvKind, 'organization') then begin
     lab := {IvLabel}'Organization';
-    ctr := Input('text', IvCoName, IvTitle, IvValue, IvClass+' w3-input', IvStyle+' text-transform: lowercase', IvTail + ' oninput="this.value=this.value.strSpaceRemove()"');
+    ctr := Elem('input'   , 'text', IvCoName, IvTitle, IvValueVec[0], IvClass+' w3-input', IvStyle+' text-transform: lowercase', IvTail + ' oninput="this.value=this.value.strSpaceRemove()"');
     hlp := {IvHelp}'&nbsp;';
   {$ENDREGION}
 
-  {$REGION 'std'}
+  {$REGION 'else'}
   end else begin
     lab := giif.NxD(IvLabel, TNamRec.CoRemove(IvCoName));
-    ctr := Input(IvKind, IvCoName, IvTitle, IvValue, IvClass, IvStyle, IvTail);
+
+         if TStrRec.StrHas(HTM_INPUT_MONO_CSV, IvKind) then
+      ctr := Elem('input'   , IvKind, IvCoName, IvTitle, IvValueVec[0], IvClass+' w3-input', IvStyle, IvTail, {IvDisabledVec[0].ToBoolean}false, IvReadOnly)
+
+    else if TStrRec.StrHas(HTM_INPUT_MULTI_CSV, IvKind) then
+      ctr := Choice(IvKind, IvCoName, IvTitle, IvOptCaptionVec, IvOptValueVec, IvClass, IvStyle, IvTail, IvValueVec, IvDisabledVec, IvReadOnly)
+
+  //else if TStrRec.StrHas(HTM_INPUT_BUTTON_CSV, IvKind) then
+    //ctr := Button(IvKind, IvCoName, IvTitle, IvValue, IvClass, IvStyle, IvTail, IvReadOnly, IvDisabled);
+    ;
+
     hlp := IvHelp;
   end;
   {$ENDREGION}
 
-  Result := GridRow([lab                                                 , hlp                                                         , ctr                    ] // valvec
-                  , ['w3-col w3-left'                                    , 'w3-col w3-right w3-text-italic w3-theme-text-dark w3-small', 'w3-rest w3-container"'] // classvec
-                  , [Format('width:%dpx;margin-top:8px;', [IvLabelWidth]), Format('width:%dpx;margin-top:10px;', [IvHelpWidth])        , ''                     ] // stylevec
-  );
+  {$REGION 'layout'}
+  // wksstyle
+  if false then
+    Result := GridRow([lab                                                  , ctr                                 , hlp                                         ] // valvec
+                    , ['w3-col'                                             , 'w3-col'                            , 'w3-text-italic w3-theme-text-dark w3-small'] // classvec
+                    , [Format('width:%dpx; margin-top:8px;', [IvLabelWidth]), Format('width:%dpx;', [IvHelpWidth]), 'w3-rest; margin-left:8px; margin-top:10px;'] // stylevec
+    )
+
+  // ymsstyle
+  else if true then
+    Result := GridRow([lab              , ctr                            ] // valvec
+                    , ['w3-col m4 l3'   , 'w3-col m8 l9 w3-animate-input'] // classvec
+                    , ['margin-top:8px;', ''                             ] // stylevec
+    )
+
+  // googlestyle
+//else if false then
+//  Result := GridRow(
+//
+//  )
+  ;
+  {$ENDREGION}
+
 end;
 
 class function  THtmRec.Form(IvCoName, IvAction, IvMethod, IvBody, IvClass, IvStyle, IvEnctype, IvValidatorCsv: string): string;
@@ -9474,7 +9763,7 @@ begin
             + sLineBreak + '</div>';
 end;
 
-class function  THtmRec.Form(IvCoName, IvAction, IvMethod, IvSubmitCaption: string; IvLabelWidth, IvHelpWidth: integer; IvLabelVec, IvKindVec, IvCoNameVec, IvValueVec, IvPlaceholderVec, IvClassVec, IvStyleVec, IvTailVec: TArray<string>; IvRequiredVec: TArray<boolean>; IvClass, IvStyle, IvEnctype, IvValidatorCsv: string): string;
+class function  THtmRec.Form(IvCoName, IvAction, IvMethod, IvSubmitCaption: string; IvLabelWidth, IvHelpWidth: integer; IvTitleVec, IvKindVec, IvCoNameVec, IvValueVec, IvPlaceholderVec, IvClassVec, IvStyleVec, IvTailVec: TArray<string>; IvRequiredVec: TArray<boolean>; IvClass, IvStyle, IvEnctype, IvValidatorCsv: string): string;
 var
   i: integer;  // idxtabindex
   sbu: TSbuRec;
@@ -9482,10 +9771,9 @@ var
 begin
 
   {$REGION 'lines'}
-  for i := Low(IvLabelVec) to High(IvLabelVec) do
-                   // label        , help         , kind        , coname        , title        , value        , class        , style        , tail        , labelwidth  , helpwidth
-    sbu.Add( FormLine(IvLabelVec[i], IvLabelVec[i], IvKindVec[i], IvCoNameVec[i], IvLabelVec[i], IvValueVec[i], IvClassVec[i], IvStyleVec[i], IvTailVec[i], IvLabelWidth, IvHelpWidth) );
-  i := 0;
+  for i := Low(IvTitleVec) to High(IvTitleVec) do
+    sbu.Add( FormLine(IvKindVec[i], IvCoNameVec[i], IvTitleVec[i], [IvValueVec[i]], [IvValueVec[i]], IvClassVec[i], IvStyleVec[i], IvTailVec[i], []         , []         , false   , IvTitleVec[i], IvTitleVec[i], IvLabelWidth, IvHelpWidth) );
+  i := 0;          // kind        , coname        , title        , captionvec     , valuevec       , class        , style        , tail        , selectedvec, disabledvec, readonly, label        , help         , labelwidth  , helpwidth
   {$ENDREGION}
 
   {$REGION 'submit'}
@@ -9499,7 +9787,7 @@ begin
 
 end;
 
-class function  THtmRec.FormModal(IvTitle, IvFaIcon: string; IvCtrlButtonVec: TArray<string>; IvCoName, IvAction, IvMethod, IvSubmitCaption: string; IvLabelWidth, IvHelpWidth: integer; IvLabelVec, IvKindVec, IvCoNameVec, IvValueVec, IvPlaceholderVec, IvClassVec, IvStyleVec, IvTailVec: TArray<string>; IvRequiredVec: TArray<boolean>; IvClass, IvStyle, IvEnctype, IvValidatorCsv: string): string;
+class function  THtmRec.FormModal(IvTitle, IvFaIcon: string; IvCtrlButtonVec: TArray<string>; IvCoName, IvAction, IvMethod, IvSubmitCaption: string; IvLabelWidth, IvHelpWidth: integer; IvTitleVec, IvKindVec, IvCoNameVec, IvValueVec, IvPlaceholderVec, IvClassVec, IvStyleVec, IvTailVec: TArray<string>; IvRequiredVec: TArray<boolean>; IvClass, IvStyle, IvEnctype, IvValidatorCsv: string): string;
 var
   hea, foo, bod: string; // deader, footer, body
   i: integer;
@@ -9510,7 +9798,7 @@ begin
   hea := hea + H(1, IvTitle);
 
   // body
-  bod := Form(IvCoName, IvAction, 'post', IvSubmitCaption, IvLabelWidth, IvHelpWidth, IvLabelVec, IvKindVec, IvCoNameVec, IvValueVec, IvPlaceholderVec, IvClassVec, IvStyleVec, IvTailVec, IvRequiredVec, IvClass, IvStyle, IvEnctype, IvValidatorCsv);
+  bod := Form(IvCoName, IvAction, 'post', IvSubmitCaption, IvLabelWidth, IvHelpWidth, IvTitleVec, IvKindVec, IvCoNameVec, IvValueVec, IvPlaceholderVec, IvClassVec, IvStyleVec, IvTailVec, IvRequiredVec, IvClass, IvStyle, IvEnctype, IvValidatorCsv);
 
   // footer
   foo := BtnStd('Home') {+ Space(16)} + BtnStd('Back');
@@ -9580,6 +9868,47 @@ var
   fke: string;      // fieldkey (just ONE for now)
   {$ENDREGION}
 
+  {$REGION 'macro'}
+  function field_name_process(ivfldname: string): string; // *** FAST OK ***
+  begin
+    Result := ivfldname;
+    if Result.StartsWith('Fld') then
+      Result := TStrRec.strRemoveFirst(Result, 3);
+    if Result.EndsWith('Md') then
+      Result := TStrRec.StrRemoveLast(Result, 2);
+  end;
+
+(*function field_value_td_process(ivfld: TField): string; // *** VERY SLOW ***
+  begin
+    Result := ivfld.AsString;
+    
+    if ivfld.IsNull then
+      Result := '<td><span class="w3-theme-text-muted">null</span></td>'
+
+    else if ivfld.FieldName = 'FldState' then
+      Result := Format('<td style="padding:6px 8px"><span class="w3-tag w3-round-xxlarge w3-%s" style="padding-top: 1.0px;padding-bottom: 1.5px">%s</span></td>', [TStaRec.ColorW3FromState(Result), Result]{, not Result.IsEmpty})
+
+    else if fld.FieldName.EndsWith('Md') then
+      Result := Format('<td>%s</td>', [TMkdRec.Process(Result)]);
+  end;
+
+  procedure field_value_td_process; // *** ACCEPTABLE ***
+  begin
+    if fld.IsNull then
+      sbu.Add('<td><span class="w3-theme-text-muted">null</span></td>')
+
+    else if fld.FieldName = 'FldState' then
+      sbu.Add('<td style="padding:6px 8px"><span class="w3-tag w3-round-xxlarge w3-%s" style="padding-top: 1.0px;padding-bottom: 1.5px">%s</span></td>', [TStaRec.ColorW3FromState(fld.AsString), fld.AsString]{, not fld.AsString.IsEmpty})
+
+    end else if fld.FieldName.EndsWith('Md') then
+      sbu.Add('<td>%s</td>', [TMkdRec.Process(fld.AsString)])
+
+    else
+      sbu.Add('<td>%s</td>', [fld.AsString])
+    ;
+  end;*)
+  {$ENDREGION}
+
 begin
 
   {$REGION 'exit'}
@@ -9614,35 +9943,51 @@ if IvDir = hvHorizontal then begin
   sbu.Add('<table class="%s" style="%s" %s>', [IvClass, IvStyle, THtmRec.IdName(tna)]);
 
   // header
+  gpro.TimerByName['TableFromDs.Horizontal.Header'].Start;
 //if not IvDsHeaderOff then begin
-//  sbu.Add('<thead>');
+//sbu.Add('<thead>');
 //sbu.Add('<tr class="w3-%s">', [gthe.Accent10Color]);
   sbu.Aif('<tr style="visibility: hidden">', '<tr>', IvDsHeaderOff);
   for fld in IvDs.Fields do begin
-    fln := StringReplace(fld.FieldName, 'Fld', '', []);
+    fln := field_name_process(fld.FieldName);
     sbu.Add('<th>%s</th>', [fln]);
   end;
   sbu.Add('</tr>');
-//  sbu.Add('</thead>');
+//sbu.Add('</thead>');
 //end;
+  gpro.TimerByName['TableFromDs.Horizontal.Header'].Stop;
 
   // body
-//  sbu.Add('<tbody>');
+  gpro.TimerByName['TableFromDs.Horizontal.Body'].Start;
+//sbu.Add('<tbody>');
   IvDs.First;
   while not IvDs.Eof do begin
     sbu.Add('<tr>');
     for fld in IvDs.Fields do begin
+    //fln := field_name_process(fld.FieldName);
+    //flv := field_value_td_process(fld);
+    //field_value_td_process;
+
       if fld.IsNull then
         sbu.Add('<td><span class="w3-theme-text-muted">null</span></td>')
-      else if fld.FieldName = 'FldState' then                 // w3-padding-xsmall
-        sbu.Add('<td style="padding:6px 8px"><span class="w3-tag w3-round-xxlarge w3-%s" style="padding-top: 1.0px;padding-bottom: 1.5px">%s</span></td>', [TStaRec.ColorW3FromState(fld.AsString), fld.AsString], not fld.AsString.Trim.IsEmpty)
+
+      else if fld.FieldName = 'FldState' then begin
+        flv := fld.AsString;
+        sbu.Add('<td style="padding:6px 8px"><span class="w3-tag w3-round-xxlarge w3-%s" style="padding-top: 1.0px;padding-bottom: 1.5px">%s</span></td>', [TStaRec.ColorW3FromState(flv), flv]{, not flv.IsEmpty})
+
+      end else if fld.FieldName.EndsWith('Md') then
+        sbu.Add('<td>%s</td>', [TMkdRec.Process(fld.AsString)])
+
       else
-        sbu.Add('<td>%s</td>', [fld.AsString]);
+        sbu.Add('<td>%s</td>', [fld.AsString])
+      ;
+
     end;
     sbu.Add('</tr>');
     IvDs.Next;
   end;
-//  sbu.Add('</tbody>');
+//sbu.Add('</tbody>');
+  gpro.TimerByName['TableFromDs.Horizontal.Body'].Stop;
 
   // end
   sbu.Add('</table>');
@@ -9659,15 +10004,24 @@ end else if IvDir = hvVertical then begin
     sbu.Add('<div class="w3-responsive">');
     sbu.Add('<table class="%s" style="%s" %s>', [IvClass, IvStyle, THtmRec.IdName(Format('%s%d', [tna, IvDs.RecNo]))]);
     for fld in IvDs.Fields do begin
-      fln := StringReplace(fld.FieldName, 'Fld', '', []);
+      fln := field_name_process(fld.FieldName);
+    //flv := field_value_td_process(fld);
       flv := fld.AsString;
+
+      if fld.IsNull then
+        flv := '<span class="w3-theme-text-muted">null</span></td>'
+
+      else if fld.FieldName = 'FldState' then
+        flv := Format('<span class="w3-tag w3-round-xxlarge w3-%s" style="padding-top: 1.0px;padding-bottom: 1.5px">%s</span>', [TStaRec.ColorW3FromState(flv), flv]{, not flv.IsEmpty})
+
+      else if fld.FieldName.EndsWith('Md') then
+        flv := TMkdRec.Process(fld.AsString)
+      ;
+
       sbu.Add('<tr>');
-    //sbu.Add('<th class="w3-%s" style="width: 0%%">%s</th><td class="w3-left-align">%s</td>', [the.BgColor, fld.FieldName, fld.AsString]);
-      sbu.Add('<th class="w3-left-align" style="width: 0%%">%s</th>', [fln]);
-      if fld.FieldName = 'FldState' then                      // w3-padding-xsmall
-        sbu.Add('<td style="padding:6px 8px"><span class="w3-tag w3-round-xxlarge w3-%s">%s</span></td>', [TStaRec.ColorW3FromState(fld.AsString), fld.AsString], not fld.AsString.Trim.IsEmpty)
-      else
-        sbu.Add('<td>%s</td>', [flv]);
+    //sbu.Add('<th class="w3-left-align w3-%s" style="width: 0%%;%s">%s</th>', [gthe.Primary60BgColor, ifthen(IvDsHeaderOff, 'visibility: hidden', ''), fln]);
+      sbu.Add('<th class="w3-left-align w3-blue-gray w3-padding-medium" style="width: 0%%">%s</th>', [fln], not IvDsHeaderOff);
+      sbu.Add('<td>%s</td>', [flv]);
       sbu.Add('</tr>');
     end;
     sbu.Add('</table>');
@@ -9847,7 +10201,9 @@ var
   dst: TDataset;
   fbk: string;
 begin
+  gpro.TimerByName['TableFromSql.DsFromSql'].Start;
   ok := TDbaRec.DsFromSql(IvSql, dst, fbk, false);
+  gpro.TimerByName['TableFromSql.DsFromSql'].Stop;
   if not ok then
     Result := Modal(true, 'CoTableFromSqlFeedback', Code(IvSql, 'sql')
                    , H(2, 'Unable to create html table from sql')
@@ -9855,7 +10211,9 @@ begin
                    , ''
                    , fmWarning)
   else try
+  //gpro.TimerByName['TableFromSql.TableFromDs'].Start;
     Result := TableFromDs(dst, IvDefault, IvClass, IvStyle, IvEditable, IvEditJson, IvDir, IvDsHeaderOff, IvDsRecordCountOff);
+  //gpro.TimerByName['TableFromSql.TableFromDs'].Stop;
   finally
     dst.Free;
   end;
@@ -10024,15 +10382,40 @@ var
   // params
   i  : integer;                 // idx
 //psb: TSbuRec;                 // strbuilder
-  pve: TReportParamRecVector;   // vec
   psh: string;                  // singlehtml
   pah: string;                  // allhtml
-  pal: string;                  // label
-  pap: string;                  // help
-  pak: string;                  // kind
+  pof: boolean;                 // paramshtmlblockoff
+  pve: TReportParamRecVector;   // vec
+//por: integer;                 // order
+  pst: string;                  // state
+  pna: string;                  // paramname
+  pde: string;                  // default
+  pca: string;                  // caption       phe: string;                  // label
+  pph: string;                  // placeholder
+  pdt: string;                  // descriptiontitle
+  phe: string;                  // help          pap: string;                  // help
+  pki: string;                  // kind          pkk: string;                  // kind
+//phi: boolean;                 // hidden
+//prq: boolean;                 // required
+//pds: boolean;                 // disabled
+  p12: string;                  // linegrid12
+  poc: string;                  // optioncsv
+  poj: string;                  // optionjson
+  poq: string;                  // optionquery
+  pcs: string;                  // connstr
+  plb: string;                  // connlib
+  pcl: string;                  // &class
+  psy: string;                  // style
+//pfm: string;                  // format
+//pro: boolean;                 // readonly
+//pav: string;                  // ajaxvalidate
   pva: string;                  // value
-  pat: string;                  // titledesc
-//pan: string;                  // name
+
+  // options (select,checkbox,radio)
+  ocv: TArray<string>;          // csv ->vec
+  ojv: TArray<string>;          // json->vec
+  oqv: TArray<string>;          // sql ->vec
+  ove: TArray<string>;          // total
 
   // datasets
   j  : integer;                 // idx
@@ -10040,7 +10423,7 @@ var
   dve: TReportDataSetRecVector; // vec
   dsh: string;                  // singlehtml
   dah: string;                  // allhtml
-  dmo: THvDirEnum;              // mode
+  ddi: THvDirEnum;              // mode
 
   // charts
   k  : integer;                 // idx
@@ -10074,7 +10457,13 @@ begin
   end;
   {$ENDREGION}
 
+  {$REGION 'querystringoverrides'}
+  pof := gwrq.FieldGet('CoParamsOff', false);
+  {$ENDREGION}
+
   {$REGION 'report'}
+  gpro.TimerByName['Report.Select'].Start;
+
   rid := IvId;
   rer.Obj.Id := rid;
   if not rer.DbaSelect(fbk) then begin
@@ -10087,52 +10476,79 @@ begin
     Result := AlertW('Report', 'The requested report is not in a visible state');
     Exit;
   end;
+
+  gpro.TimerByName['Report.Select'].Stop;
   {$ENDREGION}
 
   {$REGION 'params'}
+  gpro.TimerByName['Report.Params'].Start;
+
   pve := rer.ParamRecVector;   // *** should use directly a form ***
   if Length(pve) <= 0 then
     pah := '' //Format('<p>%s</p>', ['No Params'])
   else begin
     // params
     for i := Low(pve) to High(pve) do begin
-      // zip
-      pal := giif.NxD(pve[i].Caption, pve[i].Param);
-      pap := pve[i].Help;
-      pat := pve[i].Description;
-      pak := pve[i].Kind;
-      con := TNamRec.Co(pve[i].Param);
-     {, pve[i].OptionCsv             // OptionCsv
-      , pve[i].OptionJson            // OptionJson
-      , pve[i].OptionQuery           // OptionQuery
-      , pve[i].ConnStr               // ConnStr
-      , pve[i].ConnLib               // ConnLib
-      , pve[i].Description           // Description
-      , pve[i].Placeholder           // Placeholder
-      , pve[i].Required              // Required
-      , pve[i].Disabled              // Disabled
-      , false // pve[i].ReadOnly     // ReadOnly
-      , false // pve[i].AjaxValidate // AjaxValidate
-      , ''    // pve[i].Format       // Format
-      , pve[i].LineGrid12            // 12
-      , ''                           // 1st/last}
+                      // zip
+   {  ReportId      }
+   {  Order         }//por := pve[i].Order       ;
+   {  State         }  pst := pve[i].State       ;
+   {  Param         }  pna := pve[i].Param       ; con := TNamRec.Co(pna);
+   {  Default       }  pde := pve[i].Default     ;
+   {  Caption       }  pca := giif.NxD(pve[i].Caption, pve[i].Param);
+   {  Placeholder   }  pph := pve[i].Placeholder ;
+   {  Description   }  pdt := pve[i].Description ;
+   {  Help          }  phe := pve[i].Help        ;
+   {  Kind          }  pki := pve[i].Kind        ;
+   {  Hidden        }//phi := pve[i].Hidden      ;
+   {  Required      }//prq := pve[i].Required    ;
+   {  Disabled      }//pds := pve[i].Disabled    ;
+   {  LineGrid12    }  p12 := pve[i].LineGrid12  ;
+   {  OptionCsv     }  poc := pve[i].OptionCsv   ; ocv := TVecRec.VecFromStr(poc);
+   {  OptionJson    }  poj := pve[i].OptionJson  ; ojv := [];
+   {  OptionQuery   }  poq := pve[i].OptionQuery ; oqv := []; ove := ocv + ojv + oqv;
+   {  ConnStr       }  pcs := pve[i].ConnStr     ;
+   {  ConnLib       }  plb := pve[i].ConnLib     ;
+   {  Classs        }  pcl := pve[i].&Class      ;
+   {  Style         }  psy := pve[i].Style       ;
+   {//Format        }//pfm := pve[i].Format      ;
+   {//ReadOnly      }//pro := pve[i].ReadOnly    ;
+   {//AjaxValidate  }//pav := pve[i].AjaxValidate;
+   {//Switch        }
+   {//ToOrganization}
+   {//ToDepartment  }
+   {//ToArea        }
+   {//ToActivity    }
+   {//ToTeam        }
+   {//ToMember      }
+   {  Value         }
 
       // value
       pva := gwrq.FieldGet(con, pve[i].Default);
 
-      // transform
-      if SameText(con, 'CoTop') then
+      // transform(limitcontrol)
+      if SameText(con, 'CoTop') then begin
         if StrToIntDef(pva, 10) > DATASET_MAXRECORDS then
           pva := IntToStr(DATASET_MAXRECORDS);
+      end else if not pve[i].Value{Inspector}.IsEmpty then begin
+        // Inspector should contain script to evaluate the incoming paramvalue
+        // inspectorcompile (replace $Param$ with paramvalue)
+        // inspectorrun and get result (detectscriptinglang py/js)
+        // replace pva with result
+      end;
 
       // rv
     //pva := grva.Rva(pva);
 
       // vec
       pve[i].Value := pva;
-                                                                        // ValueSelectedCsv
-      // html         label, help, kind, coname, title, value, class        , style       , tail, labelwidth, helpwidth
-      psh := FormLine(pal  , pap , pak , con   , pat  , pva  , pve[i].Classs, pve[i].Style, ''  , 200       , 300      );
+
+      // hidden
+      if pve[i].Hidden then
+        continue;
+
+      // html         kind, coname, title, captionvec, valuevec, class, style, tail, valuevec, disabledvec, readonly, label, help, labelwidth, helpwidth
+      psh := FormLine(pki , con   , pna  , ove       , ove     , pcl  , psy  , ''  , [pva]   , []         , false   , pna  , phe , 200       , 300      );
 
       // params
       pah := pah
@@ -10155,8 +10571,12 @@ begin
   if rer.ParamsTitleOn then
     pah := Collapse('Params', 'Use the following parameters to filter the results', pah, 3, '', false, rer.ParamsPanelOn, rer.ParamsPanelClosed);
 
-  // reporthtmlblockadd
+  // reportparamshtmlblockadd(hidden)
+  if pof then
+     pah := Format('<div style="display:none">' + sLineBreak + '%s' + sLineBreak + '</div>', [pah]);
   rsb.Add(pah);
+
+  gpro.TimerByName['Report.Params'].Stop;
   {$ENDREGION}
 
   {$REGION 'datasets'}
@@ -10166,20 +10586,23 @@ begin
   else begin
     // datasets
     dsb.Clr;
+  //j := 0;
     for j := Low(dve) to High(dve) do begin
 
       {$REGION 'dataset'}
+      gpro.TimerByName['Report.Dataset'+dve[j].Dataset].Start;
+
       // mode
-      dmo :=  TEnuRec.EnumFromStr<THvDirEnum>('hv'+dve[j].Mode, hvHorizontal); // Horiz, Vert
+      ddi :=  TEnuRec.EnumFromStr<THvDirEnum>('hv'+dve[j].Mode, hvHorizontal); // Horiz, Vert
 
       // sql
       sql := params_replace(dve[j].Select, pve);
 
       // table
-      dsh := TableFromSql(sql, dve[j].FeedbackIfEmpty, dve[j].Classs, dve[j].Style, dve[j].Editable, dve[j].Json, dmo, rer.DsHeaderOff, rer.DsRecordCountOff);
+      dsh := TableFromSql(sql, dve[j].FeedbackIfEmpty, dve[j].Classs, dve[j].Style, dve[j].Editable, dve[j].Json, ddi, rer.DsHeaderOff, rer.DsRecordCountOff);
 
       // sqlfbkifadmin
-      if gwse.IsValid(fbk) then begin
+      if {gwse.IsValid(fbk) and} gmbr.IsAdmin and (not rer.DsRecordCountOff) then begin
       con := TNamRec.Co('Sql%dModal', [j]);
       dsh := dsh
       + sLineBreak + ModalBtn('Sql', con, Code(sql, 'sql'), H(2, Format('Sql %d', [j])), BtnStd('Close', 0, con), fmInfo);
@@ -10190,9 +10613,13 @@ begin
         dsh := Collapse(giif.NxD(dve[j].Title, dve[j].Dataset), dve[j].Description, dsh, 3, '', false, dve[j].PanelOn, dve[j].PanelClosed);
 
       dsb.Add(dsh);
+
+      gpro.TimerByName['Report.Dataset'+dve[j].Dataset].Stop;
       {$ENDREGION}
 
       {$REGION 'charts'}
+      gpro.TimerByName['Report.Chart'+dve[j].Dataset].Start;
+
       cve := dve[j].ChartRecVector;
       csb.Clr;
       if Length(cve) <= 0 then
@@ -10212,6 +10639,8 @@ begin
       end;
 
       csb.Add(cah);
+
+      gpro.TimerByName['Report.Chart'+dve[j].Dataset].Stop;
       {$ENDREGION}
 
     end;
@@ -10224,17 +10653,31 @@ begin
   rsb.Add(dah);
   {$ENDREGION}
 
+  {$REGION 'profilerdata'}
+  if {gwse.IsValid(fbk) and} gmbr.IsAdmin and (not rer.DsRecordCountOff) then begin
+  con := TNamRec.Co('ProfilerModal');
+  dsh := sLineBreak + ModalBtn('Profiler', con, Code(gpro.OutputTextTimers(tiAll)), H(2, 'Profiler results'), BtnStd('Close', 0, con), fmInfo);
+  rsb.Add(dsh);
+  end;
+  {$ENDREGION}
+
+  {$REGION 'end'}
   // reporthtml
   rah := rsb.Text;
 
   // collapse
   if rer.ReportTitleOn then begin
-    rti := Format('%s (%d)', [giif.NxD(rer.Obj.Title, TStrRec.StrExpand(rer.Obj.&Object)), rid]);
+    rti := giif.NxD(rer.Obj.Title, TStrRec.StrExpand(rer.Obj.&Object));
+    if {rer.ReportNumberOn}false then
+      rti := Format('%s (%d)', [rti, rid]);
+
     rah := Collapse(rti, rer.Obj.Subtitle, rah, 2, '', false, rer.ReportPanelOn, rer.ReportPanelClosed);
   end;
 
   // result
   Result := rah;
+  {$ENDREGION}
+
 end;
 
 class function  THtmRec.SlidesFromDs(IvDs: TDataSet; IvHtmlSlideBody, IvHtmlHeader, IvHtmlFooter, IvHtmlDefault: string; IvSlideId: integer): string;
@@ -10344,10 +10787,10 @@ const
   + sLineBreak + 'where FldState = ''Active'' and FldObject not in (''Zzz'', ''Available'') and FldPId = %s'
   + sLineBreak + 'order by FldOrder, FldObject';
 var
-  ish, brk: boolean; // ishome, break
+  ish, brk, bgd: boolean; // ishome, break, backgroundcolorisdark
   idi, chz: integer; // idint, childcount
   sbu: TSbuRec;
-  {pur, pph,} url, ur2, ur3, cap, sql, buf, fbk: string; // parenturl, parentpath
+  {pur, pph,}lgo, url, ur2, ur3, cap, sql, buf, fbk: string; // logourl, parenturl, parentpath
   dst, ds1, ds2, ds3: TDataset;
   {$ENDREGION}
 
@@ -10365,13 +10808,14 @@ var
     else                                        Result := '35';  // 12     ok plain nav-bar, with empty gthe.SizeClass
   end;
 
-  function  ItemAdd(IvType{Link|Button|(Caption)}, IvHref, IvCaption, IvTitle: string; IvClass: string = 'w3-bar-item'; IvStyle: string = ''; IvImg: string = ''): string;
+  function  ItemAdd(IvKind{Link|Button|(Caption)}, IvHref, IvCaption, IvTitle: string; IvClass: string = 'w3-bar-item'; IvStyle: string = ''; IvImg: string = ''): string;
   begin
     if not IvImg.IsEmpty then
-      IvCaption := Format('<img src="%s" alt="%s" style="height:%spx;padding:0px; %s">', [IvImg, IvCaption, LogoSizePx, IvStyle]);
+      //IvCaption := Format('<img src="%s" alt="%s" style="height:%spx;padding:0px; %s">', [IvImg, IvCaption, LogoSizePx, IvStyle]);
+      IvCaption := Img(IvImg, IvCaption, LogoSizePx.ToInteger, LogoSizePx.ToInteger);
 
     // link
-    if IvType[1].ToUpper = 'L' then begin
+    if IvKind[1].ToUpper = 'L' then begin
       if not IvHref.StartsWith('/') then
         IvHref := Format('javascript:%s', [IvHref]);
 
@@ -10380,7 +10824,7 @@ var
         + sLineBreak + '</a>', [IvHref, IvClass, IvStyle, IvTitle, IvCaption])
 
     // button
-    end else if IvType[1].ToUpper = 'B' then begin
+    end else if IvKind[1].ToUpper = 'B' then begin
       if IvHref.StartsWith('/') then
         IvHref := Format('window.location.href=''%s'';', [IvHref]);
 
@@ -10494,6 +10938,8 @@ begin
   {$REGION 'zip'}
   ish := IvId = gorg.HomePageId;
   idi := giif.Int(ish, IvId, IvPId);
+  bgd := TColRec.TColIsDark(TColRec.FromHexStr(TW3fRec.W3ColorFromTheme(gthe.Theme))); // TColRec.FromHexStr(gthe.Theme)
+  lgo := gorg.LogoUrl(true, bgd);
   {$ENDREGION}
 
   {$REGION 'topnav'}
@@ -10518,19 +10964,20 @@ begin
 
       {$REGION 'organization'}
   sbu.Add(  '<!-- itemsonlargeandsmallscreen -->');
-//sbu.Add(  '<div class="w3-dropdown-hover"></div>'                                                                                                                             ); // dummy1stchild
+  sbu.Add(  '<div class="w3-dropdown-hover"></div>'                                                                                                                             ); // dummy1stchild(diversebg)
   sbu.Add(  '<div class="w3-dropdown-hover">'                                                                                                                                   ); // orga
-  sbu.Add(    ItemAdd('B', 'wks.fbkNotImpl()', gorg.Obj.&Object, gorg.Obj.&Object, 'w3-padding-xsmall', '', gorg.LogoUrl)                                                     ); // logo -> presentation, contacts, etc
-  sbu.Add(    '<div class="w3-dropdown-content w3-bar-block w3-card-4">'                                                                                                        );
-  sbu.Add(      ItemAdd('B', '/WksPageIsapiProject.dll/Info'                , 'Info'    , 'Info'                 )                                                              ); // info
-//sbu.Add(      ItemAdd('B', '/WksPageIsapiProject.dll/OrganizationContacts', 'Contacts', 'Organization Contacts')                                                              ); // contacts
+//sbu.Add(    ItemAdd('B', 'wks.fbkNotImpl()', gorg.Obj.&Object, gorg.Obj.&Object, 'w3-padding-xsmall', '', lgo)                                                                ); // logo -> presentation, contacts, etc
+  sbu.Add(    ItemAdd('B', ''                , gorg.Obj.&Object, gorg.Obj.&Object, 'w3-padding-xsmall', '', lgo)                                                                ); // logo -> presentation, contacts, etc
 if gorg.Obj.&Object.Equals('Wks') and gwse.IsValid(fbk) then begin
+  sbu.Add(    '<div class="w3-dropdown-content w3-bar-block w3-card-4">'                                                                                                        );
+//sbu.Add(      ItemAdd('B', '/WksPageIsapiProject.dll/Info'                , 'Info'    , 'Info'                 )                                                              ); // info
+//sbu.Add(      ItemAdd('B', '/WksPageIsapiProject.dll/OrganizationContacts', 'Contacts', 'Organization Contacts')                                                              ); // contacts
   sbu.Add(      ItemChildAdd('Page', '\Root\Help')                                                                                                                              ); // help (global)
   sbu.Add(      ItemAdd('B', '/WksPageIsapiProject.dll/Theme'               , 'Theme'   , 'Theme'                )                                                              ); // theme
   sbu.Add(      ItemAdd('B', '/WksPageIsapiProject.dll/Init'                , 'Init'    , 'Init'                 )                                                              ); // init
   sbu.Add(      ItemAdd('B', '/WksPageIsapiProject.dll/Test'                , 'Test'    , 'Test'                 )                                                              ); // test
-end;
   sbu.Add(    '</div>');
+end;
   sbu.Add(  '</div>');
   sbu.Add(  ItemAdd('S', '', gorg.Obj.&Object, gorg.Obj.&Object, 'w3-hide-large w3-hide-medium')                                                                              ); // text
       {$ENDREGION}
@@ -12259,19 +12706,29 @@ begin
   end;
 end;
 
+function  TMbrRec.IsAdmin: boolean;
+begin
+  Result := JobGrade >= TMjgRec.GRADE_ADMINISTRATOR;
+end;
+
 function  TMbrRec.HomePath: string;
 begin
-  Result := gper.HomePath;                                                                                    // C:\$Per\I\IarussiFedericoCarloBrian
+  Result := gorg.HomePath;                                                          // C:\$Org\Wks\Member\F\FCBIarussi
+end;
+
+function  TMbrRec.BadgeFile: string;
+begin
+  Result := HomePath + Format('/%s%sBadge.png', [Member, Organization]);            // C:\$Org\Wks\Member\F\FCBIarussi\FCBIarussiWksBadge.png
 end;
 
 function  TMbrRec.HomeUrl(IvRelative: boolean): string;
 begin
-  Result := gper.HomeUrl(IvRelative);                                                                         // /Person/I/IarussiFedericoCarloBrian
+  Result := gorg.HomeUrl(IvRelative);                                               // /Organization/W/Wks/Member/F/FCBIarussi
 end;
 
 function  TMbrRec.BadgeUrl(IvRelative: boolean): string;
 begin
-  Result := HomeUrl(IvRelative) + Format('/%s%sBadge.png', [gper.SurnameNamesCollapsed, Organization]);       // /Person/I/IarussiFedericoCarloBrian/IarussiFedericoCarloBrianWksBadge.png
+  Result := HomeUrl(IvRelative) + Format('/%s%sBadge.png', [Member, Organization]); // /Organization/W/Wks/Member/F/FCBIarussi/FCBIarussiWksBadge.png
 end;
 
 procedure TMbrRec.BadgeGenerate(var IvBadge: TBitmap; IvOrganization, IvSite, IvUsername: string);
@@ -12396,7 +12853,7 @@ end;
   {$ENDREGION}
 
   {$REGION 'TMesRec'}
-class procedure TMesRec.MsgShow(IvMessage, IvTitle, IvType: string);
+class procedure TMesRec.MsgShow(IvMessage, IvTitle, IvKind: string);
 //const
 //  i: array[boolean] of TTaskDialogIcon = (tiInformation, tiError);
 var
@@ -12407,8 +12864,8 @@ begin
 //Application.MessageBox
 
   // icon
-       if IvType.StartsWith('E', true) then i := tdiError       //= 2;
-  else if IvType.StartsWith('W', true) then i := tdiWarning     //= 1;
+       if IvKind.StartsWith('E', true) then i := tdiError       //= 2;
+  else if IvKind.StartsWith('W', true) then i := tdiWarning     //= 1;
   else                                      i := tdiInformation //= 3;
                                               // tdiShield      //= 4;
                                               // tdiNone        //= 0; // no icon is presented
@@ -12422,7 +12879,7 @@ begin
   // client
   if TBynRec.IsClient then begin
     // i
-  //ShowMessage(IvMessage) // IvTitle and IvType are ignored
+  //ShowMessage(IvMessage) // IvTitle and IvKind are ignored
 
     // ii
     with Vcl.Dialogs.TTaskDialog.Create(nil) do
@@ -12459,11 +12916,11 @@ begin
 
   // nonclient
   end else begin
-         if IvType.StartsWith('E', true) then
+         if IvKind.StartsWith('E', true) then
       MessageDlg(IvMessage, TMsgDlgType.mtError       , [mbOK], 0)
-    else if IvType.StartsWith('W', true) then
+    else if IvKind.StartsWith('W', true) then
       MessageDlg(IvMessage, TMsgDlgType.mtWarning     , [mbOK], 0)
-    else if IvType.StartsWith('C', true) then
+    else if IvKind.StartsWith('C', true) then
       MessageDlg(IvMessage, TMsgDlgType.mtConfirmation, [mbOK], 0)
     else                     {'I'}
       MessageDlg(IvMessage, TMsgDlgType.mtInformation , [mbOK], 0);
@@ -12540,10 +12997,10 @@ begin
       Title              := TWksRec.ACRONYM  + ' ' + TBynRec.Info;   // IvTitle;
       Text               := Format('Version: %s', [TAaaRec.FileVer])
       + sLineBreak        + TWksRec.Copyright                        // Format(IvCopyright, [CurrentYear])
-     {+ sLineBreak}       + THtmRec.A(TWksRec.Www, TWksRec.Www);             // IvWww
+     {+ sLineBreak}       + THtmRec.A(TWksRec.Www, TWksRec.Www);     // IvWww
       CommonButtons      := [tcbClose];
       Flags              := [tfUseHiconMain{, tfAllowDialogCancellation}, tfEnableHyperlinks];
-      CustomMainIcon     := Application.Icon;                    // IvIcon;
+      CustomMainIcon     := Application.Icon;                        // IvIcon;
       OnHyperlinkClicked := AboutHyperlinkClicked;
       Execute;
     finally
@@ -13034,11 +13491,11 @@ var
         end else if alf = '[' then begin                                                            // image             -->   <img...>
           if Length(arv) < 6 then SetLength(arv, 6);
           // card?
-          isc := arv[4].Trim.Contains('card');
+          isc :=  TStrRec.StrHas(arv[4].Trim, 'card');
           // torn?
-               if arv[5].Trim.Contains('topbot') then tor := itTopBottom
-          else if arv[5].Trim.Contains('top')    then tor := itTop
-          else if arv[5].Trim.Contains('bot')    then tor := itBottom
+               if TStrRec.StrHas(arv[5].Trim, 'topbot') then tor := itTopBottom
+          else if TStrRec.StrHas(arv[5].Trim, 'top')    then tor := itTop
+          else if TStrRec.StrHas(arv[5].Trim, 'bot')    then tor := itBottom
           else                                        tor := itNone;
 
           Result := THtmRec.Img(arv[0], arv[1], StrToIntDef(arv[2], 0), StrToIntDef(arv[3], 0), isc, tor);
@@ -13730,9 +14187,19 @@ begin
   IvObjRem.&Object          := &Object         ;
 end;
 
+function  TObjRec.ObjObjectSafe: string;
+begin
+  Result := TStrRec.StrSafe(&Object);
+end;
+
+function  TObjRec.ContentKindIsMarkdown: boolean;
+begin
+  Result := ContentKind = TCodRec.MD.Kind;
+end;
+
 class function  TObjRec.IsBusinessObj(const IvObj: string): boolean;
 begin
-  Result := 'Person,User,Organization,Member,Page,Document'.Contains(IvObj);
+  Result := TStrRec.StrHas('Person,User,Organization,Member,Page,Document', IvObj);
 end;
 
 class function  TObjRec.ObjPropertyVector: TArray<string>;
@@ -13807,11 +14274,6 @@ begin
   , 'Group'
   , 'Task'
   ];
-end;
-
-      function  TObjRec.ContentKindIsMarkdown: boolean;
-begin
-  Result := ContentKind = TCodRec.MD.Kind;
 end;
 
 class function  TObjRec.HasProperty(const IvProperty: string): boolean;
@@ -14067,12 +14529,22 @@ var
   org: string;
 begin
   if IvOrganization = '' then org := Obj.&Object else org := IvOrganization;
-  Result := Format('Root/Organization/%s/%s', [org[1], org]);
+  Result := TreeDir(IvOrganization) + Format('/%s', [org]);
 end;
 
 function  TOrgRec.HomePath: string;
 begin
-  Result := Format('C:\$Org\%s\%s', [Obj.&Object[1], Obj.&Object]);                                           // C:\$Org\W\Wks
+  Result := Format('C:\$Org\%s\%s', [Obj.&Object[1], Obj.&Object]);                                         // C:\$Org\W\Wks
+end;
+
+function  TOrgRec.LogoFile: string;
+begin
+  Result := HomePath + Format('\%sLogo.png', [Obj.ObjObjectSafe]);                                          // C:\$Org\W\Wks\WksLogo.png
+end;
+
+function  TOrgRec.LogoLongFile: string;
+begin
+  Result := LogoFile.Replace('Logo.png', 'LogoLong.png');                                                   // C:\$Org\W\Wks\WksLogoLong.png
 end;
 
 function  TOrgRec.HomeUrl(IvRelative: boolean): string;
@@ -14080,22 +14552,25 @@ begin
   if Obj.&Object.Trim.IsEmpty then
     Result := ''
   else
-    Result := Format('%s/Organization/%s/%s', [ifthen(IvRelative, '', Www), Obj.&Object[1], Obj.&Object]);    // /Organization/W/Wks
+    Result := Format('%s/Organization/%s/%s', [ifthen(IvRelative, '', Www), Obj.&Object[1], Obj.&Object]);  // /Organization/W/Wks
 end;
 
-function  TOrgRec.LogoUrl(IvRelative: boolean): string;
+function  TOrgRec.LogoUrl(IvRelative, IvInverted: boolean): string;
+var
+  inv: string;
 begin
-  Result := HomeUrl(IvRelative) + Format('/%sLogo.png', [Obj.&Object]); // DUPLICATED TTheRec.                // /Organization/W/Wks/WksLogo.png
+  inv := ifthen(IvInverted, 'Inv', '');
+  Result := HomeUrl(IvRelative) + Format('/%sLogo%s.png', [Obj.&Object, inv]);                              // /Organization/W/Wks/WksLogo.png *** DUPLICATED in TTheRec ***
 end;                         // + gthe.LogoImg
 
 function  TOrgRec.LogoLongUrl(IvRelative: boolean): string;
 begin
-  Result := LogoUrl(IvRelative).Replace('Logo.png', 'LogoLong.png');                                          // /Organization/W/Wks/WksLogoLong.png
+  Result := LogoUrl(IvRelative).Replace('Logo.png', 'LogoLong.png');                                        // /Organization/W/Wks/WksLogoLong.png
 end;
 
 function  TOrgRec.IconUrl(IvRelative: boolean): string;
 begin
-  Result := HomeUrl(IvRelative) + Format('/%sIcon.ico', [Obj.&Object]);                                       // /Organization/W/Wks/WksIcon.ico
+  Result := HomeUrl(IvRelative) + Format('/%sIcon.ico', [Obj.&Object]);                                     // /Organization/W/Wks/WksIcon.ico
 end;
   {$ENDREGION}
 
@@ -14333,9 +14808,12 @@ end;
   {$ENDREGION}
 
   {$REGION 'TPerRec'}
-function  TPerRec.Info: string;
+function  TPerRec.Info(IvSurnameName: boolean): string;
 begin
-  Result := Format('%s %s', [Name, Surname]);
+  if IvSurnameName then
+    Result := Format('%s %s', [Surname, Name])
+  else
+    Result := Format('%s %s', [Name, Surname]);
 end;
 
 procedure TPerRec.Reset;
@@ -14434,31 +14912,6 @@ begin
     PictureGraphic.Free;
 end;
 
-function  TPerRec.HomePath: string;
-begin
-  Result := Format('C:\$Per\%s\%s', [Surname[1], SurnameNamesCollapsed]);                                     // C:\$Per\I\IarussiFedericoCarloBrian
-end;
-
-function  TPerRec.HomeUrl(IvRelative: boolean): string;
-begin
-  Result := Format('%s/Person/%s/%s', [ifthen(IvRelative, '', gorg.Www), Surname[1], SurnameNamesCollapsed]); // /Person/I/IarussiFedericoCarloBrian
-end;
-
-function  TPerRec.PictureUrl(IvRelative: boolean): string;
-begin
-  Result := HomeUrl(IvRelative) + Format('/%sPicture.png', [SurnameNamesCollapsed]);                          // /Person/I/IarussiFedericoCarloBrian/IarussiFedericoCarloBrianPicture.png
-end;
-
-function  TPerRec.FileNameGenerate(IvPerson, IvSubject, IvExt: string): string;
-begin
-  Result := Format('C:\$Per\%s\%s\%s_.%s', [IvPerson[1].ToUpper, IvPerson, IvPerson, IvSubject, IvExt]); // C:\$Per\G\giarussi\giarussi_Subject.ext
-end;
-
-function  TPerRec.SurnameNamesCollapsed: string;
-begin
-  Result := TStrRec.StrCollapse(Surname + Name);
-end;
-
 function  TPerRec.NameCompact: string;
 var
   nav: TArray<string>;
@@ -14472,6 +14925,42 @@ begin
       Result := nav[0] + ' '
     else
       Result := Result + Format('%s.', [LeftStr(nav[i], 1)]);
+end;
+
+function  TPerRec.SurnameNameSafe: string;
+begin
+  Result := TStrRec.StrSafe(Surname) + TStrRec.StrSafe(Name);
+end;
+
+function  TPerRec.FileSpecWithTags(IvTagVec: TArray<string>; IvExt: string): string;
+var
+  tai: string; // tail
+begin
+  tai := TStrRec.StrConcat(IvTagVec, '_');
+  if not tai.IsEmpty then
+    tai := '_' + tai;
+
+  Result := HomePath + Format('\%s%s.%s', [SurnameNameSafe, tai, IvExt]);                                 // C:\$Per\I\IarussiFedericoCarloBrian\IarussiFedericoCarloBrian_Tag0_Tag1_[...].ext
+end;
+
+function  TPerRec.HomePath: string;
+begin
+  Result := Format('C:\$Per\%s\%s', [Surname[1].ToUpper, SurnameNameSafe]);                                     // C:\$Per\I\IarussiFedericoCarloBrian
+end;
+
+function  TPerRec.PictureFile: string;
+begin
+  Result := HomePath + Format('\%sPicture.png', [SurnameNameSafe]);                                             // C:\$Per\I\IarussiFedericoCarloBrian\IarussiFedericoCarloBrian_Picture.png
+end;
+
+function  TPerRec.HomeUrl(IvRelative: boolean): string;
+begin
+  Result := Format('%s/Person/%s/%s', [ifthen(IvRelative, '', gorg.Www), Surname[1].ToUpper, SurnameNameSafe]); // /Person/I/IarussiFedericoCarloBrian
+end;
+
+function  TPerRec.PictureUrl(IvRelative: boolean): string;
+begin
+  Result := HomeUrl(IvRelative) + Format('/%sPicture.png', [SurnameNameSafe]);                                  // /Person/I/IarussiFedericoCarloBrian/IarussiFedericoCarloBrian_Picture.png
 end;
   {$ENDREGION}
 
@@ -14952,28 +15441,38 @@ begin
       SetLength(IvParamRecVector, Length(IvParamRecVector)+1);
 
       // param
-      IvParamRecVector[i].ReportId    := dst.FieldByName('FldObjectId'   ).AsInteger; // key
-      IvParamRecVector[i].Order       := dst.FieldByName('FldOrder'      ).AsInteger;
-      IvParamRecVector[i].State       := dst.FieldByName('FldState'      ).AsString ;
-      IvParamRecVector[i].Param       := dst.FieldByName('FldParam'      ).AsString ; // key
-      IvParamRecVector[i].Default     := dst.FieldByName('FldDefault'    ).AsString ;
-      IvParamRecVector[i].Caption     := dst.FieldByName('FldCaption'    ).AsString ;
-      IvParamRecVector[i].Placeholder := dst.FieldByName('FldPlaceholder').AsString ;
-      IvParamRecVector[i].Description := dst.FieldByName('FldDescription').AsString ;
-      IvParamRecVector[i].Help        := dst.FieldByName('FldHelp'       ).AsString ;
-      IvParamRecVector[i].Kind        := dst.FieldByName('FldKind'       ).AsString ;
-      IvParamRecVector[i].Hidden      := dst.FieldByName('FldHidden'     ).AsBoolean;
-      IvParamRecVector[i].Required    := dst.FieldByName('FldRequired'   ).AsBoolean;
-      IvParamRecVector[i].Disabled    := dst.FieldByName('FldDisabled'   ).AsBoolean;
-    //IvParamRecVector[i].LineGrid12  := dst.FieldByName('FldLineGrid12' ).AsString ;
-      IvParamRecVector[i].OptionCsv   := dst.FieldByName('FldOptionCsv'  ).AsString ;
-      IvParamRecVector[i].OptionJson  := dst.FieldByName('FldOptionJson' ).AsString ;
-      IvParamRecVector[i].OptionQuery := dst.FieldByName('FldOptionQuery').AsString ;
-      IvParamRecVector[i].ConnStr     := dst.FieldByName('FldConnStr'    ).AsString ;
-      IvParamRecVector[i].ConnLib     := dst.FieldByName('FldConnLib'    ).AsString ;
-      IvParamRecVector[i].Classs      := dst.FieldByName('FldClass'      ).AsString ;
-      IvParamRecVector[i].Style       := dst.FieldByName('FldStyle'      ).AsString ;
-      IvParamRecVector[i].Value       := ''                                       ;
+      IvParamRecVector[i].ReportId       := dst.FieldByName('FldObjectId'      ).AsInteger;  {  ReportId  key }
+      IvParamRecVector[i].Order          := dst.FieldByName('FldOrder'         ).AsInteger;  {  Order         }
+      IvParamRecVector[i].State          := dst.FieldByName('FldState'         ).AsString ;  {  State         }
+      IvParamRecVector[i].Param          := dst.FieldByName('FldParam'         ).AsString ;  {  Param     key }
+      IvParamRecVector[i].Default        := dst.FieldByName('FldDefault'       ).AsString ;  {  Default       }
+      IvParamRecVector[i].Caption        := dst.FieldByName('FldCaption'       ).AsString ;  {  Caption       }
+      IvParamRecVector[i].Placeholder    := dst.FieldByName('FldPlaceholder'   ).AsString ;  {  Placeholder   }
+      IvParamRecVector[i].Description    := dst.FieldByName('FldDescription'   ).AsString ;  {  Description   }
+      IvParamRecVector[i].Help           := dst.FieldByName('FldHelp'          ).AsString ;  {  Help          }
+      IvParamRecVector[i].Kind           := dst.FieldByName('FldKind'          ).AsString ;  {  Kind          }
+      IvParamRecVector[i].Hidden         := dst.FieldByName('FldHidden'        ).AsBoolean;  {  Hidden        }
+      IvParamRecVector[i].Required       := dst.FieldByName('FldRequired'      ).AsBoolean;  {  Required      }
+      IvParamRecVector[i].Disabled       := dst.FieldByName('FldDisabled'      ).AsBoolean;  {  Disabled      }
+    //IvParamRecVector[i].LineGrid12     := dst.FieldByName('FldLineGrid12'    ).AsString ;  {  LineGrid12    }
+      IvParamRecVector[i].OptionCsv      := dst.FieldByName('FldOptionCsv'     ).AsString ;  {  OptionCsv     }
+      IvParamRecVector[i].OptionJson     := dst.FieldByName('FldOptionJson'    ).AsString ;  {  OptionJson    }
+      IvParamRecVector[i].OptionQuery    := dst.FieldByName('FldOptionQuery'   ).AsString ;  {  OptionQuery   }
+      IvParamRecVector[i].ConnStr        := dst.FieldByName('FldConnStr'       ).AsString ;  {  ConnStr       }
+      IvParamRecVector[i].ConnLib        := dst.FieldByName('FldConnLib'       ).AsString ;  {  ConnLib       }
+      IvParamRecVector[i].&Class         := dst.FieldByName('FldClass'         ).AsString ;  {  Classs        }
+      IvParamRecVector[i].Style          := dst.FieldByName('FldStyle'         ).AsString ;  {  Style         }
+    //IvParamRecVector[i].Format         := dst.FieldByName('FldFormat'        ).AsString ;  {  Format        }
+    //IvParamRecVector[i].ReadOnly       := dst.FieldByName('FldReadOnly'      ).AsBoolean;  {  ReadOnly      }
+    //IvParamRecVector[i].AjaxValidate   := dst.FieldByName('FldAjaxValidate'  ).AsString ;  {  AjaxValidate  }
+    //IvParamRecVector[i].Switch         := dst.FieldByName('FldSwitch'        ).AsString ;  {//Switch        }
+    //IvParamRecVector[i].ToOrganization := dst.FieldByName('FldToOrganization').AsString ;  {//ToOrganization}
+    //IvParamRecVector[i].ToDepartment   := dst.FieldByName('FldToDepartment'  ).AsString ;  {//ToDepartment  }
+    //IvParamRecVector[i].ToArea         := dst.FieldByName('FldToArea'        ).AsString ;  {//ToArea        }
+    //IvParamRecVector[i].ToActivity     := dst.FieldByName('FldToActivity'    ).AsString ;  {//ToActivity    }
+    //IvParamRecVector[i].ToTeam         := dst.FieldByName('FldToTeam'        ).AsString ;  {//ToTeam        }
+    //IvParamRecVector[i].ToMember       := dst.FieldByName('FldToMember'      ).AsString ;  {//ToMember      }
+      IvParamRecVector[i].Value          := ''                                            ;  {  Value         }
 
       // next
       dst.Next;
@@ -15001,7 +15500,7 @@ begin
   {$ENDREGION}
 
   {$REGION 'load'}
-  sql := Format(   ' select'
+  sql := Format( ' select'
   + sLineBreak + '     *'
   + sLineBreak + ' from'
   + sLineBreak + '     DbaReport.dbo.TblDataset'
@@ -15033,7 +15532,7 @@ begin
       IvDatasetRecVector[i].Dataset         := dst.FieldByName('FldDataset'        ).AsString ; // key
       IvDatasetRecVector[i].Title           := dst.FieldByName('FldTitle'          ).AsString ;
       IvDatasetRecVector[i].Description     := dst.FieldByName('FldDescription'    ).AsString ;
-      IvDatasetRecVector[i].Mode            := dst.FieldByName('FldMode'           ).AsString ; // Horiz/Vert
+      IvDatasetRecVector[i].Mode            := dst.FieldByName('FldMode'           ).AsString ; // Horizontal/Vertical
       IvDatasetRecVector[i].ConnStr         := dst.FieldByName('FldConnStr'        ).AsString ;
       IvDatasetRecVector[i].ConnLib         := dst.FieldByName('FldConnLib'        ).AsString ;
     //IvDatasetRecVector[i].ParamStr        := dst.FieldByName('FldParamStr'       ).AsString ;
@@ -16101,7 +16600,7 @@ var
   {$REGION 'macros'}
   function  StrIsDirty(ivstr: string): boolean;
   begin
-  //Result := ivstr.Contains('[Rv') or ivstr.Contains('[--Rv');
+  //Result := TStrRec.StrHas(ivstr, '[Rv') or TStrRec.StrHas(ivstr, '[--Rv');
     Result := TStrRec.StrHasRex(ivstr, grex.REX_RV_CHECK_PAT, [roSingleLine{, roMultiLine, roIgnoreCase}]);
   end;
 
@@ -16147,7 +16646,7 @@ var
         fld := gwrq.WebRequestOrig.QueryFields.Names[i];
         dfl := Format('$%s$', [fld]);
         val := gwrq.WebRequestOrig.QueryFields.Values[fld];
-        if Result.Contains(dfl) then
+        if TStrRec.StrHas(Result, dfl) then
           Result := StringReplace(Result, dfl, val, [rfReplaceAll]);
       end;
   end;
@@ -17295,7 +17794,7 @@ begin
   // remove c style comments
   if grex.RexHas(Result, grex.REX_CPP_COMMENT_PAT , [roIgnoreCase, roMultiLine])  then
     grex.RexReplace(Result, grex.REX_CPP_COMMENT_PAT , '', [roIgnoreCase, roMultiLine]);
-     
+
   // remove python #
   if IvPythonCommentRemove then
   if grex.RexHas(Result, grex.REX_PY_COMMENT_PAT  , [roIgnoreCase, roMultiLine])  then
@@ -17312,7 +17811,7 @@ begin
 end;
 
 class function  TStrRec.StrEmptyLinesRemove(IvStr: string): string;
-var 
+var
   i: integer;
   l: TStrings;
 begin     
@@ -17322,7 +17821,7 @@ begin
   // i
   //while Pos(Char(13)+Char(10)+Char(13)+Char(10), Result) > 0 do
     //Result := StringReplace(Result, Char(13)+Char(10)+Char(13)+Char(10), Char(13)+Char(10), [rfReplaceAll]);
-  
+
   // ii
   //if grex.RexHas(Result, grex.REX_EMPTY_LINE_PAT2, [roSingleLine]) then
     //grex.RexReplace(Result, grex.REX_EMPTY_LINE_PAT2, sLineBreak, [roSingleLine]);
@@ -17339,6 +17838,16 @@ begin
   finally
     FreeAndNil(l);
   end;
+end;
+
+class function  TStrRec.StrRemoveFirst(IvStr: string; IvCharCount: integer): string;
+begin
+  Result := IvStr.Remove(0, IvCharCount);
+end;
+
+class function  TStrRec.StrRemoveLast(IvStr: string; IvCharCount: integer): string;
+begin
+  Result := IvStr.Remove(Length(IvStr) - IvCharCount);
 end;
 
 class function  TStrRec.StrReplace(IvStr, IvOut, IvIn: string): string;
@@ -17374,7 +17883,7 @@ begin
     Result := Result + IvStr;
 end;
 
-//class function TStrRec.StrSplitB(IvString, IvDelimiters: string): TStringDynArray;
+//class function  TStrRec.StrSplitB(IvString, IvDelimiters: string): TStringDynArray;
 //begin
 //  Result := SplitString(IvString, IvDelimiters);
 //end;
@@ -17426,6 +17935,12 @@ begin
   Result := a - 1;
 end;
 
+class function  TStrRec.StrSafe(IvStr: string): string;
+begin
+  Result := StrCapitalize(IvStr);
+  Result := StrClean(Result);
+end;
+
 class function  TStrRec.StrShellChrs(IvStr: string): string;
 begin
   Result := '';
@@ -17466,6 +17981,15 @@ begin
   if Result.IsEmpty then
     Result := IvDefault;
 end;
+
+class function TStrRec.StrConcat(IvStrVector: TArray<string>; IvDelimiter: string): string;
+var
+  str: string;
+begin
+  Result := '';
+  for str in IvStrVector do
+    Result := Result + IvDelimiter + str;
+end;
   {$ENDREGION}
 
   {$REGION 'TSvcRec'}
@@ -17483,7 +18007,7 @@ class function TSvcRec.ExePath(IvName: string): string;
 begin
   Result := Format('%s\Wks%sServiceProject.exe', [TBynRec.BinaryDir, IvName]);
 end;
-{$ENDREGION}
+  {$ENDREGION}
 
   {$REGION 'TSynRec'}
 {class} procedure TSynRec.Setup(IvSynEdit: TCustomSynEdit; IvTabWidth: integer; IvCodKind: TCodKindEnum; IvFoldingLineShow: boolean);
@@ -17633,7 +18157,7 @@ begin
     // +/ comments
     end else if Key in [vkSlash] then begin // slash interfere with [REGION]
       lin := LineCurrentText(IvSynEdit);
-      com := TCodRec.CommentStr2(IvCodeKindEnum);  // -- or // or # or ...
+      com := TCodRec.CommentStr(IvCodeKindEnum);  // -- or // or # or ...
     //coz := Length(com);
       lin := TStrRec.StrCommentToggle(lin, com, false, false);
       LineCurrentTextSet(IvSynEdit, lin);
@@ -17643,7 +18167,7 @@ begin
     // +. comments (consider/replace spaces)
     end else if Key in [vkPeriod] then begin
       lin := LineCurrentText(IvSynEdit);
-      com := TCodRec.CommentStr2(IvCodeKindEnum);  // -- or // or # or ...
+      com := TCodRec.CommentStr(IvCodeKindEnum);  // -- or // or # or ...
       lin := TStrRec.StrCommentToggle(lin, com, false, true);
       LineCurrentTextSet(IvSynEdit, lin);
       IvSynEdit.CaretX := 0;
@@ -18171,7 +18695,7 @@ begin
   IvSynEdit.CaretX := 1; // move to the first column of the specified line
   IvSynEdit.SetFocus;    // optional: Set focus to the SynEdit control
 end;
-{$ENDREGION}
+  {$ENDREGION}
 
   {$REGION 'TTblRec'}
 class function TTblRec.TblEditJsonStr(IvTable: string; IvKeyFieldVec: TArray<string>; IvEditFieldVec: TArray<string>): string;
@@ -18188,7 +18712,7 @@ class function TTblRec.TblEditJsonStr(IvTable: string; IvKeyFieldVec: TArray<str
 //  + sLineBreak + '}';
 var
   sbu: TSbuRec;
-  str, kfl, efl: string;
+  kfl, efl: string;
 begin
   // keyfldlist
   kfl := TVecRec.VecToList(IvKeyFieldVec, ',', true);
@@ -18777,17 +19301,22 @@ end;
 
 function  TUsrRec.HomePath: string;
 begin
-  Result := gper.HomePath;                                                                                    // C:\$Per\I\IarussiFedericoCarloBrian
+  Result := gper.HomePath;                                                         // C:\$Per\I\IarussiFedericoCarloBrian
+end;
+
+function  TUsrRec.AvatarFile: string;
+begin
+  Result := HomePath + Format('\%sAvatar.png', [gper.SurnameNameSafe]);            // C:\$Per\I\IarussiFedericoCarloBrian\IarussiFedericoCarloBrian_Avatar.png
 end;
 
 function  TUsrRec.HomeUrl(IvRelative: boolean): string;
 begin
-  Result := gper.HomeUrl(IvRelative);                                                                         // /Person/I/IarussiFedericoCarloBrian
+  Result := gper.HomeUrl(IvRelative);                                              // /Person/I/IarussiFedericoCarloBrian
 end;
 
 function  TUsrRec.AvatarUrl(IvRelative: boolean): string;
 begin
-  Result := HomeUrl(IvRelative) + Format('/%sAvatar.png', [gper.SurnameNamesCollapsed]);                      // /Person/I/IarussiFedericoCarloBrian/IarussiFedericoCarloBrianPicture.png
+  Result := HomeUrl(IvRelative) + Format('/%sAvatar.png', [gper.SurnameNameSafe]); // /Person/I/IarussiFedericoCarloBrian/IarussiFedericoCarloBrian_Avatar.png
 end;
 
 procedure TUsrRec.AvatarGenerate(var IvAvatar: TBitmap; IvSize: integer);
@@ -18836,6 +19365,11 @@ begin
 
   // free
   agg.Free;
+end;
+
+procedure TUsrRec.AvatarGenerateAI(var IvAvatar: TBitmap; IvSize: integer; IvAiInstructions: string);
+begin
+  AvatarGenerate(IvAvatar, IvSize);
 end;
   {$ENDREGION}
 
@@ -19295,7 +19829,21 @@ end;
   {$ENDREGION}
 
   {$REGION 'TW3fRec'}
-class function  TW3fRec.W3ThemeCssGenerate(IvName, IvH60PrimaryBgColor, IvH30SecondaryFgColor, IvH10AccentColor: string): string;
+class function  TW3fRec.W3ColorFromTheme(IvTheme: string): string;
+var
+  i: integer;
+begin
+  for i := Low(THEME_NAME_VEC) to High(THEME_NAME_VEC) do
+    if SameText(IvTheme, THEME_NAME_VEC[i]) then
+      Break;
+
+  if (i < Low(THEME_NAME_VEC)) or (High(THEME_NAME_VEC) < i) then
+    i := 0;
+
+  Result := THEME_COLOR_VEC[i];
+end;
+
+class function  TW3fRec.W3ThemeCssGenerate(IvTheme, IvH60PrimaryBgColor, IvH30SecondaryFgColor, IvH10AccentColor: string): string;
 
   {$REGION 'var'}
 const
@@ -19372,7 +19920,7 @@ begin
 
   {$REGION 'w3 theme primary 60%'}
   sbu.Add('/***'                                                                                , true , 0);
-  sbu.Add(' * W3CSS THEME(%s) PRIMARY-COLOR (%s) 60% - %s%'           , [IvName, phco, DateTimeToStr(Now)]);
+  sbu.Add(' * W3CSS THEME(%s) PRIMARY-COLOR (%s) 60% - %s%'          , [IvTheme, phco, DateTimeToStr(Now)]);
   sbu.Add(' */'                                                                                           );
   sbu.Add(' /* GRADES */'                                                                                 );
   sbu.Add('.w3-theme-l9        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl9 > K, '#000', '#fff'), phl9, pbl9]);
@@ -19401,7 +19949,7 @@ begin
   {$REGION 'w3 theme secondary 30%'}
   sbu.Anl;
   sbu.Add('/***'                                                                                          );
-  sbu.Add(' * W3CSS THEME(%s) SECONDARY-COLOR (%s) 30%%'                                  , [IvName, shco]);
+  sbu.Add(' * W3CSS THEME(%s) SECONDARY-COLOR (%s) 30%%'                                 , [IvTheme, shco]);
   sbu.Add(' */'                                                                                           );
   sbu.Add(' /* GRADES */'                                                                                 );
   sbu.Add('.w3-theme-s-l      {color:%s !important; background-color:%s !important} /* %d */', [ifthen(sbl5 > K, '#000', '#fff'), shl5, sbl5]);
@@ -19412,7 +19960,7 @@ begin
   {$REGION 'w3 theme accent 10%'}
   sbu.Anl;
   sbu.Add('/***'                                                                                          );
-  sbu.Add(' * W3CSS THEME(%s) ACCENT-COLOR (%s) 10%%'                                     , [IvName, ahco]);
+  sbu.Add(' * W3CSS THEME(%s) ACCENT-COLOR (%s) 10%%'                                    , [IvTheme, ahco]);
   sbu.Add(' */'                                                                                           );
   sbu.Add('.w3-theme-a-l      {color:%s !important; background-color:%s !important} /* %d */', [{ifthen(abl5 > K, '#000', '#fff')}ahd5, ahl5, abl5]); // light
   sbu.Add('.w3-theme-a        {color:%s !important; background-color:%s !important} /* %d */', [ ifthen(abco > K, '#000', '#fff')     , ahco, abco]); // normal
@@ -19423,7 +19971,7 @@ begin
   {$REGION 'w3 theme text'}
   sbu.Anl;
   sbu.Add('/***'                                                                                          );
-  sbu.Add(' * W3CSS THEME(%s) TEXT'                                                             , [IvName]);
+  sbu.Add(' * W3CSS THEME(%s) TEXT'                                                            , [IvTheme]);
   sbu.Add(' */'                                                                                           );
 //sbu.Add('.w3-theme-text             {color:%s !important;}'                                     , [shco]);
   sbu.Add('.w3-theme-text-muted       {color:%s !important;}'                                     , [shl5]);
@@ -19438,7 +19986,7 @@ begin
   {$REGION 'w3 theme border'}
   sbu.Anl;
   sbu.Add('/***'                                                                                          );
-  sbu.Add(' * W3CSS THEME(%s) BORDER'                                                           , [IvName]);
+  sbu.Add(' * W3CSS THEME(%s) BORDER'                                                          , [IvTheme]);
   sbu.Add(' */'                                                                                           );
   sbu.Anl;
   sbu.Add('.w3-theme-border-l {border-color:%s !important;}'                                      , [shl5]);
@@ -19449,7 +19997,7 @@ begin
   {$REGION 'w3 theme gradient'}
   sbu.Anl;
   sbu.Add('/***'                                                                                          );
-  sbu.Add(' * W3CSS THEME(%s) GRADIENT (%s)'                                              , [IvName, ahco]);
+  sbu.Add(' * W3CSS THEME(%s) GRADIENT (%s)'                                             , [IvTheme, ahco]);
   sbu.Add(' */'                                                                                           );
   sbu.Add('.w3-theme-gradient  {color:%s !important; background:-webkit-linear-gradient(top,%s 25%%,%s 75%%)}', [ifthen(pbco > K, '#000', '#fff'), phl2, phd1]);
   sbu.Add('.w3-theme-gradient  {color:%s !important; background:   -moz-linear-gradient(top,%s 25%%,%s 75%%)}', [ifthen(pbco > K, '#000', '#fff'), phl2, phd1]);
@@ -19461,7 +20009,7 @@ begin
   {$REGION 'w3 theme hover'}
   sbu.Anl;
   sbu.Add('/***'                                                                                          );
-  sbu.Add(' * W3CSS THEME(%s) HOVER'                                                            , [IvName]);
+  sbu.Add(' * W3CSS THEME(%s) HOVER'                                                           , [IvTheme]);
   sbu.Add(' */'                                                                                           );
   sbu.Anl;
   sbu.Add('.w3-theme-hover:hover        {color:#000 !important; background-color:%s !important}'  , [ahco]);
@@ -19472,7 +20020,7 @@ begin
   {$REGION 'w3 theme waitloader'}
   sbu.Anl;
   sbu.Add('/***'                                                                                          );
-  sbu.Add(' * W3CSS ADDIN(%s) WAITLOADER'                                                       , [IvName]);
+  sbu.Add(' * W3CSS ADDIN(%s) WAITLOADER'                                                      , [IvTheme]);
   sbu.Add(' */'                                                                                           );
   sbu.Add('@-webkit-keyframes CoSpin { /* safari */'                                                      ); // ?
   sbu.Add('  0% { -webkit-transform: rotate(0deg); }'                                                     );
@@ -19517,7 +20065,7 @@ begin
   {$REGION 'w3 theme snackbar'}
   sbu.Anl;
   sbu.Add('/***'                                                                                          );
-  sbu.Add(' * W3CSS THEME(%s) SNACKBAR'                                                         , [IvName]);
+  sbu.Add(' * W3CSS THEME(%s) SNACKBAR'                                                        , [IvTheme]);
   sbu.Add(' */'                                                                                           );
   sbu.Add('@-webkit-keyframes CoSnackbarFadein {'                                                         );
   sbu.Add('  from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;}'                                );
@@ -19580,8 +20128,8 @@ begin
   sbu.Add('.w3-padding-x-xlarge {padding-left:16px !important; padding-right:16px !important;}'           );
 
   sbu.Add('.w3-text-italic            {font-style: italic;}'                                              );
-  sbu.Add('.w3-table-centered         {margin-left: auto;margin-right: auto;}'                            );
-  sbu.Add('.w3-table-centered-compact {margin-left: auto;margin-right: auto;width: 0;}'                   );
+  sbu.Add('.w3-table-centered         {margin-left: auto;margin-right: auto; display: block;}'            );
+  sbu.Add('.w3-table-centered-compact {margin-left: auto;margin-right: auto; display: block;width: 0;}'   );
 
   sbu.Add('.w3-shadow           {filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.5));}'                   );
   sbu.Add('.w3-shadow-theme     {filter: drop-shadow(0px 0px 2px rgba(%d, %d, %d, %f));}', [TColRec.R(ptco),TColRec.G(ptco),TColRec.B(ptco), 0.5]);
@@ -19856,7 +20404,7 @@ begin
 
     // w3-theme-xxx.css
     for i := Low(THEME_NAME_VEC) to High(THEME_NAME_VEC) do begin
-      stl.Text := W3ThemeCssGenerate(THEME_NAME_VEC[i], THEME_PRIMARY_COLOR_VEC[i], THEME_SECONDARY_COLOR_VEC[i], THEME_ACCENT_COLOR_VEC[i]);
+      stl.Text := W3ThemeCssGenerate(THEME_NAME_VEC[i], THEME_PRIMARY_60_COLOR_VEC[i], THEME_SECONDARY_30_COLOR_VEC[i], THEME_ACCENT_10_COLOR_VEC[i]);
       fna := TWksRec.INC_PATH + Format('\w3\w3-theme-%s.css', [THEME_NAME_VEC[i]]);
       stl.SaveToFile(fna);
     end;
@@ -19874,7 +20422,7 @@ end;
 
 class function  TWksRec.Copyright: string;
 begin
-  Result := Format('%s %s', [ACRONYM, WWW]);
+  Result := Format('© 2010-present %s %s', [ACRONYM, WWW]);
 end;
 
 class procedure TWksRec.WksWebFilesGenerate;
@@ -19903,7 +20451,7 @@ begin
   sbu.Add('<!DOCTYPE html>'                                                    , true , 0);
   sbu.Add('<html lang="en">'                                                             );
   sbu.Add('<head>'                                                                       );
-  sbu.Add('  <title>%s Default Page</title>'                          , [TWksRec.ACRONYM]); // gorg.Organization
+  sbu.Add('  <title>%s Default Page</title>'                         , [gorg.Obj.&Object]); // TWksRec.ACRONYM
   sbu.Add('  <meta charset="utf-8">'                                                     );
   sbu.Add('  <meta http-equiv="refresh" content="2; url=/WksPageIsapiProject.dll/">'     );
   sbu.Add('  <meta name="author" content="%s" />'                      , [TWksRec.AUTHOR]);
@@ -20188,6 +20736,16 @@ class procedure TWmoRec.BeforeDispatch(IvWebRequest: TWebRequest; IvWebResponse:
 var
   fid, sid: cardinal;
   ref, red{, dab}, fbk: string; // referer, redirect, datetimebegin
+
+  function host_mistakes_fix(host: string): string;
+  begin
+    // default
+    Result := host.ToLower;
+
+    // no wwww
+    if not Result.StartsWith('www.') then
+      Result := Format('www.%s', [Result]);
+  end;
 begin
 
   {$REGION 'Help'}
@@ -20213,12 +20771,15 @@ begin
 //IvWrq.Error := '';
 //glog.Log('WebModuleBeforeDispatch');
 
+  // fixearly *** impossible ***
+//IvWebRequest.Host := host_mistakes_fix(IvWebRequest.Host);
+
   // request i
   IvWrq.WebRequestOrig := IvWebRequest;
 
   // redirect
-  ref := IvWebRequest.Referer; // Referer 'http://aiwymsdev.ai.lfoundry.com/Default.htm?CoRedirect=http://aiwymsdev.ai.lfoundry.com/WksPageIsapiProject.dll/View?CoId=167&CoDocumentId=129
-  if ref.Contains('CoRedirect=') then begin
+  ref := IvWebRequest.Referer; // Referer 'http://www.abc.com/Default.htm?CoRedirect=http://www.abc.com/WksPageIsapiProject.dll/View?CoId=167&CoDocumentId=129
+  if TStrRec.StrHas(ref, 'CoRedirect=') then begin
     red := TStrRec.StrRightOf('CoRedirect=', ref, false);
     IvWebResponse.Content := TWrsRec.SendRedirectJsStr(red);
     IvWebResponse.SendResponse;
@@ -20264,7 +20825,7 @@ begin
   IvWrq.DateTime       := TDatRec.DatFromIso(IvWebRequest.CookieFields.Values['CoDateTime'], Now); //                              2019-01-31 12:12:14.377
   IvWrq.Method         := IvWebRequest.Method;                                                     // REQUEST_METHOD               GET | POST
   IvWrq.Protocol       := IvWebRequest.ProtocolVersion;                                            //                              HTTP/1.1
-  IvWrq.Host           := IvWebRequest.Host;                                                       // SERVER_NAME                  www.wks.cloud *** THE-ONLY-SURE-INFO ***
+  IvWrq.Host           := host_mistakes_fix(IvWebRequest.Host);                                    // SERVER_NAME                  www.wks.cloud *** THE-ONLY-SURE-INFO ***
   IvWrq.Url            := IvWebRequest.URL;                                                        //                              /WksXxxIsapiProject.dll
   IvWrq.PathInfo       := IvWebRequest.PathInfo;                                                   // PATH_INFO / Ecb.PathInfo     /Info
   IvWrq.Query          := IvWebRequest.Query; {WebRequest.QueryFields.CommaText}                   // QUERY_STRING / Ecb.Query     ?CoId=381&CoXxx=2
@@ -20645,16 +21206,34 @@ end;
   {$REGION 'TWrqRec'}
 function  TWrqRec.FieldCookieExists(IvField: string): boolean; // webrequest
 begin
+  if not Assigned(WebRequestOrig) then begin
+    Error := Format('Unable to verify if cookie %s exist, WebRequestOrig is nil', [IvField]);
+    Result := false;
+    Exit;
+  end;
+
   Result := WebRequestOrig.CookieFields.IndexOfName(IvField) >= 0;
 end;
 
 function  TWrqRec.FieldQueryExists(IvField: string): boolean;
 begin
+  if not Assigned(WebRequestOrig) then begin
+    Error := Format('Unable to verify if queryfield %s, WebRequestOrig is nil', [IvField]);
+    Result := false;
+    Exit;
+  end;
+
   Result := WebRequestOrig.QueryFields.IndexOfName(IvField) >= 0;
 end;
 
 function  TWrqRec.FieldContentExists(IvField: string): boolean;
 begin
+  if not Assigned(WebRequestOrig) then begin
+    Error := Format('Unable to verify if contentfield %s, WebRequestOrig is nil', [IvField]);
+    Result := false;
+    Exit;
+  end;
+
   Result := WebRequestOrig.ContentFields.IndexOfName(IvField) >= 0;
 end;
 
@@ -20671,6 +21250,12 @@ end;
 
 function  TWrqRec.FieldCookieGet(IvField: string; IvDefault: variant): variant;
 begin
+  if not Assigned(WebRequestOrig) then begin
+    Error := Format('Unable to get cookie %s, WebRequestOrig is nil', [IvField]);
+    Result := IvDefault;
+    Exit;
+  end;
+
   if Length(WebRequestOrig.CookieFields.Values[IvField]) > 0 then
     Result := WebRequestOrig.CookieFields.Values[IvField]
   else
@@ -20679,6 +21264,12 @@ end;
 
 function  TWrqRec.FieldQueryGet(IvField: string; IvDefault: variant): variant;
 begin
+  if not Assigned(WebRequestOrig) then begin
+    Error := Format('Unable to get queryfield %s, WebRequestOrig is nil', [IvField]);
+    Result := IvDefault;
+    Exit;
+  end;
+
   if FieldQueryExists(IvField) then
     Result := WebRequestOrig.QueryFields.Values[IvField]
   else
@@ -20687,6 +21278,12 @@ end;
 
 function  TWrqRec.FieldContentGet(IvField: string; IvDefault: variant): variant;
 begin
+  if not Assigned(WebRequestOrig) then begin
+    Error := Format('Unable to get contentfield %s, WebRequestOrig is nil', [IvField]);
+    Result := IvDefault;
+    Exit;
+  end;
+
   if Length(WebRequestOrig.ContentFields.Values[IvField]) > 0 then
     Result := WebRequestOrig.ContentFields.Values[IvField]
   else
@@ -20696,19 +21293,26 @@ end;
 function  TWrqRec.FieldGet(IvField: string; IvDefault: variant): variant;
 begin
   // 0th default
-  Result := IvDefault;
+//Result := IvDefault;
 
   // 1st queryfield
   if          FieldQueryExists(IvField) then
-    Result := WebRequestOrig.QueryFields.Values[IvField]
+  //Result := WebRequestOrig.QueryFields.Values[IvField]
+    Result := FieldQueryGet(IvField, IvDefault)
 
   // 2nd contentfield
   else if FieldContentExists(IvField) then
-    Result := WebRequestOrig.ContentFields.Values[IvField]
+  //Result := WebRequestOrig.ContentFields.Values[IvField]
+    Result := FieldContentGet(IvField, IvDefault)
 
   // 3rd cookiefield
   else if FieldCookieExists(IvField) then
-    Result := WebRequestOrig.CookieFields.Values[IvField];
+  //Result := WebRequestOrig.CookieFields.Values[IvField]
+    Result := FieldCookieGet(IvField, IvDefault)
+
+  else
+    Result := IvDefault
+  ;
 
   // default
 //if  TVntRec.VntIsWhite(Result) then
@@ -20763,12 +21367,18 @@ end;
 
 function  TWrqRec.ScriptNameUrl(IvRelative: boolean): string;
 var
-  w, s: string;
+  www, sna: string;
 begin
-  w := ifthen(IvRelative, '', gorg.Www);
-  s := WebRequestOrig.ScriptName;
+  if not Assigned(WebRequestOrig) then begin
+    Error := 'Unable to calculate the scriptname url, WebRequestOrig is nil';
+    Result := '';
+    Exit;
+  end;
 
-  Result := Format('%s%s', [w, s]);
+  www := ifthen(IvRelative, '', gorg.Www);
+  sna := WebRequestOrig.ScriptName;
+
+  Result := Format('%s%s', [www, sna]);
 end;
   {$ENDREGION}
 
@@ -20789,7 +21399,7 @@ end;
 
 class procedure TWrsRec.ResponseCustomHeaderAdd(IvWebResponse: TWebResponse; IvCustomHeaderKeyValVec: TStringVector);
 var
-  i, len: integer;
+  i: integer;
   key, val: string;
 begin
   for i := 0 to (Length(IvCustomHeaderKeyValVec) div 2) - 1 do begin
@@ -20864,11 +21474,13 @@ end;
 initialization
 
 {$REGION 'Profiler'}
-glo_z := 0;
+//glog.Log('Initialize global profiler');
+gpro := TProfiler.Create(nil);
+gpro.Name := 'GlobalProfiler';
 {$ENDREGION}
 
 {$REGION 'Jachlog'}
-//glog.Log('Jachlog initialize');
+//glog.Log('Initialize global jachlog (create and register writers)');
 
   // init
   gjlog := TjachLog.Create();
@@ -20881,7 +21493,7 @@ glo_z := 0;
     gjlog.LogLevel[glo_i]  := llDebug; // (llOff{0}, llEmergency{1}, llAlert{2}, llCritical{3}, llError{4}, llWarning{5}, llNotice{6}, llInfo{7}, llDebug{8}, llAll{9})
   end;
 
-  // diskwriter
+  // diskwriterregister
   gjldsk := TjachLogToDisk.Create;
   gjldsk.BasePath                  := LOG_DIR;         //
   gjldsk.FileNamePrefix            := LOG_FILE_PREFIX; // prefix.processname.suffix.rotidx.log
@@ -20891,7 +21503,8 @@ glo_z := 0;
   gjldsk.FileCountToKeepInRotation := 4;               // 5 files
   gjldsk.IsActive                  := true;
   gjlog.RegisterLogWriter(gjldsk);
-  // syslogwriter
+
+  // syslogwriterregister (udp)
   gjludp := TjachLogToSysLogIndyUDP.Create;
   gjludp.idSysLog.Host             := LOG_SYSLOG_HOST;
   gjludp.idSysLog.Port             := LOG_SYSLOG_PORT;
@@ -20899,12 +21512,8 @@ glo_z := 0;
   gjlog.RegisterLogWriter(gjludp);
 {$ENDREGION}
 
-{$REGION 'MemoryLeaks'}
-//glog.Log('Set ReportMemoryLeaksOnShutdown to true');
-  ReportMemoryLeaksOnShutdown := true;
-{$ENDREGION}
-
 {$REGION 'Icon'}
+//glog.Log('Assign icon to the binary exe/dll');
 glo_h := LoadIcon(HInstance, '100_WKS_ICON_RC');
 if glo_h = 0 then
   glog.Log('Unable to assign main icon')
@@ -20913,11 +21522,14 @@ else
 {$ENDREGION}
 
 {$REGION 'IsAny'}
+//glog.Log('Initialize global objects regardless of the binary role');
 gini := TIniCls.Create;
 {$ENDREGION}
 
 {$REGION 'IsClient'}
 if TBynRec.IsClient then begin
+  //glog.Log('Initialize global objects for Client role');
+
   // synedit
   gsyn.SynEditSearch      := TSynEditSearch.Create(nil);
   gsyn.SynEditRegexSearch := TSynEditRegexSearch.Create(nil);
@@ -20927,31 +21539,72 @@ if TBynRec.IsClient then begin
   // *** gpxy setup happens during LoginForm creation ***
 
   // grio
-  // *** grio setup happens when it is called ***
+  // *** grio setup happens during the call ***
 end
 {$ENDREGION}
 
 {$REGION 'IsEditor'}
 else if TBynRec.IsEditor then begin
+  //glog.Log('Initialize global objects for Editor role');
+
   // synedit
   gsyn.SynEditSearch      := TSynEditSearch.Create(nil);
   gsyn.SynEditRegexSearch := TSynEditRegexSearch.Create(nil);
   gsyg.SearchFromCaret    := true;
+end
+{$ENDREGION}
+
+{$REGION 'IsServer'}
+else if TBynRec.IsEditor then begin
+  //glog.Log('Initialize global objects for Server role');
+
 end;
+{$ENDREGION}
+
+{$REGION 'GlobalBusinessObject'}
+//glog.Log('Initialization of global business objects happens later');
+// gorg;
+// gusr;
+// gper;
+// gmbr;
+{$ENDREGION}
+
+{$REGION 'MemoryLeaks'}
+//glog.Log('Set ReportMemoryLeaksOnShutdown to true');
+  ReportMemoryLeaksOnShutdown := true;
 {$ENDREGION}
 
 finalization
 
-{$REGION 'IsClient'}
-if TBynRec.IsClient then begin
+{$REGION 'GlobalBusinessObject'}
+//glog.Log('Free global business objects');
+gorg.Free;
+gusr.Free;
+gper.Free;
+gmbr.Free;
+{$ENDREGION}
+
+{$REGION 'IsServer'}
+if TBynRec.IsServer then begin
+  //glog.Log('Free global objects for Server role');
+
+end
+{$ENDREGION}
+
+{$REGION 'IsEditor'}
+else if TBynRec.IsEditor then begin
+  //glog.Log('Free global objects for Editor role');
+
   // synedit
   FreeAndNil(gsyn.SynEditSearch);
   FreeAndNil(gsyn.SynEditRegexSearch);
 end
 {$ENDREGION}
 
-{$REGION 'IsEditor'}
-else if TBynRec.IsEditor then begin
+{$REGION 'IsClient'}
+else if TBynRec.IsClient then begin
+  //glog.Log('Free global objects for Server role');
+
   // synedit
   FreeAndNil(gsyn.SynEditSearch);
   FreeAndNil(gsyn.SynEditRegexSearch);
@@ -20959,18 +21612,15 @@ end;
 {$ENDREGION}
 
 {$REGION 'IsAny'}
+//glog.Log('Free global objects regardless of the binary role');
+
 FreeAndNil(gini);
-gorg.Free;
-gusr.Free;
-gper.Free;
-gmbr.Free;
 {$ENDREGION}
 
 {$REGION 'Jachlog'}
-// lastlog
-gjlog.LogInfo('Jachlog finalize');
+//glog.Log('Unregister and free global jachlog'); // *** lastlog ***
 
-// unregister
+// writersunregister
 gjlog.UnRegisterLogWriter(gjldsk);
 gjlog.UnRegisterLogWriter(gjludp);
 
@@ -20978,6 +21628,12 @@ gjlog.UnRegisterLogWriter(gjludp);
 FreeAndNil(gjldsk);
 FreeAndNil(gjludp);
 FreeAndNil(gjlog);
+{$ENDREGION}
+
+{$REGION 'Profiler'}
+//glog.Log('Free global profiler');
+
+gpro.Free;
 {$ENDREGION}
 
 end.

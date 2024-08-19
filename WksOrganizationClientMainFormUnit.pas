@@ -239,36 +239,44 @@ end;
 
 procedure TOrganizationMainForm.OrganizationLogoSaveLabelClick(Sender: TObject);
 var
-  dir, fil, fbk: string;
+  dir, fna, ext, fbk: string;
+  {boo: boolean;}
 begin
   inherited;
 
-  dir := Format('C:\$Org\%s\%s', [ObjectDBEdit.Text[1], ObjectDBEdit.Text]);
+  dir := gorg.HomePath;
   if not TFsyRec.DirForce(dir, fbk) then begin
-    TMesRec.W('Unable to create output directory %s, logo not saved', [dir]);
+    TMesRec.W('Unable to create organization'' home directory %s, avatar not saved', [dir]);
     Exit;
   end;
 
-  fil := Format('%s\%sLogo.png', [dir, ObjectDBEdit.Text]);
-  OrganizationLogoDBImage.Picture.SaveToFile(fil);
-  TMesRec.I('Logo saved to %s', [fil]);
+  fna := gorg.LogoFile;
+  ext := '.png';
+
+  {boo :=} TGraRec.PictureDlgSave(OrganizationLogoDBImage.Picture.Graphic, fna, ext, fbk);
+  TMesRec.I('Logo saved to %s', [fna]);
+  LogFrame.Log(fbk);
 end;
 
 procedure TOrganizationMainForm.OrganizationLogoLongSaveLabelClick( Sender: TObject);
 var
-  dir, fil, fbk: string;
+  dir, fna, ext, fbk: string;
+  {boo: boolean;}
 begin
   inherited;
 
-  dir := Format('C:\$Org\%s\%s', [ObjectDBEdit.Text[1], ObjectDBEdit.Text]);
+  dir := gorg.HomePath;
   if not TFsyRec.DirForce(dir, fbk) then begin
-    TMesRec.W('Unable to create output directory %s, logo long not saved', [dir]);
+    TMesRec.W('Unable to create organization'' home directory %s, avatar not saved', [dir]);
     Exit;
   end;
 
-  fil := Format('%s\%sLogoLong.png', [dir, ObjectDBEdit.Text]);
-  OrganizationLogoDBImage.Picture.SaveToFile(fil);
-  TMesRec.I('Logo long saved to %s', [fil]);
+  fna := gorg.LogoLongFile;
+  ext := '.png';
+
+  {boo :=} TGraRec.PictureDlgSave(OrganizationLogoLongDBImage.Picture.Graphic, fna, ext, fbk);
+  TMesRec.I('LogoLong saved to %s', [fna]);
+  LogFrame.Log(fbk);
 end;
   {$ENDREGION}
 

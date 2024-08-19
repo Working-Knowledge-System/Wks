@@ -1,7 +1,5 @@
 inherited PersonMainForm: TPersonMainForm
   Caption = 'PersonMainForm'
-  ExplicitWidth = 1200
-  ExplicitHeight = 875
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
     ExplicitHeight = 606
@@ -15,22 +13,7 @@ inherited PersonMainForm: TPersonMainForm
     ExplicitWidth = 1184
   end
   inherited TopPanel: TPanel
-    ExplicitWidth = 1178
     inherited TopPageControl: TPageControl
-      Width = 810
-      ExplicitWidth = 806
-      inherited ClientTabSheet: TTabSheet
-        ExplicitWidth = 802
-      end
-      inherited ActionTabSheet: TTabSheet
-        ExplicitWidth = 802
-      end
-      inherited TopTextTabSheet: TTabSheet
-        ExplicitWidth = 802
-      end
-      inherited TopSearchTabSheet: TTabSheet
-        ExplicitWidth = 802
-      end
       object PersonTabSheet2: TTabSheet
         Caption = 'Person'
         ImageIndex = 2
@@ -55,31 +38,10 @@ inherited PersonMainForm: TPersonMainForm
         end
       end
     end
-    inherited TopPageControl3: TPageControl
-      Left = 882
-      ExplicitLeft = 878
-    end
-    inherited TopPageControl2: TPageControl
-      Left = 810
-      ExplicitLeft = 806
-    end
   end
   inherited LeftPanel: TPanel
-    ExplicitHeight = 587
     inherited LeftPageControl: TPageControl
-      Height = 588
-      ExplicitHeight = 587
       inherited ObjectTreeTabSheet: TTabSheet
-        ExplicitHeight = 558
-        inherited ObjectNodeInfoLabel: TLabel
-          Top = 543
-          Width = 292
-          ExplicitTop = 543
-        end
-        inherited ObjectDTClientTree: TDTClientTree
-          Height = 518
-          ExplicitHeight = 518
-        end
         inherited ObjectDBNavigator: TDBNavigator
           Hints.Strings = ()
         end
@@ -87,16 +49,8 @@ inherited PersonMainForm: TPersonMainForm
     end
   end
   inherited BottomPanel: TPanel
-    ExplicitWidth = 1178
     inherited LogFrame: TLogFrame
-      ExplicitWidth = 1178
       inherited LogPageControl: TPageControl
-        ExplicitWidth = 1178
-        inherited OutputTabSheet: TTabSheet
-          inherited OutputRichEdit: TRichEdit
-            ExplicitWidth = 1168
-          end
-        end
         inherited SoapTabSheet: TTabSheet
           inherited SoapGridPanel: TGridPanel
             ControlCollection = <
@@ -126,16 +80,12 @@ inherited PersonMainForm: TPersonMainForm
     end
   end
   inherited RightPanel: TPanel
-    ExplicitLeft = 881
-    ExplicitHeight = 587
     inherited RightPageControl: TPageControl
-      ExplicitHeight = 587
       inherited PropertyTabSheet: TTabSheet
         inherited ObjectJvScrollMax: TJvScrollMax
-          ExplicitHeight = 557
           inherited ObjectImageJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectImageDBImage: TDBImage
-              Height = 0
+              ExplicitHeight = 203
             end
           end
           object PersonJvScrollMaxBand: TJvScrollMaxBand
@@ -151,6 +101,9 @@ inherited PersonMainForm: TPersonMainForm
             ButtonFont.Style = [fsBold]
             Beveled = False
             ParentButtonFont = False
+            DesignSize = (
+              281
+              21)
             object PersonObjectIdLabel: TLabel
               AlignWithMargins = True
               Left = 16
@@ -212,6 +165,7 @@ inherited PersonMainForm: TPersonMainForm
               Top = 101
               Width = 97
               Height = 15
+              Anchors = [akTop, akRight]
               Caption = 'Generate Identifier'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
@@ -234,10 +188,11 @@ inherited PersonMainForm: TPersonMainForm
               ExplicitWidth = 34
             end
             object PersonPhoneValidateLabel: TLabel
-              Left = 236
+              Left = 224
               Top = 253
               Width = 41
               Height = 15
+              Anchors = [akTop, akRight]
               Caption = 'Validate'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
@@ -260,10 +215,11 @@ inherited PersonMainForm: TPersonMainForm
               ExplicitWidth = 29
             end
             object PersonEmailValidateLabel: TLabel
-              Left = 236
+              Left = 224
               Top = 303
               Width = 41
               Height = 15
+              Anchors = [akTop, akRight]
               Caption = 'Validate'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
@@ -274,11 +230,12 @@ inherited PersonMainForm: TPersonMainForm
               OnClick = PersonEmailValidateLabelClick
             end
             object PersonPictureSaveLabel: TLabel
-              Left = 242
+              Left = 241
               Top = 353
               Width = 24
               Height = 15
               Cursor = crHandPoint
+              Anchors = [akTop, akRight]
               Caption = 'Save'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
@@ -294,6 +251,7 @@ inherited PersonMainForm: TPersonMainForm
               Width = 26
               Height = 15
               Cursor = crHandPoint
+              Anchors = [akTop, akRight]
               Caption = 'Gdpr'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
@@ -445,6 +403,9 @@ inherited PersonMainForm: TPersonMainForm
             Font.Name = 'Segoe UI'
             Font.Style = []
             ParentFont = False
+            DesignSize = (
+              281
+              21)
             object UserPersonIdLabel: TLabel
               AlignWithMargins = True
               Left = 16
@@ -531,6 +492,7 @@ inherited PersonMainForm: TPersonMainForm
               Width = 24
               Height = 15
               Cursor = crHandPoint
+              Anchors = [akTop, akRight]
               Caption = 'Save'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
@@ -545,6 +507,7 @@ inherited PersonMainForm: TPersonMainForm
               Top = 153
               Width = 47
               Height = 15
+              Anchors = [akTop, akRight]
               Caption = 'Generate'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
@@ -559,6 +522,7 @@ inherited PersonMainForm: TPersonMainForm
               Top = 153
               Width = 29
               Height = 15
+              Anchors = [akTop, akRight]
               Caption = 'Show'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
@@ -573,6 +537,7 @@ inherited PersonMainForm: TPersonMainForm
               Top = 103
               Width = 116
               Height = 15
+              Anchors = [akTop, akRight]
               Caption = 'Set = Person identifier'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
@@ -588,6 +553,7 @@ inherited PersonMainForm: TPersonMainForm
               Width = 47
               Height = 15
               Cursor = crHandPoint
+              Anchors = [akTop, akRight]
               Caption = 'Generate'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
@@ -686,50 +652,6 @@ inherited PersonMainForm: TPersonMainForm
               TabOrder = 5
             end
           end
-        end
-      end
-    end
-  end
-  inherited StatusBar: TStatusBar
-    ExplicitTop = 814
-    ExplicitWidth = 1178
-  end
-  inherited MainPanel: TPanel
-    ExplicitHeight = 587
-    inherited MainPageControl: TPageControl
-      Height = 588
-      ExplicitHeight = 587
-      inherited ContentPrevTabSheet: TTabSheet
-        ExplicitHeight = 558
-        inherited ObjectContentPrevDBSynEdit: TDBSynEdit
-          Height = 532
-          ExplicitHeight = 532
-        end
-      end
-      inherited ContentTabSheet: TTabSheet
-        ExplicitHeight = 558
-        inherited ObjectContentDBSynEdit: TDBSynEdit
-          Height = 530
-          ExplicitHeight = 529
-        end
-        inherited ObjectContentTopPanel: TPanel
-          inherited ObjectContentCharCountLabel: TLabel
-            Height = 22
-          end
-        end
-      end
-      inherited JsonTabSheet: TTabSheet
-        ExplicitHeight = 558
-        inherited ObjectDataDBSynEdit: TDBSynEdit
-          Height = 532
-          ExplicitHeight = 532
-        end
-      end
-      inherited NoteTabSheet: TTabSheet
-        ExplicitHeight = 558
-        inherited ObjectNoteDBSynEdit: TDBSynEdit
-          Height = 532
-          ExplicitHeight = 532
         end
       end
     end

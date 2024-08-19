@@ -57,7 +57,7 @@ var
   f: TTextStatsForm;
   t, k: string;
   d{, n}, l, r, u, p, s, y, w: integer;
-  wz, lz: integer; // words, lines
+  wz{, lz}: integer; // words, lines
 begin
   t := IvTextToAnalize.Text;
   f := TTextStatsForm.Create(nil);

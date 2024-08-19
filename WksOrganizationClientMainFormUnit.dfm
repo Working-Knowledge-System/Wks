@@ -1,7 +1,5 @@
 inherited OrganizationMainForm: TOrganizationMainForm
   Caption = 'OrganizationMainForm'
-  ExplicitWidth = 1200
-  ExplicitHeight = 875
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
     ExplicitHeight = 696
@@ -15,22 +13,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
     ExplicitWidth = 1208
   end
   inherited TopPanel: TPanel
-    ExplicitWidth = 1178
     inherited TopPageControl: TPageControl
-      Width = 810
-      ExplicitWidth = 806
-      inherited ClientTabSheet: TTabSheet
-        ExplicitWidth = 802
-      end
-      inherited ActionTabSheet: TTabSheet
-        ExplicitWidth = 802
-      end
-      inherited TopTextTabSheet: TTabSheet
-        ExplicitWidth = 802
-      end
-      inherited TopSearchTabSheet: TTabSheet
-        ExplicitWidth = 802
-      end
       object OrganizationTabSheet2: TTabSheet
         Caption = 'Organization'
         ImageIndex = 2
@@ -55,31 +38,10 @@ inherited OrganizationMainForm: TOrganizationMainForm
         end
       end
     end
-    inherited TopPageControl3: TPageControl
-      Left = 882
-      ExplicitLeft = 878
-    end
-    inherited TopPageControl2: TPageControl
-      Left = 810
-      ExplicitLeft = 806
-    end
   end
   inherited LeftPanel: TPanel
-    ExplicitHeight = 587
     inherited LeftPageControl: TPageControl
-      Height = 588
-      ExplicitHeight = 587
       inherited ObjectTreeTabSheet: TTabSheet
-        ExplicitHeight = 558
-        inherited ObjectNodeInfoLabel: TLabel
-          Top = 543
-          Width = 292
-          ExplicitTop = 543
-        end
-        inherited ObjectDTClientTree: TDTClientTree
-          Height = 518
-          ExplicitHeight = 518
-        end
         inherited ObjectDBNavigator: TDBNavigator
           Hints.Strings = ()
         end
@@ -87,16 +49,8 @@ inherited OrganizationMainForm: TOrganizationMainForm
     end
   end
   inherited BottomPanel: TPanel
-    ExplicitWidth = 1178
     inherited LogFrame: TLogFrame
-      ExplicitWidth = 1178
       inherited LogPageControl: TPageControl
-        ExplicitWidth = 1178
-        inherited OutputTabSheet: TTabSheet
-          inherited OutputRichEdit: TRichEdit
-            ExplicitWidth = 1168
-          end
-        end
         inherited SoapTabSheet: TTabSheet
           inherited SoapGridPanel: TGridPanel
             ControlCollection = <
@@ -126,17 +80,33 @@ inherited OrganizationMainForm: TOrganizationMainForm
     end
   end
   inherited RightPanel: TPanel
-    ExplicitLeft = 881
-    ExplicitHeight = 587
     inherited RightPageControl: TPageControl
-      ExplicitHeight = 587
       inherited PropertyTabSheet: TTabSheet
         inherited ObjectJvScrollMax: TJvScrollMax
-          ExplicitHeight = 557
+          ScrollPos = 130
+          inherited ObjectIdJvScrollMaxBand: TJvScrollMaxBand
+            ExplicitTop = -130
+          end
+          inherited ObjectDateJvScrollMaxBand: TJvScrollMaxBand
+            ExplicitTop = -104
+          end
+          inherited ObjectFromJvScrollMaxBand: TJvScrollMaxBand
+            ExplicitTop = -78
+          end
+          inherited ObjectToJvScrollMaxBand: TJvScrollMaxBand
+            ExplicitTop = -52
+          end
+          inherited ObjectApprovalJvScrollMaxBand: TJvScrollMaxBand
+            ExplicitTop = -26
+          end
           inherited ObjectImageJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectImageDBImage: TDBImage
-              Height = 0
-            end
+            ExplicitTop = 0
+          end
+          inherited ObjectTypeJvScrollMaxBand: TJvScrollMaxBand
+            ExplicitTop = 26
+          end
+          inherited ObjectGeneralJvScrollMaxBand: TJvScrollMaxBand
+            ExplicitTop = 52
           end
           object OrganizationJvScrollMaxBand: TJvScrollMaxBand
             Width = 281
@@ -323,8 +293,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
           end
           object OrganizationLogoJvScrollMaxBand: TJvScrollMaxBand
             Width = 281
-            Height = 21
-            Expanded = False
+            Height = 417
             Caption = 'Logo'
             ExpandedHeight = 417
             ButtonFont.Charset = ANSI_CHARSET
@@ -334,6 +303,9 @@ inherited OrganizationMainForm: TOrganizationMainForm
             ButtonFont.Style = [fsBold]
             Beveled = False
             ParentButtonFont = False
+            DesignSize = (
+              281
+              417)
             object OrganizationLogoLabel: TLabel
               AlignWithMargins = True
               Left = 16
@@ -364,6 +336,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               Width = 24
               Height = 15
               Cursor = crHandPoint
+              Anchors = [akTop, akRight]
               Caption = 'Save'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
@@ -379,6 +352,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               Width = 24
               Height = 15
               Cursor = crHandPoint
+              Anchors = [akTop, akRight]
               Caption = 'Save'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
@@ -393,6 +367,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               Top = 53
               Width = 26
               Height = 15
+              Anchors = [akTop, akRight]
               Caption = 'Load'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
@@ -407,6 +382,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               Top = 288
               Width = 26
               Height = 15
+              Anchors = [akTop, akRight]
               Caption = 'Load'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
@@ -1074,47 +1050,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
   end
   inherited StatusBar: TStatusBar
     ExplicitTop = 814
-    ExplicitWidth = 1178
-  end
-  inherited MainPanel: TPanel
-    ExplicitHeight = 587
-    inherited MainPageControl: TPageControl
-      Height = 588
-      ExplicitHeight = 587
-      inherited ContentPrevTabSheet: TTabSheet
-        ExplicitHeight = 558
-        inherited ObjectContentPrevDBSynEdit: TDBSynEdit
-          Height = 532
-          ExplicitHeight = 532
-        end
-      end
-      inherited ContentTabSheet: TTabSheet
-        ExplicitHeight = 558
-        inherited ObjectContentDBSynEdit: TDBSynEdit
-          Height = 530
-          ExplicitHeight = 529
-        end
-        inherited ObjectContentTopPanel: TPanel
-          inherited ObjectContentCharCountLabel: TLabel
-            Height = 22
-          end
-        end
-      end
-      inherited JsonTabSheet: TTabSheet
-        ExplicitHeight = 558
-        inherited ObjectDataDBSynEdit: TDBSynEdit
-          Height = 532
-          ExplicitHeight = 532
-        end
-      end
-      inherited NoteTabSheet: TTabSheet
-        ExplicitHeight = 558
-        inherited ObjectNoteDBSynEdit: TDBSynEdit
-          Height = 532
-          ExplicitHeight = 532
-        end
-      end
-    end
+    ExplicitWidth = 1258
   end
   object OrganizationClientDataSet: TClientDataSet [14]
     Aggregates = <>

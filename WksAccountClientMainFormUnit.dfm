@@ -1,36 +1,25 @@
 inherited AccountMainForm: TAccountMainForm
   Caption = 'AccountMainForm'
-  ExplicitWidth = 1200
-  ExplicitHeight = 875
+  ClientHeight = 837
+  ClientWidth = 1268
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
+    Height = 588
     ExplicitHeight = 704
   end
   inherited RightJvNetscapeSplitter: TJvNetscapeSplitter
-    ExplicitLeft = 875
+    Left = 955
+    Height = 588
     ExplicitHeight = 704
   end
   inherited BottomJvNetscapeSplitter: TJvNetscapeSplitter
+    Top = 665
+    Width = 1268
     ExplicitTop = 787
-    ExplicitWidth = 1188
   end
   inherited TopPanel: TPanel
-    ExplicitWidth = 1178
+    Width = 1262
     inherited TopPageControl: TPageControl
-      Width = 810
-      ExplicitWidth = 806
-      inherited ClientTabSheet: TTabSheet
-        ExplicitWidth = 802
-      end
-      inherited ActionTabSheet: TTabSheet
-        ExplicitWidth = 802
-      end
-      inherited TopTextTabSheet: TTabSheet
-        ExplicitWidth = 802
-      end
-      inherited TopSearchTabSheet: TTabSheet
-        ExplicitWidth = 802
-      end
       object AccountTabSheet: TTabSheet
         Caption = 'Account'
         ImageIndex = 2
@@ -55,29 +44,15 @@ inherited AccountMainForm: TAccountMainForm
         end
       end
     end
-    inherited TopPageControl3: TPageControl
-      Left = 882
-      ExplicitLeft = 878
-    end
-    inherited TopPageControl2: TPageControl
-      Left = 810
-      ExplicitLeft = 806
-    end
   end
   inherited LeftPanel: TPanel
-    ExplicitHeight = 587
+    Height = 588
     inherited LeftPageControl: TPageControl
-      Height = 588
-      ExplicitHeight = 587
       inherited ObjectTreeTabSheet: TTabSheet
-        ExplicitHeight = 558
         inherited ObjectNodeInfoLabel: TLabel
-          Top = 543
           Width = 292
-          ExplicitTop = 543
         end
         inherited ObjectDTClientTree: TDTClientTree
-          Height = 518
           ExplicitHeight = 518
         end
         inherited ObjectDBNavigator: TDBNavigator
@@ -87,14 +62,16 @@ inherited AccountMainForm: TAccountMainForm
     end
   end
   inherited BottomPanel: TPanel
-    ExplicitWidth = 1178
+    Top = 675
+    Width = 1262
     inherited LogFrame: TLogFrame
-      ExplicitWidth = 1178
+      Width = 1262
       inherited LogPageControl: TPageControl
-        ExplicitWidth = 1178
+        Width = 1262
         inherited OutputTabSheet: TTabSheet
+          ExplicitWidth = 1254
           inherited OutputRichEdit: TRichEdit
-            ExplicitWidth = 1168
+            Width = 1252
           end
         end
         inherited SoapTabSheet: TTabSheet
@@ -126,16 +103,59 @@ inherited AccountMainForm: TAccountMainForm
     end
   end
   inherited RightPanel: TPanel
-    ExplicitLeft = 881
-    ExplicitHeight = 587
+    Left = 965
+    Height = 588
     inherited RightPageControl: TPageControl
-      ExplicitHeight = 587
+      Height = 588
       inherited PropertyTabSheet: TTabSheet
+        ExplicitHeight = 558
         inherited ObjectJvScrollMax: TJvScrollMax
-          ExplicitHeight = 557
-          inherited ObjectImageJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectImageDBImage: TDBImage
-              Height = 0
+          Height = 558
+          inherited ObjectIdJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectOrderLabel: TLabel
+              Width = 249
+            end
+            inherited ObjectRevLabel: TLabel
+              Width = 249
+            end
+            inherited ObjectPIdLabel: TLabel
+              Width = 249
+            end
+            inherited ObjectIdLabel: TLabel
+              Width = 249
+            end
+            inherited ObjectId8Label: TLabel
+              Width = 249
+            end
+          end
+          inherited ObjectDateJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectCreatedLabel: TLabel
+              Width = 249
+            end
+            inherited ObjectUpdatedLabel: TLabel
+              Width = 249
+            end
+          end
+          inherited ObjectFromJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectFromOrganizationLabel: TLabel
+              Width = 249
+            end
+            inherited ObjectFromMemberLabel: TLabel
+              Width = 249
+            end
+            inherited ObjectFromTeamLabel: TLabel
+              Width = 249
+            end
+            inherited ObjectFromAreaLabel: TLabel
+              Width = 249
+            end
+            inherited ObjectFromDepartmentLabel: TLabel
+              Width = 249
+            end
+          end
+          inherited ObjectApprovalJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectRouteLabel: TLabel
+              Width = 249
             end
           end
           object AccountJvScrollMaxBand: TJvScrollMaxBand
@@ -436,30 +456,30 @@ inherited AccountMainForm: TAccountMainForm
           end
         end
       end
+      inherited SearchTabSheet: TTabSheet
+        ExplicitHeight = 558
+        inherited SearchResultListBox: TListBox
+          Height = 421
+          ExplicitHeight = 421
+        end
+      end
+      inherited OptionTabSheet: TTabSheet
+        ExplicitHeight = 558
+        inherited OptionJvScrollMax: TJvScrollMax
+          Height = 558
+          ExplicitHeight = 558
+        end
+      end
     end
   end
   inherited StatusBar: TStatusBar
-    ExplicitTop = 814
-    ExplicitWidth = 1178
+    Top = 815
+    Width = 1262
   end
   inherited MainPanel: TPanel
-    ExplicitHeight = 587
+    Height = 588
     inherited MainPageControl: TPageControl
-      Height = 588
-      ExplicitHeight = 587
-      inherited ContentPrevTabSheet: TTabSheet
-        ExplicitHeight = 558
-        inherited ObjectContentPrevDBSynEdit: TDBSynEdit
-          Height = 532
-          ExplicitHeight = 532
-        end
-      end
       inherited ContentTabSheet: TTabSheet
-        ExplicitHeight = 558
-        inherited ObjectContentDBSynEdit: TDBSynEdit
-          Height = 530
-          ExplicitHeight = 529
-        end
         inherited ObjectContentTopPanel: TPanel
           inherited ObjectContentCharCountLabel: TLabel
             Height = 22
@@ -467,17 +487,10 @@ inherited AccountMainForm: TAccountMainForm
         end
       end
       inherited JsonTabSheet: TTabSheet
-        ExplicitHeight = 558
-        inherited ObjectDataDBSynEdit: TDBSynEdit
-          Height = 532
-          ExplicitHeight = 532
-        end
-      end
-      inherited NoteTabSheet: TTabSheet
-        ExplicitHeight = 558
-        inherited ObjectNoteDBSynEdit: TDBSynEdit
-          Height = 532
-          ExplicitHeight = 532
+        inherited ObjectDataTopPanel: TPanel
+          inherited ObjectDataCharCountLabel: TLabel
+            Height = 22
+          end
         end
       end
     end

@@ -521,8 +521,7 @@ inherited MemberMainForm: TMemberMainForm
           end
           object MemberBadgeJvScrollMaxBand: TJvScrollMaxBand
             Width = 281
-            Height = 21
-            Expanded = False
+            Height = 302
             Caption = 'Badge'
             ExpandedHeight = 302
             ButtonFont.Charset = ANSI_CHARSET
@@ -532,6 +531,9 @@ inherited MemberMainForm: TMemberMainForm
             ButtonFont.Style = [fsBold]
             Beveled = False
             ParentButtonFont = False
+            DesignSize = (
+              281
+              302)
             object MemberBadgeLabel: TLabel
               AlignWithMargins = True
               Left = 16
@@ -557,6 +559,7 @@ inherited MemberMainForm: TMemberMainForm
               Width = 24
               Height = 15
               Cursor = crHandPoint
+              Anchors = [akTop, akRight]
               Caption = 'Save'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
@@ -567,11 +570,12 @@ inherited MemberMainForm: TMemberMainForm
               OnClick = MemberBadgeSaveLabelClick
             end
             object MemberBadgeGenerateLabel: TLabel
-              Left = 189
+              Left = 186
               Top = 53
               Width = 47
               Height = 15
               Cursor = crHandPoint
+              Anchors = [akTop, akRight]
               Caption = 'Generate'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
@@ -612,36 +616,9 @@ inherited MemberMainForm: TMemberMainForm
       end
     end
   end
-  inherited MainPanel: TPanel
-    inherited MainPageControl: TPageControl
-      inherited ContentPrevTabSheet: TTabSheet
-        inherited ObjectContentPrevDBSynEdit: TDBSynEdit
-          ExplicitWidth = 522
-        end
-        inherited ObjectContentPrevTopPanel: TPanel
-          ExplicitWidth = 521
-        end
-      end
-      inherited JsonTabSheet: TTabSheet
-        inherited ObjectDataDBSynEdit: TDBSynEdit
-          ExplicitWidth = 522
-        end
-        inherited ObjectDataTopPanel: TPanel
-          ExplicitWidth = 521
-          inherited ObjectDataCharCountLabel: TLabel
-            Height = 22
-          end
-        end
-      end
-      inherited NoteTabSheet: TTabSheet
-        inherited ObjectNoteDBSynEdit: TDBSynEdit
-          ExplicitWidth = 522
-        end
-        inherited ObjectNoteTopPanel: TPanel
-          ExplicitWidth = 521
-        end
-      end
-    end
+  inherited StatusBar: TStatusBar
+    ExplicitTop = 814
+    ExplicitWidth = 1258
   end
   object MemberClientDataSet: TClientDataSet [15]
     Aggregates = <>

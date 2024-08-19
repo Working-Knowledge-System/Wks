@@ -125,7 +125,7 @@ var
   oid, aff, i: integer;
   cod: TCodRec;
   dst: TDataset;
-  sts: TStringStream;
+//sts: TStringStream;
 
   function html_repater(): string;
   var

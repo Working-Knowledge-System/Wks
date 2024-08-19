@@ -135,9 +135,10 @@ var
   pid: integer;
   str: string;
 begin
-  if not FWrq.Error.IsEmpty then
-    TWrsRec.ResponseSet(Response, FWrq.Error)
-  else begin
+  if not FWrq.Error.IsEmpty then begin
+    str := THtmRec.PageWarning('Wrong url address', FWrq.Error);
+    TWrsRec.ResponseSet(Response, str);
+  end else begin
     pid := FWrq.PageId;
     str := THtmRec.Page(pid);
     TWrsRec.ResponseSet(Response, str);
@@ -180,22 +181,22 @@ begin
   end;
 
   // gui
-  sbu.Add('<br><br>'                                                                                       );
-  sbu.Add('<div class="w3-container w3-card-4 w3-auto w3-round w3-left-align">'                            );
-  sbu.Add(  '<form class="w3-container" id="CoForm" method="post" action="/WksPageIsapiProject.dll/Init">' );
-  sbu.Add(    '<h2>Create the following W3 files:</h2>'                                                    );
-  sbu.Add(    THtmRec.List(TW3fRec.FILE_VEC)                                                               );
-  sbu.Add(    '<h2>Create the following WKS files:</h2>'                                                   );
-  sbu.Add(    THtmRec.List(TWksRec.FILE_VEC)                                                               );
-  sbu.Add(    '<h2>Please confirm</h2>'                                                                    );
-  sbu.Add(    THtmRec.Select('radio', 'CoConfirm', 'Confirm', ['No', 'Ok'], ['No', 'Ok'], [uin])           );
-  sbu.Add(    '<br>'                                                                                       );
+  sbu.Add('<br><br>'                                                                                        );
+  sbu.Add('<div class="w3-container w3-card-4 w3-auto w3-round w3-left-align">'                             );
+  sbu.Add(  '<form class="w3-container" id="CoForm" method="post" action="/WksPageIsapiProject.dll/Init">'  );
+  sbu.Add(    '<h2>Create the following W3 files:</h2>'                                                     );
+  sbu.Add(    THtmRec.List(TW3fRec.FILE_VEC)                                                                );
+  sbu.Add(    '<h2>Create the following WKS files:</h2>'                                                    );
+  sbu.Add(    THtmRec.List(TWksRec.FILE_VEC)                                                                );
+  sbu.Add(    '<h2>Please confirm</h2>'                                                                     );
+  sbu.Add(    THtmRec.Choice('radio', 'CoConfirm', 'Confirm', ['No', 'Ok'], ['No', 'Ok'], '', '', '', [uin]));
+  sbu.Add(    '<br>'                                                                                        );
   sbu.Add(    '<input class="w3-btn w3-round-xxlarge w3-blue" type="button" value="Cancel" onclick="window.location=''/WksPageIsapiProject.dll'';return false;">');
-  sbu.Add(    '<input class="w3-btn w3-round-xxlarge w3-red" type="submit" value="Submit">'                );
-  sbu.Add(  '</form>'                                                                                      );
-  sbu.Add(  '<br>'                                                                                         );
-  sbu.Add('</div>'                                                                                         );
-  sbu.Add('<br><br>'                                                                                       );
+  sbu.Add(    '<input class="w3-btn w3-round-xxlarge w3-red" type="submit" value="Submit">'                 );
+  sbu.Add(  '</form>'                                                                                       );
+  sbu.Add(  '<br>'                                                                                          );
+  sbu.Add('</div>'                                                                                          );
+  sbu.Add('<br><br>'                                                                                        );
 
   TWrsRec.ResponseSet(Response, THtmRec.Page('Init', sbu.Text));
 end;
@@ -220,23 +221,23 @@ begin
   end;
 
   // gui
-  sbu.Add('<br>'                                                                                           );
-  sbu.Add(TW3fRec.W3ThemeTestHtmlGenerate                                                                  );
+  sbu.Add('<br>'                                                                                            );
+  sbu.Add(TW3fRec.W3ThemeTestHtmlGenerate                                                                   );
 
-  sbu.Add('<br><br>'                                                                                       );
-  sbu.Add('<div class="w3-container w3-card-4 w3-auto w3-round w3-left-align">'                            );
-  sbu.Add(  '<form class="w3-container" id="CoForm" method="post" action="/WksPageIsapiProject.dll/Theme">');
-  sbu.Add(    '<h2>Select Theme:</h2>'                                                                     );
-  sbu.Add(    THtmRec.Select('select', 'CoTheme', 'Theme', TW3fRec.THEME_NAME_VEC, TW3fRec.THEME_NAME_VEC, [gthe.Theme]));
-  sbu.Add(    '<h2>Please confirm</h2>'                                                                    );
-  sbu.Add(    THtmRec.Select('radio', 'CoConfirm', 'Confirm', ['No', 'Ok'], ['No', 'Ok'], [uin])           );
-  sbu.Add(    '<br>'                                                                                       );
-  sbu.Add(    '<input class="w3-btn w3-round-xxlarge w3-blue" type="submit" value="Cancel">'               );
-  sbu.Add(    '<input class="w3-btn w3-round-xxlarge w3-red" type="submit" value="Submit">'                );
-  sbu.Add(  '</form>'                                                                                      );
-  sbu.Add(  '<br>'                                                                                         );
-  sbu.Add('</div>'                                                                                         );
-  sbu.Add('<br><br>'                                                                                       );
+  sbu.Add('<br><br>'                                                                                        );
+  sbu.Add('<div class="w3-container w3-card-4 w3-auto w3-round w3-left-align">'                             );
+  sbu.Add(  '<form class="w3-container" id="CoForm" method="post" action="/WksPageIsapiProject.dll/Theme">' );
+  sbu.Add(    '<h2>Select Theme:</h2>'                                                                      );
+  sbu.Add(    THtmRec.Choice('select', 'CoTheme', 'Theme', TW3fRec.THEME_NAME_VEC, TW3fRec.THEME_NAME_VEC, '', '', '', [gthe.Theme]));
+  sbu.Add(    '<h2>Please confirm</h2>'                                                                     );
+  sbu.Add(    THtmRec.Choice('radio', 'CoConfirm', 'Confirm', ['No', 'Ok'], ['No', 'Ok'], '', '', '', [uin]));
+  sbu.Add(    '<br>'                                                                                        );
+  sbu.Add(    '<input class="w3-btn w3-round-xxlarge w3-blue" type="submit" value="Cancel">'                );
+  sbu.Add(    '<input class="w3-btn w3-round-xxlarge w3-red" type="submit" value="Submit">'                 );
+  sbu.Add(  '</form>'                                                                                       );
+  sbu.Add(  '<br>'                                                                                          );
+  sbu.Add('</div>'                                                                                          );
+  sbu.Add('<br><br>'                                                                                        );
 
   TWrsRec.ResponseSet(Response, THtmRec.Page('Theme', sbu.Text));
 end;
@@ -286,7 +287,7 @@ begin
   , 'Login'                                // IvSubmitCaption   |
   , 80                                     // IvLabelWidth      |
   , 140                                    // IvHelpWidth      /
-  , ['Username'      , 'Password'      ]   // IvLabelVec       \
+  , ['Username'      , 'Password'      ]   // IvTitleVec       \
   , ['Username'      , 'Password'      ]   // IvKindVec         |
   , ['CoUsername'    , 'CoPassword'    ]   // IvCoNameVec       |
   , [usr             , pas             ]   // IvValueVec        |

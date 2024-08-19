@@ -111,7 +111,7 @@ begin
     i := 1;
     j := 1;
     while i <= l do begin
-      if not IsWhiteSpace(line[i]) then begin
+      if not line[i].IsWhiteSpace then begin // IsWhiteSpace()
         s[j] := line[i];
         inc(j);
       end;
@@ -124,6 +124,5 @@ begin
     s := s.ToUpper;
   Result := Crc32Calc(s, l);
 end;
-
 
 end.

@@ -1,35 +1,55 @@
 inherited CodeMainForm: TCodeMainForm
   Caption = 'CodeMainForm'
-  ClientHeight = 839
-  ClientWidth = 1188
-  ExplicitHeight = 877
+  ClientHeight = 837
+  ClientWidth = 1180
+  ExplicitWidth = 1196
+  ExplicitHeight = 876
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
-    Height = 590
+    Height = 588
     ExplicitHeight = 605
   end
   inherited RightJvNetscapeSplitter: TJvNetscapeSplitter
-    Left = 875
-    Height = 590
+    Left = 867
+    Height = 588
     ExplicitLeft = 867
     ExplicitHeight = 605
   end
   inherited BottomJvNetscapeSplitter: TJvNetscapeSplitter
-    Top = 667
-    Width = 1188
+    Top = 665
+    Width = 1180
     ExplicitTop = 688
     ExplicitWidth = 1180
   end
   inherited TopPanel: TPanel
-    Width = 1182
+    Width = 1174
+    ExplicitWidth = 1174
     inherited TopPageControl: TPageControl
+      Width = 806
+      ActivePage = CodeTabSheet
+      ExplicitWidth = 802
+      inherited ClientTabSheet: TTabSheet
+        ExplicitWidth = 798
+      end
+      inherited ActionTabSheet: TTabSheet
+        ExplicitWidth = 798
+      end
+      inherited TopTextTabSheet: TTabSheet
+        ExplicitWidth = 798
+      end
+      inherited TopSearchTabSheet: TTabSheet
+        ExplicitWidth = 798
+      end
+      inherited TopUtilsTabSheet: TTabSheet
+        ExplicitWidth = 798
+      end
       object CodeTabSheet: TTabSheet
         Caption = 'Code'
         ImageIndex = 2
         object CodeToolBar: TToolBar
           Left = 0
           Top = 0
-          Width = 153
+          Width = 204
           Height = 44
           Align = alLeft
           AutoSize = True
@@ -49,31 +69,43 @@ inherited CodeMainForm: TCodeMainForm
             Top = 0
             Action = CodeSaveAction
           end
-          object CodeRunToolButton: TToolButton
+          object CodeSaveBranchToolButton: TToolButton
             Left = 102
+            Top = 0
+            Action = CodeSaveBranchAction
+          end
+          object CodeRunToolButton: TToolButton
+            Left = 153
             Top = 0
             Action = CodeRunAction
           end
         end
       end
     end
+    inherited TopPageControl3: TPageControl
+      Left = 878
+      ExplicitLeft = 874
+    end
+    inherited TopPageControl2: TPageControl
+      Left = 806
+      ExplicitLeft = 802
+    end
   end
   inherited LeftPanel: TPanel
-    Height = 590
-    ExplicitHeight = 589
+    Height = 588
+    ExplicitHeight = 588
     inherited LeftPageControl: TPageControl
-      Height = 590
-      ExplicitHeight = 589
+      Height = 589
+      ExplicitHeight = 588
       inherited ObjectTreeTabSheet: TTabSheet
-        ExplicitHeight = 560
+        ExplicitHeight = 559
         inherited ObjectNodeInfoLabel: TLabel
-          Top = 545
-          Width = 292
-          ExplicitTop = 545
+          Top = 544
+          ExplicitTop = 544
         end
         inherited ObjectDTClientTree: TDTClientTree
-          Height = 520
-          ExplicitHeight = 520
+          Height = 519
+          ExplicitHeight = 519
         end
         inherited ObjectDBNavigator: TDBNavigator
           Hints.Strings = ()
@@ -82,17 +114,21 @@ inherited CodeMainForm: TCodeMainForm
     end
   end
   inherited BottomPanel: TPanel
-    Top = 677
-    Width = 1182
+    Top = 675
+    Width = 1174
     ExplicitTop = 676
+    ExplicitWidth = 1178
     inherited LogFrame: TLogFrame
-      Width = 1182
+      Width = 1174
+      ExplicitWidth = 1178
       inherited LogPageControl: TPageControl
-        Width = 1182
+        Width = 1174
+        ExplicitWidth = 1174
         inherited OutputTabSheet: TTabSheet
-          ExplicitWidth = 1174
+          ExplicitWidth = 1166
           inherited OutputRichEdit: TRichEdit
-            Width = 1172
+            Width = 1164
+            ExplicitWidth = 1164
           end
         end
         inherited SoapTabSheet: TTabSheet
@@ -124,22 +160,18 @@ inherited CodeMainForm: TCodeMainForm
     end
   end
   inherited RightPanel: TPanel
-    Left = 885
-    Height = 590
-    ExplicitHeight = 589
+    Left = 877
+    Height = 588
+    ExplicitLeft = 877
+    ExplicitHeight = 588
     inherited RightPageControl: TPageControl
-      Height = 590
-      ExplicitHeight = 589
+      Height = 588
+      ExplicitHeight = 588
       inherited PropertyTabSheet: TTabSheet
-        ExplicitHeight = 560
+        ExplicitHeight = 558
         inherited ObjectJvScrollMax: TJvScrollMax
-          Height = 560
-          ExplicitHeight = 559
-          inherited ObjectImageJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectImageDBImage: TDBImage
-              Height = 0
-            end
-          end
+          Height = 558
+          ExplicitHeight = 558
           object CodeJvScrollMaxBand: TJvScrollMaxBand
             Width = 281
             Height = 21
@@ -386,17 +418,17 @@ inherited CodeMainForm: TCodeMainForm
         end
       end
       inherited SearchTabSheet: TTabSheet
-        ExplicitHeight = 560
+        ExplicitHeight = 558
         inherited SearchResultListBox: TListBox
-          Height = 423
-          ExplicitHeight = 423
+          Height = 421
+          ExplicitHeight = 421
         end
       end
       inherited OptionTabSheet: TTabSheet
-        ExplicitHeight = 560
+        ExplicitHeight = 558
         inherited OptionJvScrollMax: TJvScrollMax
-          Height = 560
-          ExplicitHeight = 560
+          Height = 558
+          ExplicitHeight = 558
           object OptionCodeJvScrollMaxBand: TJvScrollMaxBand
             Width = 286
             Height = 92
@@ -440,52 +472,43 @@ inherited CodeMainForm: TCodeMainForm
     end
   end
   inherited StatusBar: TStatusBar
-    Top = 817
-    Width = 1182
+    Top = 815
+    Width = 1174
     ExplicitTop = 816
+    ExplicitWidth = 1178
   end
   inherited MainPanel: TPanel
-    Height = 590
-    ExplicitHeight = 589
+    Height = 588
+    ExplicitHeight = 588
     inherited MainPageControl: TPageControl
-      Height = 590
-      ExplicitHeight = 589
+      Height = 589
+      ExplicitHeight = 588
       inherited ContentPrevTabSheet: TTabSheet
-        ExplicitHeight = 560
+        ExplicitHeight = 559
         inherited ObjectContentPrevDBSynEdit: TDBSynEdit
-          Height = 532
-          ExplicitHeight = 532
+          Height = 531
+          ExplicitHeight = 531
         end
       end
       inherited ContentTabSheet: TTabSheet
-        ExplicitHeight = 560
+        ExplicitHeight = 559
         inherited ObjectContentDBSynEdit: TDBSynEdit
-          Height = 530
-          ExplicitHeight = 529
-        end
-        inherited ObjectContentTopPanel: TPanel
-          inherited ObjectContentCharCountLabel: TLabel
-            Height = 24
-          end
+          Height = 531
+          ExplicitHeight = 530
         end
       end
       inherited JsonTabSheet: TTabSheet
-        ExplicitHeight = 560
+        ExplicitHeight = 559
         inherited ObjectDataDBSynEdit: TDBSynEdit
-          Height = 530
-          ExplicitHeight = 530
-        end
-        inherited ObjectDataTopPanel: TPanel
-          inherited ObjectDataCharCountLabel: TLabel
-            Height = 24
-          end
+          Height = 531
+          ExplicitHeight = 531
         end
       end
       inherited NoteTabSheet: TTabSheet
-        ExplicitHeight = 560
+        ExplicitHeight = 559
         inherited ObjectNoteDBSynEdit: TDBSynEdit
-          Height = 530
-          ExplicitHeight = 530
+          Height = 531
+          ExplicitHeight = 531
         end
       end
     end
@@ -516,7 +539,7 @@ inherited CodeMainForm: TCodeMainForm
     Height = 24
     Width = 24
     Left = 360
-    Top = 376
+    Top = 432
     Bitmap = {
       494C010103000800040018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024
@@ -825,7 +848,7 @@ inherited CodeMainForm: TCodeMainForm
   object CodeAction: TActionList [27]
     Images = CodeImageList24
     Left = 568
-    Top = 376
+    Top = 432
     object CodeTestAction: TAction
       Caption = '    Test    '
       ImageIndex = 0
@@ -835,6 +858,12 @@ inherited CodeMainForm: TCodeMainForm
       Caption = '   Save   '
       ImageIndex = 1
       OnExecute = CodeSaveActionExecute
+    end
+    object CodeSaveBranchAction: TAction
+      Caption = 'Branch'
+      Hint = 'Save in a single fille all selected branch'
+      ImageIndex = 1
+      OnExecute = CodeSaveBranchActionExecute
     end
     object CodeRunAction: TAction
       Caption = 'Run'

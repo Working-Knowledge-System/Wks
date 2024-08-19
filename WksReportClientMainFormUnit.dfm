@@ -1,21 +1,27 @@
 inherited ReportMainForm: TReportMainForm
   Caption = 'ReportMainForm'
+  ClientHeight = 837
+  ClientWidth = 1268
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
+    Height = 588
     ExplicitHeight = 605
   end
   inherited RightJvNetscapeSplitter: TJvNetscapeSplitter
+    Left = 955
+    Height = 588
     ExplicitLeft = 867
     ExplicitHeight = 605
   end
   inherited BottomJvNetscapeSplitter: TJvNetscapeSplitter
+    Top = 665
+    Width = 1268
     ExplicitTop = 688
     ExplicitWidth = 1180
   end
   inherited TopPanel: TPanel
-    ExplicitWidth = 1182
+    Width = 1262
     inherited TopPageControl: TPageControl
-      ExplicitWidth = 810
       object ReportTabSheet: TTabSheet
         Caption = 'Report'
         ImageIndex = 2
@@ -40,25 +46,14 @@ inherited ReportMainForm: TReportMainForm
         end
       end
     end
-    inherited TopPageControl3: TPageControl
-      ExplicitLeft = 882
-    end
-    inherited TopPageControl2: TPageControl
-      ExplicitLeft = 810
-    end
   end
   inherited LeftPanel: TPanel
-    ExplicitHeight = 588
+    Height = 588
     inherited LeftPageControl: TPageControl
-      ExplicitHeight = 588
       inherited ObjectTreeTabSheet: TTabSheet
         inherited ObjectNodeInfoLabel: TLabel
-          Top = 544
           Width = 292
-        end
-        inherited ObjectDTClientTree: TDTClientTree
-          Height = 519
-          ExplicitHeight = 519
+          ExplicitTop = 544
         end
         inherited ObjectDBNavigator: TDBNavigator
           Hints.Strings = ()
@@ -67,15 +62,16 @@ inherited ReportMainForm: TReportMainForm
     end
   end
   inherited BottomPanel: TPanel
-    ExplicitTop = 675
-    ExplicitWidth = 1182
+    Top = 675
+    Width = 1262
     inherited LogFrame: TLogFrame
-      ExplicitWidth = 1182
+      Width = 1262
       inherited LogPageControl: TPageControl
-        ExplicitWidth = 1182
+        Width = 1262
         inherited OutputTabSheet: TTabSheet
+          ExplicitWidth = 1254
           inherited OutputRichEdit: TRichEdit
-            ExplicitWidth = 1172
+            Width = 1252
           end
         end
         inherited SoapTabSheet: TTabSheet
@@ -107,37 +103,59 @@ inherited ReportMainForm: TReportMainForm
     end
   end
   inherited RightPanel: TPanel
-    ExplicitLeft = 885
-    ExplicitHeight = 588
+    Left = 965
+    Height = 588
     inherited RightPageControl: TPageControl
-      ExplicitHeight = 588
+      Height = 588
       inherited PropertyTabSheet: TTabSheet
+        ExplicitHeight = 558
         inherited ObjectJvScrollMax: TJvScrollMax
-          ExplicitHeight = 558
-          inherited ObjectToJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectJobGradeMinDBComboBox: TDBComboBox
-              ExplicitTop = 298
+          Height = 558
+          inherited ObjectIdJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectOrderLabel: TLabel
+              Width = 249
+            end
+            inherited ObjectRevLabel: TLabel
+              Width = 249
+            end
+            inherited ObjectPIdLabel: TLabel
+              Width = 249
+            end
+            inherited ObjectIdLabel: TLabel
+              Width = 249
+            end
+            inherited ObjectId8Label: TLabel
+              Width = 249
             end
           end
-          inherited ObjectImageJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectImageDBImage: TDBImage
-              Height = 0
+          inherited ObjectDateJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectCreatedLabel: TLabel
+              Width = 249
+            end
+            inherited ObjectUpdatedLabel: TLabel
+              Width = 249
             end
           end
-          inherited ObjectTypeJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectContentKindDBComboBox: TDBComboBox
-              ExplicitTop = 103
+          inherited ObjectFromJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectFromOrganizationLabel: TLabel
+              Width = 249
             end
-            inherited ObjectKindDBComboBox: TDBComboBox
-              ExplicitTop = 48
+            inherited ObjectFromMemberLabel: TLabel
+              Width = 249
             end
-            inherited ObjectDataKindDBComboBox: TDBComboBox
-              ExplicitTop = 158
+            inherited ObjectFromTeamLabel: TLabel
+              Width = 249
+            end
+            inherited ObjectFromAreaLabel: TLabel
+              Width = 249
+            end
+            inherited ObjectFromDepartmentLabel: TLabel
+              Width = 249
             end
           end
-          inherited ObjectGeneralJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectStateDBComboBox: TDBComboBox
-              ExplicitTop = 43
+          inherited ObjectApprovalJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectRouteLabel: TLabel
+              Width = 249
             end
           end
           object ReportJvScrollMaxBand: TJvScrollMaxBand
@@ -566,8 +584,6 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldParamsPanelClosed'
               DataSource = ReportDataSource
               TabOrder = 5
-              ExplicitLeft = 15
-              ExplicitTop = 157
             end
             object ReportDsHeaderOffDBCheckBox: TDBCheckBox
               AlignWithMargins = True
@@ -584,8 +600,6 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldDsHeaderOff'
               DataSource = ReportDataSource
               TabOrder = 6
-              ExplicitLeft = 32
-              ExplicitTop = 235
             end
             object ReportDsRecordCountOffDBCheckBox: TDBCheckBox
               AlignWithMargins = True
@@ -601,7 +615,6 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldDsRecordCountOff'
               DataSource = ReportDataSource
               TabOrder = 7
-              ExplicitLeft = 32
             end
           end
           object ReportParamJvScrollMaxBand: TJvScrollMaxBand
@@ -1070,7 +1083,7 @@ inherited ReportMainForm: TReportMainForm
             Height = 21
             Expanded = False
             Caption = 'Dataset'
-            ExpandedHeight = 890
+            ExpandedHeight = 952
             ButtonFont.Charset = ANSI_CHARSET
             ButtonFont.Color = clWindowText
             ButtonFont.Height = -11
@@ -1117,7 +1130,7 @@ inherited ReportMainForm: TReportMainForm
             object ReportDatasetViewerCsvLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 472
+              Top = 522
               Width = 249
               Height = 15
               Margins.Left = 16
@@ -1125,12 +1138,13 @@ inherited ReportMainForm: TReportMainForm
               Align = alTop
               Caption = 'Viewer (csv)'
               Layout = tlCenter
+              ExplicitTop = 472
               ExplicitWidth = 63
             end
             object ReportDatasetEditorCsvLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 522
+              Top = 572
               Width = 249
               Height = 15
               Margins.Left = 16
@@ -1138,18 +1152,20 @@ inherited ReportMainForm: TReportMainForm
               Align = alTop
               Caption = 'Editor (csv)'
               Layout = tlCenter
+              ExplicitTop = 522
               ExplicitWidth = 59
             end
             object ReportDatasetLanguageLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 372
+              Top = 422
               Width = 249
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Language (for query)'
+              ExplicitTop = 372
               ExplicitWidth = 111
             end
             object ReportDatasetConnStrLabel: TLabel
@@ -1168,7 +1184,7 @@ inherited ReportMainForm: TReportMainForm
             object ReportDatasetMaxRecordsLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 422
+              Top = 472
               Width = 249
               Height = 15
               Margins.Left = 16
@@ -1176,6 +1192,7 @@ inherited ReportMainForm: TReportMainForm
               Align = alTop
               Caption = 'Max Records'
               Layout = tlCenter
+              ExplicitTop = 422
               ExplicitWidth = 68
             end
             object ReportDatasetDescriptionLabel: TLabel
@@ -1218,7 +1235,7 @@ inherited ReportMainForm: TReportMainForm
             object ReportDatasetTimeoutSecLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 572
+              Top = 622
               Width = 249
               Height = 15
               Margins.Left = 16
@@ -1226,12 +1243,13 @@ inherited ReportMainForm: TReportMainForm
               Align = alTop
               Caption = 'Timeout (seconds)'
               Layout = tlCenter
+              ExplicitTop = 572
               ExplicitWidth = 98
             end
             object ReportDatasetSwitchLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 722
+              Top = 772
               Width = 249
               Height = 15
               Margins.Left = 16
@@ -1239,21 +1257,10 @@ inherited ReportMainForm: TReportMainForm
               Align = alTop
               Caption = 'Switch'
               Layout = tlCenter
+              ExplicitTop = 722
               ExplicitWidth = 35
             end
             object ReportDatasetClassLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 622
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'Class'
-              ExplicitWidth = 27
-            end
-            object ReportDatasetStyleLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 672
@@ -1262,8 +1269,34 @@ inherited ReportMainForm: TReportMainForm
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
+              Caption = 'Class'
+              ExplicitTop = 622
+              ExplicitWidth = 27
+            end
+            object ReportDatasetStyleLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 722
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
               Caption = 'Style'
+              ExplicitTop = 672
               ExplicitWidth = 25
+            end
+            object ReportDatasetModeLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 372
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Mode (direction)'
+              ExplicitWidth = 89
             end
             object ReportDatasetDBEdit: TDBEdit
               AlignWithMargins = True
@@ -1314,7 +1347,7 @@ inherited ReportMainForm: TReportMainForm
             object ReportDatasetViewerCsvDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 493
+              Top = 543
               Width = 249
               Height = 23
               Margins.Left = 16
@@ -1323,11 +1356,12 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldViewerCsv'
               DataSource = DatasetDataSource
               TabOrder = 3
+              ExplicitTop = 493
             end
             object ReportDatasetEditorCsvDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 543
+              Top = 593
               Width = 249
               Height = 23
               Margins.Left = 16
@@ -1336,11 +1370,12 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldEditorCsv'
               DataSource = DatasetDataSource
               TabOrder = 4
+              ExplicitTop = 543
             end
             object ReportDatasetLanguageDBComboBox: TDBComboBox
               AlignWithMargins = True
               Left = 16
-              Top = 393
+              Top = 443
               Width = 249
               Height = 23
               Margins.Left = 16
@@ -1355,6 +1390,7 @@ inherited ReportMainForm: TReportMainForm
               ParentShowHint = False
               ShowHint = True
               TabOrder = 5
+              ExplicitTop = 393
             end
             object ReportDatasetConnStrDBEdit: TDBEdit
               AlignWithMargins = True
@@ -1372,7 +1408,7 @@ inherited ReportMainForm: TReportMainForm
             object ReportDatasetMaxRecordsDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 443
+              Top = 493
               Width = 249
               Height = 23
               Margins.Left = 16
@@ -1381,6 +1417,7 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldMaxRecords'
               DataSource = DatasetDataSource
               TabOrder = 7
+              ExplicitTop = 443
             end
             object ReportDatasetDescriptionDBEdit: TDBEdit
               AlignWithMargins = True
@@ -1430,7 +1467,7 @@ inherited ReportMainForm: TReportMainForm
             object ReportDatasetTimeoutSecDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 593
+              Top = 643
               Width = 249
               Height = 23
               Margins.Left = 16
@@ -1439,11 +1476,12 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldTimeoutSec'
               DataSource = DatasetDataSource
               TabOrder = 11
+              ExplicitTop = 593
             end
             object ReportDatasetEditableDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 777
+              Top = 827
               Width = 249
               Height = 17
               Margins.Left = 16
@@ -1455,11 +1493,12 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldEditable'
               DataSource = DatasetDataSource
               TabOrder = 12
+              ExplicitTop = 777
             end
             object ReportDatasetSwitchDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 743
+              Top = 793
               Width = 249
               Height = 23
               Margins.Left = 16
@@ -1468,21 +1507,9 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldSwitch'
               DataSource = DatasetDataSource
               TabOrder = 13
+              ExplicitTop = 743
             end
             object ReportDatasetClassDBEdit: TDBEdit
-              AlignWithMargins = True
-              Left = 16
-              Top = 643
-              Width = 249
-              Height = 23
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              DataField = 'FldClass'
-              DataSource = DatasetDataSource
-              TabOrder = 14
-            end
-            object ReportDatasetStyleDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
               Top = 693
@@ -1491,14 +1518,29 @@ inherited ReportMainForm: TReportMainForm
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
+              DataField = 'FldClass'
+              DataSource = DatasetDataSource
+              TabOrder = 14
+              ExplicitTop = 643
+            end
+            object ReportDatasetStyleDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 743
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
               DataField = 'FldStyle'
               DataSource = DatasetDataSource
               TabOrder = 15
+              ExplicitTop = 693
             end
             object ReportDatasetPanelClosedDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 856
+              Top = 906
               Width = 249
               Height = 17
               Margins.Left = 16
@@ -1508,11 +1550,12 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldPanelClosed'
               DataSource = DatasetDataSource
               TabOrder = 16
+              ExplicitTop = 856
             end
             object ReportDatasetPanelOnDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 833
+              Top = 883
               Width = 249
               Height = 17
               Margins.Left = 16
@@ -1522,11 +1565,12 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldPanelOn'
               DataSource = DatasetDataSource
               TabOrder = 17
+              ExplicitTop = 833
             end
             object ReportDatasetTitleOnDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 810
+              Top = 860
               Width = 249
               Height = 17
               Margins.Left = 16
@@ -1537,6 +1581,27 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldTitleOn'
               DataSource = DatasetDataSource
               TabOrder = 18
+              ExplicitTop = 810
+            end
+            object ReportDatasetModeDBComboBox: TDBComboBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 393
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldMode'
+              DataSource = DatasetDataSource
+              Items.Strings = (
+                ''
+                'Horizontal'
+                'Vertical')
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 19
+              ExplicitTop = 390
             end
           end
           object ReportChartJvScrollMaxBand: TJvScrollMaxBand
@@ -1887,63 +1952,42 @@ inherited ReportMainForm: TReportMainForm
         end
       end
       inherited SearchTabSheet: TTabSheet
+        ExplicitHeight = 558
         inherited SearchResultListBox: TListBox
-          ExplicitHeight = 422
+          Height = 421
+          ExplicitHeight = 421
         end
       end
       inherited OptionTabSheet: TTabSheet
+        ExplicitHeight = 558
         inherited OptionJvScrollMax: TJvScrollMax
-          ExplicitHeight = 559
+          Height = 558
+          ExplicitHeight = 558
         end
       end
     end
   end
   inherited StatusBar: TStatusBar
-    ExplicitTop = 815
-    ExplicitWidth = 1182
+    Top = 815
+    Width = 1262
+    ExplicitTop = 814
+    ExplicitWidth = 1258
   end
   inherited MainPanel: TPanel
-    ExplicitHeight = 588
+    Height = 588
     inherited MainPageControl: TPageControl
-      ExplicitHeight = 588
-      inherited ContentPrevTabSheet: TTabSheet
-        inherited ObjectContentPrevDBSynEdit: TDBSynEdit
-          Height = 531
-          ExplicitHeight = 531
-        end
-      end
       inherited ContentTabSheet: TTabSheet
-        inherited ObjectContentDBSynEdit: TDBSynEdit
-          Height = 529
-          ExplicitTop = 30
-          ExplicitHeight = 528
-        end
         inherited ObjectContentTopPanel: TPanel
           inherited ObjectContentCharCountLabel: TLabel
-            Height = 24
-          end
-          inherited ObjectDBEdit: TDBEdit
-            ExplicitHeight = 24
+            Height = 22
           end
         end
       end
       inherited JsonTabSheet: TTabSheet
-        inherited ObjectDataDBSynEdit: TDBSynEdit
-          Height = 529
-          ExplicitTop = 30
-          ExplicitHeight = 529
-        end
         inherited ObjectDataTopPanel: TPanel
           inherited ObjectDataCharCountLabel: TLabel
-            Height = 24
+            Height = 22
           end
-        end
-      end
-      inherited NoteTabSheet: TTabSheet
-        inherited ObjectNoteDBSynEdit: TDBSynEdit
-          Height = 529
-          ExplicitTop = 30
-          ExplicitHeight = 529
         end
       end
       object ReportParamTabSheet: TTabSheet
@@ -1952,48 +1996,45 @@ inherited ReportMainForm: TReportMainForm
         object ReportParamSplitter3: TSplitter
           AlignWithMargins = True
           Left = 8
-          Top = 322
-          Width = 506
+          Top = 321
+          Width = 528
           Height = 3
           Cursor = crVSplit
           Margins.Left = 8
           Margins.Right = 8
           Align = alBottom
           ExplicitTop = 358
-          ExplicitWidth = 528
         end
         object ReportParamSplitter2: TSplitter
           AlignWithMargins = True
           Left = 8
-          Top = 205
-          Width = 506
+          Top = 204
+          Width = 528
           Height = 3
           Cursor = crVSplit
           Margins.Left = 8
           Margins.Right = 8
           Align = alBottom
           ExplicitTop = 41
-          ExplicitWidth = 528
         end
         object ReportParamSplitter: TSplitter
           AlignWithMargins = True
           Left = 8
-          Top = 88
-          Width = 506
+          Top = 87
+          Width = 528
           Height = 3
           Cursor = crVSplit
           Margins.Left = 8
           Margins.Right = 8
           Align = alBottom
           ExplicitTop = 41
-          ExplicitWidth = 528
         end
         object ReportParamTopPanel: TPanel
           AlignWithMargins = True
           Left = 8
           Top = 8
-          Width = 506
-          Height = 74
+          Width = 528
+          Height = 73
           Margins.Left = 8
           Margins.Top = 8
           Margins.Right = 8
@@ -2029,8 +2070,8 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 32
-            Width = 500
-            Height = 39
+            Width = 522
+            Height = 38
             Margins.Top = 32
             Align = alClient
             DataSource = ParamDataSource
@@ -2051,8 +2092,8 @@ inherited ReportMainForm: TReportMainForm
         object ReportParamOptionQueryPanel: TPanel
           AlignWithMargins = True
           Left = 8
-          Top = 331
-          Width = 506
+          Top = 330
+          Width = 528
           Height = 225
           Margins.Left = 8
           Margins.Right = 8
@@ -2065,7 +2106,7 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 3
-            Width = 500
+            Width = 522
             Height = 15
             Align = alTop
             Caption = 
@@ -2077,7 +2118,7 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 178
-            Width = 500
+            Width = 522
             Height = 15
             Align = alBottom
             Caption = 'Option Query Connection String (explicit or Source Id)'
@@ -2087,7 +2128,7 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 24
-            Width = 500
+            Width = 522
             Height = 148
             Cursor = crIBeam
             DataField = 'FldOptionQuery'
@@ -2136,7 +2177,7 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 199
-            Width = 500
+            Width = 522
             Height = 23
             Align = alBottom
             DataField = 'FldConnStr'
@@ -2147,8 +2188,8 @@ inherited ReportMainForm: TReportMainForm
         object ReportParamOptionJsonPanel: TPanel
           AlignWithMargins = True
           Left = 8
-          Top = 214
-          Width = 506
+          Top = 213
+          Width = 528
           Height = 102
           Margins.Left = 8
           Margins.Right = 8
@@ -2161,7 +2202,7 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 3
-            Width = 500
+            Width = 522
             Height = 15
             Align = alTop
             Caption = 
@@ -2173,7 +2214,7 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 24
-            Width = 500
+            Width = 522
             Height = 75
             Cursor = crIBeam
             DataField = 'FldOptionJson'
@@ -2222,8 +2263,8 @@ inherited ReportMainForm: TReportMainForm
         object ReportParamOptionCsvPanel: TPanel
           AlignWithMargins = True
           Left = 8
-          Top = 97
-          Width = 506
+          Top = 96
+          Width = 528
           Height = 102
           Margins.Left = 8
           Margins.Right = 8
@@ -2236,7 +2277,7 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 3
-            Width = 500
+            Width = 522
             Height = 15
             Align = alTop
             Caption = 'Options Csv (option Value and Caption will be the same)'
@@ -2246,7 +2287,7 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 24
-            Width = 500
+            Width = 522
             Height = 75
             Cursor = crIBeam
             DataField = 'FldOptionCsv'
@@ -2299,22 +2340,21 @@ inherited ReportMainForm: TReportMainForm
         object ReportDatasetSplitter: TSplitter
           AlignWithMargins = True
           Left = 8
-          Top = 88
-          Width = 506
+          Top = 87
+          Width = 528
           Height = 3
           Cursor = crVSplit
           Margins.Left = 8
           Margins.Right = 8
           Align = alBottom
           ExplicitTop = 203
-          ExplicitWidth = 528
         end
         object ReportDatasetTopPanel: TPanel
           AlignWithMargins = True
           Left = 8
           Top = 8
-          Width = 506
-          Height = 74
+          Width = 528
+          Height = 73
           Margins.Left = 8
           Margins.Top = 8
           Margins.Right = 8
@@ -2350,8 +2390,8 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 32
-            Width = 500
-            Height = 39
+            Width = 522
+            Height = 38
             Margins.Top = 32
             Align = alClient
             DataSource = DatasetDataSource
@@ -2372,8 +2412,8 @@ inherited ReportMainForm: TReportMainForm
         object DatasetAndChartPageControl: TPageControl
           AlignWithMargins = True
           Left = 8
-          Top = 97
-          Width = 506
+          Top = 96
+          Width = 528
           Height = 454
           Margins.Left = 8
           Margins.Right = 8
@@ -2387,7 +2427,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 492
+              Width = 514
               Height = 418
               Cursor = crIBeam
               DataField = 'FldSelect'
@@ -2440,7 +2480,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 492
+              Width = 514
               Height = 418
               Cursor = crIBeam
               DataField = 'FldInsert'
@@ -2493,7 +2533,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 492
+              Width = 514
               Height = 418
               Cursor = crIBeam
               DataField = 'FldUpdate'
@@ -2546,7 +2586,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 492
+              Width = 514
               Height = 418
               Cursor = crIBeam
               DataField = 'FldDelete'
@@ -2629,7 +2669,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 22
-              Width = 492
+              Width = 514
               Height = 399
               Cursor = crIBeam
               Margins.Top = 22
@@ -2683,7 +2723,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 168
-              Width = 492
+              Width = 514
               Height = 3
               Cursor = crVSplit
               Align = alTop
@@ -2695,7 +2735,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 492
+              Width = 514
               Height = 27
               Align = alTop
               BevelOuter = bvNone
@@ -2731,7 +2771,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 36
-              Width = 492
+              Width = 514
               Height = 126
               Align = alTop
               DataSource = ChartDataSource
@@ -2746,7 +2786,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 177
-              Width = 492
+              Width = 514
               Height = 27
               Align = alTop
               BevelOuter = bvNone
@@ -2782,7 +2822,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 210
-              Width = 492
+              Width = 514
               Height = 211
               Align = alClient
               DataSource = SerieDataSource

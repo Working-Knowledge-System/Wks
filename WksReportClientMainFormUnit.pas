@@ -208,6 +208,8 @@ type
     SerieDataSource: TDataSource;
     ReportDsHeaderOffDBCheckBox: TDBCheckBox;
     ReportDsRecordCountOffDBCheckBox: TDBCheckBox;
+    ReportDatasetModeDBComboBox: TDBComboBox;
+    ReportDatasetModeLabel: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure PostActionExecute(Sender: TObject);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);

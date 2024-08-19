@@ -267,8 +267,8 @@ begin
 end;
 
 procedure TTextDiffForm.File1ToolButtonClick(Sender: TObject);
-var
-  i: integer;
+//var
+//  i: integer;
 begin
   OpenDialog.InitialDir := ExtractFilePath(FFile1);
   OpenDialog.FileName   := ExtractFileName(FFile1);
@@ -282,8 +282,8 @@ begin
 end;
 
 procedure TTextDiffForm.File2ToolButtonClick(Sender: TObject);
-var
-  i: integer;
+//var
+//  i: integer;
 begin
   OpenDialog.InitialDir := ExtractFilePath(FFile2);
   OpenDialog.FileName   := ExtractFileName(FFile2);
@@ -601,16 +601,16 @@ end;
 
 procedure TTextDiffForm.SynEditHighlightNow(IvSynEdit: TSynEdit; IvPatternList: TStrings);
 var
-  i, j, x, y, u, v: int64;
+  i, j{, x}, y, u, v: int64;
   p: TPoint;
   c: TBufferCoord;
   n, l, f, t: string; // repattern, line, foundword, token
   a: TSynHighlighterAttributes; // attr
-begin  
-  if not Assigned(IvSynEdit.SearchEngine) then 
+begin
+  if not Assigned(IvSynEdit.SearchEngine) then
     IvSynEdit.SearchEngine := TSynEditSearch.Create(IvSynEdit);
   IvSynEdit.SearchEngine.Options := [ssoReplace, ssoReplaceAll];
-    
+
   for i := 0 to IvPatternList.Count-1 do begin
     // repattern
     n := IvPatternList.Strings[i];
@@ -619,8 +619,8 @@ begin
 
     // colors
     IvSynEdit.SearchEngine.Pattern := n;  
-    IvSynEdit.Canvas.Font.Color := clYellow;
-    IvSynEdit.Canvas.Brush.Color  := clRed;  
+    IvSynEdit.Canvas.Font.Color    := clYellow;
+    IvSynEdit.Canvas.Brush.Color   := clRed;
 
     // font
     IvSynEdit.GetHighlighterAttriAtRowCol(c, t, a);
@@ -639,15 +639,18 @@ begin
       for j := 0 to IvSynEdit.SearchEngine.ResultCount-1 do begin
         u := IvSynEdit.SearchEngine.Results[j];
         v := IvSynEdit.SearchEngine.Lengths[j];
-        f := Copy(l, u, v);              
-//      c := IvSynEdit.CharIndexToRowCol(u-1);
+        f := Copy(l, u, v);
+      try
+      //c := IvSynEdit.CharIndexToRowCol(u-1);
         c := BufferCoord(u, y+1);
-//      f := GetWordAtRowCol(c);                                          
+      except
+      end;
+//      f := GetWordAtRowCol(c);
         p := IvSynEdit.RowColumnToPixels(IvSynEdit.BufferToDisplayPos(c));
         IvSynEdit.Canvas.TextOut(p.X, p.Y, {IvSynEdit.SearchEngine.Pattern}f);
       end;
-    end;    
-  end;    
+    end;
+  end;
 end;
 
 procedure TTextDiffForm.SynEdit1Change(Sender: TObject);
@@ -657,11 +660,11 @@ end;
 
 procedure TTextDiffForm.SynEdit1Paint(Sender: TObject; ACanvas: TCanvas);
 var
-  x, y, j, u, v: integer; // x=col, y=row, seres idx, res, len
+  {x, }y, j, u, v: integer; // x=col, y=row, seres idx, res, len
   p: TPoint;
   l, f, t: string; // line, found, token
   a: TSynHighlighterAttributes; // attr
-begin 
+begin
   SynEditHighlightNow(SynEdit1, Memo1.Lines);
   Exit;
   

@@ -513,8 +513,8 @@ type
     // synedit
     FSynEditCaretPos    : TBufferCoord;    // syneditposcache
     FSynEditTopLinePos  : integer;         // syneditposcache
-    FSynEditIsDragging  : boolean;         // syneditselectiondrag
-    FSynEditDragStartPos: TPoint;          // syneditselectiondrag
+  //FSynEditIsDragging  : boolean;         // syneditselectiondrag
+  //FSynEditDragStartPos: TPoint;          // syneditselectiondrag
     // text
     FTextUtilsLineBeginWith: string;
     // python
@@ -1517,12 +1517,12 @@ end;
 
 procedure TBaseMainForm.TextFoldActionExecute(Sender: TObject);
 begin
-  if TextFoldAction.ImageIndex = 1 then begin
-    TextFoldAction.ImageIndex := 2;
+  if TextFoldAction.ImageIndex = 7 then begin
+    TextFoldAction.ImageIndex := 8;
     TextFoldAction.Caption := 'Unfold';
     gsyn.Focused.CollapseFoldType(FoldRegionType);
   end else begin
-    TextFoldAction.ImageIndex := 1;
+    TextFoldAction.ImageIndex := 7;
     TextFoldAction.Caption := 'Fold';
     gsyn.Focused.UnCollapseFoldType(FoldRegionType);
   end;
@@ -1796,7 +1796,7 @@ begin
       try
         MaskFPUExceptions(true);
         wat.StartNew;
-        FPythonEngine.ExecString(cod);
+        FPythonEngine.ExecString(ansistring(cod));
         wat.Stop;
         LogFrame.LogOne('Python code executed in %d ms', [wat.Elapsed.Milliseconds], fmSuccess);
       except
@@ -2075,11 +2075,12 @@ var
   fna, ext, fbk: string;
   {boo: boolean;}
 begin
-  fna := Format('%d_%s_Image', [FId, StringReplace(ObjectDBEdit.Text, '?', '_', [rfReplaceAll])]);
+  fna := Format('%s_%d_%s_Image', [FObjectKind, FId, TStrRec.StrSafe(ObjectDBEdit.Text)]);
   ext := '.png';
+
   {boo :=} TGraRec.PictureDlgSave(ObjectImageDBImage.Picture.Graphic, fna, ext, fbk);
-  if OptionVerboseCheckBox.Checked then
-    LogFrame.Log(fbk);
+  TMesRec.I('Image saved to %s', [fna]);
+  LogFrame.Log(fbk);
 end;
 
 procedure TBaseMainForm.ObjectImageFitLabelClick(Sender: TObject);

@@ -65,9 +65,10 @@ object BaseMainForm: TBaseMainForm
       Top = 0
       Width = 890
       Height = 74
-      ActivePage = TopSearchTabSheet
+      ActivePage = ActionTabSheet
       Align = alClient
       TabOrder = 0
+      ExplicitWidth = 886
       object ClientTabSheet: TTabSheet
         Caption = 'Client'
         object ClientToolBar: TToolBar
@@ -967,8 +968,6 @@ object BaseMainForm: TBaseMainForm
     Caption = 'BottomPanel'
     ShowCaption = False
     TabOrder = 2
-    ExplicitTop = 674
-    ExplicitWidth = 1258
     inline LogFrame: TLogFrame
       Left = 0
       Top = 0
@@ -978,7 +977,7 @@ object BaseMainForm: TBaseMainForm
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0
-      ExplicitWidth = 1258
+      ExplicitWidth = 1262
       inherited LogPageControl: TPageControl
         Width = 1262
         ExplicitWidth = 1258
@@ -1014,8 +1013,16 @@ object BaseMainForm: TBaseMainForm
               end>
           end
         end
-        inherited OptionTabSheet: TTabSheet
-          ExplicitWidth = 1254
+      end
+      inherited LogToolBar: TToolBar
+        inherited ClearToolButton: TToolButton
+          ExplicitWidth = 43
+        end
+        inherited ClearAutoToolButton: TToolButton
+          ExplicitWidth = 42
+        end
+        inherited WrapToolButton: TToolButton
+          ExplicitWidth = 44
         end
       end
     end
@@ -1041,7 +1048,7 @@ object BaseMainForm: TBaseMainForm
       Top = 0
       Width = 300
       Height = 588
-      ActivePage = OptionTabSheet
+      ActivePage = PropertyTabSheet
       Align = alClient
       TabOrder = 0
       ExplicitHeight = 587
@@ -1068,6 +1075,7 @@ object BaseMainForm: TBaseMainForm
           ParentShowHint = False
           ShowHint = True
           TabOrder = 0
+          ExplicitHeight = 557
           object ObjectIdJvScrollMaxBand: TJvScrollMaxBand
             Width = 281
             Height = 26
@@ -1717,7 +1725,7 @@ object BaseMainForm: TBaseMainForm
             ParentButtonFont = False
             object ObjectImageLoadLabel: TLabel
               Left = 16
-              Top = 24
+              Top = 30
               Width = 23
               Height = 13
               Cursor = crHandPoint
@@ -1732,7 +1740,7 @@ object BaseMainForm: TBaseMainForm
             end
             object ObjectImageSaveLabel: TLabel
               Left = 53
-              Top = 24
+              Top = 30
               Width = 24
               Height = 13
               Cursor = crHandPoint
@@ -1747,7 +1755,7 @@ object BaseMainForm: TBaseMainForm
             end
             object ObjectImageEditLabel: TLabel
               Left = 91
-              Top = 24
+              Top = 30
               Width = 18
               Height = 13
               Cursor = crHandPoint
@@ -1761,7 +1769,7 @@ object BaseMainForm: TBaseMainForm
             end
             object ObjectImageFitLabel: TLabel
               Left = 157
-              Top = 24
+              Top = 30
               Width = 12
               Height = 13
               Cursor = crHandPoint
@@ -1776,7 +1784,7 @@ object BaseMainForm: TBaseMainForm
             end
             object ObjectImageClearLabel: TLabel
               Left = 122
-              Top = 24
+              Top = 30
               Width = 25
               Height = 13
               Cursor = crHandPoint
@@ -2271,7 +2279,6 @@ object BaseMainForm: TBaseMainForm
           BevelOuter = bvNone
           ParentColor = True
           TabOrder = 0
-          ExplicitHeight = 557
           object OptionDateTimeJvScrollMaxBand: TJvScrollMaxBand
             Width = 286
             Height = 26
@@ -2831,6 +2838,8 @@ object BaseMainForm: TBaseMainForm
       item
         Width = 50
       end>
+    ExplicitTop = 814
+    ExplicitWidth = 1258
   end
   object MainPanel: TPanel
     Left = 313

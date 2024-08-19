@@ -192,19 +192,23 @@ end;
 
 procedure TMemberMainForm.MemberBadgeSaveLabelClick(Sender: TObject);
 var
-  dir, fil, fbk: string;
+  dir, fna, ext, fbk: string;
+  {boo: boolean;}
 begin
   inherited;
 
-  dir := Format('C:\$Mem\%s\%s', [MemberDBEdit.Text[1], MemberDBEdit.Text]);
+  dir := gmbr.HomePath;
   if not TFsyRec.DirForce(dir, fbk) then begin
-    TMesRec.W('Unable to create output directory %s, badge not saved', [dir]);
+    TMesRec.W('Unable to create member'' home directory %s, avatar not saved', [dir]);
     Exit;
   end;
 
-  fil := Format('%s\%s%sBadge.png', [dir, MemberOrganizationDBEdit.Text, MemberDBEdit.Text]);
-  MemberBadgeDBImage.Picture.SaveToFile(fil);
-  TMesRec.I('Badge saved to %s', [fil]);
+  fna := gmbr.BadgeFile;
+  ext := '.png';
+
+  {boo :=} TGraRec.PictureDlgSave(MemberBadgeDBImage.Picture.Graphic, fna, ext, fbk);
+  TMesRec.I('Badge saved to %s', [fna]);
+  LogFrame.Log(fbk);
 end;
 {$ENDREGION}
 

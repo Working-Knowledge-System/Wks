@@ -999,7 +999,6 @@ begin
   sbu.Add('where');
   sbu.Add('    [name] like ''Dba%''');
   sbu.Add('and [name] not like ''DbaZzz%''');
-  sbu.Add('and [name] not like ''DbaLfoundry%''');
   sbu.Add('--and [name] not in ('''')');
   sbu.Add('order by 1');
   sbu.Add('open c');

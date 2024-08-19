@@ -585,7 +585,7 @@ begin
   + sLineBreak + '--, a.FldMessageWhenInactive'
   + sLineBreak + 'from'
   + sLineBreak + '    TblA                    a inner join'
-  + sLineBreak + '	DbaClient.dbo.TblClient b on (b.FldClient = a.FldClient)'
+  + sLineBreak + '    DbaClient.dbo.TblClient b on (b.FldClient = a.FldClient)'
   + sLineBreak + 'where'
   + sLineBreak + '    b.FldState = ''Active'''
   + sLineBreak + 'and b.FldDeploy = 1'

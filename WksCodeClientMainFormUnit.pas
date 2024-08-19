@@ -49,6 +49,8 @@ type
     CodeOutputToDBComboBox: TDBComboBox;
     CodeRunToolButton: TToolButton;
     CodeRunAction: TAction;
+    CodeSaveBranchToolButton: TToolButton;
+    CodeSaveBranchAction: TAction;
     procedure FormCreate(Sender: TObject);
     procedure PostActionExecute(Sender: TObject);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
@@ -61,10 +63,12 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure CodeRunActionExecute(Sender: TObject);
     procedure ObjectClientDataSetAfterPost(DataSet: TDataSet);
+    procedure CodeSaveBranchActionExecute(Sender: TObject);
   private
     { Private declarations }
     FOutputToChache: string;
     FOutputDirectoryChache: string;
+    procedure CodeSave(IvWithChilds: boolean);
   public
     { Public declarations }
   end;
@@ -177,34 +181,31 @@ end;
 {$ENDREGION}
 
 {$REGION 'CodeActions'}
-procedure TCodeMainForm.CodeTestActionExecute(Sender: TObject);
-begin
-  inherited;
-
-  TMesRec.NI;
-end;
-
-procedure TCodeMainForm.CodeSaveActionExecute(Sender: TObject);
+procedure TCodeMainForm.CodeSave(IvWithChilds: boolean);
 var
-  okk, hch, ach: boolean; // ok, haschild, addchild
-  blz, ask: integer; // blockcount, askreply
+  okk, hch, wch: boolean; // ok, haschild, withchild
+  blz{, ask}: integer; // blockcount, askreply
   oid, nam, ext, odi, od2, ofn, of2, cod, co2{, kin, mim}, fsp, jva, fbk: string; // id, codename, ext, outputdir, outputfilename, code(single/tree), kind, mime, filespec, jsonvalue
   stl: TStringList;
   jso, jsi: ISuperObject; // jsonobj, jsonitem
 begin
   inherited;
 
-  // exit
+  // savetonotdefined
   if CodeOutputToDBComboBox.ItemIndex <= 0 {nointent} then begin
     LogFrame.Log('"Output to" is undefined, please select if you want to save the output to the "local computer" or to the "remote server", the code "%s" will not be saved to disk', [nam], clRed);
     Beep;
     Exit;
   end;
-  if giis.Nx(CodeClientDataSet.FieldByName('FldOutputDirectory').AsString) then begin
+
+  // outputdir
+  odi := CodeClientDataSet.FieldByName('FldOutputDirectory').AsString;
+  if giis.Nx(odi) then begin
     LogFrame.Log('OutputDirectory not defined, the code "%s" will not be saved to disk', [nam], clRed);
     Beep;
     Exit;
   end;
+  odi := grva.RvaDsRecord(odi, [ObjectClientDataSet, CodeClientDataSet]);
 
   // id
   oid := ObjectClientDataSet.FieldByName('FldId').AsString;
@@ -212,19 +213,20 @@ begin
   // haschilds
   hch := TVstRec.NodeHasChildren(ObjectDTClientTree.FocusedNode);
   if hch then begin
-    ask := TAskRec.YesNoCancel('Selected node has children.'+#10#13+'Save the node with childs?'+#10#13+'If No, only the selected single node will be saved.');
-    if (ask = mrNone) or (ask = mrCancel) then begin
-      LogFrame.Log('User cancelled "Save" action', clWebOrange);
-      Exit;
-    end else if ask = mrYes then begin
-      LogFrame.Log('Save node with childs');
-      ach := true;
-    end else begin
-      LogFrame.Log('Save only selected node');
-      ach := false;
-    end;
+  //ask := TAskRec.YesNoCancel('Selected node has children.'+#10#13+'Save the node with childs?'+#10#13+'If No, only the selected single node will be saved.');
+  //if (ask = mrNone) or (ask = mrCancel) then begin
+  //  LogFrame.Log('User cancelled "Save" action', clWebOrange);
+  //  Exit;
+  //end else if ask = mrYes then begin
+  //  LogFrame.Log('Save node with childs');
+  //  wch := true;
+  //end else begin
+  //  LogFrame.Log('Save only selected node');
+  //  wch := false;
+  //end;
+    wch := IvWithChilds;
   end else
-    ach := false;
+    wch := false;
 
   // codename
   nam := ObjectClientDataSet.FieldByName('FldObject').AsString;
@@ -241,12 +243,6 @@ begin
   end;
 
   // outputdir
-  odi := CodeClientDataSet.FieldByName('FldOutputDirectory').AsString;
-  if giis.Nx(odi) then begin
-    LogFrame.Log('OutputDirectory not defined, the code "%s" will not be saved to disk', [nam], clRed);
-    Exit;
-  end;
-  odi := grva.RvaDsRecord(odi, [ObjectClientDataSet, CodeClientDataSet]);
   if not DirectoryExists(odi) then
     if not OptionCodeDirCreateIfNotExixtsCheckBox.Checked then begin
       LogFrame.Log('OutputDirectory %s does not exists in the filesystem, the code "%s" will not be saved to disk', [odi, nam], clRed);
@@ -273,15 +269,13 @@ begin
 
   // saveremote
   if CodeOutputToDBComboBox.ItemIndex = 1 {server} then begin
-    okk := TDbaRec.ObjTreeContentRioSave('Code', oid, ach, fsp, blz, nam, cod, fbk);
+    okk := TDbaRec.ObjTreeContentRioSave('Code', oid, wch, fsp, blz, nam, cod, fbk);
     LogFrame.Log(fbk, okk);
     Exit;
   end;
 
-  // codefromdba
-  okk := TDbaRec.ObjTreeContentRio('Code', oid, ach, blz, nam, cod, fbk);
-
-  // issue
+  // codefromdbario
+  okk := TDbaRec.ObjTreeContentRio('Code', oid, wch, blz, nam, cod, fbk);
   if not okk then begin
     TMesRec.W(fbk);
     LogFrame.Log(fbk, clRed);
@@ -291,13 +285,13 @@ begin
   // savelocally
   stl := TStringList.Create;
   try
-    // no-multi-save-template
+    // no-data --> no-multi-save-template
     if giis.Nx(ObjectDataDBSynEdit.Text) then begin
       stl.Text := cod;
       stl.SaveToFile(fsp);
-      LogFrame.Log('Code tree-Content saved to local computer: %s', [fsp], clGreen);
+      LogFrame.Log('Code saved to local computer: %s', [fsp], clGreen);
 
-    // yes-multi-save-template
+    // yes-data --> yes-multi-save-template
     end else begin
       jso := SO(ObjectDataDBSynEdit.Text);
       for jsi in jso['Items'] do begin
@@ -321,7 +315,7 @@ begin
 
         // save
         stl.SaveToFile(fsp);
-        LogFrame.Log('Code saved to file: %s', [fsp]);
+        LogFrame.Log('Code saved to local computer: %s', [fsp], clGreen);
       end;
     end;
   finally
@@ -329,10 +323,31 @@ begin
   end;
 end;
 
+procedure TCodeMainForm.CodeTestActionExecute(Sender: TObject);
+begin
+  inherited;
+
+  TMesRec.NI;
+end;
+
+procedure TCodeMainForm.CodeSaveActionExecute(Sender: TObject);
+begin
+  inherited;
+
+  CodeSave(false);
+end;
+
+procedure TCodeMainForm.CodeSaveBranchActionExecute(Sender: TObject);
+begin
+  inherited;
+
+  CodeSave(true);
+end;
+
 procedure TCodeMainForm.CodeRunActionExecute(Sender: TObject);
 var
   oid: integer;
-  cna, ruc, exr, wdi: string; // codename, runcommand, execresult, workingdir
+  cna, ruc{, exr, wdi}: string; // codename, runcommand, execresult, workingdir
 begin
   inherited;
 
@@ -361,9 +376,9 @@ begin
       if true then
         TWinRec.WinNewProcess(ruc, true, false)
       else begin
-        wdi := TBynRec.BinaryDir;
-        TDosRec.DosExec(ruc, exr, wdi);
-        LogFrame.Output(exr);
+      //wdi := TBynRec.BinaryDir;
+      //TDosRec.DosExec(ruc, exr, wdi);
+      //LogFrame.Output(exr);
       end;
       LogFrame.Log('Executed: %s', [ruc]);
     except
