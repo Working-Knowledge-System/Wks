@@ -1,0 +1,204 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{FABC9260-BBF5-4E42-80DA-FA487747090F}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="WksBaseClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksXxxClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksPersonClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksOrganizationClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksMemberClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksAccountClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksAgentClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksCodeClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksDocumentClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksFormClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksInvoiceClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksPageClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksReportClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksSystemClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksTaskClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="WksBaseClientProject">
+        <MSBuild Projects="WksBaseClientProject.dproj"/>
+    </Target>
+    <Target Name="WksBaseClientProject:Clean">
+        <MSBuild Projects="WksBaseClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksBaseClientProject:Make">
+        <MSBuild Projects="WksBaseClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksXxxClientProject">
+        <MSBuild Projects="WksXxxClientProject.dproj"/>
+    </Target>
+    <Target Name="WksXxxClientProject:Clean">
+        <MSBuild Projects="WksXxxClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksXxxClientProject:Make">
+        <MSBuild Projects="WksXxxClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksPersonClientProject">
+        <MSBuild Projects="WksPersonClientProject.dproj"/>
+    </Target>
+    <Target Name="WksPersonClientProject:Clean">
+        <MSBuild Projects="WksPersonClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksPersonClientProject:Make">
+        <MSBuild Projects="WksPersonClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksOrganizationClientProject">
+        <MSBuild Projects="WksOrganizationClientProject.dproj"/>
+    </Target>
+    <Target Name="WksOrganizationClientProject:Clean">
+        <MSBuild Projects="WksOrganizationClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksOrganizationClientProject:Make">
+        <MSBuild Projects="WksOrganizationClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksMemberClientProject">
+        <MSBuild Projects="WksMemberClientProject.dproj"/>
+    </Target>
+    <Target Name="WksMemberClientProject:Clean">
+        <MSBuild Projects="WksMemberClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksMemberClientProject:Make">
+        <MSBuild Projects="WksMemberClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksAccountClientProject">
+        <MSBuild Projects="WksAccountClientProject.dproj"/>
+    </Target>
+    <Target Name="WksAccountClientProject:Clean">
+        <MSBuild Projects="WksAccountClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksAccountClientProject:Make">
+        <MSBuild Projects="WksAccountClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksAgentClientProject">
+        <MSBuild Projects="WksAgentClientProject.dproj"/>
+    </Target>
+    <Target Name="WksAgentClientProject:Clean">
+        <MSBuild Projects="WksAgentClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksAgentClientProject:Make">
+        <MSBuild Projects="WksAgentClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksCodeClientProject">
+        <MSBuild Projects="WksCodeClientProject.dproj"/>
+    </Target>
+    <Target Name="WksCodeClientProject:Clean">
+        <MSBuild Projects="WksCodeClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksCodeClientProject:Make">
+        <MSBuild Projects="WksCodeClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksDocumentClientProject">
+        <MSBuild Projects="WksDocumentClientProject.dproj"/>
+    </Target>
+    <Target Name="WksDocumentClientProject:Clean">
+        <MSBuild Projects="WksDocumentClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksDocumentClientProject:Make">
+        <MSBuild Projects="WksDocumentClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksFormClientProject">
+        <MSBuild Projects="WksFormClientProject.dproj"/>
+    </Target>
+    <Target Name="WksFormClientProject:Clean">
+        <MSBuild Projects="WksFormClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksFormClientProject:Make">
+        <MSBuild Projects="WksFormClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksInvoiceClientProject">
+        <MSBuild Projects="WksInvoiceClientProject.dproj"/>
+    </Target>
+    <Target Name="WksInvoiceClientProject:Clean">
+        <MSBuild Projects="WksInvoiceClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksInvoiceClientProject:Make">
+        <MSBuild Projects="WksInvoiceClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksPageClientProject">
+        <MSBuild Projects="WksPageClientProject.dproj"/>
+    </Target>
+    <Target Name="WksPageClientProject:Clean">
+        <MSBuild Projects="WksPageClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksPageClientProject:Make">
+        <MSBuild Projects="WksPageClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksReportClientProject">
+        <MSBuild Projects="WksReportClientProject.dproj"/>
+    </Target>
+    <Target Name="WksReportClientProject:Clean">
+        <MSBuild Projects="WksReportClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksReportClientProject:Make">
+        <MSBuild Projects="WksReportClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksSystemClientProject">
+        <MSBuild Projects="WksSystemClientProject.dproj"/>
+    </Target>
+    <Target Name="WksSystemClientProject:Clean">
+        <MSBuild Projects="WksSystemClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksSystemClientProject:Make">
+        <MSBuild Projects="WksSystemClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksTaskClientProject">
+        <MSBuild Projects="WksTaskClientProject.dproj"/>
+    </Target>
+    <Target Name="WksTaskClientProject:Clean">
+        <MSBuild Projects="WksTaskClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksTaskClientProject:Make">
+        <MSBuild Projects="WksTaskClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="WksBaseClientProject;WksXxxClientProject;WksPersonClientProject;WksOrganizationClientProject;WksMemberClientProject;WksAccountClientProject;WksAgentClientProject;WksCodeClientProject;WksDocumentClientProject;WksFormClientProject;WksInvoiceClientProject;WksPageClientProject;WksReportClientProject;WksSystemClientProject;WksTaskClientProject"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="WksBaseClientProject:Clean;WksXxxClientProject:Clean;WksPersonClientProject:Clean;WksOrganizationClientProject:Clean;WksMemberClientProject:Clean;WksAccountClientProject:Clean;WksAgentClientProject:Clean;WksCodeClientProject:Clean;WksDocumentClientProject:Clean;WksFormClientProject:Clean;WksInvoiceClientProject:Clean;WksPageClientProject:Clean;WksReportClientProject:Clean;WksSystemClientProject:Clean;WksTaskClientProject:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="WksBaseClientProject:Make;WksXxxClientProject:Make;WksPersonClientProject:Make;WksOrganizationClientProject:Make;WksMemberClientProject:Make;WksAccountClientProject:Make;WksAgentClientProject:Make;WksCodeClientProject:Make;WksDocumentClientProject:Make;WksFormClientProject:Make;WksInvoiceClientProject:Make;WksPageClientProject:Make;WksReportClientProject:Make;WksSystemClientProject:Make;WksTaskClientProject:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
