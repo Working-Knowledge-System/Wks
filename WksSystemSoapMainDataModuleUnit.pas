@@ -19,26 +19,28 @@ uses
 {$REGION 'Type'}
 type
   ISystemMainDataModule = interface(IAppServerSOAP)
-    ['{06F9DEAE-E322-48C9-A5C6-D0CA0383AA22}']
+    ['{EFD5B5DC-7F6F-4B22-BA56-A343E8AAE309}']
   end;
 
   TSystemMainDataModule = class(TSoapDataModule, ISystemMainDataModule, IAppServerSOAP, IAppServer)
     SystemADOConnection: TADOConnection;
-    ObjectADOTable: TADOTable;
-    ObjectDataSource: TDataSource;
-    ObjectDataSetProvider: TDataSetProvider;
     SystemADOTable: TADOTable;
     SystemDataSetProvider: TDataSetProvider;
-    LogADOQuery: TADOQuery;
+    ObjectADOTable: TADOTable;
+    ObjectDataSetProvider: TDataSetProvider;
+    ObjectDataSource: TDataSource;
     AuditADOQuery: TADOQuery;
-    LogDataSetProvider: TDataSetProvider;
     AuditDataSetProvider: TDataSetProvider;
-    ClientsDataSetProvider: TDataSetProvider;
-    ChangesDataSetProvider: TDataSetProvider;
-    ClientsADOTable: TADOTable;
-    ChangesADOTable: TADOTable;
-    ClientsDataSource: TDataSource;
-    ClientADOConnection: TADOConnection;
+    BinariesADOTable: TADOTable;
+    BinariesDataSetProvider: TDataSetProvider;
+    ObjADOTable: TADOTable;
+    ObjDataSetProvider: TDataSetProvider;
+    LogADOQuery: TADOQuery;
+    LogDataSetProvider: TDataSetProvider;
+    StateADOTable: TADOTable;
+    StateDataSetProvider: TDataSetProvider;
+    RequirementsADOTable: TADOTable;
+    RequirementsDataSetProvider: TDataSetProvider;
     procedure SoapDataModuleCreate(Sender: TObject);
   private
     { Private declarations }
@@ -60,15 +62,16 @@ uses
 {$REGION 'Routine'}
 procedure TWksSystemSoapMainDataModuleUnitCreateInstance(out obj: TObject);
 begin
- obj := TSystemMainDataModule.Create(nil);
+  obj := TSystemMainDataModule.Create(nil);
 end;
 {$ENDREGION}
 
 {$REGION 'TMainDataModule'}
 procedure TSystemMainDataModule.SoapDataModuleCreate(Sender: TObject);
 begin
+  if SystemADOConnection.Connected then
+    SystemADOConnection.Close;
   SystemADOConnection.ConnectionString := DBA_CONNECTION_STR;
-  ClientADOConnection.ConnectionString := DBA_CONNECTION_STR;
 end;
 {$ENDREGION}
 

@@ -1,134 +1,101 @@
 inherited CodeMainForm: TCodeMainForm
   Caption = 'CodeMainForm'
-  ClientHeight = 837
-  ClientWidth = 1180
-  ExplicitWidth = 1196
-  ExplicitHeight = 876
+  ClientHeight = 847
+  ClientWidth = 1580
+  ExplicitHeight = 885
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
-    Height = 588
+    Height = 601
     ExplicitHeight = 605
   end
   inherited RightJvNetscapeSplitter: TJvNetscapeSplitter
-    Left = 867
-    Height = 588
+    Left = 1270
+    Height = 601
     ExplicitLeft = 867
     ExplicitHeight = 605
   end
   inherited BottomJvNetscapeSplitter: TJvNetscapeSplitter
-    Top = 665
-    Width = 1180
+    Top = 675
+    Width = 1580
     ExplicitTop = 688
     ExplicitWidth = 1180
   end
   inherited TopPanel: TPanel
-    Width = 1174
-    ExplicitWidth = 1174
+    Width = 1580
     inherited TopPageControl: TPageControl
-      Width = 806
-      ActivePage = CodeTabSheet
-      ExplicitWidth = 802
-      inherited ClientTabSheet: TTabSheet
-        ExplicitWidth = 798
-      end
-      inherited ActionTabSheet: TTabSheet
-        ExplicitWidth = 798
-      end
-      inherited TopTextTabSheet: TTabSheet
-        ExplicitWidth = 798
-      end
-      inherited TopSearchTabSheet: TTabSheet
-        ExplicitWidth = 798
-      end
-      inherited TopUtilsTabSheet: TTabSheet
-        ExplicitWidth = 798
-      end
       object CodeTabSheet: TTabSheet
         Caption = 'Code'
         ImageIndex = 2
         object CodeToolBar: TToolBar
           Left = 0
           Top = 0
-          Width = 204
+          Width = 147
           Height = 44
           Align = alLeft
           AutoSize = True
           ButtonHeight = 46
-          ButtonWidth = 51
+          ButtonWidth = 49
           Caption = 'CodeToolBar'
           Images = CodeImageList24
           ShowCaptions = True
           TabOrder = 0
-          object CodeTestToolButton: TToolButton
-            Left = 0
-            Top = 0
-            Action = CodeTestAction
-          end
           object CodeSaveToolButton: TToolButton
-            Left = 51
+            Left = 0
             Top = 0
             Action = CodeSaveAction
           end
           object CodeSaveBranchToolButton: TToolButton
-            Left = 102
+            Left = 49
             Top = 0
             Action = CodeSaveBranchAction
           end
           object CodeRunToolButton: TToolButton
-            Left = 153
+            Left = 98
             Top = 0
             Action = CodeRunAction
           end
         end
       end
     end
-    inherited TopPageControl3: TPageControl
-      Left = 878
-      ExplicitLeft = 874
-    end
-    inherited TopPageControl2: TPageControl
-      Left = 806
-      ExplicitLeft = 802
-    end
   end
   inherited LeftPanel: TPanel
-    Height = 588
-    ExplicitHeight = 588
+    Height = 601
+    ExplicitHeight = 600
     inherited LeftPageControl: TPageControl
-      Height = 589
-      ExplicitHeight = 588
+      Height = 601
+      ExplicitHeight = 600
       inherited ObjectTreeTabSheet: TTabSheet
-        ExplicitHeight = 559
+        ExplicitHeight = 571
         inherited ObjectNodeInfoLabel: TLabel
-          Top = 544
-          ExplicitTop = 544
+          Top = 556
+          Width = 292
+          ExplicitTop = 556
         end
         inherited ObjectDTClientTree: TDTClientTree
-          Height = 519
-          ExplicitHeight = 519
+          Height = 531
+          ExplicitHeight = 531
         end
         inherited ObjectDBNavigator: TDBNavigator
           Hints.Strings = ()
         end
       end
+      inherited WordTabSheet: TTabSheet
+        ExplicitHeight = 571
+      end
     end
   end
   inherited BottomPanel: TPanel
-    Top = 675
-    Width = 1174
-    ExplicitTop = 676
-    ExplicitWidth = 1178
+    Top = 685
+    Width = 1580
+    ExplicitTop = 685
     inherited LogFrame: TLogFrame
-      Width = 1174
-      ExplicitWidth = 1178
+      Width = 1580
       inherited LogPageControl: TPageControl
-        Width = 1174
-        ExplicitWidth = 1174
+        Width = 1580
         inherited OutputTabSheet: TTabSheet
-          ExplicitWidth = 1166
+          ExplicitWidth = 1572
           inherited OutputRichEdit: TRichEdit
-            Width = 1164
-            ExplicitWidth = 1164
+            Width = 1570
           end
         end
         inherited SoapTabSheet: TTabSheet
@@ -160,24 +127,28 @@ inherited CodeMainForm: TCodeMainForm
     end
   end
   inherited RightPanel: TPanel
-    Left = 877
-    Height = 588
-    ExplicitLeft = 877
-    ExplicitHeight = 588
+    Left = 1280
+    Height = 601
+    ExplicitHeight = 600
     inherited RightPageControl: TPageControl
-      Height = 588
-      ExplicitHeight = 588
+      Height = 601
+      ExplicitHeight = 600
       inherited PropertyTabSheet: TTabSheet
-        ExplicitHeight = 558
+        ExplicitHeight = 571
         inherited ObjectJvScrollMax: TJvScrollMax
-          Height = 558
-          ExplicitHeight = 558
+          Height = 571
+          ExplicitHeight = 570
+          inherited ObjectImageJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectImageDBImage: TDBImage
+              Height = 0
+            end
+          end
           object CodeJvScrollMaxBand: TJvScrollMaxBand
             Width = 281
             Height = 21
             Expanded = False
             Caption = 'Code'
-            ExpandedHeight = 415
+            ExpandedHeight = 561
             ButtonFont.Charset = ANSI_CHARSET
             ButtonFont.Color = clWindowText
             ButtonFont.Height = -11
@@ -227,16 +198,25 @@ inherited CodeMainForm: TCodeMainForm
               Top = 253
               Width = 249
               Height = 15
+              Cursor = crHandPoint
+              Hint = 'Open the output directory'
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Output directory'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlue
+              Font.Height = -12
+              Font.Name = 'Segoe UI'
+              Font.Style = [fsUnderline]
+              ParentFont = False
+              OnClick = CodeOutputDirectoryLabelClick
               ExplicitWidth = 88
             end
             object CodeOutputFileNameLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 303
+              Top = 353
               Width = 249
               Height = 15
               Margins.Left = 16
@@ -248,7 +228,7 @@ inherited CodeMainForm: TCodeMainForm
             object CodeRunCommandLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 353
+              Top = 403
               Width = 249
               Height = 15
               Margins.Left = 16
@@ -268,6 +248,41 @@ inherited CodeMainForm: TCodeMainForm
               Align = alTop
               Caption = 'Output to'
               ExplicitWidth = 52
+            end
+            object CodeOutputProdDirectoryDBEditLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 303
+              Width = 249
+              Height = 15
+              Cursor = crHandPoint
+              Hint = 'Open the output PROD directory'
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Output PROD directory'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlue
+              Font.Height = -12
+              Font.Name = 'Segoe UI'
+              Font.Style = [fsUnderline]
+              ParentFont = False
+              OnClick = CodeOutputProdDirectoryDBEditLabelClick
+              ExplicitWidth = 122
+            end
+            object CodeOutputProdDirectorySaveDBEditLabel: TLabel
+              Left = 240
+              Top = 303
+              Width = 24
+              Height = 15
+              Caption = 'Save'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlue
+              Font.Height = -12
+              Font.Name = 'Segoe UI'
+              Font.Style = [fsUnderline]
+              ParentFont = False
+              OnClick = CodeOutputProdDirectorySaveDBEditLabelClick
             end
             object CodeObjectIdDBEdit: TDBEdit
               AlignWithMargins = True
@@ -365,7 +380,7 @@ inherited CodeMainForm: TCodeMainForm
             object CodeOutputFileNameDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 324
+              Top = 374
               Width = 249
               Height = 23
               Hint = 'Page'
@@ -381,7 +396,7 @@ inherited CodeMainForm: TCodeMainForm
             object CodeRunCommandDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 374
+              Top = 424
               Width = 249
               Height = 23
               Hint = 'Page'
@@ -414,21 +429,94 @@ inherited CodeMainForm: TCodeMainForm
               ShowHint = True
               TabOrder = 7
             end
+            object CodeHeaderAndFooterOffDBCheckBox: TDBCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 481
+              Width = 249
+              Height = 17
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Header and Footer off'
+              DataField = 'FldHeaderAndFooterOff'
+              DataSource = CodeDataSource
+              TabOrder = 8
+            end
+            object CodeCommentRemoveDBCheckBox: TDBCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 504
+              Width = 249
+              Height = 17
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Comments remove'
+              DataField = 'FldCommentRemove'
+              DataSource = CodeDataSource
+              TabOrder = 9
+            end
+            object CodeLinesEmptyRemoveDBCheckBox: TDBCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 527
+              Width = 249
+              Height = 17
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Empty lines remove'
+              DataField = 'FldLinesEmptyRemove'
+              DataSource = CodeDataSource
+              TabOrder = 10
+            end
+            object CodeOutputProdDirectoryDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 324
+              Width = 249
+              Height = 23
+              Hint = 'Page'
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldOutputProdDirectory'
+              DataSource = CodeDataSource
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 11
+            end
+            object CodeDescriptionBlockAddDBCheckBox: TDBCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 458
+              Width = 249
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 8
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Add Description block'
+              DataField = 'FldDescriptionBlockAdd'
+              DataSource = CodeDataSource
+              TabOrder = 12
+            end
           end
         end
       end
       inherited SearchTabSheet: TTabSheet
-        ExplicitHeight = 558
+        ExplicitHeight = 571
         inherited SearchResultListBox: TListBox
-          Height = 421
-          ExplicitHeight = 421
+          Height = 434
+          ExplicitHeight = 434
         end
       end
       inherited OptionTabSheet: TTabSheet
-        ExplicitHeight = 558
+        ExplicitHeight = 571
         inherited OptionJvScrollMax: TJvScrollMax
-          Height = 558
-          ExplicitHeight = 558
+          Height = 571
+          ExplicitHeight = 571
           object OptionCodeJvScrollMaxBand: TJvScrollMaxBand
             Width = 286
             Height = 92
@@ -472,43 +560,90 @@ inherited CodeMainForm: TCodeMainForm
     end
   end
   inherited StatusBar: TStatusBar
-    Top = 815
-    Width = 1174
-    ExplicitTop = 816
-    ExplicitWidth = 1178
+    Top = 825
+    Width = 1574
+    ExplicitTop = 824
   end
   inherited MainPanel: TPanel
-    Height = 588
-    ExplicitHeight = 588
+    Height = 601
+    ExplicitHeight = 600
     inherited MainPageControl: TPageControl
-      Height = 589
-      ExplicitHeight = 588
-      inherited ContentPrevTabSheet: TTabSheet
-        ExplicitHeight = 559
+      Height = 601
+      ExplicitHeight = 600
+      inherited ObjectContentPrevTabSheet: TTabSheet
+        ExplicitHeight = 571
         inherited ObjectContentPrevDBSynEdit: TDBSynEdit
-          Height = 531
-          ExplicitHeight = 531
+          Height = 543
+          ExplicitHeight = 543
+        end
+        inherited ObjectContentPrevTopPanel: TPanel
+          inherited ObjectContentPrevCharCountLabel: TLabel
+            Height = 22
+          end
         end
       end
-      inherited ContentTabSheet: TTabSheet
-        ExplicitHeight = 559
-        inherited ObjectContentDBSynEdit: TDBSynEdit
-          Height = 531
-          ExplicitHeight = 530
+      inherited ObjectContentTabSheet: TTabSheet
+        ExplicitHeight = 571
+        inherited ObjectContentSplitter: TSplitter
+          Height = 543
+          ExplicitHeight = 543
+        end
+        inherited ObjectContentTopPanel: TPanel
+          inherited ObjectContentCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+        inherited ObjectContentSplitView: TSplitView
+          Height = 543
+          ExplicitHeight = 542
+          inherited ObjectContentEdgeBrowser: TEdgeBrowser
+            Height = 543
+            ExplicitHeight = 542
+          end
+        end
+        inherited ObjectContentLeftPanel: TPanel
+          Height = 543
+          ExplicitHeight = 542
+          inherited ObjectContentDBSynEdit: TDBSynEdit
+            Height = 435
+            ExplicitHeight = 434
+          end
         end
       end
-      inherited JsonTabSheet: TTabSheet
-        ExplicitHeight = 559
+      inherited ObjectDataTabSheet: TTabSheet
+        ExplicitHeight = 571
         inherited ObjectDataDBSynEdit: TDBSynEdit
-          Height = 531
-          ExplicitHeight = 531
+          Height = 543
+          ExplicitHeight = 543
+        end
+        inherited ObjectDataTopPanel: TPanel
+          inherited ObjectDataCharCountLabel: TLabel
+            Height = 22
+          end
         end
       end
-      inherited NoteTabSheet: TTabSheet
-        ExplicitHeight = 559
+      inherited ObjectNoteTabSheet: TTabSheet
+        ExplicitHeight = 571
         inherited ObjectNoteDBSynEdit: TDBSynEdit
-          Height = 531
-          ExplicitHeight = 531
+          Height = 543
+          ExplicitHeight = 543
+        end
+        inherited ObjectNoteTopPanel: TPanel
+          inherited ObjectNoteCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited FilesRioTabSheet: TTabSheet
+        ExplicitHeight = 571
+        inherited FilesRioTopPanel: TPanel
+          inherited FilesRioInfoLabel: TLabel
+            Height = 31
+          end
+        end
+        inherited FilesRioTree: TVirtualStringTree
+          Height = 525
+          ExplicitHeight = 525
         end
       end
     end
@@ -538,8 +673,8 @@ inherited CodeMainForm: TCodeMainForm
     ColorDepth = cd32Bit
     Height = 24
     Width = 24
-    Left = 360
-    Top = 432
+    Left = 376
+    Top = 544
     Bitmap = {
       494C010103000800040018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024
@@ -847,26 +982,27 @@ inherited CodeMainForm: TCodeMainForm
   end
   object CodeAction: TActionList [27]
     Images = CodeImageList24
-    Left = 568
-    Top = 432
-    object CodeTestAction: TAction
-      Caption = '    Test    '
-      ImageIndex = 0
-      OnExecute = CodeTestActionExecute
-    end
+    Left = 584
+    Top = 544
     object CodeSaveAction: TAction
       Caption = '   Save   '
+      Hint = 'Save current object to the Destination Directory'
       ImageIndex = 1
       OnExecute = CodeSaveActionExecute
     end
     object CodeSaveBranchAction: TAction
       Caption = 'Branch'
-      Hint = 'Save in a single fille all selected branch'
+      Hint = 
+        'Save all objects down in the current branch to a single file int' +
+        'o the Destination Directory'
       ImageIndex = 1
       OnExecute = CodeSaveBranchActionExecute
     end
     object CodeRunAction: TAction
       Caption = 'Run'
+      Hint = 
+        'Execute the code of the current object invoking a convenient com' +
+        'piler or runtime'
       ImageIndex = 2
       OnExecute = CodeRunActionExecute
     end

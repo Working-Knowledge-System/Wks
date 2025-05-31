@@ -1,27 +1,20 @@
 inherited XxxMainForm: TXxxMainForm
   Caption = 'XxxMainForm'
-  ClientHeight = 838
-  ExplicitHeight = 876
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
-    Height = 589
     ExplicitHeight = 605
   end
   inherited RightJvNetscapeSplitter: TJvNetscapeSplitter
-    Height = 589
     ExplicitLeft = 867
     ExplicitHeight = 605
   end
   inherited BottomJvNetscapeSplitter: TJvNetscapeSplitter
-    Top = 666
     ExplicitLeft = -8
     ExplicitTop = 771
     ExplicitWidth = 1208
   end
   inherited TopPanel: TPanel
-    ExplicitWidth = 1182
     inherited TopPageControl: TPageControl
-      ExplicitWidth = 810
       object XxxTabSheet: TTabSheet
         Caption = 'Xxx'
         ImageIndex = 2
@@ -46,28 +39,10 @@ inherited XxxMainForm: TXxxMainForm
         end
       end
     end
-    inherited TopPageControl3: TPageControl
-      ExplicitLeft = 882
-    end
-    inherited TopPageControl2: TPageControl
-      ExplicitLeft = 810
-    end
   end
   inherited LeftPanel: TPanel
-    Height = 589
-    ExplicitHeight = 588
     inherited LeftPageControl: TPageControl
-      Height = 589
-      ExplicitHeight = 588
       inherited ObjectTreeTabSheet: TTabSheet
-        ExplicitHeight = 559
-        inherited ObjectNodeInfoLabel: TLabel
-          Top = 544
-        end
-        inherited ObjectDTClientTree: TDTClientTree
-          Height = 519
-          ExplicitHeight = 519
-        end
         inherited ObjectDBNavigator: TDBNavigator
           Hints.Strings = ()
         end
@@ -75,18 +50,8 @@ inherited XxxMainForm: TXxxMainForm
     end
   end
   inherited BottomPanel: TPanel
-    Top = 676
-    ExplicitTop = 675
-    ExplicitWidth = 1182
     inherited LogFrame: TLogFrame
-      ExplicitWidth = 1182
       inherited LogPageControl: TPageControl
-        ExplicitWidth = 1182
-        inherited OutputTabSheet: TTabSheet
-          inherited OutputRichEdit: TRichEdit
-            ExplicitWidth = 1172
-          end
-        end
         inherited SoapTabSheet: TTabSheet
           inherited SoapGridPanel: TGridPanel
             ControlCollection = <
@@ -116,17 +81,10 @@ inherited XxxMainForm: TXxxMainForm
     end
   end
   inherited RightPanel: TPanel
-    Height = 589
-    ExplicitLeft = 885
-    ExplicitHeight = 588
     inherited RightPageControl: TPageControl
-      Height = 589
-      ExplicitHeight = 588
       inherited PropertyTabSheet: TTabSheet
-        ExplicitHeight = 559
         inherited ObjectJvScrollMax: TJvScrollMax
-          Height = 559
-          ExplicitHeight = 558
+          ExplicitHeight = 569
           object XxxJvScrollMaxBand: TJvScrollMaxBand
             Width = 281
             Height = 21
@@ -287,59 +245,22 @@ inherited XxxMainForm: TXxxMainForm
           end
         end
       end
-      inherited SearchTabSheet: TTabSheet
-        ExplicitHeight = 559
-        inherited SearchResultListBox: TListBox
-          Height = 422
-          ExplicitHeight = 422
-        end
-      end
       inherited OptionTabSheet: TTabSheet
-        ExplicitHeight = 559
         inherited OptionJvScrollMax: TJvScrollMax
-          Height = 559
-          ExplicitHeight = 559
+          ExplicitHeight = 570
         end
       end
     end
   end
   inherited StatusBar: TStatusBar
-    Top = 816
-    ExplicitTop = 815
-    ExplicitWidth = 1182
+    ExplicitTop = 823
+    ExplicitWidth = 1728
   end
   inherited MainPanel: TPanel
-    Height = 589
-    ExplicitHeight = 588
     inherited MainPageControl: TPageControl
-      Height = 589
-      ExplicitHeight = 588
-      inherited ContentPrevTabSheet: TTabSheet
-        ExplicitHeight = 559
-        inherited ObjectContentPrevDBSynEdit: TDBSynEdit
-          Height = 532
-          ExplicitHeight = 532
-        end
-      end
-      inherited ContentTabSheet: TTabSheet
-        ExplicitHeight = 559
-        inherited ObjectContentDBSynEdit: TDBSynEdit
-          Height = 531
-          ExplicitHeight = 530
-        end
-      end
-      inherited JsonTabSheet: TTabSheet
-        ExplicitHeight = 559
-        inherited ObjectDataDBSynEdit: TDBSynEdit
-          Height = 532
-          ExplicitHeight = 532
-        end
-      end
-      inherited NoteTabSheet: TTabSheet
-        ExplicitHeight = 559
-        inherited ObjectNoteDBSynEdit: TDBSynEdit
-          Height = 532
-          ExplicitHeight = 532
+      inherited ObjectContentTabSheet: TTabSheet
+        inherited ObjectContentSplitter: TSplitter
+          ExplicitHeight = 536
         end
       end
     end
@@ -369,8 +290,8 @@ inherited XxxMainForm: TXxxMainForm
     ColorDepth = cd32Bit
     Height = 24
     Width = 24
-    Left = 360
-    Top = 376
+    Left = 376
+    Top = 544
     Bitmap = {
       494C010101000800040018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024
@@ -678,10 +599,11 @@ inherited XxxMainForm: TXxxMainForm
   end
   object XxxAction: TActionList [28]
     Images = XxxImageList24
-    Left = 568
-    Top = 376
+    Left = 584
+    Top = 544
     object XxxTestAction: TAction
       Caption = '    Test    '
+      Hint = 'Just a test'
       ImageIndex = 0
       OnExecute = XxxTestActionExecute
     end

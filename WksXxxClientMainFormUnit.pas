@@ -6,6 +6,8 @@ interface
 uses
     Winapi.Windows
   , Winapi.Messages
+  , Winapi.ActiveX
+  , Winapi.WebView2
   , System.Actions
   , System.Classes
   , System.ImageList
@@ -26,6 +28,8 @@ uses
   , Vcl.Menus
   , Vcl.StdCtrls
   , Vcl.ToolWin
+  , Vcl.Edge
+  , Vcl.WinXCtrls
   , Data.DB
   , Datasnap.DBClient
   , Soap.SOAPConn
@@ -77,7 +81,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
-    procedure PostActionExecute(Sender: TObject);
+    procedure ActionPostActionExecute(Sender: TObject);
     procedure XxxClientDataSetAfterDelete(DataSet: TDataSet);
     procedure XxxClientDataSetAfterInsert(DataSet: TDataSet);
     procedure XxxClientDataSetAfterPost(DataSet: TDataSet);
@@ -85,6 +89,8 @@ type
     procedure XxxTestActionExecute(Sender: TObject);
   private
     { Private declarations }
+    // winmessages
+    procedure WmFormAfterShow(var Msg: TMessage); message WM_AFTER_SHOW; // thiggered also from the baseform
   public
     { Public declarations }
   end;
@@ -132,6 +138,12 @@ begin
 
 end;
 
+procedure TXxxMainForm.WmFormAfterShow(var Msg: TMessage);
+begin
+  // code here will be executed after formshow event happened in the baseform
+//ShowMessage('WM_AFTER_SHOW message received 2nd !');
+end;
+
 procedure TXxxMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   inherited;
@@ -144,11 +156,11 @@ end;
 {$ENDREGION}
 
 {$REGION 'Actions'}
-procedure TXxxMainForm.PostActionExecute(Sender: TObject);
+procedure TXxxMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // ... continue from ancestor
+  // detail
   if XxxClientDataSet.State = dsEdit then
     XxxDBNavigator.BtnClick(nbPost);
 end;

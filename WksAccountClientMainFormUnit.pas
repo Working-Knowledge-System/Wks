@@ -4,15 +4,55 @@ interface
 
 {$REGION 'Uses'}
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, WksBaseClientMainFormUnit, Data.DB,
-  Datasnap.DBClient, Soap.SOAPConn, System.Actions, Vcl.ActnList,
-  System.ImageList, Vcl.ImgList, Vcl.Buttons, SynEdit, SynDBEdit, Vcl.ComCtrls,
-  Vcl.StdCtrls, JvExMask, JvSpin, JvExComCtrls, JvDateTimePicker, Vcl.DBCtrls,
-  Vcl.Mask, Vcl.ExtCtrls, JvExControls, JvScrollMax, JvExExtCtrls,
-  JvExtComponent, WksLogFrameUnit, VirtualTrees, DTDBTreeView, DTClientTree,
-  Vcl.ToolWin, JvNetscapeSplitter, JvComponentBase, JvThreadTimer, Vcl.AppEvnts,
-  JvClock, Vcl.Menus;
+    Winapi.Windows
+  , Winapi.Messages
+  , Winapi.WebView2
+  , Winapi.ActiveX
+  , System.Actions
+  , System.Classes
+  , System.ImageList
+  , System.SysUtils
+  , System.Variants
+  , Vcl.ActnList
+  , Vcl.AppEvnts
+  , Vcl.Buttons
+  , Vcl.ComCtrls
+  , Vcl.Controls
+  , Vcl.DBCtrls
+  , Vcl.Dialogs
+  , Vcl.ExtCtrls
+  , Vcl.Forms
+  , Vcl.Graphics
+  , Vcl.ImgList
+  , Vcl.Mask
+  , Vcl.Menus
+  , Vcl.StdCtrls
+  , Vcl.ToolWin
+  , Vcl.WinXCtrls
+  , Vcl.Edge
+  , Data.DB
+  , Datasnap.DBClient
+  , JvClock
+  , JvComponentBase
+  , JvDateTimePicker
+  , JvExComCtrls
+  , JvExControls
+  , JvExExtCtrls
+  , JvExMask
+  , JvExtComponent
+  , JvNetscapeSplitter
+  , JvScrollMax
+  , JvSpin
+  , JvThreadTimer
+  , Soap.SOAPConn
+  , SynDBEdit
+  , SynEdit
+  , VirtualTrees
+  , DTClientTree
+  , DTDBTreeView
+  , WksBaseClientMainFormUnit
+  , WksLogFrameUnit
+  ;
 {$ENDREGION}
 
 {$REGION 'Type'}
@@ -40,20 +80,21 @@ type
     AccountSecureResponseDBEdit: TDBEdit;
     AccountSecureResponseLabel: TLabel;
     AccountSecurityJvScrollMaxBand: TJvScrollMaxBand;
-    AccountTabSheet: TTabSheet;
-    AccountTestAction: TAction;
-    AccountTestToolButton: TToolButton;
-    AccountToolBar: TToolBar;
     AccountUsernameDBEdit: TDBEdit;
     AccountUsernameLabel: TLabel;
+    AccountPasswordGenerateLabel: TLabel;
     procedure FormCreate(Sender: TObject);
-    procedure PostActionExecute(Sender: TObject);
+    procedure ActionPostActionExecute(Sender: TObject);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
     procedure AccountClientDataSetAfterPost(DataSet: TDataSet);
     procedure AccountClientDataSetReconcileError(DataSet: TCustomClientDataSet; E: EReconcileError; UpdateKind: TUpdateKind; var Action: TReconcileAction);
     procedure AccountClientDataSetAfterInsert(DataSet: TDataSet);
     procedure AccountClientDataSetAfterDelete(DataSet: TDataSet);
-    procedure AccountTestActionExecute(Sender: TObject);
+    procedure AccountEmailLabelClick(Sender: TObject);
+    procedure AccountPasswordLabelClick(Sender: TObject);
+    procedure AccountUsernameLabelClick(Sender: TObject);
+    procedure AccountLoginHookLabelClick(Sender: TObject);
+    procedure AccountPasswordGenerateLabelClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -77,6 +118,7 @@ uses
   , System.Types
   , Vcl.RecError // reconcileerrors
   , Wks000Unit
+  //, WksPasswordGenFormUnit
   ;
 {$ENDREGION}
 
@@ -88,7 +130,6 @@ begin
   inherited;
 
   {$REGION 'gui'}
-//AccountTestToolButton.Visible := false
   {$ENDREGION}
 
   {$REGION 'property'}
@@ -101,11 +142,11 @@ end;
 {$ENDREGION}
 
 {$REGION 'Actions'}
-procedure TAccountMainForm.PostActionExecute(Sender: TObject);
+procedure TAccountMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // ... continue from ancestor
+  // detail
   if AccountClientDataSet.State = dsEdit then
     AccountDBNavigator.BtnClick(nbPost);
 end;
@@ -139,12 +180,55 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION 'AccountActions'}
-procedure TAccountMainForm.AccountTestActionExecute(Sender: TObject);
+{$REGION 'Property'}
+procedure TAccountMainForm.AccountEmailLabelClick(Sender: TObject);
 begin
   inherited;
 
-  TMesRec.NI;
+  LogFrame.LogOne(TClpRec.ClpCopy(AccountEmailDBEdit.Text));
+end;
+
+procedure TAccountMainForm.AccountUsernameLabelClick(Sender: TObject);
+begin
+  inherited;
+
+  LogFrame.LogOne(TClpRec.ClpCopy(AccountUsernameDBEdit.Text));
+end;
+
+procedure TAccountMainForm.AccountPasswordLabelClick(Sender: TObject);
+begin
+  inherited;
+
+  LogFrame.LogOne(TClpRec.ClpCopy(AccountPasswordDBEdit.Text));
+end;
+
+procedure TAccountMainForm.AccountPasswordGenerateLabelClick(Sender: TObject);
+var
+  pwd: string;
+begin
+  inherited;
+
+  // generate
+//  if not WksPasswordGenFormUnit.TPasswordGenForm.Execute(pwd) then
+    Exit;
+
+  // confirm
+  if TAskRec.No('Set this password:   %s   ?'
+    + sLineBreak + ''
+    + sLineBreak + 'WARNING: the current one will be replaced and losted !', [pwd]) then
+    Exit;
+
+  // set
+  AccountClientDataSet.Edit;
+  AccountClientDataSet.FieldByName('FldPassword' ).AsString := pwd;
+  AccountClientDataSet.Post;
+end;
+
+procedure TAccountMainForm.AccountLoginHookLabelClick(Sender: TObject);
+begin
+  inherited;
+
+  LogFrame.LogOne(TClpRec.ClpCopy(AccountLoginHookDBEdit.Text));
 end;
 {$ENDREGION}
 

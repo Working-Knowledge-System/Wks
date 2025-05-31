@@ -14,35 +14,52 @@ uses
   Vcl.ToolWin, JvNetscapeSplitter, Vcl.Grids, Vcl.DBGrids, JvExDBGrids,
   JvDBGrid, JvDBUltimGrid, JvComponentBase, JvThreadTimer, Vcl.AppEvnts, JvClock,
   IdSysLogMessage, IdSocketHandle, IdBaseComponent, IdComponent, IdUDPBase,
-  IdUDPServer, IdSysLogServer, Vcl.Menus;
+  IdUDPServer, IdSysLogServer, Vcl.Menus, Winapi.WebView2, Winapi.ActiveX,
+  Vcl.Edge, Vcl.WinXCtrls;
 {$ENDREGION}
 
 {$REGION 'Type'}
 type
   TSystemMainForm = class(TBaseMainForm)
-    SystemSyslogIdSyslogServer: TIdSyslogServer;
     AuditClientDataSet: TClientDataSet;
     AuditCountLabel: TLabel;
     AuditDataSource: TDataSource;
     AuditJvDBUltimGrid: TJvDBUltimGrid;
     AuditRefreshSpeedButton: TSpeedButton;
-    AuditTabSheet: TTabSheet;
     AuditTopPanel: TPanel;
-    DbLogTabSheet: TTabSheet;
+    BinariesClientDataSet: TClientDataSet;
+    BinariesCountLabel: TLabel;
+    BinariesDataSource: TDataSource;
+    BinariesDescriptionDBMemo: TDBMemo;
+    BinariesDescriptionTabSheet: TTabSheet;
+    BinariesJvDBUltimGrid: TJvDBUltimGrid;
+    BinariesNoteDBMemo: TDBMemo;
+    BinariesNoteTabSheet: TTabSheet;
+    BinariesPanel: TPanel;
+    BinariesAction: TActionList;
+    BinariesClientDeployAction: TAction;
+    BinariesClientDeployToolButton: TToolButton;
+    BinariesImageList: TImageList;
+    BinariesServerDeployAction: TAction;
+    BinariesServerDeployToolButton: TToolButton;
+    BinariesServiceDeployAction: TAction;
+    BinariesToolBar: TToolBar;
     LogClientDataSet: TClientDataSet;
     LogCountLabel: TLabel;
     LogDataSource: TDataSource;
     LogJvDBUltimGrid: TJvDBUltimGrid;
     LogRefreshSpeedButton: TSpeedButton;
     LogTopPanel: TPanel;
+    PageControl1: TPageControl;
     SysLogLabel: TLabel;
     SysLogPanel: TPanel;
-    SysLogTabSheet: TTabSheet;
-    SystemSyslogRichEdit: TRichEdit;
     SystemAction: TActionList;
+    SystemAuditTabSheet: TTabSheet;
+    SystemBinariesTabSheet: TTabSheet;
     SystemClientDataSet: TClientDataSet;
     SystemDBNavigator: TDBNavigator;
     SystemDataSource: TDataSource;
+    SystemDbLogTabSheet: TTabSheet;
     SystemDbaBackupDdlAction: TAction;
     SystemDbaBackupDdlToolButton: TToolButton;
     SystemDbaCreateDdlAction: TAction;
@@ -57,71 +74,36 @@ type
     SystemJvScrollMaxBand: TJvScrollMaxBand;
     SystemObjectIdDBEdit: TDBEdit;
     SystemObjectIdLabel: TLabel;
+    SystemSysLogTabSheet: TTabSheet;
+    SystemSyslogAction: TActionList;
+    SystemSyslogCleanAction: TAction;
+    SystemSyslogCleanSpeedButton: TSpeedButton;
+    SystemSyslogIdSyslogServer: TIdSyslogServer;
+    SystemSyslogImageList: TImageList;
+    SystemSyslogRichEdit: TRichEdit;
+    SystemSyslogStartAction: TAction;
+    SystemSyslogStartSpeedButton: TSpeedButton;
     SystemTabSheet: TTabSheet;
-    SystemTestAction: TAction;
-    SystemTestToolButton: TToolButton;
     SystemToolBar: TToolBar;
     SystemValue1DBEdit: TDBEdit;
     SystemValue1Label: TLabel;
     SystemValue2DBEdit: TDBEdit;
     SystemValue2Label: TLabel;
-    TopServiceTabSheet: TTabSheet;
-    TopServiceLabel: TLabel;
     TopServiceComboBox: TComboBox;
-    TopServiceInstallButton: TButton;
-    TopServiceUninstallButton: TButton;
-    TopServicePauseButton: TButton;
     TopServiceContinueButton: TButton;
+    TopServiceInstallButton: TButton;
+    TopServiceLabel: TLabel;
+    TopServicePauseButton: TButton;
     TopServiceStartButton: TButton;
     TopServiceStopButton: TButton;
-    SystemSyslogImageList: TImageList;
-    SystemSyslogAction: TActionList;
-    SystemSyslogStartAction: TAction;
-    SystemSyslogCleanAction: TAction;
-    SystemSyslogStartSpeedButton: TSpeedButton;
-    SystemSyslogCleanSpeedButton: TSpeedButton;
-    TopDeployTabSheet: TTabSheet;
-    DeployToolBar: TToolBar;
-    DeployClientsToolButton: TToolButton;
-    DeployImageList: TImageList;
-    DeployAction: TActionList;
-    DeployClientsAction: TAction;
-    DeployServersToolButton: TToolButton;
-    DeployServersAction: TAction;
-    DeployServicesAction: TAction;
-    ClientsTabSheet: TTabSheet;
-    ClientsClientDataSet: TClientDataSet;
-    ClientsDataSource: TDataSource;
-    ClientsPanel: TPanel;
-    ClientsCountLabel: TLabel;
-    ClientsRefreshSpeedButton: TSpeedButton;
-    ClientsJvDBUltimGrid: TJvDBUltimGrid;
-    ClientsJvScrollMaxBand: TJvScrollMaxBand;
-    ClientsObjectLabel: TLabel;
-    ClientsObjectDBEdit: TDBEdit;
-    ClientsDBNavigator: TDBNavigator;
-    ClientsClientDBEdit: TDBEdit;
-    ClientsClientLabel: TLabel;
-    ClientsOsDBComboBox: TDBComboBox;
-    ClientsOsLabel: TLabel;
-    ClientsImageUrlLabel: TLabel;
-    ClientsImageUrlDBEdit: TDBEdit;
-    ClientsDownloadDBCheckBox: TDBCheckBox;
-    ClientsDeployDBCheckBox: TDBCheckBox;
-    ClientsStateLabel: TLabel;
-    ClientsStateDBComboBox: TDBComboBox;
-    PageControl1: TPageControl;
-    ClientsDescriptionTabSheet: TTabSheet;
-    ClientsOverviewTabSheet: TTabSheet;
-    ClientsNoteTabSheet: TTabSheet;
-    ClientsMessageWhenInactiveTabSheet: TTabSheet;
-    ClientsMessageWhenInactiveDBMemo: TDBMemo;
-    ClientsNoteDBMemo: TDBMemo;
-    ClientsOverviewDBMemo: TDBMemo;
-    ClientsDescriptionDBMemo: TDBMemo;
+    TopServiceTabSheet: TTabSheet;
+    TopServiceUninstallButton: TButton;
+    Splitter1: TSplitter;
+    BinariesServiceToolButton: TToolButton;
+    BinariesDBNavigator: TDBNavigator;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure PostActionExecute(Sender: TObject);
+    procedure ActionPostActionExecute(Sender: TObject);
     procedure SystemSyslogIdSyslogServerSyslog(Sender: TObject; ASysLogMessage: TIdSysLogMessage; ABinding: TIdSocketHandle);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
     procedure AuditClientDataSetAfterRefresh(DataSet: TDataSet);
@@ -138,7 +120,6 @@ type
     procedure SystemDbaDefinitionRebuildActionExecute(Sender: TObject);
     procedure SystemDbaDeleteDdlActionExecute(Sender: TObject);
     procedure SystemDbaRestoreDdlActionExecute(Sender: TObject);
-    procedure SystemTestActionExecute(Sender: TObject);
     procedure TopServiceInstallButtonClick(Sender: TObject);
     procedure TopServiceContinueButtonClick(Sender: TObject);
     procedure TopServiceUninstallButtonClick(Sender: TObject);
@@ -146,11 +127,11 @@ type
     procedure TopServiceStopButtonClick(Sender: TObject);
     procedure SystemSyslogStartActionExecute(Sender: TObject);
     procedure SystemSyslogCleanActionExecute(Sender: TObject);
-    procedure DeployClientsActionExecute(Sender: TObject);
-    procedure DeployServersActionExecute(Sender: TObject);
-    procedure DeployServicesActionExecute(Sender: TObject);
-    procedure ClientsRefreshSpeedButtonClick(Sender: TObject);
-    procedure ClientsClientDataSetAfterRefresh(DataSet: TDataSet);
+    procedure BinariesClientDeployActionExecute(Sender: TObject);
+    procedure BinariesServerDeployActionExecute(Sender: TObject);
+    procedure BinariesServiceDeployActionExecute(Sender: TObject);
+    procedure BinariesClientDataSetAfterRefresh(DataSet: TDataSet);
+    procedure MainPanelClick(Sender: TObject);
   private
     { Private declarations }
     FSyslogCount: integer;
@@ -229,7 +210,6 @@ begin
   inherited;
 
   {$REGION 'gui'}
-//SystemTestToolButton.Visible := false;
   TopServiceComboBox.ItemIndex := 0;
   {$ENDREGION}
 
@@ -255,11 +235,11 @@ end;
 {$ENDREGION}
 
 {$REGION 'Actions'}
-procedure TSystemMainForm.PostActionExecute(Sender: TObject);
+procedure TSystemMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // ... continue from ancestor
+  // detail
   if SystemClientDataSet.State = dsEdit then
     SystemDBNavigator.BtnClick(nbPost);
 end;
@@ -353,13 +333,6 @@ end;
 {$ENDREGION}
 
 {$REGION 'SystemAction'}
-procedure TSystemMainForm.SystemTestActionExecute(Sender: TObject);
-begin
-  inherited;
-
-  TMesRec.NI;
-end;
-
 procedure TSystemMainForm.SystemDbaDefinitionRebuildActionExecute(Sender: TObject);
 var
 //bol: boolean;
@@ -501,15 +474,15 @@ begin
 
   // logdetails
   {
-  SyslogRichEdit.Lines.Add(r);                              // <14>Nov  8 15:42:35 AIWYMSDEV YmsWafermarkDualProject[3312]: tick...
-  SyslogRichEdit.Lines.Add(h);                              // AIWYMSDEV
+  SyslogRichEdit.Lines.Add(r);                              // <14>Nov  8 15:42:35 www.wks.cloud WksWafermarkDualProject[3312]: tick...
+  SyslogRichEdit.Lines.Add(h);                              // www.wks.cloud
   SyslogRichEdit.Lines.Add(p);                              // 10.176.66.8
   SyslogRichEdit.Lines.Add(DateTimeToStr(t));               // 11/8/2022 3:42:35 PM
   SyslogRichEdit.Lines.Add(TEnumConverter.EnumToString(f)); // sfUserLevel
   SyslogRichEdit.Lines.Add(TEnumConverter.EnumToString(s)); // slInformational
   SyslogRichEdit.Lines.Add(a.ToString);                     // -1
-  SyslogRichEdit.Lines.Add(e);                              // YmsWafermarkDualProject[3312]: Z:\
-  SyslogRichEdit.Lines.Add(x);                              // YmsWafermarkDualProject
+  SyslogRichEdit.Lines.Add(e);                              // WksWafermarkDualProject[3312]: Z:\
+  SyslogRichEdit.Lines.Add(x);                              // WksWafermarkDualProject
   SyslogRichEdit.Lines.Add(i.ToString);                     // 3312
   SyslogRichEdit.Lines.Add(c);                              // tick...
   }
@@ -521,7 +494,7 @@ procedure TSystemMainForm.LogClientDataSetAfterRefresh(DataSet: TDataSet);
 begin
   inherited;
 
-  TGriRec.GriFix(LogJvDBUltimGrid);
+  TGriRec.GriFit(LogJvDBUltimGrid);
   LogCountLabel.Caption := Format('%d logs', [DataSet.RecordCount]);
 end;
 
@@ -531,126 +504,12 @@ begin
 
   LogClientDataSet.Refresh;
 end;
-{$ENDREGION}
-
-{$REGION 'Deploy'}
-procedure TSystemMainForm.DeployClientsActionExecute(Sender: TObject);
-const
-  ZIP_TARGET_PATH = 'C:\$\X\Zip';
-var
-  dst: TDataset;
-  sql, cli, ver, osb, fna, fs0, fs1, fs2, fs3, fsp, zfs: string;
+procedure TSystemMainForm.MainPanelClick(Sender: TObject);
 begin
   inherited;
 
-  // log
-  LogFrame.LogShow;
-
-  // clientsget
-  sql :=         'with TblA as (select'
-  + sLineBreak + '    FldClient'
-  + sLineBreak + '  , max(b.FldVersion) as FldVersion'
-  + sLineBreak + '  , FldDateTime'
-  + sLineBreak + '  , FldChange'
-  + sLineBreak + '  , FldState'
-  + sLineBreak + '  , FldMessageWhenInactive'
-  + sLineBreak + 'from'
-  + sLineBreak + '    DbaClient.dbo.TblChange b'
-  + sLineBreak + 'where'
-  + sLineBreak + '    FldState = ''Active'''
-  + sLineBreak + 'group by'
-  + sLineBreak + '    FldClient'
-  + sLineBreak + '  , FldDateTime'
-  + sLineBreak + '  , FldChange'
-  + sLineBreak + '  , FldState'
-  + sLineBreak + '  , FldMessageWhenInactive'
-  + sLineBreak + ' )'
-  + sLineBreak + 'select'
-  + sLineBreak + '    b.FldState'
-  + sLineBreak + '  , b.FldObject'
-  + sLineBreak + '  , b.FldClient'
-  + sLineBreak + '  , b.FldOs'
-  + sLineBreak + '--, b.FldDescription'
-  + sLineBreak + '--, b.FldOverview'
-  + sLineBreak + '--, b.FldImageUrl'
-  + sLineBreak + '--, b.FldNote'
-  + sLineBreak + '--, b.FldMessageWhenInactive'
-  + sLineBreak + '  , b.FldDeploy'
-  + sLineBreak + '  , b.FldDownload'
-  + sLineBreak + '--, a.FldClient'
-  + sLineBreak + '  , a.FldVersion'
-  + sLineBreak + '  , a.FldDateTime'
-  + sLineBreak + '--, a.FldChange'
-  + sLineBreak + '--, a.FldState'
-  + sLineBreak + '--, a.FldMessageWhenInactive'
-  + sLineBreak + 'from'
-  + sLineBreak + '    TblA                    a inner join'
-  + sLineBreak + '    DbaClient.dbo.TblClient b on (b.FldClient = a.FldClient)'
-  + sLineBreak + 'where'
-  + sLineBreak + '    b.FldState = ''Active'''
-  + sLineBreak + 'and b.FldDeploy = 1'
-  ;
-  TDbaRec.DsFromSql(sql, dst);
-
-  // targetclean
-  if DirectoryExists(ZIP_TARGET_PATH) then
-    TDirectory.Delete(ZIP_TARGET_PATH, true);
-
-  // targetcreate
-  TDirectory.CreateDirectory(ZIP_TARGET_PATH);
-
-  // deploy
-  Screen.Cursor := crHourGlass;
-  try
-    while not dst.Eof do begin
-      // source
-      cli := dst.FieldByName('FldClient' ).AsString;
-      osb := dst.FieldByName('FldOs'     ).AsString;
-      ver := dst.FieldByName('FldVersion').AsString;
-      fna := Format('%sProject.exe'          , [cli]);
-      fs0 := Format('C:\$\X\Win32\Debug\%s'  , [fna]);
-      fs1 := Format('C:\$\X\Win32\Release\%s', [fna]);
-      fs2 := Format('C:\$\X\Win64\Debug\%s'  , [fna]);
-      fs3 := Format('C:\$\X\Win64\Release\%s', [fna]);
-      if     FileExists(fs0) then
-        fsp := fs0
-      else if FileExists(fs1) then
-        fsp := fs1
-      else if FileExists(fs2) then
-        fsp := fs2
-      else if FileExists(fs3) then
-        fsp := fs3
-      else
-        TMesRec.W('unable to find source file %s or %s or %s or %s, skipping %s', [fs0, fs1, fs2, fs3, fna]);
-
-      // target
-      zfs := Format('%s\%s_%s_%s.zip', [ZIP_TARGET_PATH, cli, ver, osb]);
-      LogFrame.Log('zipping file %s to %s...', [fsp, zfs]);
-
-      // zip
-      TZipRec.ZipFile(zfs, fsp);
-      LogFrame.Log('done');
-
-      dst.Next;
-    end;
-  finally
-    Screen.Cursor := crDefault;
-  end;
 end;
 
-procedure TSystemMainForm.DeployServersActionExecute(Sender: TObject);
-begin
-  inherited;
-
-  TMesRec.NI;
-end;
-
-procedure TSystemMainForm.DeployServicesActionExecute(Sender: TObject);
-begin
-  inherited;
-
-  TMesRec.NI;
-end;
 {$ENDREGION}
 
 {$REGION 'Audit'}
@@ -658,7 +517,7 @@ procedure TSystemMainForm.AuditClientDataSetAfterRefresh(DataSet: TDataSet);
 begin
   inherited;
 
-  TGriRec.GriFix(AuditJvDBUltimGrid);
+  TGriRec.GriFit(AuditJvDBUltimGrid);
   AuditCountLabel.Caption := Format('%d audits', [DataSet.RecordCount]);
 end;
 
@@ -670,24 +529,126 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION 'Clients'}
-procedure TSystemMainForm.ClientsClientDataSetAfterRefresh(DataSet: TDataSet);
+{$REGION 'Binaries'}
+
+  {$REGION 'Cds'}
+procedure TSystemMainForm.BinariesClientDataSetAfterRefresh(DataSet: TDataSet);
 begin
   inherited;
 
-  TGriRec.GriFix(ClientsJvDBUltimGrid);
-  ClientsCountLabel.Caption := Format('%d clients', [DataSet.RecordCount]);
+  TGriRec.GriFit(BinariesJvDBUltimGrid);
+  BinariesCountLabel.Caption := Format('%d clients', [DataSet.RecordCount]);
 end;
+  {$ENDREGION}
 
-procedure TSystemMainForm.ClientsRefreshSpeedButtonClick(Sender: TObject);
+  {$REGION 'Actions'}
+procedure TSystemMainForm.BinariesClientDeployActionExecute(Sender: TObject); // *** MOVE TO SYSTEM AS RIO ACTION ***
+const
+  ZIP_TARGET_PATH = 'C:\$\X\Zip';
+var
+  dst: TDataset;
+  sql, bin, ext, ver, osb, fna, fs0, fs1, fs2, fs3, fsp, zfs: string;
 begin
   inherited;
 
-  ClientsClientDataSet.Refresh;
-end;
-{$ENDREGION}
+  // log
+  LogFrame.LogShow;
 
-{$REGION 'Services'}
+  // clientsget
+  sql :=         'select'
+  + sLineBreak + '    FldId'
+  + sLineBreak + '  , FldState'
+  + sLineBreak + '  , FldDeploy'
+  + sLineBreak + '  , FldDownload'
+  + sLineBreak + '  , FldObject'
+  + sLineBreak + '  , FldBinary'
+  + sLineBreak + '  , FldExt'
+  + sLineBreak + '  , FldVersion'
+  + sLineBreak + '  , FldOs'
+  + sLineBreak + '  , FldKind'
+  + sLineBreak + '  , FldDescription'
+  + sLineBreak + '  , FldNote'
+  + sLineBreak + '--, FldDateTime'
+  + sLineBreak + 'from'
+  + sLineBreak + '    DbaSystem.dbo.TblBinary'
+  + sLineBreak + 'where'
+  + sLineBreak + '    FldState = ''Active'''
+  + sLineBreak + 'and FldKind in (''Client'', ''ClientDll'', ''Editor'')'
+  + sLineBreak + 'and FldDeploy = 1'
+  + sLineBreak + 'order by'
+  + sLineBreak + '    FldBinary'
+  ;
+  TDbaRec.DsFromSql(sql, dst);
+
+  // targetdelete
+  if DirectoryExists(ZIP_TARGET_PATH) then
+    TDirectory.Delete(ZIP_TARGET_PATH, true);
+
+  // targetcreate
+  TDirectory.CreateDirectory(ZIP_TARGET_PATH);
+
+  // deploy
+  Screen.Cursor := crHourGlass;
+  try
+    while not dst.Eof do begin
+      // source
+      bin := dst.FieldByName('FldBinary' ).AsString;
+      ext := dst.FieldByName('FldExt'    ).AsString;
+      osb := dst.FieldByName('FldOs'     ).AsString;
+      ver := dst.FieldByName('FldVersion').AsString;
+      fna := Format('%s%s'                   , [bin, ext]);
+      fs0 := Format('C:\$\X\Win64\Release\%s', [fna]);
+    //fs1 := Format('C:\$\X\Win64\Debug\%s'  , [fna]);
+      fs2 := Format('C:\$\X\Win32\Release\%s', [fna]);
+    //fs3 := Format('C:\$\X\Win32\Debug\%s'  , [fna]);
+
+      //try
+      if      FileExists(fs0) then
+        fsp := fs0
+      else if FileExists(fs1) then
+        fsp := fs1
+      else if FileExists(fs2) then
+        fsp := fs2
+      else if FileExists(fs3) then
+        fsp := fs3
+      else begin
+        fsp := '';
+        LogFrame.Log('binary %s skipped, unable to find binary file', [bin, zfs], clWebDarkOrange);
+      end;
+
+      // go
+      if not fsp.IsEmpty then begin
+        // target
+        zfs := Format('%s\%s_%s_%s.zip', [ZIP_TARGET_PATH, bin, ver, osb]);
+
+        // zip
+        TZipRec.ZipFile(fsp, zfs);
+        LogFrame.Log('binary %s zipped to %s', [bin, zfs]);
+      end;
+
+      dst.Next;
+    end;
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TSystemMainForm.BinariesServerDeployActionExecute(Sender: TObject);
+begin
+  inherited;
+
+  TMesRec.NI;
+end;
+
+procedure TSystemMainForm.BinariesServiceDeployActionExecute(Sender: TObject);
+begin
+  inherited;
+
+  TMesRec.I('See specific tab "Services"');
+end;
+  {$ENDREGION}
+
+  {$REGION 'Services'}
 procedure TSystemMainForm.TopServiceInstallButtonClick(Sender: TObject);
 var
   sch, svh: SC_HANDLE; // servicecontrolmanagerhandle, servicehandle
@@ -876,6 +837,8 @@ begin
   inherited;
 
 end;
+  {$ENDREGION}
+
 {$ENDREGION}
 
 end.

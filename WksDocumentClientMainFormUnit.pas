@@ -12,7 +12,7 @@ uses
   Vcl.Mask, Vcl.ExtCtrls, JvExControls, JvScrollMax, JvExExtCtrls,
   JvExtComponent, WksLogFrameUnit, VirtualTrees, DTDBTreeView, DTClientTree,
   Vcl.ToolWin, JvNetscapeSplitter, JvComponentBase, JvThreadTimer, Vcl.AppEvnts,
-  JvClock, Vcl.Menus;
+  JvClock, Vcl.Menus, Winapi.WebView2, Winapi.ActiveX, Vcl.Edge, Vcl.WinXCtrls;
 {$ENDREGION}
 
 {$REGION 'Type'}
@@ -34,18 +34,13 @@ type
     DocumentObjectIdLabel: TLabel;
     DocumentPIdDBEdit: TDBEdit;
     DocumentPIdLabel: TLabel;
-    DocumentTabSheet: TTabSheet;
-    DocumentTestAction: TAction;
-    DocumentToolBar: TToolBar;
-    DocumentTestToolButton: TToolButton;
     procedure FormCreate(Sender: TObject);
-    procedure PostActionExecute(Sender: TObject);
+    procedure ActionPostActionExecute(Sender: TObject);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
     procedure DocumentClientDataSetAfterDelete(DataSet: TDataSet);
     procedure DocumentClientDataSetAfterInsert(DataSet: TDataSet);
     procedure DocumentClientDataSetAfterPost(DataSet: TDataSet);
     procedure DocumentClientDataSetReconcileError(DataSet: TCustomClientDataSet; E: EReconcileError; UpdateKind: TUpdateKind; var Action: TReconcileAction);
-    procedure DocumentTestActionExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -80,7 +75,6 @@ begin
   inherited;
 
   {$REGION 'gui'}
-//DocumentTestToolButton.Visible := false;
   {$ENDREGION}
 
   {$REGION 'property'}
@@ -93,11 +87,11 @@ end;
 {$ENDREGION}
 
 {$REGION 'Actions'}
-procedure TDocumentMainForm.PostActionExecute(Sender: TObject);
+procedure TDocumentMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // ... continue from ancestor
+  // detail
   if DocumentClientDataSet.State = dsEdit then
     DocumentDBNavigator.BtnClick(nbPost);
 end;
@@ -128,15 +122,6 @@ begin
   end;
   {$ENDREGION}
 
-end;
-{$ENDREGION}
-
-{$REGION 'DocumentActions'}
-procedure TDocumentMainForm.DocumentTestActionExecute(Sender: TObject);
-begin
-  inherited;
-
-  TMesRec.NI;
 end;
 {$ENDREGION}
 

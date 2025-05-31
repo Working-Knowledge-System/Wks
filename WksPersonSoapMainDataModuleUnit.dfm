@@ -14,7 +14,7 @@ object PersonMainDataModule: TPersonMainDataModule
   end
   object PersonADOTable: TADOTable
     Connection = PersonADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     IndexFieldNames = 'FldObjectId'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -39,14 +39,14 @@ object PersonMainDataModule: TPersonMainDataModule
   end
   object ObjectADOTable: TADOTable
     Connection = PersonADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     TableName = 'TblObject'
     Left = 240
     Top = 40
   end
   object UserADOTable: TADOTable
     Connection = PersonADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     IndexFieldNames = 'FldPersonId'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource

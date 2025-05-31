@@ -15,7 +15,7 @@ object OrganizationMainDataModule: TOrganizationMainDataModule
   end
   object OrganizationADOTable: TADOTable
     Connection = OrganizationADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     IndexFieldNames = 'FldObjectId'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -40,14 +40,14 @@ object OrganizationMainDataModule: TOrganizationMainDataModule
   end
   object ObjectADOTable: TADOTable
     Connection = OrganizationADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     TableName = 'TblObject'
     Left = 240
     Top = 40
   end
   object ThemeADOTable: TADOTable
     Connection = OrganizationADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     IndexFieldNames = 'FldObjectId'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource

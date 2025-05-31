@@ -1,34 +1,46 @@
 inherited TaskMainForm: TTaskMainForm
   Caption = 'TaskMainForm'
-  ClientHeight = 841
+  ExplicitWidth = 1588
   ExplicitHeight = 879
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
-    Height = 592
     ExplicitHeight = 605
   end
   inherited RightJvNetscapeSplitter: TJvNetscapeSplitter
-    Height = 592
     ExplicitLeft = 867
     ExplicitHeight = 605
   end
   inherited BottomJvNetscapeSplitter: TJvNetscapeSplitter
-    Top = 669
     ExplicitTop = 688
     ExplicitWidth = 1180
   end
   inherited TopPanel: TPanel
-    ExplicitWidth = 1194
+    ExplicitWidth = 1572
     inherited TopPageControl: TPageControl
-      ActivePage = TaskTabSheet
-      ExplicitWidth = 822
+      Width = 1156
+      ExplicitWidth = 1152
+      inherited TopClientTabSheet: TTabSheet
+        ExplicitWidth = 1148
+      end
+      inherited TopActionTabSheet: TTabSheet
+        ExplicitWidth = 1148
+      end
+      inherited TopTextTabSheet: TTabSheet
+        ExplicitWidth = 1148
+      end
+      inherited TopSearchTabSheet: TTabSheet
+        ExplicitWidth = 1148
+      end
+      inherited TopUtilsTabSheet: TTabSheet
+        ExplicitWidth = 1148
+      end
       object TaskTabSheet: TTabSheet
         Caption = 'Task'
         ImageIndex = 2
         object TaskToolBar: TToolBar
           Left = 0
           Top = 0
-          Width = 498
+          Width = 415
           Height = 44
           Align = alLeft
           AutoSize = True
@@ -38,18 +50,13 @@ inherited TaskMainForm: TTaskMainForm
           Images = TaskImageList24
           ShowCaptions = True
           TabOrder = 0
-          object TaskTestToolButton: TToolButton
-            Left = 0
-            Top = 0
-            Action = TaskTestAction
-          end
           object TaskDatesResetToolButton: TToolButton
-            Left = 83
+            Left = 0
             Top = 0
             Action = TaskDatesResetAction
           end
           object TaskMoveToolButton: TToolButton
-            Left = 166
+            Left = 83
             Top = 0
             Hint = 'Move the task 7 days earlier or later'
             Action = TaskMoveEarlierAction
@@ -57,21 +64,21 @@ inherited TaskMainForm: TTaskMainForm
             OnMouseMove = TaskMoveToolButtonMouseMove
           end
           object TaskStartChangeToolButton: TToolButton
-            Left = 249
+            Left = 166
             Top = 0
             Action = TaskStartEarlierAction
             OnMouseLeave = TaskStartChangeToolButtonMouseLeave
             OnMouseMove = TaskStartChangeToolButtonMouseMove
           end
           object TaskEtaChangeToolButton: TToolButton
-            Left = 332
+            Left = 249
             Top = 0
             Action = TaskEtaLaterAction
             OnMouseLeave = TaskEtaChangeToolButtonMouseLeave
             OnMouseMove = TaskEtaChangeToolButtonMouseMove
           end
           object TaskParentsUpdateToolButton: TToolButton
-            Left = 415
+            Left = 332
             Top = 0
             Action = TaskParentsUpdateAction
           end
@@ -79,45 +86,49 @@ inherited TaskMainForm: TTaskMainForm
       end
     end
     inherited TopPageControl3: TPageControl
-      ExplicitLeft = 894
+      Left = 1276
+      ExplicitLeft = 1272
     end
     inherited TopPageControl2: TPageControl
-      ExplicitLeft = 822
+      Left = 1156
+      ExplicitLeft = 1152
     end
   end
   inherited LeftPanel: TPanel
-    Height = 592
-    ExplicitHeight = 591
+    ExplicitHeight = 594
     inherited LeftPageControl: TPageControl
-      Height = 592
-      ExplicitHeight = 591
+      Height = 595
+      ExplicitHeight = 594
       inherited ObjectTreeTabSheet: TTabSheet
-        ExplicitHeight = 562
+        ExplicitHeight = 565
         inherited ObjectNodeInfoLabel: TLabel
-          Top = 547
-          ExplicitTop = 547
+          Top = 550
+          Width = 292
+          ExplicitTop = 549
         end
         inherited ObjectDTClientTree: TDTClientTree
-          Height = 522
-          ExplicitHeight = 522
+          Height = 525
+          ExplicitHeight = 525
         end
         inherited ObjectDBNavigator: TDBNavigator
           Hints.Strings = ()
         end
       end
+      inherited WordTabSheet: TTabSheet
+        ExplicitHeight = 565
+      end
     end
   end
   inherited BottomPanel: TPanel
-    Top = 679
-    ExplicitTop = 678
-    ExplicitWidth = 1194
+    ExplicitTop = 679
+    ExplicitWidth = 1576
     inherited LogFrame: TLogFrame
-      ExplicitWidth = 1194
+      ExplicitWidth = 1576
       inherited LogPageControl: TPageControl
-        ExplicitWidth = 1194
+        ExplicitWidth = 1572
         inherited OutputTabSheet: TTabSheet
           inherited OutputRichEdit: TRichEdit
-            ExplicitWidth = 1184
+            ExplicitWidth = 1562
           end
         end
         inherited SoapTabSheet: TTabSheet
@@ -149,17 +160,18 @@ inherited TaskMainForm: TTaskMainForm
     end
   end
   inherited RightPanel: TPanel
-    Height = 592
-    ExplicitLeft = 897
-    ExplicitHeight = 591
+    ExplicitLeft = 1272
+    ExplicitHeight = 594
     inherited RightPageControl: TPageControl
-      Height = 592
-      ExplicitHeight = 591
+      ExplicitHeight = 594
       inherited PropertyTabSheet: TTabSheet
-        ExplicitHeight = 562
         inherited ObjectJvScrollMax: TJvScrollMax
-          Height = 562
-          ExplicitHeight = 561
+          ExplicitHeight = 564
+          inherited ObjectImageJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectImageDBImage: TDBImage
+              Height = 0
+            end
+          end
           object TaskJvScrollMaxBand: TJvScrollMaxBand
             Width = 281
             Height = 21
@@ -565,18 +577,13 @@ inherited TaskMainForm: TTaskMainForm
           end
         end
       end
-      inherited SearchTabSheet: TTabSheet
-        ExplicitHeight = 562
-        inherited SearchResultListBox: TListBox
-          Height = 425
-          ExplicitHeight = 425
-        end
-      end
       inherited OptionTabSheet: TTabSheet
-        ExplicitHeight = 562
         inherited OptionJvScrollMax: TJvScrollMax
-          Height = 562
-          ExplicitHeight = 562
+          inherited OptionFilesJvScrollMaxBand: TJvScrollMaxBand
+            Height = 21
+            Expanded = False
+            ExplicitHeight = 21
+          end
           object OptionTaskJvScrollMaxBand: TJvScrollMaxBand
             Width = 286
             Height = 21
@@ -619,42 +626,88 @@ inherited TaskMainForm: TTaskMainForm
     end
   end
   inherited StatusBar: TStatusBar
-    Top = 819
     ExplicitTop = 818
-    ExplicitWidth = 1194
+    ExplicitWidth = 1566
   end
   inherited MainPanel: TPanel
-    Height = 592
-    ExplicitHeight = 591
+    ExplicitHeight = 594
     inherited MainPageControl: TPageControl
-      Height = 592
-      ExplicitHeight = 591
-      inherited ContentPrevTabSheet: TTabSheet
-        ExplicitHeight = 562
+      Height = 595
+      ExplicitHeight = 594
+      inherited ObjectContentPrevTabSheet: TTabSheet
+        ExplicitHeight = 565
         inherited ObjectContentPrevDBSynEdit: TDBSynEdit
-          Height = 534
-          ExplicitHeight = 534
+          Height = 537
+          ExplicitHeight = 537
+        end
+        inherited ObjectContentPrevTopPanel: TPanel
+          inherited ObjectContentPrevCharCountLabel: TLabel
+            Height = 22
+          end
         end
       end
-      inherited ContentTabSheet: TTabSheet
-        ExplicitHeight = 562
-        inherited ObjectContentDBSynEdit: TDBSynEdit
-          Height = 534
-          ExplicitHeight = 533
+      inherited ObjectContentTabSheet: TTabSheet
+        ExplicitHeight = 565
+        inherited ObjectContentSplitter: TSplitter
+          Height = 537
+          ExplicitHeight = 536
+        end
+        inherited ObjectContentTopPanel: TPanel
+          inherited ObjectContentCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+        inherited ObjectContentSplitView: TSplitView
+          Height = 537
+          ExplicitHeight = 536
+          inherited ObjectContentEdgeBrowser: TEdgeBrowser
+            Height = 537
+            ExplicitHeight = 536
+          end
+        end
+        inherited ObjectContentLeftPanel: TPanel
+          Height = 537
+          ExplicitHeight = 536
+          inherited ObjectContentDBSynEdit: TDBSynEdit
+            Height = 429
+            ExplicitHeight = 428
+          end
         end
       end
-      inherited JsonTabSheet: TTabSheet
-        ExplicitHeight = 562
+      inherited ObjectDataTabSheet: TTabSheet
+        ExplicitHeight = 565
         inherited ObjectDataDBSynEdit: TDBSynEdit
-          Height = 534
-          ExplicitHeight = 534
+          Height = 537
+          ExplicitHeight = 537
+        end
+        inherited ObjectDataTopPanel: TPanel
+          inherited ObjectDataCharCountLabel: TLabel
+            Height = 22
+          end
         end
       end
-      inherited NoteTabSheet: TTabSheet
-        ExplicitHeight = 562
+      inherited ObjectNoteTabSheet: TTabSheet
+        ExplicitHeight = 565
         inherited ObjectNoteDBSynEdit: TDBSynEdit
-          Height = 534
-          ExplicitHeight = 534
+          Height = 537
+          ExplicitHeight = 537
+        end
+        inherited ObjectNoteTopPanel: TPanel
+          inherited ObjectNoteCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited FilesRioTabSheet: TTabSheet
+        ExplicitHeight = 565
+        inherited FilesRioTopPanel: TPanel
+          inherited FilesRioInfoLabel: TLabel
+            Height = 31
+          end
+        end
+        inherited FilesRioTree: TVirtualStringTree
+          Height = 519
+          ExplicitHeight = 519
         end
       end
     end
@@ -684,8 +737,8 @@ inherited TaskMainForm: TTaskMainForm
     ColorDepth = cd32Bit
     Height = 24
     Width = 24
-    Left = 360
-    Top = 376
+    Left = 376
+    Top = 544
     Bitmap = {
       494C010108001800040018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000060000000480000000100200000000000006C
@@ -1587,13 +1640,8 @@ inherited TaskMainForm: TTaskMainForm
   end
   object TaskAction: TActionList [28]
     Images = TaskImageList24
-    Left = 568
-    Top = 376
-    object TaskTestAction: TAction
-      Caption = '    Test    '
-      ImageIndex = 0
-      OnExecute = TaskTestActionExecute
-    end
+    Left = 584
+    Top = 544
     object TaskDatesResetAction: TAction
       Caption = '        Reset        '
       Hint = 'Reset Start and Stop/ETA dates to today date'

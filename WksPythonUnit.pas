@@ -16,11 +16,14 @@ uses
 {$REGION 'Type'}
 type
 
-  {$REGION 'PytRec'}
-TPytRec = record
+  {$REGION 'PythonRec'}
+TPythonRec = record
 public
   class function  PythonVersionInfo(IvPythonVersion: TPythonVersion): string; static;
+  class function  PythonExePath: string; static;
   class function  PythonComponentsInit(IvOwner: TComponent; var IvPythonEngine: TPythonEngine; var IvPythonGUIInputOutput: TPythonGUIInputOutput; var IvMemo: TCustomMemo; IvOptionPythonVersionItemIndex: integer; var IvFbk: string): boolean; static;
+  class function  PythonFileRun(const IvFile: string; out IvOutput, IvMsg: string; out IvAffected: integer): boolean; static; // load and execute a .py file
+  class function  PythonCodeRun(const IvCode: string; out IvOutput, IvMsg: string; out IvAffected: integer): boolean; static; // execute python code fragment
 end;
   {$ENDREGION}
 
@@ -28,8 +31,15 @@ end;
 
 implementation
 
-{$REGION 'TPytRec'}
-class function TPytRec.PythonVersionInfo(IvPythonVersion: TPythonVersion): string;
+{$REGION 'Use'}
+uses
+    System.IOUtils
+  , Wks000Unit
+  ;
+{$ENDREGION}
+
+{$REGION 'TPythonRec'}
+class function TPythonRec.PythonVersionInfo(IvPythonVersion: TPythonVersion): string;
 begin
     Result      := Format('Python Version         : %s', [IvPythonVersion.Version         ])
     + sLineBreak + Format('Python SysVersion      : %s', [IvPythonVersion.SysVersion      ])
@@ -41,7 +51,18 @@ begin
     + sLineBreak + Format('Python ApiVersion      : %d', [IvPythonVersion.ApiVersion      ])
 end;
 
-class function TPytRec.PythonComponentsInit(IvOwner: TComponent; var IvPythonEngine: TPythonEngine; var IvPythonGUIInputOutput: TPythonGUIInputOutput; var IvMemo: TCustomMemo; IvOptionPythonVersionItemIndex: integer; var IvFbk: string): boolean;
+class function TPythonRec.PythonExePath: string;
+var
+  vel: TPythonVersion;
+begin
+  // versionlast
+  if GetLatestRegisteredPythonVersion(vel) then
+    Result := vel.PythonExecutable
+  else
+    Result := ''; // python not installed
+end;
+
+class function TPythonRec.PythonComponentsInit(IvOwner: TComponent; var IvPythonEngine: TPythonEngine; var IvPythonGUIInputOutput: TPythonGUIInputOutput; var IvMemo: TCustomMemo; IvOptionPythonVersionItemIndex: integer; var IvFbk: string): boolean;
 var
 //own: TComponent;
   pvs: TPythonVersions;
@@ -86,6 +107,62 @@ begin
       IvFbk  := e.Message;
       Result := false;
     end;
+  end;
+end;
+
+class function TPythonRec.PythonFileRun(const IvFile: string; out IvOutput, IvMsg: string; out IvAffected: integer): boolean;
+var
+  exe, cmd, fbk: string;
+begin
+  // exe
+  exe := PythonExePath;
+  if not TFsyRec.FileExists(exe, fbk) then begin
+    IvOutput := '';
+    IvMsg := Format('Python executable "%s" does not exist, unable to run file "%s"', [exe, IvFile]);
+    IvAffected := 0;
+    Result := false;
+    Exit;
+  end;
+
+  // command
+  cmd := Format('"%s" %s', [exe, IvFile]);
+
+  // winprocess
+  try
+    IvOutput := TWinRec.WinCmdExecute(cmd);
+    IvMsg := 'Ok';
+    IvAffected := 0;
+    Result := true;
+  except
+    on e: Exception do begin
+      IvOutput := '';
+      IvMsg := e.Message;
+      IvAffected := 0;
+      Result := false;
+    end;
+  end;
+end;
+
+class function TPythonRec.PythonCodeRun(const IvCode: string; out IvOutput, IvMsg: string; out IvAffected: integer): boolean;
+var
+  stl: TStringList;
+  fis: string; // filespec
+begin
+  // stringlist
+  stl := TStringList.Create;
+  try
+    // filespec
+    fis := TFsyRec.FileTempRnd('.py');
+
+    // codetofile
+    stl.Text := IvCode;
+    stl.SaveToFile(fis);
+
+    // filerun
+    Result := PythonFileRun(fis, IvOutput, IvMsg, IvAffected);
+  finally
+    DeleteFile(fis);
+    FreeAndNil(stl);
   end;
 end;
 {$ENDREGION}

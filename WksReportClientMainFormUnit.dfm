@@ -1,59 +1,140 @@
 inherited ReportMainForm: TReportMainForm
   Caption = 'ReportMainForm'
-  ClientHeight = 837
-  ClientWidth = 1268
+  StyleElements = [seFont, seClient, seBorder]
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
-    Height = 588
     ExplicitHeight = 605
   end
   inherited RightJvNetscapeSplitter: TJvNetscapeSplitter
-    Left = 955
-    Height = 588
     ExplicitLeft = 867
     ExplicitHeight = 605
   end
   inherited BottomJvNetscapeSplitter: TJvNetscapeSplitter
-    Top = 665
-    Width = 1268
     ExplicitTop = 688
     ExplicitWidth = 1180
   end
   inherited TopPanel: TPanel
-    Width = 1262
+    StyleElements = [seFont, seClient, seBorder]
     inherited TopPageControl: TPageControl
-      object ReportTabSheet: TTabSheet
-        Caption = 'Report'
-        ImageIndex = 2
-        object ReportToolBar: TToolBar
-          Left = 0
-          Top = 0
-          Width = 51
-          Height = 44
-          Align = alLeft
-          AutoSize = True
-          ButtonHeight = 46
-          ButtonWidth = 51
-          Caption = 'ReportToolBar'
-          Images = ReportImageList24
-          ShowCaptions = True
-          TabOrder = 0
-          object ReportTestToolButton: TToolButton
-            Left = 0
-            Top = 0
-            Action = ReportTestAction
-          end
+      inherited TopSearchTabSheet: TTabSheet
+        inherited SearchReplaceOutLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceInLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceSwapLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceOutEdit: TEdit
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceInEdit: TEdit
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+    end
+    inherited TopPageControl3: TPageControl
+      inherited TimeTabSheet: TTabSheet
+        inherited YearLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MonthLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited DayLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited TimerLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited WeekdayLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited WeekLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited TimerJvClock: TJvClock
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited PersonTabSheet: TTabSheet
+        inherited PersonNameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited PersonSurnameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited PersonSurnameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited PersonNameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited UserTabSheet: TTabSheet
+        inherited UserUsernameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited UserPasswordLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited UserPasswordLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited UserUsernameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited MemberTabSheet: TTabSheet
+        inherited MemberMemberLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MemberMemberLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MemberRoleLevelLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MemberRoleLevelLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited OrganizationTabSheet: TTabSheet
+        inherited OrganizationOrganizationLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited OrganizationNameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited OrganizationNameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited OrganizationOrganizationLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+    end
+    inherited TopPageControl2: TPageControl
+      inherited ObjectTabSheet: TTabSheet
+        inherited ObjectIdDBText: TDBText
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited ObjectKindDBText: TDBText
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited ObjectStateDBText: TDBText
+          StyleElements = [seFont, seClient, seBorder]
         end
       end
     end
   end
   inherited LeftPanel: TPanel
-    Height = 588
+    StyleElements = [seFont, seClient, seBorder]
     inherited LeftPageControl: TPageControl
       inherited ObjectTreeTabSheet: TTabSheet
         inherited ObjectNodeInfoLabel: TLabel
-          Width = 292
-          ExplicitTop = 544
+          StyleElements = [seFont, seClient, seBorder]
         end
         inherited ObjectDBNavigator: TDBNavigator
           Hints.Strings = ()
@@ -62,16 +143,17 @@ inherited ReportMainForm: TReportMainForm
     end
   end
   inherited BottomPanel: TPanel
-    Top = 675
-    Width = 1262
+    StyleElements = [seFont, seClient, seBorder]
     inherited LogFrame: TLogFrame
-      Width = 1262
       inherited LogPageControl: TPageControl
-        Width = 1262
         inherited OutputTabSheet: TTabSheet
-          ExplicitWidth = 1254
           inherited OutputRichEdit: TRichEdit
-            Width = 1252
+            StyleElements = [seFont, seClient, seBorder]
+          end
+        end
+        inherited LogTabSheet: TTabSheet
+          inherited LogRichEdit: TRichEdit
+            StyleElements = [seFont, seClient, seBorder]
           end
         end
         inherited SoapTabSheet: TTabSheet
@@ -97,65 +179,244 @@ inherited ReportMainForm: TReportMainForm
                 Control = LogFrame.SoapResponseRichEdit
                 Row = 1
               end>
+            StyleElements = [seFont, seClient, seBorder]
+            inherited SoapResponseLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited SoapRequestRichEdit: TRichEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited SoapRequestLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited SoapResponseRichEdit: TRichEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+        end
+        inherited OptionTabSheet: TTabSheet
+          inherited OptionOutputLineWidthMaxLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited OptionOutputLinesMaxLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited OptionOutputLineWidthMaxEdit: TEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited OptionOutputLinesMaxEdit: TEdit
+            StyleElements = [seFont, seClient, seBorder]
           end
         end
       end
     end
   end
   inherited RightPanel: TPanel
-    Left = 965
-    Height = 588
+    StyleElements = [seFont, seClient, seBorder]
     inherited RightPageControl: TPageControl
-      Height = 588
       inherited PropertyTabSheet: TTabSheet
-        ExplicitHeight = 558
         inherited ObjectJvScrollMax: TJvScrollMax
-          Height = 558
+          StyleElements = [seFont, seClient, seBorder]
           inherited ObjectIdJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectOrderLabel: TLabel
-              Width = 249
+              StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectRevLabel: TLabel
-              Width = 249
+              StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectPIdLabel: TLabel
-              Width = 249
+              StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectIdLabel: TLabel
-              Width = 249
+              StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectId8Label: TLabel
-              Width = 249
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectOrderDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectPIdDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectRevDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectIdDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectId8DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
             end
           end
           inherited ObjectDateJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectCreatedLabel: TLabel
-              Width = 249
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectCreatedDBText: TDBText
+              StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectUpdatedLabel: TLabel
-              Width = 249
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedDBText: TDBText
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedByDBText: TDBText
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedByLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
             end
           end
           inherited ObjectFromJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectFromOrganizationLabel: TLabel
-              Width = 249
+              StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectFromMemberLabel: TLabel
-              Width = 249
+              StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectFromTeamLabel: TLabel
-              Width = 249
+              StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectFromAreaLabel: TLabel
-              Width = 249
+              StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectFromDepartmentLabel: TLabel
-              Width = 249
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromOrganizationDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromMemberDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromTeamDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromAreaDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromDepartmentDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectToJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectToOrganizationLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToMemberLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToTeamLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToAreaLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToDepartmentLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectJobGradeMinLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectJobGradeCalculateLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToOrganizationDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToMemberDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToTeamDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToAreaDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToDepartmentDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectJobGradeMinDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
             end
           end
           inherited ObjectApprovalJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectRouteLabel: TLabel
-              Width = 249
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectRouteDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectImageJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectImageLoadLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageSaveLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageEditLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageFitLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageClearLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectTypeJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectContentKindLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectKindLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDataKindLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectContentKindDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectKindDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDataKindDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectGeneralJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectStateLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSpareLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDescriptionLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectTitleLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSubtitleLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectStateDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSpareDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDescriptionDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectTitleDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSubtitleDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
             end
           end
           object ReportJvScrollMaxBand: TJvScrollMaxBand
@@ -163,7 +424,7 @@ inherited ReportMainForm: TReportMainForm
             Height = 21
             Expanded = False
             Caption = 'Report'
-            ExpandedHeight = 616
+            ExpandedHeight = 860
             ButtonFont.Charset = ANSI_CHARSET
             ButtonFont.Color = clWindowText
             ButtonFont.Height = -11
@@ -484,24 +745,10 @@ inherited ReportMainForm: TReportMainForm
               ShowHint = True
               TabOrder = 11
             end
-          end
-          object ReportFlagsJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
-            Height = 21
-            Expanded = False
-            Caption = 'Flags'
-            ExpandedHeight = 255
-            ButtonFont.Charset = ANSI_CHARSET
-            ButtonFont.Color = clWindowText
-            ButtonFont.Height = -11
-            ButtonFont.Name = 'Segoe UI'
-            ButtonFont.Style = [fsBold]
-            Beveled = False
-            ParentButtonFont = False
             object ReportReportTitleOnDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 35
+              Top = 616
               Width = 249
               Height = 17
               Margins.Left = 16
@@ -511,12 +758,12 @@ inherited ReportMainForm: TReportMainForm
               Caption = 'Report Title Show'
               DataField = 'FldReportTitleOn'
               DataSource = ReportDataSource
-              TabOrder = 0
+              TabOrder = 12
             end
             object ReportReportPanelOnDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 58
+              Top = 639
               Width = 249
               Height = 17
               Margins.Left = 16
@@ -525,12 +772,12 @@ inherited ReportMainForm: TReportMainForm
               Caption = 'Report Panel Show'
               DataField = 'FldReportPanelOn'
               DataSource = ReportDataSource
-              TabOrder = 1
+              TabOrder = 13
             end
             object ReportReportPanelClosedDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 81
+              Top = 662
               Width = 249
               Height = 17
               Margins.Left = 16
@@ -539,28 +786,27 @@ inherited ReportMainForm: TReportMainForm
               Caption = 'Report Panel Closed'
               DataField = 'FldReportPanelClosed'
               DataSource = ReportDataSource
-              TabOrder = 2
+              TabOrder = 14
             end
             object ReportParamsTitleDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 117
+              Top = 721
               Width = 249
               Height = 17
               Hint = 'Show or hide the title of "Params" panel'
               Margins.Left = 16
-              Margins.Top = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Params Title Show'
               DataField = 'FldParamsTitleOn'
               DataSource = ReportDataSource
-              TabOrder = 3
+              TabOrder = 15
             end
             object ReportParamsPanelOnDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 140
+              Top = 744
               Width = 249
               Height = 17
               Margins.Left = 16
@@ -569,12 +815,12 @@ inherited ReportMainForm: TReportMainForm
               Caption = 'Params Panel Show'
               DataField = 'FldParamsPanelOn'
               DataSource = ReportDataSource
-              TabOrder = 4
+              TabOrder = 16
             end
             object ReportParamsPanelClosedDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 163
+              Top = 767
               Width = 249
               Height = 17
               Margins.Left = 16
@@ -583,12 +829,12 @@ inherited ReportMainForm: TReportMainForm
               Caption = 'Params Panel Closed'
               DataField = 'FldParamsPanelClosed'
               DataSource = ReportDataSource
-              TabOrder = 5
+              TabOrder = 17
             end
             object ReportDsHeaderOffDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 199
+              Top = 803
               Width = 249
               Height = 17
               Hint = 'Hide the header table that renders the dataset'
@@ -596,25 +842,41 @@ inherited ReportMainForm: TReportMainForm
               Margins.Top = 16
               Margins.Right = 16
               Align = alTop
-              Caption = 'Dataset header hide'
+              Caption = 'Datasets header hide'
               DataField = 'FldDsHeaderOff'
               DataSource = ReportDataSource
-              TabOrder = 6
+              TabOrder = 18
             end
             object ReportDsRecordCountOffDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 222
+              Top = 826
               Width = 249
               Height = 17
               Hint = 'Hide the records  count for the dataset'
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
-              Caption = 'Dataset records count hide'
+              Caption = 'Datasets records count hide'
               DataField = 'FldDsRecordCountOff'
               DataSource = ReportDataSource
-              TabOrder = 7
+              TabOrder = 19
+            end
+            object ReportParamsOffDBCheckBox: TDBCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 698
+              Width = 249
+              Height = 17
+              Hint = 'Show or hide the title of "Params" panel'
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Params Hide'
+              DataField = 'FldParamsOff'
+              DataSource = ReportDataSource
+              TabOrder = 20
             end
           end
           object ReportParamJvScrollMaxBand: TJvScrollMaxBand
@@ -1138,7 +1400,6 @@ inherited ReportMainForm: TReportMainForm
               Align = alTop
               Caption = 'Viewer (csv)'
               Layout = tlCenter
-              ExplicitTop = 472
               ExplicitWidth = 63
             end
             object ReportDatasetEditorCsvLabel: TLabel
@@ -1152,7 +1413,6 @@ inherited ReportMainForm: TReportMainForm
               Align = alTop
               Caption = 'Editor (csv)'
               Layout = tlCenter
-              ExplicitTop = 522
               ExplicitWidth = 59
             end
             object ReportDatasetLanguageLabel: TLabel
@@ -1165,7 +1425,6 @@ inherited ReportMainForm: TReportMainForm
               Margins.Right = 16
               Align = alTop
               Caption = 'Language (for query)'
-              ExplicitTop = 372
               ExplicitWidth = 111
             end
             object ReportDatasetConnStrLabel: TLabel
@@ -1192,7 +1451,6 @@ inherited ReportMainForm: TReportMainForm
               Align = alTop
               Caption = 'Max Records'
               Layout = tlCenter
-              ExplicitTop = 422
               ExplicitWidth = 68
             end
             object ReportDatasetDescriptionLabel: TLabel
@@ -1243,7 +1501,6 @@ inherited ReportMainForm: TReportMainForm
               Align = alTop
               Caption = 'Timeout (seconds)'
               Layout = tlCenter
-              ExplicitTop = 572
               ExplicitWidth = 98
             end
             object ReportDatasetSwitchLabel: TLabel
@@ -1257,7 +1514,6 @@ inherited ReportMainForm: TReportMainForm
               Align = alTop
               Caption = 'Switch'
               Layout = tlCenter
-              ExplicitTop = 722
               ExplicitWidth = 35
             end
             object ReportDatasetClassLabel: TLabel
@@ -1270,7 +1526,6 @@ inherited ReportMainForm: TReportMainForm
               Margins.Right = 16
               Align = alTop
               Caption = 'Class'
-              ExplicitTop = 622
               ExplicitWidth = 27
             end
             object ReportDatasetStyleLabel: TLabel
@@ -1283,7 +1538,6 @@ inherited ReportMainForm: TReportMainForm
               Margins.Right = 16
               Align = alTop
               Caption = 'Style'
-              ExplicitTop = 672
               ExplicitWidth = 25
             end
             object ReportDatasetModeLabel: TLabel
@@ -1297,6 +1551,19 @@ inherited ReportMainForm: TReportMainForm
               Align = alTop
               Caption = 'Mode (direction)'
               ExplicitWidth = 89
+            end
+            object ReportDatasetFeedbackIfEmptyLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 822
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Feedback if empty (Html)'
+              Layout = tlCenter
+              ExplicitWidth = 135
             end
             object ReportDatasetDBEdit: TDBEdit
               AlignWithMargins = True
@@ -1356,7 +1623,6 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldViewerCsv'
               DataSource = DatasetDataSource
               TabOrder = 3
-              ExplicitTop = 493
             end
             object ReportDatasetEditorCsvDBEdit: TDBEdit
               AlignWithMargins = True
@@ -1370,7 +1636,6 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldEditorCsv'
               DataSource = DatasetDataSource
               TabOrder = 4
-              ExplicitTop = 543
             end
             object ReportDatasetLanguageDBComboBox: TDBComboBox
               AlignWithMargins = True
@@ -1390,7 +1655,6 @@ inherited ReportMainForm: TReportMainForm
               ParentShowHint = False
               ShowHint = True
               TabOrder = 5
-              ExplicitTop = 393
             end
             object ReportDatasetConnStrDBEdit: TDBEdit
               AlignWithMargins = True
@@ -1417,7 +1681,6 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldMaxRecords'
               DataSource = DatasetDataSource
               TabOrder = 7
-              ExplicitTop = 443
             end
             object ReportDatasetDescriptionDBEdit: TDBEdit
               AlignWithMargins = True
@@ -1476,12 +1739,11 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldTimeoutSec'
               DataSource = DatasetDataSource
               TabOrder = 11
-              ExplicitTop = 593
             end
             object ReportDatasetEditableDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 827
+              Top = 877
               Width = 249
               Height = 17
               Margins.Left = 16
@@ -1493,7 +1755,6 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldEditable'
               DataSource = DatasetDataSource
               TabOrder = 12
-              ExplicitTop = 777
             end
             object ReportDatasetSwitchDBEdit: TDBEdit
               AlignWithMargins = True
@@ -1507,7 +1768,6 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldSwitch'
               DataSource = DatasetDataSource
               TabOrder = 13
-              ExplicitTop = 743
             end
             object ReportDatasetClassDBEdit: TDBEdit
               AlignWithMargins = True
@@ -1521,7 +1781,6 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldClass'
               DataSource = DatasetDataSource
               TabOrder = 14
-              ExplicitTop = 643
             end
             object ReportDatasetStyleDBEdit: TDBEdit
               AlignWithMargins = True
@@ -1535,12 +1794,11 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldStyle'
               DataSource = DatasetDataSource
               TabOrder = 15
-              ExplicitTop = 693
             end
             object ReportDatasetPanelClosedDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 906
+              Top = 956
               Width = 249
               Height = 17
               Margins.Left = 16
@@ -1550,12 +1808,11 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldPanelClosed'
               DataSource = DatasetDataSource
               TabOrder = 16
-              ExplicitTop = 856
             end
             object ReportDatasetPanelOnDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 883
+              Top = 933
               Width = 249
               Height = 17
               Margins.Left = 16
@@ -1565,12 +1822,11 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldPanelOn'
               DataSource = DatasetDataSource
               TabOrder = 17
-              ExplicitTop = 833
             end
             object ReportDatasetTitleOnDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 860
+              Top = 910
               Width = 249
               Height = 17
               Margins.Left = 16
@@ -1581,7 +1837,6 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldTitleOn'
               DataSource = DatasetDataSource
               TabOrder = 18
-              ExplicitTop = 810
             end
             object ReportDatasetModeDBComboBox: TDBComboBox
               AlignWithMargins = True
@@ -1601,7 +1856,19 @@ inherited ReportMainForm: TReportMainForm
               ParentShowHint = False
               ShowHint = True
               TabOrder = 19
-              ExplicitTop = 390
+            end
+            object ReportDatasetFeedbackIfEmptyDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 843
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldFeedbackIfEmpty'
+              DataSource = DatasetDataSource
+              TabOrder = 20
             end
           end
           object ReportChartJvScrollMaxBand: TJvScrollMaxBand
@@ -1952,42 +2219,137 @@ inherited ReportMainForm: TReportMainForm
         end
       end
       inherited SearchTabSheet: TTabSheet
-        ExplicitHeight = 558
+        inherited SearchFilterPanel: TPanel
+          StyleElements = [seFont, seClient, seBorder]
+          inherited SearchLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited ReplaceLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited SearchReplaceSwapLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited SearchInLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited SearchButtonedEdit: TButtonedEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited ReplaceButtonedEdit: TButtonedEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+        end
         inherited SearchResultListBox: TListBox
-          Height = 421
-          ExplicitHeight = 421
+          StyleElements = [seFont, seClient, seBorder]
         end
       end
       inherited OptionTabSheet: TTabSheet
-        ExplicitHeight = 558
         inherited OptionJvScrollMax: TJvScrollMax
-          Height = 558
-          ExplicitHeight = 558
+          StyleElements = [seFont, seClient, seBorder]
+          inherited OptionDateTimeJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionWeekWorkOneStartLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekDayLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekTimeLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekDayEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekTimeEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionInterfaceJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionTabWidthLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionStateDefaultLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFontSizeLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTabWidthJvSpinEdit: TJvSpinEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionStateDefaultComboBox: TComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFontSizeJvSpinEdit: TJvSpinEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionFoldersJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionPersistRootFolderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTempFolderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPersistRootFolderEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTempFolderEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionSecurityJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionCryptoKeyLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionCryptoKeyEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionPythonJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionPythonVersionLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPythonExePathLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPythonVersionComboBox: TComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPythonExePathEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionFilesJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionFilesWorkingFolderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesOnDoubleClickLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesWorkingFolderClearLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesOnDoubleClickComboBox: TComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesWorkingFolderSelectButtonedEdit: TButtonedEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
         end
       end
     end
   end
-  inherited StatusBar: TStatusBar
-    Top = 815
-    Width = 1262
-    ExplicitTop = 814
-    ExplicitWidth = 1258
-  end
   inherited MainPanel: TPanel
-    Height = 588
+    StyleElements = [seFont, seClient, seBorder]
     inherited MainPageControl: TPageControl
-      inherited ContentTabSheet: TTabSheet
-        inherited ObjectContentTopPanel: TPanel
-          inherited ObjectContentCharCountLabel: TLabel
-            Height = 22
-          end
+      inherited ObjectContentTabSheet: TTabSheet
+        inherited ObjectContentSplitter: TSplitter
+          ExplicitHeight = 536
         end
-      end
-      inherited JsonTabSheet: TTabSheet
-        inherited ObjectDataTopPanel: TPanel
-          inherited ObjectDataCharCountLabel: TLabel
-            Height = 22
-          end
+        inherited ObjectContentSplitView: TSplitView
+          DoubleBuffered = True
         end
       end
       object ReportParamTabSheet: TTabSheet
@@ -1996,45 +2358,48 @@ inherited ReportMainForm: TReportMainForm
         object ReportParamSplitter3: TSplitter
           AlignWithMargins = True
           Left = 8
-          Top = 321
-          Width = 528
+          Top = 329
+          Width = 926
           Height = 3
           Cursor = crVSplit
           Margins.Left = 8
           Margins.Right = 8
           Align = alBottom
           ExplicitTop = 358
+          ExplicitWidth = 528
         end
         object ReportParamSplitter2: TSplitter
           AlignWithMargins = True
           Left = 8
-          Top = 204
-          Width = 528
+          Top = 212
+          Width = 926
           Height = 3
           Cursor = crVSplit
           Margins.Left = 8
           Margins.Right = 8
           Align = alBottom
           ExplicitTop = 41
+          ExplicitWidth = 528
         end
         object ReportParamSplitter: TSplitter
           AlignWithMargins = True
           Left = 8
-          Top = 87
-          Width = 528
+          Top = 95
+          Width = 926
           Height = 3
           Cursor = crVSplit
           Margins.Left = 8
           Margins.Right = 8
           Align = alBottom
           ExplicitTop = 41
+          ExplicitWidth = 528
         end
         object ReportParamTopPanel: TPanel
           AlignWithMargins = True
           Left = 8
           Top = 8
-          Width = 528
-          Height = 73
+          Width = 926
+          Height = 81
           Margins.Left = 8
           Margins.Top = 8
           Margins.Right = 8
@@ -2070,8 +2435,8 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 32
-            Width = 522
-            Height = 38
+            Width = 920
+            Height = 46
             Margins.Top = 32
             Align = alClient
             DataSource = ParamDataSource
@@ -2092,8 +2457,8 @@ inherited ReportMainForm: TReportMainForm
         object ReportParamOptionQueryPanel: TPanel
           AlignWithMargins = True
           Left = 8
-          Top = 330
-          Width = 528
+          Top = 338
+          Width = 926
           Height = 225
           Margins.Left = 8
           Margins.Right = 8
@@ -2106,29 +2471,27 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 3
-            Width = 522
+            Width = 574
             Height = 15
             Align = alTop
             Caption = 
               'Options Query (option Value and Caption can be different: select' +
               ' Fld1 as FldValue, Fld2 as FldCaption from ...)'
-            ExplicitWidth = 574
           end
           object ReportParamOptionQueryConnStrLabel: TLabel
             AlignWithMargins = True
             Left = 3
             Top = 178
-            Width = 522
+            Width = 286
             Height = 15
             Align = alBottom
             Caption = 'Option Query Connection String (explicit or Source Id)'
-            ExplicitWidth = 286
           end
           object ReportParamOptionQueryDBSynEdit: TDBSynEdit
             AlignWithMargins = True
             Left = 3
             Top = 24
-            Width = 522
+            Width = 920
             Height = 148
             Cursor = crIBeam
             DataField = 'FldOptionQuery'
@@ -2168,8 +2531,6 @@ inherited ReportMainForm: TReportMainForm
                 Kind = gbkMargin
                 Width = 3
               end>
-            Options = [eoAltSetsColumnMode, eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoHideShowScrollbars, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
-            SelectedColor.Alpha = 0.400000005960464500
             TabWidth = 3
             WantTabs = True
           end
@@ -2177,7 +2538,7 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 199
-            Width = 522
+            Width = 920
             Height = 23
             Align = alBottom
             DataField = 'FldConnStr'
@@ -2188,8 +2549,8 @@ inherited ReportMainForm: TReportMainForm
         object ReportParamOptionJsonPanel: TPanel
           AlignWithMargins = True
           Left = 8
-          Top = 213
-          Width = 528
+          Top = 221
+          Width = 926
           Height = 102
           Margins.Left = 8
           Margins.Right = 8
@@ -2202,19 +2563,18 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 3
-            Width = 522
+            Width = 534
             Height = 15
             Align = alTop
             Caption = 
               'Options Json (option Value and Caption can be different: {"value' +
               '": "caption", "value2": "caption2", ...})'
-            ExplicitWidth = 534
           end
           object ReportParamOptionJsonDBSynEdit: TDBSynEdit
             AlignWithMargins = True
             Left = 3
             Top = 24
-            Width = 522
+            Width = 920
             Height = 75
             Cursor = crIBeam
             DataField = 'FldOptionJson'
@@ -2254,8 +2614,6 @@ inherited ReportMainForm: TReportMainForm
                 Kind = gbkMargin
                 Width = 3
               end>
-            Options = [eoAltSetsColumnMode, eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoHideShowScrollbars, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
-            SelectedColor.Alpha = 0.400000005960464500
             TabWidth = 3
             WantTabs = True
           end
@@ -2263,8 +2621,8 @@ inherited ReportMainForm: TReportMainForm
         object ReportParamOptionCsvPanel: TPanel
           AlignWithMargins = True
           Left = 8
-          Top = 96
-          Width = 528
+          Top = 104
+          Width = 926
           Height = 102
           Margins.Left = 8
           Margins.Right = 8
@@ -2277,17 +2635,16 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 3
-            Width = 522
+            Width = 297
             Height = 15
             Align = alTop
             Caption = 'Options Csv (option Value and Caption will be the same)'
-            ExplicitWidth = 297
           end
           object ReportParamOptionCsvDBSynEdit: TDBSynEdit
             AlignWithMargins = True
             Left = 3
             Top = 24
-            Width = 522
+            Width = 920
             Height = 75
             Cursor = crIBeam
             DataField = 'FldOptionCsv'
@@ -2327,8 +2684,6 @@ inherited ReportMainForm: TReportMainForm
                 Kind = gbkMargin
                 Width = 3
               end>
-            Options = [eoAltSetsColumnMode, eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoHideShowScrollbars, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
-            SelectedColor.Alpha = 0.400000005960464500
             TabWidth = 3
             WantTabs = True
           end
@@ -2340,21 +2695,22 @@ inherited ReportMainForm: TReportMainForm
         object ReportDatasetSplitter: TSplitter
           AlignWithMargins = True
           Left = 8
-          Top = 87
-          Width = 528
+          Top = 95
+          Width = 926
           Height = 3
           Cursor = crVSplit
           Margins.Left = 8
           Margins.Right = 8
           Align = alBottom
           ExplicitTop = 203
+          ExplicitWidth = 528
         end
         object ReportDatasetTopPanel: TPanel
           AlignWithMargins = True
           Left = 8
           Top = 8
-          Width = 528
-          Height = 73
+          Width = 926
+          Height = 81
           Margins.Left = 8
           Margins.Top = 8
           Margins.Right = 8
@@ -2390,8 +2746,8 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 32
-            Width = 522
-            Height = 38
+            Width = 920
+            Height = 46
             Margins.Top = 32
             Align = alClient
             DataSource = DatasetDataSource
@@ -2412,8 +2768,8 @@ inherited ReportMainForm: TReportMainForm
         object DatasetAndChartPageControl: TPageControl
           AlignWithMargins = True
           Left = 8
-          Top = 96
-          Width = 528
+          Top = 104
+          Width = 926
           Height = 454
           Margins.Left = 8
           Margins.Right = 8
@@ -2427,7 +2783,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 514
+              Width = 912
               Height = 418
               Cursor = crIBeam
               DataField = 'FldSelect'
@@ -2467,8 +2823,6 @@ inherited ReportMainForm: TReportMainForm
                   Kind = gbkMargin
                   Width = 3
                 end>
-              Options = [eoAltSetsColumnMode, eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoHideShowScrollbars, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
-              SelectedColor.Alpha = 0.400000005960464500
               TabWidth = 3
               WantTabs = True
             end
@@ -2480,7 +2834,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 514
+              Width = 912
               Height = 418
               Cursor = crIBeam
               DataField = 'FldInsert'
@@ -2520,8 +2874,6 @@ inherited ReportMainForm: TReportMainForm
                   Kind = gbkMargin
                   Width = 3
                 end>
-              Options = [eoAltSetsColumnMode, eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoHideShowScrollbars, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
-              SelectedColor.Alpha = 0.400000005960464500
               TabWidth = 3
               WantTabs = True
             end
@@ -2533,7 +2885,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 514
+              Width = 912
               Height = 418
               Cursor = crIBeam
               DataField = 'FldUpdate'
@@ -2573,8 +2925,6 @@ inherited ReportMainForm: TReportMainForm
                   Kind = gbkMargin
                   Width = 3
                 end>
-              Options = [eoAltSetsColumnMode, eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoHideShowScrollbars, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
-              SelectedColor.Alpha = 0.400000005960464500
               TabWidth = 3
               WantTabs = True
             end
@@ -2586,7 +2936,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 514
+              Width = 912
               Height = 418
               Cursor = crIBeam
               DataField = 'FldDelete'
@@ -2626,8 +2976,6 @@ inherited ReportMainForm: TReportMainForm
                   Kind = gbkMargin
                   Width = 3
                 end>
-              Options = [eoAltSetsColumnMode, eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoHideShowScrollbars, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
-              SelectedColor.Alpha = 0.400000005960464500
               TabWidth = 3
               WantTabs = True
             end
@@ -2669,7 +3017,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 22
-              Width = 514
+              Width = 912
               Height = 399
               Cursor = crIBeam
               Margins.Top = 22
@@ -2710,8 +3058,6 @@ inherited ReportMainForm: TReportMainForm
                   Kind = gbkMargin
                   Width = 3
                 end>
-              Options = [eoAltSetsColumnMode, eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoHideShowScrollbars, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
-              SelectedColor.Alpha = 0.400000005960464500
               TabWidth = 3
               WantTabs = True
             end
@@ -2723,7 +3069,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 168
-              Width = 514
+              Width = 912
               Height = 3
               Cursor = crVSplit
               Align = alTop
@@ -2735,7 +3081,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 514
+              Width = 912
               Height = 27
               Align = alTop
               BevelOuter = bvNone
@@ -2771,7 +3117,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 36
-              Width = 514
+              Width = 912
               Height = 126
               Align = alTop
               DataSource = ChartDataSource
@@ -2786,7 +3132,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 177
-              Width = 514
+              Width = 912
               Height = 27
               Align = alTop
               BevelOuter = bvNone
@@ -2822,7 +3168,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 210
-              Width = 514
+              Width = 912
               Height = 211
               Align = alClient
               DataSource = SerieDataSource
@@ -2863,8 +3209,8 @@ inherited ReportMainForm: TReportMainForm
     ColorDepth = cd32Bit
     Height = 24
     Width = 24
-    Left = 360
-    Top = 376
+    Left = 376
+    Top = 544
     Bitmap = {
       494C010101000800040018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024
@@ -3172,12 +3518,12 @@ inherited ReportMainForm: TReportMainForm
   end
   object ReportAction: TActionList [28]
     Images = ReportImageList24
-    Left = 568
-    Top = 376
+    Left = 584
+    Top = 544
     object ReportTestAction: TAction
       Caption = '    Test    '
+      Hint = 'Just a test'
       ImageIndex = 0
-      OnExecute = ReportTestActionExecute
     end
   end
   object ParamClientDataSet: TClientDataSet [29]

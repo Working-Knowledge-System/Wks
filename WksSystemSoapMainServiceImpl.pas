@@ -15,42 +15,43 @@ uses
 
 {$REGION 'Type'}
 type
+  // system class that implements the corresponding soap invokable interface
   TSystemSoapMainService = class(TInvokableClass, ISystemSoapMainService)
   public
-    // system *** move Soap to the end ***
-    function  SystemSoapInfo                (var IvFbk: string): boolean; stdcall;
-    function  SystemSoapOutline             (var IvOutline: string; var IvFbk: string): boolean; stdcall;
-    function  SystemSoapPrivacy             (var IvPrivacy: string; var IvFbk: string): boolean; stdcall;
-    function  SystemSoapLicense             (var IvLicense: string; var IvFbk: string): boolean; stdcall;
-    function  SystemSoapCopyright           (var IvCopyright: string; var IvFbk: string): boolean; stdcall;
-  //function  SystemSoapContentGet          (const IvId: integer; var IvContent: string; const IvDefault: string; var IvFbk: string): boolean; stdcall;
-  //function  SystemSoapContentSet          (const IvId: integer; const IvContent: string; var IvFbk: string): boolean; stdcall;
-    function  SystemSoapSystemGet           (var IvSysRem: TSysRem; var IvFbk: string): boolean; stdcall;
-    // person/user
+    // system methods
+    function  SystemInfoSoap                (var IvFbk: string): boolean; stdcall;
+    function  SystemOutlineSoap             (var IvOutline: string; var IvFbk: string): boolean; stdcall;
+    function  SystemPrivacySoap             (var IvPrivacy: string; var IvFbk: string): boolean; stdcall;
+    function  SystemLicenseSoap             (var IvLicense: string; var IvFbk: string): boolean; stdcall;
+    function  SystemCopyrightSoap           (var IvCopyright: string; var IvFbk: string): boolean; stdcall;
+    function  SystemSysRemGetSoap           (var IvSysRem: TSysRem; var IvFbk: string): boolean; stdcall;
+  //function  SystemContentGetSoap          (const IvId: integer; var IvContent: string; const IvDefault: string; var IvFbk: string): boolean; stdcall;
+  //function  SystemContentSetSoap          (const IvId: integer; const IvContent: string; var IvFbk: string): boolean; stdcall;
+    // person/user methods
     function  SystemPersonInitSoap          (const IvPerson: string; var IvPersonRem: TPerRem; var IvFbk: string): boolean; stdcall;
     function  SystemUserExistsSoap          (const IvUsername: string; var IvFbk: string): boolean; stdcall;
     function  SystemUserIsActiveSoap        (const IvUsername: string; var IvFbk: string): boolean; stdcall;
     function  SystemUserIsAuthenticatedSoap (const IvUsername, IvPassword: string; var IvFbk: string): boolean; stdcall;
     function  SystemUserInitSoap            (const IvUsername: string; var IvUserRem: TUsrRem; var IvFbk: string): boolean; stdcall;
-    // organization/theme
+    // organization/theme methods
     function  SystemOrganizationInitSoap    (const IvOrganization: string; var IvOrganizationRem: TOrgRem; var IvFbk: string): boolean; stdcall;
     function  SystemThemeInitSoap           (const IvOrganizationId: integer; var IvThemeRem: TTheRem; var IvFbk: string): boolean; stdcall;
-    // member
+    // member methods
     function  SystemMemberInitSoap          (const IvOrganization, IvUsername: string; var IvMemberRem: TMbrRem; IvFbk: string): boolean; stdcall;
-    // client
-    function  SystemClientExistsSoap        (const IvClient: string; var IvFbk: string): boolean; stdcall;
-    function  SystemClientVersionIsOkSoap   (const IvClient, IvVer: string; var IvFbk: string): boolean; stdcall;
-    // session
+    // binary methods
+    function  SystemBinaryExistsSoap        (const IvBinary: string; var IvFbk: string): boolean; stdcall;
+    function  SystemBinaryVersionIsOkSoap   (const IvBinary, IvVer: string; var IvFbk: string): boolean; stdcall;
+    // session methods
     function  SystemSessionInsertSoap       (const IvDateTimeBegin: TDateTime               ; const IvKind: string; const IvSessionId, IvFingerprintId: cardinal; const IvIpLan, IvDomain, IvComputer, IvOsLogin, IvClient, IvVersion, IvServer, IvOrganization, IvUsername: string; var IvFbk: string): boolean; stdcall;
     function  SystemSessionCloseSoap        (const IvDateTimeBegin, IvDateTimeEnd: TDateTime; const IvKind: string; const IvSessionId, IvFingerprintId: cardinal; const IvIpLan, IvDomain, IvComputer, IvOsLogin, IvClient, IvVersion, IvServer, IvOrganization, IvUsername: string; var IvFbk: string): boolean; stdcall;
-    // object
+    // object methods
     function  SystemObjectIdNextSoap        (const IvObj: string; var IvIdNext: integer; var IvFbk: string): boolean; stdcall;
     function  SystemObjectNewRio            (const IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvFromOrganization, IvFromMember: string; var IvIdNew: integer): boolean; stdcall;
-    function  SystemObjectTreeContent       (const IvObj, IvIdOrPath: string; IvWithChild: boolean                    ; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; stdcall;
-    function  SystemObjectTreeContentSave   (const IvObj, IvIdOrPath: string; IvWithChild: boolean; IvFileSpec: string; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; stdcall;
+    function  SystemObjectTreeContent       (const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean                    ; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; stdcall;
+    function  SystemObjectTreeContentSave   (const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean; IvFileSpec: string; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; stdcall;
     function  SystemObjSoapFieldGet         (const IvObj, IvIdOrPath, IvField: string;   var IvValue: variant; const IvDefault: variant): boolean; stdcall;
     function  SystemObjSoapFieldSet         (const IvObj, IvIdOrPath, IvField: string; const IvValue: variant): boolean; stdcall;
-    // dba
+    // dba methods
     function  SystemDbaInfosSoap            (var IvBuild, IvMajorVersion, IvMinorVersion, IvBuildType, IvUpdateLevel, IvUpdateReference, IvFbk: string): boolean; stdcall;
     function  SystemDbaFilesPathsSoap       (var IvDataPath, IvLogPath, IvBackupPath, IvFbk: string): boolean; stdcall;
     function  SystemDbaDatabaseRebuildSoap  (var IvFbk: string): boolean; stdcall;
@@ -58,6 +59,23 @@ type
     function  SystemDbaDeleteDdlSoap        (var IvHost, IvDateTimeCode, IvDdl, IvFbk: string): boolean; stdcall;
     function  SystemDbaBackupDdlSoap        (var IvHost, IvDateTimeCode, IvDdl, IvFbk: string): boolean; stdcall;
     function  SystemDbaRestoreDdlSoap       (var IvHost, IvDateTimeCode, IvDdl, IvFbk: string): boolean; stdcall;
+    // tbl methods
+    function  SystemTblExistsSoap           (const IvTbl: string): boolean; stdcall;
+    function  SystemTblIdExistsSoap         (const IvTbl: string; IvId: integer): boolean; stdcall;
+    function  SystemTblIdMaxSoap            (const IvTbl, IvWhere: string): integer; stdcall;
+    function  SystemTblIdAvailableSoap      (const IvTbl, IvWhere: string): integer; stdcall;
+    function  SystemTblIdNextSoap           (const IvTbl: string; IvUseIdAvailable: boolean): integer; stdcall;
+    // rec methods
+    function  SystemRecInsertSoap           (const IvTbl: string; const IvValueVec: {TVariantVector}TArray<variant>; var IvFbk: string): boolean; stdcall;
+    // fld methods
+    function  SystemFldHasValueSoap         (const IvTbl, IvFld: string; const IvValue: variant; var IvFbk: string): boolean; stdcall;
+    function  SystemFldGetSoap              (const IvTbl, IvFld: string; IvId: integer  ;   var IvValue: variant; IvDefault: variant; var IvFbk: string): boolean; stdcall;
+    function  SystemFldGetWhereSoap         (const IvTbl, IvFld: string; IvWhere: string;   var IvValue: variant; IvDefault: variant; var IvFbk: string): boolean; stdcall;
+    function  SystemFldSetSoap              (const IvTbl, IvFld: string; IvId: integer  ; const IvValue: variant                    ; var IvFbk: string): boolean; stdcall;
+    function  SystemFldSetWhereSoap         (const IvTbl, IvFld: string; IvWhere: string; const IvValue: variant                    ; var IvFbk: string): boolean; stdcall;
+    function  SystemFldIncSoap              (const IvTbl, IvFld: string; IvWhere: string                                            ; var IvFbk: string): boolean; stdcall;
+    function  SystemFldDecSoap              (const IvTbl, IvFld: string; IvWhere: string                                            ; var IvFbk: string): boolean; stdcall;
+    function  SystemFldDoMathSoap           (const IvTbl, IvFld: string; IvWhere: string; IvOperator: char; IvOperand: string       ; var IvFbk: string): boolean; stdcall;
   end;
 {$ENDREGION}
 
@@ -74,13 +92,13 @@ uses
 {$REGION 'TSystemSoapMainService'}
 
   {$REGION 'System'}
-function TSystemSoapMainService.SystemSoapInfo(var IvFbk: string): boolean;
+function TSystemSoapMainService.SystemInfoSoap(var IvFbk: string): boolean;
 begin
-  IvFbk := Format('%s %s - %s - SYSTEM Soap Main Service', [TWksRec.ACRONYM, TBynRec.Info, DateTimeToStr(Now)]);
+  IvFbk := Format('%s SYSTEM Soap Main Service (%s - %s)', [TSysRec.ACRONYM, TBynRec.Info, DateTimeToStr(Now)]);
   Result := true;
 end;
 
-function TSystemSoapMainService.SystemSoapOutline(var IvOutline, IvFbk: string): boolean;
+function TSystemSoapMainService.SystemOutlineSoap(var IvOutline, IvFbk: string): boolean;
 var
   def, vnt: variant; // default
 begin
@@ -98,7 +116,7 @@ begin
   IvFbk := 'Ok';
 end;
 
-function TSystemSoapMainService.SystemSoapPrivacy(var IvPrivacy, IvFbk: string): boolean;
+function TSystemSoapMainService.SystemPrivacySoap(var IvPrivacy, IvFbk: string): boolean;
 var
   def, vnt: variant; // default
 begin
@@ -112,7 +130,7 @@ begin
   IvFbk := 'Ok';
 end;
 
-function TSystemSoapMainService.SystemSoapLicense(var IvLicense, IvFbk: string): boolean;
+function TSystemSoapMainService.SystemLicenseSoap(var IvLicense, IvFbk: string): boolean;
 var
   def, vnt: variant; // default
 begin
@@ -131,33 +149,25 @@ begin
   IvFbk := 'Ok';
 end;
 
-function TSystemSoapMainService.SystemSoapCopyright(var IvCopyright, IvFbk: string): boolean;
+function TSystemSoapMainService.SystemCopyrightSoap(var IvCopyright, IvFbk: string): boolean;
 begin
-  IvCopyright := TWksRec.Copyright;
+  IvCopyright := TSysRec.Copyright;
   IvFbk := 'Ok';
   Result := true;
 end;
 
-//function TSystemSoapMainService.SystemSoapContentGet(const IvId: integer; var IvContent: string; const IvDefault: string; var IvFbk: string): boolean;
-//begin
-//end;
-
-//function TSystemSoapMainService.SystemSoapContentSet(const IvId: integer; const IvContent: string; var IvFbk: string): boolean;
-//begin
-//end;
-
-function TSystemSoapMainService.SystemSoapSystemGet(var IvSysRem: TSysRem; var IvFbk: string): boolean;
+function TSystemSoapMainService.SystemSysRemGetSoap(var IvSysRem: TSysRem; var IvFbk: string): boolean;
 begin
   IvFbk := 'Ok';
   Result := true;
 
-  IvSysRem.Author      := TWksRec.AUTHOR;
-  IvSysRem.Architect   := TWksRec.AUTHOR;
-  IvSysRem.Acronym     := TWksRec.ACRONYM;
-  IvSysRem.Name        := TWksRec.NAME;
-  IvSysRem.Description := TWksRec.DESCRIPTION;
-  IvSysRem.Copyright   := TWksRec.Copyright;
-  IvSysRem.Slogan      := TWksRec.SLOGAN;
+  IvSysRem.Author      := TSysRec.AUTHOR;
+  IvSysRem.Architect   := TSysRec.AUTHOR;
+  IvSysRem.Acronym     := TSysRec.ACRONYM;
+  IvSysRem.Name        := TSysRec.NAME;
+  IvSysRem.Description := TSysRec.DESCRIPTION;
+  IvSysRem.Copyright   := TSysRec.Copyright;
+  IvSysRem.Slogan      := TSysRec.SLOGAN;
   IvSysRem.LogoBytes   := nil; // *** TBD ***
 {
   if not Assigned(IvSysRem.Admin) then IvSysRem.Admin := TAdmRem.Create;
@@ -172,18 +182,14 @@ begin
   IvSysRem.Network.Email      := o.S['Network.Email     '];
 
   if not Assigned(IvSysRem.Smtp) then IvSysRem.Smtp := TSmtRem.Create;
-//IvSysRem.Smtp.Organization  := o.S['Smtp.Organization' ];
-//IvSysRem.Smtp.Owner         := o.S['Smtp.Owner'        ];
-//IvSysRem.Smtp.Account       := o.S['Smtp.Account'      ];
+//IvSysRem.Smtp.Smtp          := o.S['Smtp.Smtp'         ];
   IvSysRem.Smtp.Host          := o.S['Smtp.Host'         ];
   IvSysRem.Smtp.Port          := o.S['Smtp.Port'         ];
   IvSysRem.Smtp.Username      := o.S['Smtp.Username'     ];
   IvSysRem.Smtp.Password      := o.S['Smtp.Password'     ];
 
-  if not Assigned(IvSysRem.Pop3) then IvSysRem.Pop3 := TPopRem.Create;
-//IvSysRem.Pop3.Organization  := o.S['Pop3.Organization' ];
-//IvSysRem.Pop3.Owner         := o.S['Pop3.Owner'        ];
-//IvSysRem.Pop3.Account       := o.S['Pop3.Account'      ];
+  if not Assigned(IvSysRem.Pop3) then IvSysRem.f := TPopRem.Create;
+//IvSysRem.Pop3.Pop3          := o.S['Pop3.Pop3'         ];
   IvSysRem.Pop3.Host          := o.S['Pop3.Host'         ];
   IvSysRem.Pop3.Port          := o.S['Pop3.Port'         ];
   IvSysRem.Pop3.Username      := o.S['Pop3.Username'     ];
@@ -193,6 +199,16 @@ begin
   IvSysRem.Pop3.CleanOnExit   := o.B['Pop3.CleanOnExit'  ];
 }
 end;
+
+//function TSystemSoapMainService.SystemContentGetSoap(const IvId: integer; var IvContent: string; const IvDefault: string; var IvFbk: string): boolean;
+//begin
+//
+//end;
+
+//function TSystemSoapMainService.SystemContentSetSoap(const IvId: integer; const IvContent: string; var IvFbk: string): boolean;
+//begin
+//
+//end;
   {$ENDREGION}
 
   {$REGION 'Person/User'}
@@ -404,29 +420,37 @@ begin
   end;
 
   // detail
-  IvMemberRem.Id           := mbr.Id          ;
-  IvMemberRem.PId          := mbr.PId         ;
-  IvMemberRem.Organization := mbr.Organization;
-  IvMemberRem.Area         := mbr.Area        ;
-  IvMemberRem.State        := mbr.State       ;
+  IvMemberRem.ObjectId     := mbr.ObjectId    ;
+  IvMemberRem.Number       := mbr.Number      ;
   IvMemberRem.Member       := mbr.Member      ;
   IvMemberRem.Email        := mbr.Email       ;
+  IvMemberRem.State        := mbr.State       ;
+  IvMemberRem.Organization := mbr.Organization;
+  IvMemberRem.Department   := mbr.Department  ;
+  IvMemberRem.Area         := mbr.Area        ;
+  IvMemberRem.Team         := mbr.Team        ;
+  IvMemberRem.Site         := mbr.Site        ;
+  IvMemberRem.Building     := mbr.Building    ;
+  IvMemberRem.Workstation  := mbr.Workstation ;
+  IvMemberRem.Phone        := mbr.Phone       ;
   IvMemberRem.JobTitle     := mbr.JobTitle    ;
   IvMemberRem.JobRole      := mbr.JobRole     ;
   IvMemberRem.JobLevel     := mbr.JobLevel    ;
+  IvMemberRem.&Unit        := mbr.&Unit       ;
+  IvMemberRem.CostCenter   := mbr.CostCenter  ;
   IvMemberRem.BadgeBytes   := TBarRec.BarFromGraphic(mbr.BadgeGraphic);
 end;
   {$ENDREGION}
 
-  {$REGION 'Client'}
-function  TSystemSoapMainService.SystemClientExistsSoap(const IvClient: string; var IvFbk: string): boolean;
+  {$REGION 'Binary'}
+function  TSystemSoapMainService.SystemBinaryExistsSoap(const IvBinary: string; var IvFbk: string): boolean;
 begin
-  Result := TBynRec.ClientExists(IvClient, IvFbk);
+  Result := TSysRec.BinaryExists(IvBinary, IvFbk);
 end;
 
-function  TSystemSoapMainService.SystemClientVersionIsOkSoap(const IvClient, IvVer: string; var IvFbk: string): boolean;
+function  TSystemSoapMainService.SystemBinaryVersionIsOkSoap(const IvBinary, IvVer: string; var IvFbk: string): boolean;
 begin
-  Result := TBynRec.ClientVersionIsOk(IvClient, IvVer, IvFbk);
+  Result := TSysRec.BinaryVersionIsOk(IvBinary, IvVer, IvFbk);
 end;
   {$ENDREGION}
 
@@ -485,16 +509,16 @@ begin
   Result := TObjRec.New(IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvFromOrganization, IvFromMember, IvIdNew);
 end;
 
-function  TSystemSoapMainService.SystemObjectTreeContent(const IvObj, IvIdOrPath: string; IvWithChild: boolean; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean;
+function  TSystemSoapMainService.SystemObjectTreeContent(const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean;
 begin
-  Result := TDbaRec.ObjTreeContentDba(IvObj, IvIdOrPath, IvWithChild, IvAffected, IvObjName, IvHTreeContent, IvFbk);
+  Result := TDbaRec.ObjTreeContentDba(IvObj, IvIdOrPath, IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove, IvAffected, IvObjName, IvHTreeContent, IvFbk);
 end;
 
-function  TSystemSoapMainService.SystemObjectTreeContentSave(const IvObj, IvIdOrPath: string; IvWithChild: boolean; IvFileSpec: string; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean;
+function  TSystemSoapMainService.SystemObjectTreeContentSave(const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean; IvFileSpec: string; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean;
 var
   stl: TStringList;
 begin
-  Result := TDbaRec.ObjTreeContentDba(IvObj, IvIdOrPath, IvWithChild, IvAffected, IvObjName, IvHTreeContent, IvFbk);
+  Result := TDbaRec.ObjTreeContentDba(IvObj, IvIdOrPath, IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove, IvAffected, IvObjName, IvHTreeContent, IvFbk);
 
   // saveremotely
   stl := TStringList.Create;
@@ -1125,10 +1149,92 @@ begin
 end;
   {$ENDREGION}
 
+  {$REGION 'Tbl'}
+function TSystemSoapMainService.SystemTblExistsSoap(const IvTbl: string): boolean;
+begin
+  Result := TDbaRec.TblExists(IvTbl);
+end;
+
+function TSystemSoapMainService.SystemTblIdExistsSoap(const IvTbl: string; IvId: integer): boolean;
+begin
+  Result := TDbaRec.TblIdExists(IvTbl, IvId);
+end;
+
+function TSystemSoapMainService.SystemTblIdMaxSoap(const IvTbl, IvWhere: string): integer;
+begin
+  Result := TDbaRec.TblIdMax(IvTbl, IvWhere);
+end;
+
+function TSystemSoapMainService.SystemTblIdAvailableSoap(const IvTbl, IvWhere: string): integer;
+begin
+  Result := TDbaRec.TblIdAvailable(IvTbl, IvWhere);
+end;
+
+function TSystemSoapMainService.SystemTblIdNextSoap(const IvTbl: string; IvUseIdAvailable: boolean): integer;
+begin
+  Result := TDbaRec.TblIdNext(IvTbl, IvUseIdAvailable);
+end;
+  {$ENDREGION}
+
+  {$REGION 'Rec'}
+function TSystemSoapMainService.SystemRecInsertSoap(const IvTbl: string; const IvValueVec: TArray<variant>; var IvFbk: string): boolean; // TArray<variant> is serializable by SOAP
+var
+  avn: TArray<TVarRec>;
+begin
+  // convert to array of const
+  avn := TVntRec.VntVecToTVarRecVec(IvValueVec);
+
+  Result := TDbaRec.RecInsert(IvTbl, avn, IvFbk);
+end;
+  {$ENDREGION}
+
+  {$REGION 'Fld'}
+function TSystemSoapMainService.SystemFldHasValueSoap(const IvTbl, IvFld: string; const IvValue: variant; var IvFbk: string): boolean;
+begin
+  Result := TDbaRec.FldHasValue(IvTbl, IvFld, IvValue, IvFbk);
+end;
+
+function TSystemSoapMainService.SystemFldGetSoap(const IvTbl, IvFld: string; IvId: integer; var IvValue: variant; IvDefault: variant; var IvFbk: string): boolean;
+begin
+  Result := TDbaRec.FldGet(IvTbl, IvFld, IvId, IvValue, IvDefault, IvFbk);
+end;
+
+function TSystemSoapMainService.SystemFldGetWhereSoap(const IvTbl, IvFld: string; IvWhere: string; var IvValue: variant; IvDefault: variant; var IvFbk: string): boolean;
+begin
+  Result := TDbaRec.FldGetWhere(IvTbl, IvFld, IvWhere, IvValue, IvDefault, IvFbk);
+end;
+
+function TSystemSoapMainService.SystemFldSetSoap(const IvTbl, IvFld: string; IvId: integer; const IvValue: variant; var IvFbk: string): boolean;
+begin
+  Result := TDbaRec.FldSet(IvTbl, IvFld, IvId, IvValue, IvFbk);
+end;
+
+function TSystemSoapMainService.SystemFldSetWhereSoap(const IvTbl, IvFld: string; IvWhere: string; const IvValue: variant; var IvFbk: string): boolean;
+begin
+  Result := TDbaRec.FldSetWhere(IvTbl, IvFld, IvWhere, IvValue, IvFbk);
+end;
+
+function TSystemSoapMainService.SystemFldIncSoap(const IvTbl, IvFld: string; IvWhere: string; var IvFbk: string): boolean;
+begin
+  Result := TDbaRec.FldInc(IvTbl, IvFld, IvWhere, IvFbk);
+end;
+
+function TSystemSoapMainService.SystemFldDecSoap(const IvTbl, IvFld: string; IvWhere: string; var IvFbk: string): boolean;
+begin
+  Result := TDbaRec.FldDec(IvTbl, IvFld, IvWhere, IvFbk);
+end;
+
+function TSystemSoapMainService.SystemFldDoMathSoap(const IvTbl, IvFld: string; IvWhere: string; IvOperator: char; IvOperand: string; var IvFbk: string): boolean;
+begin
+  Result := TDbaRec.FldDoMath(IvTbl, IvFld, IvWhere, IvOperator, IvOperand, IvFbk);
+end;
+  {$ENDREGION}
+
 {$ENDREGION}
 
-{$REGION 'Init'}
 initialization
+
+{$REGION 'Init'}
    InvRegistry.RegisterInvokableClass(TSystemSoapMainService);
 {$ENDREGION}
 

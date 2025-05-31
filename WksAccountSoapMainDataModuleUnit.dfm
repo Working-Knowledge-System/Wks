@@ -14,7 +14,7 @@ object AccountMainDataModule: TAccountMainDataModule
   end
   object AccountADOTable: TADOTable
     Connection = AccountADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     IndexFieldNames = 'FldObjectId'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -39,7 +39,7 @@ object AccountMainDataModule: TAccountMainDataModule
   end
   object ObjectADOTable: TADOTable
     Connection = AccountADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     TableName = 'TblObject'
     Left = 240
     Top = 40

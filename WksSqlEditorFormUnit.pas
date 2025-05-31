@@ -13,6 +13,7 @@ uses
   , System.ImageList
   , System.SysUtils
   , System.Variants
+  , System.Diagnostics
   , Vcl.ActnList
   , Vcl.Buttons
   , Vcl.ComCtrls
@@ -27,6 +28,8 @@ uses
   , Vcl.PythonGUIInputOutput
   , Vcl.StdCtrls
   , Vcl.ToolWin
+  , Data.DB
+  , Data.Win.ADODB
   , JvExControls
   , JvExExtCtrls
   , JvExtComponent
@@ -36,18 +39,23 @@ uses
   , SynEditHighlighter
   , SynEditCodeFolding
   , SynHighlighterSQL
+  , SynHighlighterJSON
   , PythonEngine
   , VirtualTrees
   , WksLogFrameUnit
-  , WksTextEditorFormUnit, SynHighlighterJSON
+  , WksTextEditorFormUnit
   ;
 {$ENDREGION}
 
 {$REGION 'Type'}
 type
   TSqlEditorForm = class(TTextEditorForm)
+    ResultADOConnection: TADOConnection;
+    ResultADOQuery: TADOQuery;
+    ResultDataSource: TDataSource;
     procedure FormCreate(Sender: TObject);
     procedure RunActionExecute(Sender: TObject);
+    procedure LayoutActionExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -65,6 +73,10 @@ implementation
 
 {$REGION 'Use'}
 {$R *.dfm}
+
+uses
+    Wks000Unit
+  ;
 {$ENDREGION}
 
 {$REGION 'Routine'}
@@ -115,17 +127,58 @@ end;
 {$ENDREGION}
 
 {$REGION 'Action'}
-procedure TSqlEditorForm.RunActionExecute(Sender: TObject);
-//var
-//  tab: TTabSheet;
-//  sql, opt: string;
+procedure TSqlEditorForm.LayoutActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // continue from parent form: tabcurrent
-//  tab := TabCurrent;
+  // override
+  RightPageControl.ActivePage := LogFrame.GridTabSheet;
+end;
 
-//  sql := Script;
+procedure TSqlEditorForm.RunActionExecute(Sender: TObject);
+{var
+  wat: TStopwatch;
+//tab: TTabSheet;
+  sql, cos: string;
+  rez, ems: integer; // recordcount}
+begin
+  inherited;
+{
+  // tab
+//tab := TabCurrent;
+
+  // script
+  sql := Script;
+
+  // connection
+  ResultADOConnection.Close;
+  ResultADOConnection.ConnectionString := DBA_CONNECTION_STR;
+
+  // try
+  Screen.Cursor := crHourGlass;
+  try
+    // query
+    ResultADOQuery.Close;
+    ResultADOQuery.SQL.Text := sql;
+    try
+      wat := TStopwatch.StartNew;
+      ResultADOQuery.Open;
+      wat.Stop;
+      rez := ResultADOQuery.RecordCount;
+      ems := wat.ElapsedMilliseconds;
+      ResultDataSource.DataSet := ResultADOQuery;
+      LogFrame.LogOne('affected records: %d in %d ms', [rez, ems], fmSuccess);
+      LogFrame.GridDs(ResultDataSource);
+    except
+      on e: Exception do begin
+        TMesRec.E(e);
+        ResultADOQuery.Close;
+        ResultADOConnection.Close;
+      end;
+    end;
+  finally
+    Screen.Cursor := crDefault;
+  end;}
 end;
 {$ENDREGION}
 

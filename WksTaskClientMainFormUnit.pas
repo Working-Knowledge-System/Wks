@@ -12,7 +12,8 @@ uses
   Vcl.Mask, Vcl.ExtCtrls, JvExControls, JvScrollMax, JvExExtCtrls,
   JvExtComponent, WksLogFrameUnit, VirtualTrees, DTDBTreeView, DTClientTree,
   Vcl.ToolWin, JvNetscapeSplitter, JvDBRadioPanel, JvDBDateTimePicker,
-  JvComponentBase, JvThreadTimer, Vcl.AppEvnts, JvClock, Vcl.Menus;
+  JvComponentBase, JvThreadTimer, Vcl.AppEvnts, JvClock, Vcl.Menus,
+  Winapi.WebView2, Winapi.ActiveX, Vcl.Edge, Vcl.WinXCtrls;
 {$ENDREGION}
 
 {$REGION 'Type'}
@@ -43,8 +44,6 @@ type
     TaskStakeholderCsvDBEdit: TDBEdit;
     TaskStakeholderCsvLabel: TLabel;
     TaskTabSheet: TTabSheet;
-    TaskTestAction: TAction;
-    TaskTestToolButton: TToolButton;
     TaskToolBar: TToolBar;
     TaskStartJvDBDateTimePicker: TJvDBDateTimePicker;
     TaskStartLabel: TLabel;
@@ -68,13 +67,12 @@ type
     OptionTaskUpdateUpToLevelComboBox: TComboBox;
     TaskDurationLabel: TLabel;
     procedure FormCreate(Sender: TObject);
-    procedure PostActionExecute(Sender: TObject);
+    procedure ActionPostActionExecute(Sender: TObject);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
     procedure TaskClientDataSetAfterDelete(DataSet: TDataSet);
     procedure TaskClientDataSetAfterInsert(DataSet: TDataSet);
     procedure TaskClientDataSetAfterPost(DataSet: TDataSet);
     procedure TaskClientDataSetReconcileError(DataSet: TCustomClientDataSet; E: EReconcileError; UpdateKind: TUpdateKind; var Action: TReconcileAction);
-    procedure TaskTestActionExecute(Sender: TObject);
     procedure TaskStartLabelClick(Sender: TObject);
     procedure TaskEtaLabelClick(Sender: TObject);
     procedure TaskDatesResetActionExecute(Sender: TObject);
@@ -129,7 +127,6 @@ begin
   inherited;
 
   {$REGION 'gui'}
-//TaskTestToolButton.Visible := false
   {$ENDREGION}
 
   {$REGION 'property'}
@@ -163,11 +160,11 @@ end;
 {$ENDREGION}
 
 {$REGION 'Actions'}
-procedure TTaskMainForm.PostActionExecute(Sender: TObject);
+procedure TTaskMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // ... continue from ancestor
+  // detail
   if TaskClientDataSet.State = dsEdit then
     TaskDBNavigator.BtnClick(nbPost);
 end;
@@ -286,13 +283,6 @@ end;
 {$ENDREGION}
 
 {$REGION 'TaskActions'}
-procedure TTaskMainForm.TaskTestActionExecute(Sender: TObject);
-begin
-  inherited;
-
-  TMesRec.NI;
-end;
-
 procedure TTaskMainForm.TaskDatesResetActionExecute(Sender: TObject);
 begin
   inherited;

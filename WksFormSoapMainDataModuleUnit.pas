@@ -19,7 +19,7 @@ uses
 {$REGION 'Type'}
 type
   IFormMainDataModule = interface(IAppServerSOAP)
-    ['{06F9DEAE-E322-48C9-A5C6-D0CA0383AA22}']
+    ['{B8654CD4-08AE-4DC7-978C-D2D4689E2EAD}']
   end;
 
   TFormMainDataModule = class(TSoapDataModule, IFormMainDataModule, IAppServerSOAP, IAppServer)
@@ -50,13 +50,15 @@ uses
 {$REGION 'Routine'}
 procedure TWksFormSoapMainDataModuleUnitCreateInstance(out obj: TObject);
 begin
- obj := TFormMainDataModule.Create(nil);
+  obj := TFormMainDataModule.Create(nil);
 end;
 {$ENDREGION}
 
 {$REGION 'TMainDataModule'}
 procedure TFormMainDataModule.SoapDataModuleCreate(Sender: TObject);
 begin
+  if FormADOConnection.Connected then
+    FormADOConnection.Close;
   FormADOConnection.ConnectionString := DBA_CONNECTION_STR;
 end;
 {$ENDREGION}

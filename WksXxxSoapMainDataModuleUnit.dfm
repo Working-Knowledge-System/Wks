@@ -14,7 +14,7 @@ object XxxMainDataModule: TXxxMainDataModule
   end
   object XxxADOTable: TADOTable
     Connection = XxxADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     IndexFieldNames = 'FldObjectId'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -39,7 +39,7 @@ object XxxMainDataModule: TXxxMainDataModule
   end
   object ObjectADOTable: TADOTable
     Connection = XxxADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     TableName = 'TblObject'
     Left = 240
     Top = 40

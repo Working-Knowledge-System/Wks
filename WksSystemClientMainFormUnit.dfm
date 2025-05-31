@@ -1,24 +1,42 @@
 inherited SystemMainForm: TSystemMainForm
   Caption = 'SystemMainForm'
+  ExplicitWidth = 1588
+  ExplicitHeight = 879
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
-    ExplicitHeight = 702
+    ExplicitHeight = 592
   end
   inherited RightJvNetscapeSplitter: TJvNetscapeSplitter
     ExplicitLeft = 939
-    ExplicitHeight = 702
+    ExplicitHeight = 592
   end
   inherited BottomJvNetscapeSplitter: TJvNetscapeSplitter
-    ExplicitTop = 785
+    ExplicitTop = 669
     ExplicitWidth = 1252
   end
   inherited TopPanel: TPanel
+    ExplicitWidth = 1572
     inherited TopPageControl: TPageControl
+      Width = 1156
+      ExplicitWidth = 1152
+      inherited TopClientTabSheet: TTabSheet
+        ExplicitWidth = 1148
+      end
+      inherited TopActionTabSheet: TTabSheet
+        ExplicitWidth = 1148
+      end
       inherited TopTextTabSheet: TTabSheet
+        ExplicitWidth = 1148
         inherited TextToolBar: TToolBar
           Width = 785
           ExplicitWidth = 785
         end
+      end
+      inherited TopSearchTabSheet: TTabSheet
+        ExplicitWidth = 1148
+      end
+      inherited TopUtilsTabSheet: TTabSheet
+        ExplicitWidth = 1148
       end
       object SystemTabSheet: TTabSheet
         Caption = 'System'
@@ -26,7 +44,7 @@ inherited SystemMainForm: TSystemMainForm
         object SystemToolBar: TToolBar
           Left = 0
           Top = 0
-          Width = 582
+          Width = 485
           Height = 44
           Align = alLeft
           AutoSize = True
@@ -36,62 +54,30 @@ inherited SystemMainForm: TSystemMainForm
           Images = SystemImageList24
           ShowCaptions = True
           TabOrder = 0
-          object SystemTestToolButton: TToolButton
-            Left = 0
-            Top = 0
-            Action = SystemTestAction
-          end
           object SystemDbaDefinitionRebuildToolButton: TToolButton
-            Left = 97
+            Left = 0
             Top = 0
             Action = SystemDbaDefinitionRebuildAction
           end
           object SystemDbaCreateDdlToolButton: TToolButton
-            Left = 194
+            Left = 97
             Top = 0
             Action = SystemDbaCreateDdlAction
           end
           object SystemDbaDeleteDdlToolButton: TToolButton
-            Left = 291
+            Left = 194
             Top = 0
             Action = SystemDbaDeleteDdlAction
           end
           object SystemDbaBackupDdlToolButton: TToolButton
-            Left = 388
+            Left = 291
             Top = 0
             Action = SystemDbaBackupDdlAction
           end
           object SystemDbaRestoreDdlToolButton: TToolButton
-            Left = 485
+            Left = 388
             Top = 0
             Action = SystemDbaRestoreDdlAction
-          end
-        end
-      end
-      object TopDeployTabSheet: TTabSheet
-        Caption = 'Deploy'
-        ImageIndex = 6
-        object DeployToolBar: TToolBar
-          Left = 0
-          Top = 0
-          Width = 481
-          Height = 44
-          Align = alLeft
-          ButtonHeight = 46
-          ButtonWidth = 44
-          Caption = 'DeployToolBar'
-          Images = DeployImageList
-          ShowCaptions = True
-          TabOrder = 0
-          object DeployClientsToolButton: TToolButton
-            Left = 0
-            Top = 0
-            Action = DeployClientsAction
-          end
-          object DeployServersToolButton: TToolButton
-            Left = 44
-            Top = 0
-            Action = DeployServersAction
           end
         end
       end
@@ -171,19 +157,51 @@ inherited SystemMainForm: TSystemMainForm
         end
       end
     end
+    inherited TopPageControl3: TPageControl
+      Left = 1276
+      ExplicitLeft = 1272
+    end
+    inherited TopPageControl2: TPageControl
+      Left = 1156
+      ExplicitLeft = 1152
+    end
   end
   inherited LeftPanel: TPanel
+    ExplicitHeight = 594
     inherited LeftPageControl: TPageControl
+      Height = 595
+      ExplicitHeight = 594
       inherited ObjectTreeTabSheet: TTabSheet
+        ExplicitHeight = 565
+        inherited ObjectNodeInfoLabel: TLabel
+          Top = 550
+          Width = 292
+        end
+        inherited ObjectDTClientTree: TDTClientTree
+          Height = 525
+          ExplicitHeight = 525
+        end
         inherited ObjectDBNavigator: TDBNavigator
           Hints.Strings = ()
         end
       end
+      inherited WordTabSheet: TTabSheet
+        ExplicitHeight = 565
+      end
     end
   end
   inherited BottomPanel: TPanel
+    ExplicitTop = 679
+    ExplicitWidth = 1576
     inherited LogFrame: TLogFrame
+      ExplicitWidth = 1576
       inherited LogPageControl: TPageControl
+        ExplicitWidth = 1572
+        inherited OutputTabSheet: TTabSheet
+          inherited OutputRichEdit: TRichEdit
+            ExplicitWidth = 1562
+          end
+        end
         inherited SoapTabSheet: TTabSheet
           inherited SoapGridPanel: TGridPanel
             ControlCollection = <
@@ -213,9 +231,18 @@ inherited SystemMainForm: TSystemMainForm
     end
   end
   inherited RightPanel: TPanel
+    ExplicitLeft = 1272
+    ExplicitHeight = 594
     inherited RightPageControl: TPageControl
+      ExplicitHeight = 594
       inherited PropertyTabSheet: TTabSheet
         inherited ObjectJvScrollMax: TJvScrollMax
+          ExplicitHeight = 564
+          inherited ObjectImageJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectImageDBImage: TDBImage
+              Height = 0
+            end
+          end
           object SystemJvScrollMaxBand: TJvScrollMaxBand
             Width = 281
             Height = 21
@@ -321,228 +348,101 @@ inherited SystemMainForm: TSystemMainForm
               TabOrder = 3
             end
           end
-          object ClientsJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
-            Height = 21
-            Expanded = False
-            Caption = 'Client'
-            ExpandedHeight = 364
-            ButtonFont.Charset = ANSI_CHARSET
-            ButtonFont.Color = clWindowText
-            ButtonFont.Height = -11
-            ButtonFont.Name = 'Segoe UI'
-            ButtonFont.Style = [fsBold]
-            Beveled = False
-            ParentButtonFont = False
-            object ClientsObjectLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 103
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'Object'
-              ExplicitWidth = 35
-            end
-            object ClientsClientLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 153
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'Client'
-              ExplicitWidth = 31
-            end
-            object ClientsOsLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 203
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'OS Bitness'
-              ExplicitWidth = 55
-            end
-            object ClientsImageUrlLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 253
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'Image URL'
-              ExplicitWidth = 57
-            end
-            object ClientsStateLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 53
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'State'
-              ExplicitWidth = 26
-            end
-            object ClientsObjectDBEdit: TDBEdit
-              AlignWithMargins = True
-              Left = 16
-              Top = 124
-              Width = 249
-              Height = 23
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Color = clMoneyGreen
-              DataField = 'FldObject'
-              DataSource = ClientsDataSource
-              ParentShowHint = False
-              ReadOnly = True
-              ShowHint = True
-              TabOrder = 0
-            end
-            object ClientsDBNavigator: TDBNavigator
-              AlignWithMargins = True
-              Left = 3
-              Top = 22
-              Width = 275
-              Height = 25
-              DataSource = ClientsDataSource
-              VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
-              Align = alTop
-              Flat = True
-              TabOrder = 1
-            end
-            object ClientsClientDBEdit: TDBEdit
-              AlignWithMargins = True
-              Left = 16
-              Top = 174
-              Width = 249
-              Height = 23
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Color = clMoneyGreen
-              DataField = 'FldClient'
-              DataSource = ClientsDataSource
-              ParentShowHint = False
-              ReadOnly = True
-              ShowHint = True
-              TabOrder = 2
-            end
-            object ClientsOsDBComboBox: TDBComboBox
-              AlignWithMargins = True
-              Left = 16
-              Top = 224
-              Width = 249
-              Height = 23
-              Hint = 'State'
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              DataField = 'FldOs'
-              DataSource = ClientsDataSource
-              DropDownCount = 48
-              Items.Strings = (
-                ''
-                'Win32'
-                'Win64')
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 3
-            end
-            object ClientsImageUrlDBEdit: TDBEdit
-              AlignWithMargins = True
-              Left = 16
-              Top = 274
-              Width = 249
-              Height = 23
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Color = clMoneyGreen
-              DataField = 'FldImageUrl'
-              DataSource = ClientsDataSource
-              ParentShowHint = False
-              ReadOnly = True
-              ShowHint = True
-              TabOrder = 4
-            end
-            object ClientsDownloadDBCheckBox: TDBCheckBox
-              AlignWithMargins = True
-              Left = 16
-              Top = 331
-              Width = 249
-              Height = 17
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'Download'
-              DataField = 'FldDownload'
-              DataSource = ClientsDataSource
-              TabOrder = 5
-            end
-            object ClientsDeployDBCheckBox: TDBCheckBox
-              AlignWithMargins = True
-              Left = 16
-              Top = 308
-              Width = 249
-              Height = 17
-              Margins.Left = 16
-              Margins.Top = 8
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'Deploy'
-              DataField = 'FldDeploy'
-              DataSource = ClientsDataSource
-              TabOrder = 6
-            end
-            object ClientsStateDBComboBox: TDBComboBox
-              AlignWithMargins = True
-              Left = 16
-              Top = 74
-              Width = 249
-              Height = 23
-              Hint = 'State'
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              DataField = 'FldState'
-              DataSource = ClientsDataSource
-              DropDownCount = 48
-              Items.Strings = (
-                ''
-                'Active'
-                'Inactive')
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 7
-            end
-          end
         end
       end
     end
   end
+  inherited StatusBar: TStatusBar
+    ExplicitTop = 818
+    ExplicitWidth = 1566
+  end
   inherited MainPanel: TPanel
+    OnClick = MainPanelClick
+    ExplicitHeight = 594
     inherited MainPageControl: TPageControl
-      object SysLogTabSheet: TTabSheet
+      Height = 595
+      ActivePage = SystemBinariesTabSheet
+      ExplicitHeight = 594
+      inherited ObjectContentPrevTabSheet: TTabSheet
+        ExplicitHeight = 565
+        inherited ObjectContentPrevDBSynEdit: TDBSynEdit
+          Height = 537
+          ExplicitHeight = 537
+        end
+        inherited ObjectContentPrevTopPanel: TPanel
+          inherited ObjectContentPrevCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited ObjectContentTabSheet: TTabSheet
+        ExplicitHeight = 565
+        inherited ObjectContentSplitter: TSplitter
+          Height = 537
+          ExplicitHeight = 536
+        end
+        inherited ObjectContentTopPanel: TPanel
+          inherited ObjectContentCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+        inherited ObjectContentSplitView: TSplitView
+          Height = 537
+          inherited ObjectContentEdgeBrowser: TEdgeBrowser
+            Height = 537
+          end
+        end
+        inherited ObjectContentLeftPanel: TPanel
+          Height = 537
+          inherited ObjectContentDBSynEdit: TDBSynEdit
+            Height = 429
+          end
+        end
+      end
+      inherited ObjectDataTabSheet: TTabSheet
+        ExplicitHeight = 565
+        inherited ObjectDataDBSynEdit: TDBSynEdit
+          Height = 537
+          ExplicitHeight = 537
+        end
+        inherited ObjectDataTopPanel: TPanel
+          inherited ObjectDataCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited ObjectNoteTabSheet: TTabSheet
+        ExplicitHeight = 565
+        inherited ObjectNoteDBSynEdit: TDBSynEdit
+          Height = 537
+          ExplicitHeight = 537
+        end
+        inherited ObjectNoteTopPanel: TPanel
+          inherited ObjectNoteCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited FilesRioTabSheet: TTabSheet
+        ExplicitHeight = 565
+        inherited FilesRioTopPanel: TPanel
+          inherited FilesRioInfoLabel: TLabel
+            Height = 31
+          end
+        end
+        inherited FilesRioTree: TVirtualStringTree
+          Height = 519
+          ExplicitHeight = 519
+        end
+      end
+      object SystemSysLogTabSheet: TTabSheet
         Caption = 'SysLog'
         ImageIndex = 6
         object SysLogPanel: TPanel
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 521
+          Width = 941
           Height = 30
           Margins.Left = 0
           Margins.Top = 0
@@ -556,7 +456,7 @@ inherited SystemMainForm: TSystemMainForm
           TabOrder = 0
           object SysLogLabel: TLabel
             AlignWithMargins = True
-            Left = 415
+            Left = 835
             Top = 3
             Width = 98
             Height = 24
@@ -594,8 +494,8 @@ inherited SystemMainForm: TSystemMainForm
           AlignWithMargins = True
           Left = 3
           Top = 33
-          Width = 516
-          Height = 522
+          Width = 936
+          Height = 529
           Align = alClient
           BorderStyle = bsNone
           Font.Charset = ANSI_CHARSET
@@ -612,14 +512,14 @@ inherited SystemMainForm: TSystemMainForm
           OnChange = SystemSyslogRichEditChange
         end
       end
-      object DbLogTabSheet: TTabSheet
+      object SystemDbLogTabSheet: TTabSheet
         Caption = 'DbLog'
         ImageIndex = 4
         object LogTopPanel: TPanel
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 521
+          Width = 941
           Height = 30
           Margins.Left = 0
           Margins.Top = 0
@@ -633,7 +533,7 @@ inherited SystemMainForm: TSystemMainForm
           TabOrder = 0
           object LogCountLabel: TLabel
             AlignWithMargins = True
-            Left = 432
+            Left = 852
             Top = 3
             Width = 81
             Height = 24
@@ -663,8 +563,8 @@ inherited SystemMainForm: TSystemMainForm
           AlignWithMargins = True
           Left = 3
           Top = 33
-          Width = 516
-          Height = 522
+          Width = 936
+          Height = 529
           Align = alClient
           BorderStyle = bsNone
           DataSource = LogDataSource
@@ -690,14 +590,14 @@ inherited SystemMainForm: TSystemMainForm
           SortWith = swClient
         end
       end
-      object AuditTabSheet: TTabSheet
+      object SystemAuditTabSheet: TTabSheet
         Caption = 'Audit'
         ImageIndex = 5
         object AuditTopPanel: TPanel
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 521
+          Width = 941
           Height = 30
           Margins.Left = 0
           Margins.Top = 0
@@ -711,7 +611,7 @@ inherited SystemMainForm: TSystemMainForm
           TabOrder = 0
           object AuditCountLabel: TLabel
             AlignWithMargins = True
-            Left = 423
+            Left = 843
             Top = 3
             Width = 90
             Height = 24
@@ -741,8 +641,8 @@ inherited SystemMainForm: TSystemMainForm
           AlignWithMargins = True
           Left = 3
           Top = 33
-          Width = 516
-          Height = 522
+          Width = 936
+          Height = 529
           Align = alClient
           BorderStyle = bsNone
           DataSource = AuditDataSource
@@ -768,15 +668,25 @@ inherited SystemMainForm: TSystemMainForm
           SortWith = swClient
         end
       end
-      object ClientsTabSheet: TTabSheet
-        Caption = 'Clients'
+      object SystemBinariesTabSheet: TTabSheet
+        Caption = 'Binaries'
         ImageIndex = 7
-        object ClientsPanel: TPanel
+        object Splitter1: TSplitter
+          Left = 0
+          Top = 369
+          Width = 942
+          Height = 3
+          Cursor = crVSplit
+          Align = alBottom
+          ExplicitTop = 30
+          ExplicitWidth = 344
+        end
+        object BinariesPanel: TPanel
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 521
-          Height = 30
+          Width = 941
+          Height = 46
           Margins.Left = 0
           Margins.Top = 0
           Margins.Right = 1
@@ -787,43 +697,67 @@ inherited SystemMainForm: TSystemMainForm
           ParentBackground = False
           ShowCaption = False
           TabOrder = 0
-          object ClientsCountLabel: TLabel
+          object BinariesCountLabel: TLabel
             AlignWithMargins = True
-            Left = 416
+            Left = 831
             Top = 3
-            Width = 97
-            Height = 24
+            Width = 102
+            Height = 40
             Margins.Right = 8
             Align = alRight
-            Caption = 'ClientsCountLabel'
+            Caption = 'BinariesCountLabel'
             Layout = tlCenter
             ExplicitHeight = 15
           end
-          object ClientsRefreshSpeedButton: TSpeedButton
-            AlignWithMargins = True
-            Left = 16
-            Top = 3
-            Width = 53
-            Height = 24
-            Margins.Left = 16
+          object BinariesToolBar: TToolBar
+            Left = 0
+            Top = 0
+            Width = 267
+            Height = 46
             Align = alLeft
-            Caption = 'Refresh'
+            AutoSize = True
+            ButtonHeight = 46
+            ButtonWidth = 89
+            Caption = 'BinariesToolBar'
+            Images = BinariesImageList
+            ShowCaptions = True
+            TabOrder = 0
+            object BinariesClientDeployToolButton: TToolButton
+              Left = 0
+              Top = 0
+              Action = BinariesClientDeployAction
+            end
+            object BinariesServerDeployToolButton: TToolButton
+              Left = 89
+              Top = 0
+              Action = BinariesServerDeployAction
+            end
+            object BinariesServiceToolButton: TToolButton
+              Left = 178
+              Top = 0
+              Action = BinariesServiceDeployAction
+            end
+          end
+          object BinariesDBNavigator: TDBNavigator
+            Left = 288
+            Top = 10
+            Width = 264
+            Height = 25
+            DataSource = BinariesDataSource
+            VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
             Flat = True
-            OnClick = ClientsRefreshSpeedButtonClick
-            ExplicitLeft = 28
-            ExplicitTop = 6
-            ExplicitHeight = 22
+            TabOrder = 1
           end
         end
-        object ClientsJvDBUltimGrid: TJvDBUltimGrid
+        object BinariesJvDBUltimGrid: TJvDBUltimGrid
           AlignWithMargins = True
           Left = 3
-          Top = 33
-          Width = 516
-          Height = 329
+          Top = 49
+          Width = 936
+          Height = 317
           Align = alClient
           BorderStyle = bsNone
-          DataSource = ClientsDataSource
+          DataSource = BinariesDataSource
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -12
@@ -847,24 +781,25 @@ inherited SystemMainForm: TSystemMainForm
         end
         object PageControl1: TPageControl
           Left = 0
-          Top = 365
-          Width = 522
+          Top = 372
+          Width = 942
           Height = 193
-          ActivePage = ClientsMessageWhenInactiveTabSheet
+          ActivePage = BinariesDescriptionTabSheet
           Align = alBottom
           TabOrder = 2
-          object ClientsDescriptionTabSheet: TTabSheet
+          ExplicitTop = 371
+          object BinariesDescriptionTabSheet: TTabSheet
             Caption = 'Description'
-            object ClientsDescriptionDBMemo: TDBMemo
+            object BinariesDescriptionDBMemo: TDBMemo
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 508
+              Width = 928
               Height = 157
               Align = alClient
               BorderStyle = bsNone
               DataField = 'FldDescription'
-              DataSource = ClientsDataSource
+              DataSource = BinariesDataSource
               Font.Charset = ANSI_CHARSET
               Font.Color = clWindowText
               Font.Height = -13
@@ -874,63 +809,19 @@ inherited SystemMainForm: TSystemMainForm
               TabOrder = 0
             end
           end
-          object ClientsOverviewTabSheet: TTabSheet
-            Caption = 'Overview'
-            ImageIndex = 1
-            object ClientsOverviewDBMemo: TDBMemo
-              AlignWithMargins = True
-              Left = 3
-              Top = 3
-              Width = 508
-              Height = 157
-              Align = alClient
-              BorderStyle = bsNone
-              DataField = 'FldOverview'
-              DataSource = ClientsDataSource
-              Font.Charset = ANSI_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -13
-              Font.Name = 'Courier New'
-              Font.Style = []
-              ParentFont = False
-              TabOrder = 0
-            end
-          end
-          object ClientsNoteTabSheet: TTabSheet
-            Caption = 'Note'
+          object BinariesNoteTabSheet: TTabSheet
+            Caption = '  Note'
             ImageIndex = 2
-            object ClientsNoteDBMemo: TDBMemo
+            object BinariesNoteDBMemo: TDBMemo
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 508
+              Width = 928
               Height = 157
               Align = alClient
               BorderStyle = bsNone
               DataField = 'FldNote'
-              DataSource = ClientsDataSource
-              Font.Charset = ANSI_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -13
-              Font.Name = 'Courier New'
-              Font.Style = []
-              ParentFont = False
-              TabOrder = 0
-            end
-          end
-          object ClientsMessageWhenInactiveTabSheet: TTabSheet
-            Caption = 'Message when inactive'
-            ImageIndex = 3
-            object ClientsMessageWhenInactiveDBMemo: TDBMemo
-              AlignWithMargins = True
-              Left = 3
-              Top = 3
-              Width = 508
-              Height = 157
-              Align = alClient
-              BorderStyle = bsNone
-              DataField = 'FldMessageWhenInactive'
-              DataSource = ClientsDataSource
+              DataSource = BinariesDataSource
               Font.Charset = ANSI_CHARSET
               Font.Color = clWindowText
               Font.Height = -13
@@ -970,8 +861,8 @@ inherited SystemMainForm: TSystemMainForm
     DrawingStyle = dsTransparent
     Height = 24
     Width = 24
-    Left = 360
-    Top = 376
+    Left = 376
+    Top = 544
     Bitmap = {
       494C010105000800040018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000003000000001002000000000000048
@@ -1576,13 +1467,8 @@ inherited SystemMainForm: TSystemMainForm
   end
   object SystemAction: TActionList [28]
     Images = SystemImageList24
-    Left = 568
-    Top = 376
-    object SystemTestAction: TAction
-      Caption = '    Test    '
-      ImageIndex = 0
-      OnExecute = SystemTestActionExecute
-    end
+    Left = 584
+    Top = 544
     object SystemDbaDefinitionRebuildAction: TAction
       Caption = 'Dba Defs Rebuild'
       Hint = 'Rebuild the definitions of all databases'
@@ -1645,16 +1531,16 @@ inherited SystemMainForm: TSystemMainForm
     Bindings = <>
     ThreadedEvent = True
     OnSyslog = SystemSyslogIdSyslogServerSyslog
-    Left = 776
-    Top = 432
+    Left = 792
+    Top = 600
   end
   object SystemSyslogImageList: TImageList
     ColorDepth = cd32Bit
     DrawingStyle = dsTransparent
     Height = 24
     Width = 24
-    Left = 360
-    Top = 432
+    Left = 376
+    Top = 600
     Bitmap = {
       494C010102000800040018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024
@@ -1962,8 +1848,8 @@ inherited SystemMainForm: TSystemMainForm
   end
   object SystemSyslogAction: TActionList
     Images = SystemSyslogImageList
-    Left = 568
-    Top = 432
+    Left = 584
+    Top = 600
     object SystemSyslogStartAction: TAction
       AutoCheck = True
       Caption = 'Start'
@@ -1976,15 +1862,18 @@ inherited SystemMainForm: TSystemMainForm
       OnExecute = SystemSyslogCleanActionExecute
     end
   end
-  object DeployImageList: TImageList
+  object BinariesImageList: TImageList
     ColorDepth = cd32Bit
     Height = 24
     Width = 24
-    Left = 360
-    Top = 488
+    Left = 376
+    Top = 656
     Bitmap = {
-      494C010101000800040018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010102000800040018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024
+      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000000000030001001E0006
+      0035000600360002002000000003000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000400000000000000000504032A2E1E0F7F653D08BE8E5713E1B672
       2CFDB5712AFD8E5713E1663D0ABF2F1F10800604032C00000000000000000000
@@ -1995,8 +1884,8 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000001000B004506450BA7219B3AEC2AC64AFF28D0
+      47FF25D142FF27C644FF1F9D34EE044808AC000D004C00000002000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       00030000000003020222533619ABB87329FFC5936FFFD6B8A6FFE3CFC5FFE9DB
       D4FFE9DBD4FFE3CFC5FFD6B8A7FFC59370FFB8732AFF58391DAF030302230000
@@ -2007,8 +1896,8 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000004002C0D6B17C436D061FF3CE96DFF24F144FF17F62BFF0CFA
+      18FF04FC0AFF0AFB15FF1AF730FF36EE60FF32CE59FF0A6A11CA000500310000
       0000000000000000000000000000000000000000000000000000000000030000
       00001B130E60B47026FCC79979FFEADDD5FFF6F5F5FBF9F9F9FCFBFBFBFDFFFF
       FFFFFFFFFFFFFBFBFBFDF9F9F9FCF6F5F5FBE8DBD4FEC89A7AFFB57026FD1C14
@@ -2019,9 +1908,9 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000003000000002A1E
+      00000012005822B23EF631E05BFF2DE256FF2DE857FF24EE44FF1BF432FF13F7
+      24FF0FF91DFF12F822FF1AF430FF22EF41FF2CE955FF3AD56AF717892ADA000E
+      004B000000000000000000000000000000000000000000000003000000002A1E
       1478B9742FFFDBC1B3FFF5F5F5FAFFFFFFFFFFFFFFFFFEFEFEFFFEFEFDFFFEFE
       FDFFFEFEFDFFFEFEFDFFFEFEFEFFFFFFFFFFFFFFFFFFF5F5F5FADBC2B4FFB975
       2FFF2B1E147A0000000000000003000000000000000000000000000000000000
@@ -2030,10 +1919,10 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      00000000000000000000000000000000000000000004000000001B130D5FB974
+      0000000000000000000000000000000000000000000000000000000000000011
+      005923BA3FFD1CDB34FF21DD3DFF29E14FFF2FE45BFF29EB4FFF22F040FF1CF3
+      35FF1AF430FF1CF334FF21F03EFF28EC4CFF2EDD58FB22B341E41A842FC40E51
+      19A50008003800000000000000000000000000000004000000001B130D5FB974
       2FFFDDCAC0FCFBFBFBFDFFFFFFFFFEFDFDFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
       FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFDFDFFFFFFFFFFFBFBFBFDDDCC
       C2FCB9742FFF1C140E6200000000000000040000000000000000000000000000
@@ -2042,10 +1931,10 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000003020222B47025FCDBC1
+      00000000000000000000000000000000000000000000000000000004002D189E
+      2CF60FD51DFF13D823FF1CDC34FF24DF45FF2CE255FF2FE55AFF2AEA51FF26ED
+      48FF24EE45FF25ED47FF29EB4FFF2CDC55FA25B948E7188A2CC80D6119A90942
+      118D042407710001001500000000000000000000000003020222B47025FCDBC1
       B2FFFBFBFBFDFEFDFDFFFEFEFEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFEFFFFFF
       FEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFEFFFFFFFFFFFFFFFEFFFEFDFDFFFBFB
       FBFDDBC2B3FFB57025FD04030224000000000000000000000000000000000000
@@ -2054,10 +1943,10 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000053361AABC79978FFF5F5
+      0000000000000000000000000000000000000000000000000001095111C60CCD
+      18FF06D30DFF0ED61BFF17DA2AFF1FDD39FF25E047FF2DE257FF3AE36CFF39DD
+      69FF37DC67FF37E167FE2DD656F724B846E6188D2FCB0E641BAC07450E90032D
+      0675031D065E0009003C00000001000000000000000053361AABC79978FFF5F5
       F5FAFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
       FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFEFFFFFFFFFFFFFF
       FFFFF5F5F5FAC79A7AFF593A1DB0000000000000000000000000000000000000
@@ -2066,10 +1955,10 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      00000000000000000000000000000000000005040329B87328FFEADCD4FFFFFF
+      000000000000000000000000000000000000000000000008004812A122FF00C9
+      00FF02D105FF09D412FF10D71FFF18DA2CFF28DC4BFF2FC757FC125822B00721
+      0C71061F0B710D3D18A11F7A39D618822FC50D611AA907410E8C032B0672011A
+      025A000F0045000701320000000C0000000005040329B87328FFEADCD4FFFFFF
       FFFFFEFDFDFFF8F4F2FFF8F4F1FFFFFFFFFFFFFFFFFFFEFDFDFFF7F1EFFFFAF7
       F6FFFFFFFFFFFFFFFFFFFCFAF9FFF6F1EEFFFDFBFAFFFFFFFFFFFEFDFDFFF5EF
       ECFFFCFAF9FFE9DCD5FEB87329FF0604032C0000000000000000000000000000
@@ -2078,10 +1967,10 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000002C1D0F7DC4926EFFF5F4F4FBFFFF
+      00000000000000000000000000000000000000000000053109AA08AC0FFF00BF
+      00FF00CC00FF03D208FF09D413FF19D630FF1B9832E501080236000000000000
+      000000000000000000000001001B051C0A740527096E02190358000F01450008
+      003400040026000100190000000B000000002C1D0F7DC4926EFFF5F4F4FBFFFF
       FFFFF7F1EFFFBE8556FFBE8352FFF5EFECFFFFFFFFFFEBDDD6FFB56A00FFCFA9
       92FFFFFFFFFFFFFFFFFFE8D9D1FFB46500FFEEE3DDFFFFFFFFFFD6B8A7FFB466
       00FFE9DBD3FFF7F7F7FBC4916CFF2E1E0F7F0000000000000000000000000000
@@ -2090,10 +1979,10 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000633C0ABCD5B6A4FFF9F9F9FCFFFF
+      000000000000000000000000000000000000000000030D6518EE00A100FF00B3
+      00FF00C200FF00CD00FF04D20AFF19B22DFC0107013600000000000000000000
+      00000000000000000000000000000000000C010601370006002C000300210001
+      00170000000F000000090000000300000000633C0ABCD5B6A4FFF9F9F9FCFFFF
       FFFFE8D9D1FFB97634FFB97634FFE6D5CCFFFFFFFFFFD8BBABFFB87122FFC088
       5CFFF7F2EFFFFFFFFFFFE7D7CFFFB15B00FFF2EBE7FFEFE4DEFFB05700FFD7B9
       A8FFFFFFFFFFF9F9F9FCD6B8A6FF653D0BBE0000000000000000000000000000
@@ -2102,10 +1991,10 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000008A5412DEE2CEC3FFFBFBFBFDFFFF
+      000000000000000000000000000000000000000100200A7213FF009100FF00A4
+      00FF00B400FF00C100FF06C60CFF08480FB20000000000000000000000000000
+      0000000000000000000000000000000000000000000C0000000E0000000A0000
+      0006000000030000000100000000000000008A5412DEE2CEC3FFFBFBFBFDFFFF
       FFFFD5B6A3FFC59572FFCCA48AFFD3B29EFFFFFFFFFFC59470FFD0AC95FFC089
       5DFFE8D9D1FFFFFFFFFFE6D6CDFFB56900FFE9DAD2FFC4916CFFC3916BFFFDFC
       FBFFFFFFFFFFFBFBFBFDE3CFC5FF8E5715E10000000000000000000000000000
@@ -2114,9 +2003,9 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000000000050138107816FF169816FF1AA4
+      1AFF1DB31DFF00B200FF05AC0BFF031C06740000000000000000000000000000
+      0000000000000000000000000000000000000000000100000001000000000000
       000000000000000000000000000000000000B67430FCE8D9D1FFFFFFFFFFFEFD
       FCFFC18C62FFD6B7A5FFE6D4CBFFC28E67FFF6F0EDFFB87228FFEADDD5FFCA9F
       83FFD5B6A4FFFFFFFFFFE6D5CCFFB97530FFC4936FFFB97634FFF3EBE7FFFFFF
@@ -2126,10 +2015,10 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000B1712DFAE8D8D0FFFFFFFFFFF4ED
+      0000000000000000000000000000000000000005013828892EFF48B748FF48B8
+      48FF47BC47FF03A103FF049C09FF031B06730000000000000000000000000000
+      000000000002529A74DD0A8D13FF109019FF128C1AFA148F1EFB11931CFD0C95
+      18FE0E9C1BFF10A41EFF12861FDD00010013B1712DFAE8D8D0FFFFFFFFFFF4ED
       E9FFB56800FFE3D0C6FFF7F3F0FFBE8351FFD9BEAEFFBA793DFFFBF8F6FFD7BA
       A9FFC28E66FFFFFFFFFFE7D7CFFFB76F19FFD9BFAFFFBB7A3FFFE4D2C8FFFFFF
       FFFFFDFCFCFFFFFFFFFFE9DBD3FFB6722DFD0000000000000000000000000000
@@ -2138,10 +2027,10 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000008A5411DEE1CCC0FFFBFBFBFDE6D5
+      000000000000000000000000000000000000000200212E8B37FF5CC25CFF5CC2
+      5CFF5CC25CFF199B19FF019204FF094011AF0000000000000000000000000000
+      000000000000081F0D7E08AD10FF1AF61AFF49F349FF5EF05EFF60E960FF52DE
+      52FF3ACD3AFF1DB71DFF12B420FF020C04408A5411DEE1CCC0FFFBFBFBFDE6D5
       CCFFB36300FFEEE4DEFFFFFFFFFFC89A7AFFBC7D46FFC89C7DFFFFFFFFFFE5D3
       C9FFB66D08FFFBF9F7FFEADDD6FFB26100FFF3ECE8FFDCC3B4FFB36200FFF3EC
       E8FFFFFFFFFFFBFBFBFDE2CFC4FF8D5615E00000000000000000000000000000
@@ -2150,10 +2039,10 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000633C0BBCD4B4A2FFF9F9F9FCCDA7
+      00000000000000000000000000000000000000000004247530EF6FCB6FFF6FCB
+      6FFF6FCB6FFF49B349FF008800FF10871EFB0005013100000000000000000000
+      00000000000000000000051F09830BB114FF00E600FF21E221FF5BE55BFF6FE4
+      6FFF6FDF6FFF6FDA6FFF4FD460FF020D0540633C0BBCD4B4A2FFF9F9F9FCCDA7
       8EFFB56800FFF8F3F1FFFFFFFFFFD8BBABFFAA4000FFD7BAA9FFFFFFFFFFF0E7
       E2FFAC4900FFE9DBD3FFEBDDD6FFA93B00FFEEE3DEFFFFFFFFFFC0885BFFBD81
       4DFFF8F4F2FFF9F9F9FCD5B6A4FF653D0BBE0000000000000000000000000000
@@ -2162,10 +2051,10 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000002B1C0E7BC4926DFFF5F4F4FBEBDE
+      00000000000000000000000000000000000000000000093810AD7ACA7CFF82D4
+      82FF82D482FF83D383FF1B961BFF028904FF0E661AE10004012F000000000000
+      000000000000000000000003012B0F7B1DEF00D300FF00D000FF60E160FF82E4
+      82FF82E182FF82DE82FF5ADA6CFF020D05402B1C0E7BC4926DFFF5F4F4FBEBDE
       D7FFE9DBD4FFFEFEFDFFFFFFFFFFF6F0EDFFE4D2C8FFF5EFECFFFFFFFFFFFCFB
       FAFFE6D5CCFFF3EBE7FFF8F3F1FFE4D2C9FFF8F3F1FFFFFFFFFFF4EEEAFFE3D0
       C5FFF5EEEBFFF7F7F7FBC4916CFF2C1D0E7D0000000000000000000000000000
@@ -2174,10 +2063,10 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      00000000000000000000000000000000000005030228B87227FFE9DBD3FFFFFF
+      00000000000000000000000000000000000000000000010B024C57AB5EFF93DB
+      93FF93DB93FF93DB93FF85D085FF0F900FFF018703FF0A7515FA05300BAA0212
+      046C0211046B052D0BA60B7D14F902B304FF00BF00FF4DD54DFF93E693FF93E4
+      93FF93E393FF93E193FF62DD71FF020D044005030228B87227FFE9DBD3FFFFFF
       FFFFFFFFFFFFFFFFFFFFFFFEFEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFEFFFFFF
       FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFEFEFFFFFFFFFFFFFF
       FFFFFFFFFFFFEADBD4FFB87329FF050403290000000000000000000000000000
@@ -2186,10 +2075,10 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000053361BAAC69876FFF5F4
+      0000000000000000000000000000000000000000000000000002125619CA9AD9
+      9BFFA3E1A3FFA3E1A3FFA3E1A3FF95D795FF2A9E2AFF008800FF018403FF047C
+      08FF047D08FF018C03FF009D00FF09A909FF63D063FFA3E7A3FFA3E6A3FFA3E6
+      A3FFA3E5A3FFA3E3A3FF67DE74FF020D03400000000053361BAAC69876FFF5F4
       F4FAFFFEFEFFFFFEFEFFFFFFFFFFFFFEFEFFFEFDFDFFFFFEFEFFFFFFFFFFFFFF
       FFFFFEFDFDFFFFFEFEFFFFFFFEFFFEFDFDFFFFFFFEFFFFFFFFFFFEFEFDFFFEFE
       FEFFF5F5F5FAC79979FF53371AAC000000000000000000000000000000000000
@@ -2198,10 +2087,10 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000003020220B06E25FADABF
+      0000000000000000000000000000000000000000000000000000000500323D9F
+      45F8B1E6B1FFB0E6B0FFB0E6B0FFB0E6B0FFB2E7B2FF86CE86FF4CAF4CFF2E9F
+      2EFF279C27FF3AA83AFF65C265FFA5E2A5FFB0E8B0FFB0E8B0FFB0E8B0FFB0E8
+      B0FFB0E7B0FFB0E7B0FF6BE075FF010D03400000000003020220B06E25FADABF
       B0FFFBFBFBFDFEFEFEFFFFFEFEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
       FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFEFFFEFEFDFFFBFB
       FBFDDBC1B2FFB47026FC03020222000000000000000000000000000000000000
@@ -2210,10 +2099,10 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000000000040000000019120C5CB974
+      0000000000000000000000000000000000000000000000000000000000000115
+      036053BA59FDBEEBBEFFBCEBBCFFBDEBBDFFBCEBBCFFBCEBBCFFBDEBBDFFBCEB
+      BCFFBCEBBCFFBCEBBCFFBCEBBCFFBCEBBCFFBCEBBCFFBCEBBCFFBEECBEFF6CD6
+      72FF73DB79FFBEECBEFF6DE275FF010D0240000000040000000019120C5CB974
       2DFFDECABEFDFBFBFBFDFFFFFFFFFEFDFDFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
       FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFDFDFFFFFFFFFFFBFBFBFDDECB
       C0FDB9742EFF1A130D5E00000000000000040000000000000000000000000000
@@ -2223,9 +2112,9 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000000000000000000400000000271C
+      00000118026140BA45F8BCEBBDFFC7EFC7FFC7EFC7FFC7EFC7FFC7EFC7FFC7EF
+      C7FFC7EFC7FFC7EFC7FFC7EFC7FFC7EFC7FFC7EFC7FFBEECBFFF46C24AFA021F
+      0369033205806BDE6FFF70E475FF000D0140000000000000000400000000271C
       1374B9742DFFDABFB0FFF5F5F5FAFFFFFFFFFFFFFFFFFEFEFEFFFEFEFDFFFEFE
       FDFFFEFEFDFFFEFEFDFFFEFEFEFFFFFFFFFFFFFFFFFFF5F5F5FADAC0B1FFB974
       2FFF2A1E15780000000000000003000000000000000000000000000000000000
@@ -2235,9 +2124,9 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000030000
+      000000000000000700330E750FCC73D374FFC5EEC5FFD2F3D2FFD0F3D0FFD0F3
+      D0FFD0F3D0FFD0F3D0FFD1F3D1FFC7EFC7FF76D477FF0F7D12D2000800380000
+      0000000000000133027FB0ECB2FE040A04380000000000000000000000030000
       000018120C5BB06C23F9C69776FFE9DBD3FFF6F5F4FBF9F9F9FCFBFBFBFDFFFF
       FFFFFFFFFFFFFBFBFBFDF9F9F9FCF6F5F4FBEADBD4FFC79877FFB06E25FA1A13
       0D5E000000000000000300000000000000000000000000000000000000000000
@@ -2247,9 +2136,9 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000000000020010004F095609B26EBF6EF3C1E9C1FFDFF3
+      DFFFE0F3E0FFC3E9C3FF72C472F50A590AB50013005400000003000000000000
+      0000000000000000000007080730000000020000000000000000000000000000
       0004000000000302021F52361BA9B87227FFC4916CFFD5B6A3FFE2CDC2FFE8D9
       D0FFE8D9D0FFE2CEC2FFD5B6A4FFC4926DFFB87227FF53361BAA030202200000
       0000000000030000000000000000000000000000000000000000000000000000
@@ -2259,15 +2148,12 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000000000080406042D0C10
+      0C450C100C450407042E00000009000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000040000000000000000050303282C1D0F7C623B0ABB88520CDCB272
       2FFAB27230FA88520CDC623B0ABB2C1D0F7C0503022800000000000000000000
       0004000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -2287,41 +2173,41 @@ inherited SystemMainForm: TSystemMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000}
   end
-  object DeployAction: TActionList
-    Images = DeployImageList
-    Left = 568
-    Top = 488
-    object DeployClientsAction: TAction
-      Caption = 'Clients'
-      Hint = 'Deploy clients executables so can be downloaded from the website'
-      ImageIndex = 0
-      OnExecute = DeployClientsActionExecute
+  object BinariesAction: TActionList
+    Images = BinariesImageList
+    Left = 584
+    Top = 656
+    object BinariesClientDeployAction: TAction
+      Caption = 'Clients Deploy'
+      Hint = 'Deploy clients binaries so can be downloaded from the website'
+      ImageIndex = 1
+      OnExecute = BinariesClientDeployActionExecute
     end
-    object DeployServersAction: TAction
-      Caption = 'Servers'
+    object BinariesServerDeployAction: TAction
+      Caption = 'Servers Deploy'
       Hint = 
         'Deploy ISAPI, SOAP and REST servers to the  IIS web server direc' +
         'tory'
-      ImageIndex = 0
-      OnExecute = DeployServersActionExecute
+      ImageIndex = 1
+      OnExecute = BinariesServerDeployActionExecute
     end
-    object DeployServicesAction: TAction
-      Caption = 'Services'
-      ImageIndex = 0
-      OnExecute = DeployServicesActionExecute
+    object BinariesServiceDeployAction: TAction
+      Caption = 'Services Deploy'
+      ImageIndex = 1
+      OnExecute = BinariesServiceDeployActionExecute
     end
   end
-  object ClientsClientDataSet: TClientDataSet
+  object BinariesClientDataSet: TClientDataSet
     Aggregates = <>
     Params = <>
-    ProviderName = 'ClientsDataSetProvider'
+    ProviderName = 'BinariesDataSetProvider'
     RemoteServer = MainSoapConnection
-    AfterRefresh = ClientsClientDataSetAfterRefresh
+    AfterRefresh = BinariesClientDataSetAfterRefresh
     Left = 72
     Top = 600
   end
-  object ClientsDataSource: TDataSource
-    DataSet = ClientsClientDataSet
+  object BinariesDataSource: TDataSource
+    DataSet = BinariesClientDataSet
     Left = 208
     Top = 600
   end

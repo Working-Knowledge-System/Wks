@@ -12,7 +12,8 @@ uses
   Vcl.Mask, Vcl.ExtCtrls, JvExControls, JvScrollMax, JvExExtCtrls,
   JvExtComponent, WksLogFrameUnit, VirtualTrees, DTDBTreeView, DTClientTree,
   Vcl.ToolWin, JvNetscapeSplitter, JvComponentBase, JvNavigationPane,
-  JvDBSpinEdit, JvThreadTimer, Vcl.AppEvnts, JvClock, Vcl.Menus;
+  JvDBSpinEdit, JvThreadTimer, Vcl.AppEvnts, JvClock, Vcl.Menus,
+  Winapi.WebView2, Winapi.ActiveX, Vcl.Edge, Vcl.WinXCtrls;
 {$ENDREGION}
 
 {$REGION 'Type'}
@@ -28,7 +29,6 @@ type
     PageContentFixedDBCheckBox: TDBCheckBox;
     PageCssDBSynEdit: TDBSynEdit;
     PageCssTabSheet: TTabSheet;
-    PageDBEdit: TDBEdit;
     PageDBNavigator: TDBNavigator;
     PageDataSource: TDataSource;
     PageFlagsJvScrollMaxBand1: TJvScrollMaxBand;
@@ -44,7 +44,6 @@ type
     PageJsDBSynEdit: TDBSynEdit;
     PageJsTabSheet: TTabSheet;
     PageJvScrollMaxBand: TJvScrollMaxBand;
-    PageLabel: TLabel;
     PageLeftRightSpaceLabel: TLabel;
     PageLeftSpaceJvDBSpinEdit: TJvDBSpinEdit;
     PageMarginJvScrollMaxBand: TJvScrollMaxBand;
@@ -59,11 +58,7 @@ type
     PageSpacesResetLabel: TLabel;
     PageSubtitleShowDBCheckBox: TDBCheckBox;
     PageSystemInfoOffDBCheckBox: TDBCheckBox;
-    PageTabSheet: TTabSheet;
-    PageTestAction: TAction;
-    PageTestToolButton: TToolButton;
     PageTitleShowDBCheckBox: TDBCheckBox;
-    PageToolBar: TToolBar;
     PageTopNavOffDBCheckBox: TDBCheckBox;
     PageTopSpaceJvDBSpinEdit: TJvDBSpinEdit;
     PageTopSpaceLabel: TLabel;
@@ -77,14 +72,14 @@ type
     CodeHeaderTopPanel: TPanel;
     PageJsLabel: TLabel;
     CodeJsAfterTopPanel: TPanel;
+    PageImageShowDBCheckBox: TDBCheckBox;
     procedure FormCreate(Sender: TObject);
-    procedure PostActionExecute(Sender: TObject);
+    procedure ActionPostActionExecute(Sender: TObject);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
     procedure PageClientDataSetAfterDelete(DataSet: TDataSet);
     procedure PageClientDataSetAfterInsert(DataSet: TDataSet);
     procedure PageClientDataSetAfterPost(DataSet: TDataSet);
     procedure PageClientDataSetReconcileError(DataSet: TCustomClientDataSet; E: EReconcileError; UpdateKind: TUpdateKind; var Action: TReconcileAction);
-    procedure PageTestActionExecute(Sender: TObject);
     procedure PageHeaderDBSynEditChange(Sender: TObject);
     procedure PageFooterDBSynEditChange(Sender: TObject);
     procedure PageHeadDBSynEditChange(Sender: TObject);
@@ -98,11 +93,20 @@ type
     procedure PageJsDBSynEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure PageJsAfterDBSynEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure OptionFoldingLineShowCheckBoxClick(Sender: TObject);
+    procedure PageClientDataSetAfterScroll(DataSet: TDataSet);
+    procedure PageClientDataSetAfterRefresh(DataSet: TDataSet);
+    procedure PageClientDataSetBeforeScroll(DataSet: TDataSet);
+    procedure PageClientDataSetBeforeInsert(DataSet: TDataSet);
+    procedure PageClientDataSetBeforePost(DataSet: TDataSet);
+    procedure PageClientDataSetBeforeRefresh(DataSet: TDataSet);
+    procedure PageClientDataSetAfterCancel(DataSet: TDataSet);
+    procedure PageClientDataSetBeforeDelete(DataSet: TDataSet);
   private
     { Private declarations }
   public
     { Public declarations }
-    procedure SynEditsSetup;
+    procedure PageSynEditsSetup;
+    procedure PageTabsUpdate;
   end;
 {$ENDREGION}
 
@@ -126,7 +130,7 @@ uses
 {$ENDREGION}
 
 {$REGION 'Routine'}
-procedure TPageMainForm.SynEditsSetup;
+procedure TPageMainForm.PageSynEditsSetup;
 begin
   gsyn.Setup(PageHeaderDBSynEdit , Trunc(OptionTabWidthJvSpinEdit.Value), ckHtml, OptionFoldingLineShowCheckBox.Checked);
   gsyn.Setup(PageFooterDBSynEdit , Trunc(OptionTabWidthJvSpinEdit.Value), ckHtml, OptionFoldingLineShowCheckBox.Checked);
@@ -134,6 +138,16 @@ begin
   gsyn.Setup(PageCssDBSynEdit    , Trunc(OptionTabWidthJvSpinEdit.Value), ckCss , OptionFoldingLineShowCheckBox.Checked);
   gsyn.Setup(PageJsDBSynEdit     , Trunc(OptionTabWidthJvSpinEdit.Value), ckJs  , OptionFoldingLineShowCheckBox.Checked);
   gsyn.Setup(PageJsAfterDBSynEdit, Trunc(OptionTabWidthJvSpinEdit.Value), ckJs  , OptionFoldingLineShowCheckBox.Checked);
+end;
+
+procedure TPageMainForm.PageTabsUpdate;
+begin
+  PageHeaderTabSheet.Caption  := ifthen(PageHeaderDBSynEdit.Text.IsEmpty , 'Header'   , 'HEADER'   );
+  PageFooterTabSheet.Caption  := ifthen(PageFooterDBSynEdit.Text.IsEmpty , 'Footer'   , 'FOOTER'   );
+  PageHeadTabSheet.Caption    := ifthen(PageHeadDBSynEdit.Text.IsEmpty   , '  Head'   , '  HEAD'   );
+  PageCssTabSheet.Caption     := ifthen(PageCssDBSynEdit.Text.IsEmpty    , '   Css'   , '   CSS'   );
+  PageJsTabSheet.Caption      := ifthen(PageJsDBSynEdit.Text.IsEmpty     , 'Js Before', 'JS BEFORE');
+  PageJsAfterTabSheet.Caption := ifthen(PageJsAfterDBSynEdit.Text.IsEmpty, 'Js After' , 'JS AFTER' );
 end;
 {$ENDREGION}
 
@@ -145,11 +159,10 @@ begin
   inherited;
 
   {$REGION 'gui'}
-//PageTestToolButton.Visible := false;
   {$ENDREGION}
 
   {$REGION 'syn'}
-  SynEditsSetup;
+  PageSynEditsSetup;
   {$ENDREGION}
 
   {$REGION 'property'}
@@ -166,99 +179,171 @@ procedure TPageMainForm.PageHeaderDBSynEditChange(Sender: TObject);
 begin
   inherited;
 
-  PageHeaderTabSheet.Caption := ifthen(PageHeaderDBSynEdit.Text.IsEmpty, 'Header', 'Header •');
+  // notempty
+  if PageHeaderDBSynEdit.Text.IsEmpty then
+    PageHeaderTabSheet.Caption := TStrRec.StrCapitalize(PageHeaderTabSheet.Caption)
+  else
+    PageHeaderTabSheet.Caption := UpperCase(PageHeaderTabSheet.Caption);
 end;
 
 procedure TPageMainForm.PageHeaderDBSynEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   inherited;
 
-  // stdshorcutsloop
-  gsyn.KeyUp(Sender as TDBSynEdit, ckHtml, Key, Shift);
+  // edit
+  if not (PageClientDataSet.State in [dsEdit]) then
+    PageClientDataSet.Edit;
+
+  // modified
+  if not TStrRec.StrEndsWith(PageHeaderTabSheet.Caption, ' ' + CHAR_CONTENT_CHANGED) then
+    PageHeaderTabSheet.Caption := PageHeaderTabSheet.Caption + ' ' + CHAR_CONTENT_CHANGED;
+
+  // stdshorcuts
+  gsyn.SynEditOnKeyUp(Sender{, ckHtml}, Key, Shift);
 end;
 
 procedure TPageMainForm.PageFooterDBSynEditChange(Sender: TObject);
 begin
   inherited;
 
-  PageFooterTabSheet.Caption := ifthen(PageFooterDBSynEdit.Text.IsEmpty, 'Footer', 'Footer •');
+  // notempty
+  if PageFooterDBSynEdit.Text.IsEmpty then
+    PageFooterTabSheet.Caption := TStrRec.StrCapitalize(PageFooterTabSheet.Caption)
+  else
+    PageFooterTabSheet.Caption := UpperCase(PageFooterTabSheet.Caption);
 end;
 
 procedure TPageMainForm.PageFooterDBSynEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   inherited;
 
-  // stdshorcutsloop
-  gsyn.KeyUp(Sender as TDBSynEdit, ckHtml, Key, Shift);
+  // edit
+  if not (PageClientDataSet.State in [dsEdit]) then
+    PageClientDataSet.Edit;
+
+  // modified
+  if not TStrRec.StrEndsWith(PageFooterTabSheet.Caption, ' ' + CHAR_CONTENT_CHANGED) then
+    PageFooterTabSheet.Caption := PageFooterTabSheet.Caption + ' ' + CHAR_CONTENT_CHANGED;
+
+  // stdshorcuts
+  gsyn.SynEditOnKeyUp(Sender{, ckHtml}, Key, Shift);
 end;
 
 procedure TPageMainForm.PageHeadDBSynEditChange(Sender: TObject);
 begin
   inherited;
 
-  PageHeadTabSheet.Caption := ifthen(PageHeadDBSynEdit.Text.IsEmpty, ' Head', 'Head •');
+  // notempty
+  if PageHeadDBSynEdit.Text.IsEmpty then
+    PageHeadTabSheet.Caption := TStrRec.StrCapitalize(PageHeadTabSheet.Caption)
+  else
+    PageHeadTabSheet.Caption := UpperCase(PageHeadTabSheet.Caption);
 end;
 
 procedure TPageMainForm.PageHeadDBSynEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   inherited;
 
-  // stdshorcutsloop
-  gsyn.KeyUp(Sender as TDBSynEdit, ckHtml, Key, Shift);
+  // edit
+  if not (PageClientDataSet.State in [dsEdit]) then
+    PageClientDataSet.Edit;
+
+  // modified
+  if not TStrRec.StrEndsWith(PageHeadTabSheet.Caption, ' ' + CHAR_CONTENT_CHANGED) then
+    PageHeadTabSheet.Caption := PageHeadTabSheet.Caption + ' ' + CHAR_CONTENT_CHANGED;
+
+  // stdshorcuts
+  gsyn.SynEditOnKeyUp(Sender{, ckHtml}, Key, Shift);
 end;
 
 procedure TPageMainForm.PageCssDBSynEditChange(Sender: TObject);
 begin
   inherited;
 
-  PageCssTabSheet.Caption := ifthen(PageCssDBSynEdit.Text.IsEmpty, '   Css', ' Css •');
+  // notempty
+  if PageCssDBSynEdit.Text.IsEmpty then
+    PageCssTabSheet.Caption := TStrRec.StrCapitalize(PageCssTabSheet.Caption)
+  else
+    PageCssTabSheet.Caption := UpperCase(PageCssTabSheet.Caption);
 end;
 
 procedure TPageMainForm.PageCssDBSynEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   inherited;
 
-  // stdshorcutsloop
-  gsyn.KeyUp(Sender as TDBSynEdit, ckCss, Key, Shift);
+  // edit
+  if not (PageClientDataSet.State in [dsEdit]) then
+    PageClientDataSet.Edit;
+
+  // modified
+  if not TStrRec.StrEndsWith(PageCssTabSheet.Caption, ' ' + CHAR_CONTENT_CHANGED) then
+    PageCssTabSheet.Caption := PageCssTabSheet.Caption + ' ' + CHAR_CONTENT_CHANGED;
+
+  // stdshorcuts
+  gsyn.SynEditOnKeyUp(Sender{, ckCss}, Key, Shift);
 end;
 
 procedure TPageMainForm.PageJsDBSynEditChange(Sender: TObject);
 begin
   inherited;
 
-  PageJsTabSheet.Caption := ifthen(PageJsDBSynEdit.Text.IsEmpty, 'Js Before', 'Js Before •');
+  // notempty
+  if PageJsDBSynEdit.Text.IsEmpty then
+    PageJsTabSheet.Caption := TStrRec.StrCapitalize(PageJsTabSheet.Caption)
+  else
+    PageJsTabSheet.Caption := UpperCase(PageJsTabSheet.Caption);
 end;
 
 procedure TPageMainForm.PageJsDBSynEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   inherited;
 
-  // stdshorcutsloop
-  gsyn.KeyUp(Sender as TDBSynEdit, ckJs, Key, Shift);
+  // edit
+  if not (PageClientDataSet.State in [dsEdit]) then
+    PageClientDataSet.Edit;
+
+  // modified
+  if not TStrRec.StrEndsWith(PageJsTabSheet.Caption, ' ' + CHAR_CONTENT_CHANGED) then
+    PageJsTabSheet.Caption := PageJsTabSheet.Caption + ' ' + CHAR_CONTENT_CHANGED;
+
+  // stdshorcuts
+  gsyn.SynEditOnKeyUp(Sender{, ckJs}, Key, Shift);
 end;
 
 procedure TPageMainForm.PageJsAfterDBSynEditChange(Sender: TObject);
 begin
   inherited;
 
-  PageJsAfterTabSheet.Caption := ifthen(PageJsAfterDBSynEdit.Text.IsEmpty, 'Js After', 'Js After •');
+  // notempty
+  if PageJsAfterDBSynEdit.Text.IsEmpty then
+    PageJsAfterTabSheet.Caption := TStrRec.StrCapitalize(PageJsAfterTabSheet.Caption)
+  else
+    PageJsAfterTabSheet.Caption := UpperCase(PageJsAfterTabSheet.Caption);
 end;
 
 procedure TPageMainForm.PageJsAfterDBSynEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   inherited;
 
-  // stdshorcutsloop
-  gsyn.KeyUp(Sender as TDBSynEdit, ckJs, Key, Shift);
+  // edit
+  if not (PageClientDataSet.State in [dsEdit]) then
+    PageClientDataSet.Edit;
+
+  // modified
+  if not TStrRec.StrEndsWith(PageJsAfterTabSheet.Caption, ' ' + CHAR_CONTENT_CHANGED) then
+    PageJsAfterTabSheet.Caption := PageJsAfterTabSheet.Caption + ' ' + CHAR_CONTENT_CHANGED;
+
+  // stdshorcuts
+  gsyn.SynEditOnKeyUp(Sender{, ckJs}, Key, Shift);
 end;
 {$ENDREGION}
 
 {$REGION 'Actions'}
-procedure TPageMainForm.PostActionExecute(Sender: TObject);
+procedure TPageMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // ... continue from ancestor
+  // detail
   if PageClientDataSet.State = dsEdit then
     PageDBNavigator.BtnClick(nbPost);
 end;
@@ -292,29 +377,27 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION 'PageActions'}
-procedure TPageMainForm.PageTestActionExecute(Sender: TObject);
-begin
-  inherited;
-
-  TMesRec.NI;
-end;
-{$ENDREGION}
-
 {$REGION 'PageCds'}
-procedure TPageMainForm.PageClientDataSetAfterDelete(DataSet: TDataSet);
+procedure TPageMainForm.PageClientDataSetBeforeScroll(DataSet: TDataSet);
 begin
   inherited;
 
-  {$REGION 'detail'}
-  if PageClientDataSet.ApplyUpdates(0) > 0 then
-    TMesRec.I('Unable to delete %s detail data from remote server', [FObj])
-  else begin
-    PageClientDataSet.Refresh; // IMPORTAN
-    LogFrame.Log('%s detail data deleted from remote server', ['Object']);
-  end;
-  {$ENDREGION}
+  // tabs
+  PageTabsUpdate;
+end;
 
+procedure TPageMainForm.PageClientDataSetAfterScroll(DataSet: TDataSet);
+begin
+  inherited;
+
+  // detail
+end;
+
+procedure TPageMainForm.PageClientDataSetBeforeInsert(DataSet: TDataSet);
+begin
+  inherited;
+
+  // detail
 end;
 
 procedure TPageMainForm.PageClientDataSetAfterInsert(DataSet: TDataSet);
@@ -323,13 +406,20 @@ begin
 
   {$REGION 'detail'}
   // set
-  DataSet.Edit;
+ {DataSet.Edit;
 //DataSet.FieldByName('FldObjectId').Value := FId; // automatic
-  DataSet.FieldByName('FldPage'    ).Value := TNamRec.RndInt('Page');
+  DataSet.FieldByName('FldPage'    ).Value := TNamRec.RndInt('Page'); *** removed ***
   DataSet.Post;
-  LogFrame.Log('%s data initialized', [FObj]);
+  LogFrame.Log('%s data initialized', [FObj]);}
   {$ENDREGION}
 
+end;
+
+procedure TPageMainForm.PageClientDataSetBeforePost(DataSet: TDataSet);
+begin
+  inherited;
+
+  // detail
 end;
 
 procedure TPageMainForm.PageClientDataSetAfterPost(DataSet: TDataSet);
@@ -343,6 +433,57 @@ begin
   else begin
     PageClientDataSet.Refresh; // IMPORTAN
     LogFrame.Log('%s detail data saved to remote server', [FObj]);
+  end;
+
+  // tabs
+  PageTabsUpdate;
+  {$ENDREGION}
+
+end;
+
+procedure TPageMainForm.PageClientDataSetBeforeRefresh(DataSet: TDataSet);
+begin
+  inherited;
+
+  // detail
+end;
+
+procedure TPageMainForm.PageClientDataSetAfterRefresh(DataSet: TDataSet);
+begin
+  inherited;
+
+  {$REGION 'detail'}
+  // tabs
+  PageTabsUpdate;
+  {$ENDREGION}
+
+end;
+
+procedure TPageMainForm.PageClientDataSetAfterCancel(DataSet: TDataSet);
+begin
+  inherited;
+
+  // tabs
+  PageTabsUpdate;
+end;
+
+procedure TPageMainForm.PageClientDataSetBeforeDelete(DataSet: TDataSet);
+begin
+  inherited;
+
+  // detail
+end;
+
+procedure TPageMainForm.PageClientDataSetAfterDelete(DataSet: TDataSet);
+begin
+  inherited;
+
+  {$REGION 'detail'}
+  if PageClientDataSet.ApplyUpdates(0) > 0 then
+    TMesRec.I('Unable to delete %s detail data from remote server', [FObj])
+  else begin
+    PageClientDataSet.Refresh; // IMPORTAN
+    LogFrame.Log('%s detail data deleted from remote server', ['Object']);
   end;
   {$ENDREGION}
 
@@ -364,7 +505,7 @@ procedure TPageMainForm.OptionFoldingLineShowCheckBoxClick(Sender: TObject);
 begin
   inherited;
 
-  SynEditsSetup;
+  PageSynEditsSetup;
 end;
 {$ENDREGION}
 

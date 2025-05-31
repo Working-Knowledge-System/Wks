@@ -54,6 +54,9 @@ inherited PythonEditorForm: TPythonEditorForm
         inherited TreeSplitter: TSplitter
           ExplicitTop = 412
         end
+        inherited TreeVst: TVirtualStringTree
+          ExplicitHeight = 387
+        end
       end
     end
   end

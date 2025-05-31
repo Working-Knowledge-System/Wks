@@ -19,7 +19,7 @@ uses
 {$REGION 'Type'}
 type
   IMemberMainDataModule = interface(IAppServerSOAP)
-    ['{06F9DEAE-E322-48C9-A5C6-D0CA0383AA22}']
+    ['{6ED97487-4EF2-47B2-ABE4-02C5697232D9}']
   end;
 
   TMemberMainDataModule = class(TSoapDataModule, IMemberMainDataModule, IAppServerSOAP, IAppServer)
@@ -50,13 +50,15 @@ uses
 {$REGION 'Routine'}
 procedure TWksMemberSoapMainDataModuleUnitCreateInstance(out obj: TObject);
 begin
- obj := TMemberMainDataModule.Create(nil);
+  obj := TMemberMainDataModule.Create(nil);
 end;
 {$ENDREGION}
 
 {$REGION 'TMainDataModule'}
 procedure TMemberMainDataModule.SoapDataModuleCreate(Sender: TObject);
 begin
+  if MemberADOConnection.Connected then
+    MemberADOConnection.Close;
   MemberADOConnection.ConnectionString := DBA_CONNECTION_STR;
 end;
 {$ENDREGION}

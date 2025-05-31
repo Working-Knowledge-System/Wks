@@ -12,61 +12,68 @@ uses
   Vcl.Mask, Vcl.ExtCtrls, JvExControls, JvScrollMax, JvExExtCtrls,
   JvExtComponent, WksLogFrameUnit, VirtualTrees, DTDBTreeView, DTClientTree,
   Vcl.ToolWin, JvNetscapeSplitter, JvComponentBase, JvThreadTimer, Vcl.AppEvnts,
-  JvClock, Vcl.Menus;
+  JvClock, Vcl.Menus, Winapi.WebView2, Winapi.ActiveX, Vcl.Edge, Vcl.WinXCtrls;
 {$ENDREGION}
 
 {$REGION 'Type'}
 type
   TMemberMainForm = class(TBaseMainForm)
     MemberAction: TActionList;
-    MemberAreaDBEdit: TDBEdit;
-    MemberAreaLabel: TLabel;
     MemberBadgeDBImage: TDBImage;
     MemberBadgeGenerateLabel: TLabel;
     MemberBadgeJvScrollMaxBand: TJvScrollMaxBand;
     MemberBadgeLabel: TLabel;
     MemberBadgeSaveLabel: TLabel;
     MemberClientDataSet: TClientDataSet;
-    MemberDBEdit: TDBEdit;
-    MemberDBNavigator2: TDBNavigator;
-    MemberDBNavigator3: TDBNavigator;
+    MemberMemberDBEdit: TDBEdit;
     MemberDBNavigator: TDBNavigator;
     MemberDataSource: TDataSource;
     MemberEmailDBEdit: TDBEdit;
     MemberEmailGenerateLabel: TLabel;
     MemberEmailLabel: TLabel;
-    MemberIdDBEdit: TDBEdit;
-    MemberIdLabel: TLabel;
+    MemberNumberDBEdit: TDBEdit;
     MemberIdentifierSetLabel: TLabel;
     MemberImageList24: TImageList;
-    MemberJobLevelDBEdit: TDBEdit;
-    MemberJobLevelLabel: TLabel;
-    MemberJobRoleDBEdit: TDBEdit;
-    MemberJobRoleLabel: TLabel;
-    MemberJobSetLabel: TLabel;
-    MemberJobTitleDBEdit: TDBEdit;
-    MemberJobTitleLabel: TLabel;
     MemberJvScrollMaxBand: TJvScrollMaxBand;
     MemberLabel: TLabel;
     MemberLocationJvScrollMaxBand: TJvScrollMaxBand;
     MemberObjectIdDBEdit: TDBEdit;
     MemberObjectIdLabel: TLabel;
-    MemberOrganizationDBEdit: TDBEdit;
-    MemberOrganizationLabel: TLabel;
-    MemberPIdDBEdit: TDBEdit;
-    MemberPIdLabel: TLabel;
     MemberSiteDBEdit: TDBEdit;
     MemberSiteLabel: TLabel;
     MemberStateDBComboBox: TDBComboBox;
     MemberStateLabel: TLabel;
     MemberWorkstationDBEdit: TDBEdit;
     MemberWorkstationLabel: TLabel;
-    MemberTabSheet2: TTabSheet;
-    MemberTestAction: TAction;
-    MemberToolBar: TToolBar;
-    MemberTestToolButton: TToolButton;
+    MemberNumberLabel: TLabel;
+    MemberJobJvScrollMaxBand: TJvScrollMaxBand;
+    MemberJobTitleLabel: TLabel;
+    MemberJobTitleDBEdit: TDBEdit;
+    MemberJobRoleLabel: TLabel;
+    MemberJobSetLabel: TLabel;
+    MemberJobRoleDBEdit: TDBEdit;
+    MemberJobLevelLabel: TLabel;
+    MemberJobLevelDBEdit: TDBEdit;
+    MemberStructureJvScrollMaxBand: TJvScrollMaxBand;
+    MemberOrganizationLabel: TLabel;
+    MemberOrganizationDBEdit: TDBEdit;
+    MemberAreaLabel: TLabel;
+    MemberAreaDBEdit: TDBEdit;
+    MemberDepartmentLabel: TLabel;
+    MemberDepartmentDBEdit: TDBEdit;
+    MemberTeamLabel: TLabel;
+    MemberTeamDBEdit: TDBEdit;
+    MemberBuildingLabel: TLabel;
+    MemberBuildingDBEdit: TDBEdit;
+    MemberPhoneLabel: TLabel;
+    MemberPhoneDBEdit: TDBEdit;
+    MemberOtherJvScrollMaxBand: TJvScrollMaxBand;
+    MemberUnitLabel: TLabel;
+    MemberUnitDBEdit: TDBEdit;
+    MemberCostCenterLabel: TLabel;
+    MemberCostCenterDBEdit: TDBEdit;
     procedure FormCreate(Sender: TObject);
-    procedure PostActionExecute(Sender: TObject);
+    procedure ActionPostActionExecute(Sender: TObject);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
     procedure MemberBadgeGenerateLabelClick(Sender: TObject);
     procedure MemberBadgeSaveLabelClick(Sender: TObject);
@@ -77,7 +84,6 @@ type
     procedure MemberEmailGenerateLabelClick(Sender: TObject);
     procedure MemberIdentifierSetLabelClick(Sender: TObject);
     procedure MemberJobSetLabelClick(Sender: TObject);
-    procedure MemberTestActionExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -110,18 +116,17 @@ begin
   inherited;
 
   {$REGION 'gui'}
-//MemberTestToolButton.Visible := false
   {$ENDREGION}
 
 end;
 {$ENDREGION}
 
 {$REGION 'Actions'}
-procedure TMemberMainForm.PostActionExecute(Sender: TObject);
+procedure TMemberMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // ... continue from ancestor
+  // detail
   if MemberClientDataSet.State = dsEdit then
     MemberDBNavigator.BtnClick(nbPost);
 end;
@@ -133,7 +138,7 @@ begin
   inherited;
 
   MemberClientDataSet.Edit;
-  MemberIdDBEdit.Text := ObjectDBEdit.Text;
+  MemberMemberDBEdit.Text := ObjectDBEdit.Text;
 //MemberClientDataSet.Post; // leave the action to the user
 end;
 
@@ -152,7 +157,7 @@ begin
   eat := org.Www.Replace('www.', '');
 
   MemberClientDataSet.Edit;
-  MemberEmailDBEdit.Text := Format('%s@%s', [MemberDBEdit.Text, eat]);
+  MemberEmailDBEdit.Text := Format('%s@%s', [MemberMemberDBEdit.Text, eat]);
 //MemberClientDataSet.Post;
 end;
 
@@ -174,14 +179,14 @@ begin
     TMesRec.W('Member "Organization" is empty, please define it');
   if MemberSiteDBEdit.Text = '' then
     TMesRec.W('Member "Site" is empty, please define it');
-  if MemberDBEdit.Text = '' then
+  if MemberMemberDBEdit.Text = '' then
     TMesRec.W('"Member" is empty, please define it');
 
   // gen
   bmp := TBitmap.Create;
   try
   //bmp.Assign(MemberBadgeDBImage.Picture.Bitmap);
-    gmbr.BadgeGenerate(bmp, MemberOrganizationDBEdit.Text, MemberSiteDBEdit.Text, MemberDBEdit.Text);
+    gmbr.BadgeGenerate(bmp, MemberOrganizationDBEdit.Text, MemberSiteDBEdit.Text, MemberMemberDBEdit.Text);
     MemberClientDataSet.Edit;
     MemberBadgeDBImage.Picture.Assign(bmp);
     MemberClientDataSet.Post;
@@ -240,15 +245,6 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION 'MemberActions'}
-procedure TMemberMainForm.MemberTestActionExecute(Sender: TObject);
-begin
-  inherited;
-
-  TMesRec.NI;
-end;
-{$ENDREGION}
-
 {$REGION 'MemberCds'}
 procedure TMemberMainForm.MemberClientDataSetAfterDelete(DataSet: TDataSet);
 begin
@@ -277,14 +273,28 @@ begin
 
   {$REGION 'detail'}
   // set
-  DataSet.Edit;
-//DataSet.FieldByName('FldObjectId').Value := FId; // automatic
-  DataSet.FieldByName('FldId'      ).Value := 1;
-  DataSet.FieldByName('FldPId'     ).Value := 0;
-//DataSet.FieldByName('FldMember'  ).Value := TNamRec.Username();
-//DataSet.FieldByName('FldEmail'   ).Value := 'mariorossi@wks.cloud';
-  DataSet.Post;
-  LogFrame.Log('%s data initialized', [FObj]);
+//DataSet.Edit;
+//DataSet.FieldByName('FldbjectId'     ).Value := FId; // automatic
+//DataSet.FieldByName('FldNumber'      ).Value := ;
+//DataSet.FieldByName('FldMember'      ).Value := TNamRec.Username();
+//DataSet.FieldByName('FldEmail'       ).Value := 'mariorossi@wks.cloud';
+//DataSet.FieldByName('FldState'       ).Value := ;
+//DataSet.FieldByName('FldOrganization').Value := ;
+//DataSet.FieldByName('FldDepartment'  ).Value := ;
+//DataSet.FieldByName('FldArea'        ).Value := ;
+//DataSet.FieldByName('FldTeam'        ).Value := ;
+//DataSet.FieldByName('FldSite'        ).Value := ;
+//DataSet.FieldByName('FldBuilding'    ).Value := ;
+//DataSet.FieldByName('FldWorkstation' ).Value := ;
+//DataSet.FieldByName('FldPhone'       ).Value := ;
+//DataSet.FieldByName('FldJobTitle'    ).Value := ;
+//DataSet.FieldByName('FldJobRol'e     ).Value := ;
+//DataSet.FieldByName('FldJobLevel'    ).Value := ;
+//DataSet.FieldByName('Fld&Unit'       ).Value := ;
+//DataSet.FieldByName('FldCostCenter'  ).Value := ;
+//DataSet.FieldByName('FldBadgeGraphic').Value := ;
+//DataSet.Post;
+//LogFrame.Log('%s data initialized', [FObj]);
   {$ENDREGION}
 
 end;
