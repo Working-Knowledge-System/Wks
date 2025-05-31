@@ -17,6 +17,7 @@ object LogFrame: TLogFrame
     object OutputTabSheet: TTabSheet
       Caption = 'Output'
       ImageIndex = 1
+      OnShow = OutputTabSheetShow
       object OutputRichEdit: TRichEdit
         AlignWithMargins = True
         Left = 1
@@ -47,6 +48,7 @@ object LogFrame: TLogFrame
     object LogTabSheet: TTabSheet
       Caption = '   Log'
       ImageIndex = 3
+      OnShow = LogTabSheetShow
       object LogRichEdit: TRichEdit
         AlignWithMargins = True
         Left = 1
@@ -72,6 +74,25 @@ object LogFrame: TLogFrame
         ScrollBars = ssBoth
         TabOrder = 0
         WordWrap = False
+      end
+    end
+    object GridTabSheet: TTabSheet
+      Caption = '  Grid'
+      ImageIndex = 4
+      object GridDBGrid: TDBGrid
+        AlignWithMargins = True
+        Left = 3
+        Top = 3
+        Width = 626
+        Height = 104
+        Align = alClient
+        BorderStyle = bsNone
+        TabOrder = 0
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -12
+        TitleFont.Name = 'Segoe UI'
+        TitleFont.Style = []
       end
     end
     object SoapTabSheet: TTabSheet
@@ -247,7 +268,7 @@ object LogFrame: TLogFrame
     end
   end
   object LogToolBar: TToolBar
-    Left = 215
+    Left = 265
     Top = 1
     Width = 169
     Height = 21
@@ -296,7 +317,7 @@ object LogFrame: TLogFrame
     end
   end
   object LogOneStaticText: TStaticText
-    Left = 400
+    Left = 450
     Top = 4
     Width = 97
     Height = 15

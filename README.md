@@ -17,7 +17,7 @@ The system uses a variety of technologies, languages, and libraries, prioritizin
 - Object Pascal
 - ISAPI, SOAP, REST
 - MS SQL Server, MongoDB, Redis
-- NATS
+- MQTT, NATS
 - HTML, CSS, JavaScript
 - W3CSS, W3JS, Pico
 - HTMX, Alpine, Datastar
@@ -69,10 +69,12 @@ More objects to come include:
 - Agent
 - Code
 - Document
+- Equipment
 - File
 - Form
 - Image
 - Page
 - Report
+- Spc
 - Task
 

@@ -1,6 +1,7 @@
 unit WksTextEditorFormUnit;
 
-{ *** TEXT EDITOR ANCESTOR ***
+{
+  *** TEXT EDITOR ANCESTOR ***
   Form.Tag      contains the TCokEnum (as integer)
   Tab.Tag       0 = notchanged ; 1 = changed
   SynEdit.Tag   = Form.Tag   *** WASTEFUL use just Form.Tag ***
@@ -36,12 +37,10 @@ uses
   , Vcl.ToolWin
   , Vcl.PythonGUIInputOutput
   , JvExControls
+  , JvScrollMax
   , JvExExtCtrls
   , JvExtComponent
   , JvNetscapeSplitter
-  , JvScrollMax
-  , JvSplitter
-  , JvSyncSplitter
   , SynEdit
   , SynEditTypes
   , SynEditCodeFolding
@@ -232,7 +231,7 @@ type
     procedure SearchActionExecute(Sender: TObject);
     procedure MainPageControlMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure MainPageControlDragDrop(Sender, Source: TObject; X, Y: Integer);
-    procedure MainPageControlDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
+    procedure MainPageControlDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: boolean);
     procedure ExitActionExecute(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure CommentActionExecute(Sender: TObject);
@@ -288,6 +287,7 @@ implementation
 
 uses
     WksSpellcheckFormUnit
+  , WksPythonUnit
   ;
 {$ENDREGION}
 
@@ -331,6 +331,16 @@ begin
     frm.Release;
   end;
 end;
+  {$ENDREGION}
+
+  {$REGION 'WMessage'}
+{procedure TTextEditorForm.WMSyscommand(var IvMsg: TWmSysCommand);
+begin
+  if IvMsg.CmdType = SC_Close then
+      ShowMessage('X close button pressed');
+
+  inherited;
+end;}
   {$ENDREGION}
 
   {$REGION 'RvLocal'}
@@ -477,12 +487,12 @@ procedure TTextEditorForm.SynEditOnChange(Sender: TObject);
 begin
   if not SynEditCurrentIsChanged then begin
     TabCurrent.Tag := 1;
-    TabCurrent.Caption := TabCurrent.Caption + ' *';
+    TabCurrent.Caption := TabCurrent.Caption + ' ' + CHAR_CONTENT_CHANGED;
   end;
   StatusBarUpdate;
 end;
 
-procedure TTextEditorForm.SynEditDblClick(Sender: TObject); // *** duplicate in Base ? ***
+procedure TTextEditorForm.SynEditDblClick(Sender: TObject); // *** duplicate in Base or wks000unit ***
 var
   sel, rep: string;
 begin
@@ -491,15 +501,15 @@ begin
     Exit;
 
        if sel = 'false' then rep := 'true'
-  else if sel = 'False' then rep := 'True'
   else if sel = 'true'  then rep := 'false'
+  else if sel = 'False' then rep := 'True'
   else if sel = 'True'  then rep := 'False';
   SynEditCurrent.SelText := rep;
 end;
 
 procedure TTextEditorForm.SynEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  gsyn.KeyUp(Sender as TSynEdit, SynEditCurrentCodeKind, Key, Shift);
+  gsyn.SynEditOnKeyUp(Sender, Key, Shift);
   StatusBarUpdate;
 end;
 
@@ -619,7 +629,7 @@ procedure TTextEditorForm.PythonComponentsReset;
 var
   pvs: TPythonVersions;
   pve: TPythonVersion;
-  sbu: TSbuRec;
+  str: string;
 begin
   // exit
   if OptionPythonVersionComboBox.ItemIndex < 0 then begin
@@ -643,16 +653,9 @@ begin
   PythonEngine1.LoadDll;
 
   // log
-  sbu.Add('Python Version         : %s', [pve.Version         ]);
-  sbu.Add('Python SysVersion      : %s', [pve.SysVersion      ]);
-  sbu.Add('Python DLLPath         : %s', [pve.DLLPath         ]);
-  sbu.Add('Python PythonPath      : %s', [pve.PythonPath      ]);
-  sbu.Add('Python PythonExecutable: %s', [pve.PythonExecutable]);
-  sbu.Add('Python SysArchitecture : %s', [pve.SysArchitecture ]);
-  sbu.Add('Python DisplayName     : %s', [pve.DisplayName     ]);
-  sbu.Add('Python ApiVersion      : %d', [pve.ApiVersion      ]);
-  sbu.Add('Python engine resetted (recreated)');
-  LogFrame.Log(sbu.Text);
+  str := TPythonRec.PythonVersionInfo(pve);
+  LogFrame.Log(str);
+  LogFrame.Log('Python engine resetted (recreated)');
 end;
   {$ENDREGION}
 
@@ -696,9 +699,9 @@ begin
 //      lin := sli[i];
 //    end;
 
-    // noemptylines
+    // nolinesempty
     for i := sli.count - 1 downto 0 do begin
-      if trim(sli[i]) = '' then
+      if trim(sli[i]) = '' then // *** WARNING : same feature in StrLinesEmptyRemove() ***
         sli.Delete(i);
     end;
 
@@ -808,8 +811,8 @@ begin
   tab := TabNew;
 
   // contentadd from temporarytransfer (this works eiter if the form is invoked modal and Script has something or if the form is a normal app and Script is empty)
-  tab.Tag := 1; // avoidadding ' *'
-  SynEditCurrent.Text := Script;
+  tab.Tag := 1; // avoidadding ' ' + CHAR_CONTENT_CHANGED
+    SynEditCurrent.Text := Script;
   tab.Tag := 0; // onchangereset
 end;
 
@@ -881,8 +884,8 @@ begin
   tab.Caption := fil;
 
   syn := SynEditCurrent;
-  tab.Tag := 1; // avoidadding ' *'
-  syn.Lines.LoadFromFile(fil);
+  tab.Tag := 1; // avoidadding ' ' + CHAR_CONTENT_CHANGED
+    syn.Lines.LoadFromFile(fil);
   tab.Tag := 0; // onchangereset
 
   if OptionFoldAfterOpenCheckBox.Checked then
@@ -903,7 +906,7 @@ begin
     Exit;
   end;
 
-  TabCurrent.Caption := StringReplace(TabCurrent.Caption, ' *', '', []);
+  TabCurrent.Caption := StringReplace(TabCurrent.Caption, ' ' + CHAR_CONTENT_CHANGED, '', []);
 //if fileexist then
 //  askoverryde
 //else
@@ -917,7 +920,7 @@ begin
   if not TabAvailable then
     Exit;
 
-  SaveTextFileDialog.FileName := StringReplace(TabCurrent.Caption, ' *', '', []);
+  SaveTextFileDialog.FileName := StringReplace(TabCurrent.Caption, ' ' + CHAR_CONTENT_CHANGED, '', []);
   if not SaveTextFileDialog.Execute then
     Exit;
   TabCurrent.Caption := SaveTextFileDialog.FileName;
@@ -937,19 +940,19 @@ end;
 
 procedure TTextEditorForm.CommentActionExecute(Sender: TObject);
 var
-  cok: TCodKindEnum;
+//cok: TCodKindEnum;
   syn: TSynEdit;
   key: word;
   sst: TShiftState;
 begin
   // simulatectrl+/
-  cok := SynEditCurrentCodeKind;
+//cok := SynEditCurrentCodeKind;
   syn := SynEditCurrent;
   key := vkSlash;
   sst := [ssCtrl];
-  gsyn.KeyUp(syn, cok, key, sst);
+  gsyn.SynEditOnKeyUp(syn, key, sst);
 
-  // *** CONTINUE IN DESCENDENT FORMS
+  // *** CONTINUE IN DESCENDENT FORMS ***
   // [...]
 end;
 
@@ -1057,9 +1060,13 @@ begin
     LogFrame.Log('Execute a fragment of script "%s"', [TabCurrent.Caption]);
   end;
 
-  // nocomment
+  // comment
 //if CommentRemoveOption.Checked then
   //FScript := TStr.RecCommentRemove(FScript);
+
+  // linesempty
+//if LinesEmptyOption.Checked then
+  //FScript := TStr.RecLinesEmptyRemove(FScript);
 
   // compile
 //FScript := TRvaRec.Rva(FScript);
@@ -1222,6 +1229,7 @@ begin
     RightPanel.Width                     := ClientWidth div 2;
 
     LogFrame.OutputTabSheet.PageControl  := RightPageControl;
+    LogFrame.GridTabSheet.PageControl    := RightPageControl;
     RightPageControl.ActivePage          := LogFrame.OutputTabSheet;
     LogFrame.OutputTabSheet.PageIndex    := 0;
   //LogFrame.ConsoleSplitter.Visible     := false;
@@ -1233,6 +1241,7 @@ begin
     RightPanel.Tag                       := 0;
 
     LogFrame.OutputTabSheet.PageControl  := LogFrame.LogPageControl;
+    LogFrame.GridTabSheet.PageControl    := LogFrame.LogPageControl;
     LogFrame.LogPageControl.ActivePage   := LogFrame.OutputTabSheet;
     LogFrame.OutputTabSheet.PageIndex    := 0;
   //LogFrame.ConsoleSplitter.Visible     := true;
@@ -1255,9 +1264,9 @@ begin
   // cache
   MatchPrevAction.Hint := Format('Search previous "%s"', [SynEditCurrent.SelText]);
 
-  // key
+  // stdshorcuts (simulate ctrl+shift+F)
   key := vkF;
-  gsyn.KeyUp(SynEditCurrent, SynEditCurrentCodeKind, key, [ssShift, ssCtrl]);
+  gsyn.SynEditOnKeyUp(SynEditCurrent, key, [ssShift, ssCtrl]);
 end;
 
 procedure TTextEditorForm.MatchNextActionExecute(Sender: TObject);
@@ -1272,9 +1281,9 @@ begin
   // cache
   MatchNextAction.Hint := Format('Search next "%s"', [SynEditCurrent.SelText]);
 
-  // key
+  // stdshorcuts (simulate ctrl+F)
   key := vkF;
-  gsyn.KeyUp(SynEditCurrent, SynEditCurrentCodeKind, key, [ssCtrl]);
+  gsyn.SynEditOnKeyUp(SynEditCurrent, key, [ssCtrl]);
 end;
 
 procedure TTextEditorForm.SynEditInsertHeaderActionExecute(Sender: TObject);
@@ -1463,10 +1472,10 @@ begin
   end;
 end;
 
-procedure TTextEditorForm.MainPageControlDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
+procedure TTextEditorForm.MainPageControlDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: boolean);
 begin
   if Sender is TPageControl then
-    Accept := True;
+    Accept := true;
 end;
   {$ENDREGION}
 

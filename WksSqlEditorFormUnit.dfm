@@ -1,64 +1,67 @@
 inherited SqlEditorForm: TSqlEditorForm
   Caption = 'SqlEditorForm'
-  ClientWidth = 1360
   ExplicitWidth = 1372
-  ExplicitHeight = 799
+  ExplicitHeight = 798
   TextHeight = 15
+  inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
+    ExplicitHeight = 506
+  end
   inherited RightJvNetscapeSplitter: TJvNetscapeSplitter
-    Left = 1127
     ExplicitLeft = 1127
+    ExplicitHeight = 506
   end
   inherited BottomJvNetscapeSplitter: TJvNetscapeSplitter
-    Width = 1360
+    ExplicitTop = 588
     ExplicitWidth = 1360
   end
   inherited TopPageControl: TPageControl
-    Width = 1354
     ExplicitWidth = 1350
     inherited TopMainTabSheet: TTabSheet
       ExplicitWidth = 1346
     end
   end
   inherited LeftPanel: TPanel
-    ExplicitHeight = 506
+    ExplicitHeight = 505
     inherited LeftPageControl: TPageControl
-      Height = 507
-      ExplicitHeight = 506
+      Height = 506
+      ExplicitHeight = 505
       inherited JsonTabSheet: TTabSheet
-        ExplicitHeight = 477
+        ExplicitHeight = 476
         inherited TreeSplitter: TSplitter
-          Top = 412
+          Top = 411
+          ExplicitTop = 412
         end
         inherited TreeVst: TVirtualStringTree
-          Height = 390
+          Height = 389
         end
         inherited TreeNodeValueSynEdit: TSynEdit
-          Top = 418
-          ExplicitTop = 417
+          Top = 417
+          ExplicitTop = 416
         end
       end
     end
   end
   inherited MainPanel: TPanel
-    ExplicitHeight = 506
+    ExplicitHeight = 505
     inherited MainPageControl: TPageControl
-      Height = 507
-      ExplicitHeight = 508
+      Height = 506
+      ExplicitHeight = 505
     end
   end
   inherited RightPanel: TPanel
-    Left = 1137
     ExplicitLeft = 1133
+    ExplicitHeight = 505
     inherited RightPageControl: TPageControl
+      ExplicitHeight = 505
       inherited OptionTabSheet: TTabSheet
         inherited OptionJvScrollMax: TJvScrollMax
-          ExplicitHeight = 476
+          ExplicitHeight = 475
           inherited OptionGeneralJvScrollMaxBand: TJvScrollMaxBand
             inherited OptionDirDefaultLabel: TLabel
-              Width = 184
+              Width = 168
             end
             inherited OptionTabWidthLabel: TLabel
-              Width = 184
+              Width = 168
             end
           end
         end
@@ -66,16 +69,20 @@ inherited SqlEditorForm: TSqlEditorForm
     end
   end
   inherited BottomPanel: TPanel
-    Width = 1354
+    ExplicitTop = 598
+    ExplicitWidth = 1354
     inherited LogFrame: TLogFrame
-      Width = 1354
+      ExplicitWidth = 1354
       inherited LogPageControl: TPageControl
-        Width = 1354
+        ExplicitWidth = 1350
         inherited OutputTabSheet: TTabSheet
-          ExplicitWidth = 1346
           inherited OutputRichEdit: TRichEdit
-            Width = 1344
             ExplicitWidth = 1340
+          end
+        end
+        inherited GridTabSheet: TTabSheet
+          inherited GridDBGrid: TDBGrid
+            Width = 626
           end
         end
         inherited SoapTabSheet: TTabSheet
@@ -104,13 +111,40 @@ inherited SqlEditorForm: TSqlEditorForm
           end
         end
       end
+      inherited LogToolBar: TToolBar
+        inherited ClearToolButton: TToolButton
+          ExplicitWidth = 43
+        end
+        inherited ClearAutoToolButton: TToolButton
+          ExplicitWidth = 42
+        end
+        inherited WrapToolButton: TToolButton
+          ExplicitWidth = 44
+        end
+      end
     end
   end
   inherited StatusBar: TStatusBar
-    Width = 1354
+    ExplicitTop = 737
     ExplicitWidth = 1350
   end
   inherited PythonGUIInputOutput1: TPythonGUIInputOutput
     Output = LogFrame.OutputRichEdit
+  end
+  object ResultADOConnection: TADOConnection
+    LoginPrompt = False
+    Left = 736
+    Top = 376
+  end
+  object ResultADOQuery: TADOQuery
+    Connection = ResultADOConnection
+    Parameters = <>
+    Left = 856
+    Top = 376
+  end
+  object ResultDataSource: TDataSource
+    DataSet = ResultADOQuery
+    Left = 976
+    Top = 376
   end
 end

@@ -12,7 +12,8 @@ uses
   Vcl.Mask, Vcl.ExtCtrls, JvExControls, JvScrollMax, JvExExtCtrls,
   JvExtComponent, WksLogFrameUnit, VirtualTrees, DTDBTreeView, DTClientTree,
   Vcl.ToolWin, JvNetscapeSplitter, Vcl.Grids, Vcl.DBGrids, JvComponentBase,
-  JvThreadTimer, Vcl.AppEvnts, JvClock, Vcl.Menus;
+  JvThreadTimer, Vcl.AppEvnts, JvClock, Vcl.Menus, Winapi.WebView2,
+  Winapi.ActiveX, Vcl.Edge, Vcl.WinXCtrls;
 {$ENDREGION}
 
 {$REGION 'Type'}
@@ -43,10 +44,6 @@ type
     PersonPictureSaveLabel: TLabel;
     PersonSurnameDBEdit: TDBEdit;
     PersonSurnameLabel1: TLabel;
-    PersonTabSheet2: TTabSheet;
-    PersonTestAction: TAction;
-    PersonTestToolButton: TToolButton;
-    PersonToolBar: TToolBar;
     UserAvatarDBImage: TDBImage;
     UserAvatarGenerateLabel: TLabel;
     UserAvatarLabel: TLabel;
@@ -66,8 +63,10 @@ type
     UserUsernameDBEdit: TDBEdit;
     UserUsernameLabel1: TLabel;
     UserUsernameSetLabel: TLabel;
+    UserIpLabel: TLabel;
+    UserIpDBEdit: TDBEdit;
     procedure FormCreate(Sender: TObject);
-    procedure PostActionExecute(Sender: TObject);
+    procedure ActionPostActionExecute(Sender: TObject);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
     procedure PersonClientDataSetAfterDelete(DataSet: TDataSet);
     procedure PersonClientDataSetAfterInsert(DataSet: TDataSet);
@@ -79,7 +78,6 @@ type
     procedure PersonPhoneDBEditChange(Sender: TObject);
     procedure PersonPhoneValidateLabelClick(Sender: TObject);
     procedure PersonPictureSaveLabelClick(Sender: TObject);
-    procedure PersonTestActionExecute(Sender: TObject);
     procedure UserAvatarGenerateLabelClick(Sender: TObject);
     procedure UserAvatarSaveLabelClick(Sender: TObject);
     procedure UserClientDataSetAfterDelete(DataSet: TDataSet);
@@ -128,11 +126,11 @@ end;
 {$ENDREGION}
 
 {$REGION 'Actions'}
-procedure TPersonMainForm.PostActionExecute(Sender: TObject);
+procedure TPersonMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // ... continue from ancestor
+  // detail
   if PersonClientDataSet.State = dsEdit then
     PersonDBNavigator.BtnClick(nbPost);
 end;
@@ -176,15 +174,6 @@ begin
   end;
   {$ENDREGION}
 
-end;
-{$ENDREGION}
-
-{$REGION 'PersonActions'}
-procedure TPersonMainForm.PersonTestActionExecute(Sender: TObject);
-begin
-  inherited;
-
-  TMesRec.NI;
 end;
 {$ENDREGION}
 

@@ -19,7 +19,7 @@ uses
 {$REGION 'Type'}
 type
   IAgentMainDataModule = interface(IAppServerSOAP)
-    ['{06F9DEAE-E322-48C9-A5C6-D0CA0383AA22}']
+    ['{FAE95A0B-8260-40FB-AABF-709802EAF92D}']
   end;
 
   TAgentMainDataModule = class(TSoapDataModule, IAgentMainDataModule, IAppServerSOAP, IAppServer)
@@ -29,6 +29,8 @@ type
     ObjectDataSetProvider: TDataSetProvider;
     AgentADOTable: TADOTable;
     AgentDataSetProvider: TDataSetProvider;
+    AgentActiveDataSetProvider: TDataSetProvider;
+    AgentActiveADOQuery: TADOQuery;
     procedure SoapDataModuleCreate(Sender: TObject);
   private
     { Private declarations }
@@ -50,13 +52,15 @@ uses
 {$REGION 'Routine'}
 procedure TWksAgentSoapMainDataModuleUnitCreateInstance(out obj: TObject);
 begin
- obj := TAgentMainDataModule.Create(nil);
+  obj := TAgentMainDataModule.Create(nil);
 end;
 {$ENDREGION}
 
 {$REGION 'TMainDataModule'}
 procedure TAgentMainDataModule.SoapDataModuleCreate(Sender: TObject);
 begin
+  if AgentADOConnection.Connected then
+    AgentADOConnection.Close;
   AgentADOConnection.ConnectionString := DBA_CONNECTION_STR;
 end;
 {$ENDREGION}

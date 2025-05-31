@@ -1,47 +1,37 @@
 inherited PersonMainForm: TPersonMainForm
   Caption = 'PersonMainForm'
+  ClientHeight = 842
+  ClientWidth = 1580
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
+    Height = 596
     ExplicitHeight = 606
   end
   inherited RightJvNetscapeSplitter: TJvNetscapeSplitter
+    Left = 1270
+    Height = 596
     ExplicitLeft = 871
     ExplicitHeight = 606
   end
   inherited BottomJvNetscapeSplitter: TJvNetscapeSplitter
+    Top = 670
+    Width = 1580
     ExplicitTop = 689
     ExplicitWidth = 1184
   end
   inherited TopPanel: TPanel
+    Width = 1580
     inherited TopPageControl: TPageControl
-      object PersonTabSheet2: TTabSheet
-        Caption = 'Person'
-        ImageIndex = 2
-        object PersonToolBar: TToolBar
-          Left = 0
-          Top = 0
-          Width = 51
-          Height = 44
-          Align = alLeft
-          AutoSize = True
-          ButtonHeight = 46
-          ButtonWidth = 51
-          Caption = 'PersonToolBar'
-          Images = PersonImageList24
-          ShowCaptions = True
-          TabOrder = 0
-          object PersonTestToolButton: TToolButton
-            Left = 0
-            Top = 0
-            Action = PersonTestAction
-          end
-        end
-      end
+      ExplicitWidth = 1160
     end
   end
   inherited LeftPanel: TPanel
+    Height = 596
     inherited LeftPageControl: TPageControl
       inherited ObjectTreeTabSheet: TTabSheet
+        inherited ObjectNodeInfoLabel: TLabel
+          Width = 292
+        end
         inherited ObjectDBNavigator: TDBNavigator
           Hints.Strings = ()
         end
@@ -49,8 +39,18 @@ inherited PersonMainForm: TPersonMainForm
     end
   end
   inherited BottomPanel: TPanel
+    Top = 680
+    Width = 1580
     inherited LogFrame: TLogFrame
+      Width = 1580
       inherited LogPageControl: TPageControl
+        Width = 1580
+        inherited OutputTabSheet: TTabSheet
+          ExplicitWidth = 1572
+          inherited OutputRichEdit: TRichEdit
+            Width = 1570
+          end
+        end
         inherited SoapTabSheet: TTabSheet
           inherited SoapGridPanel: TGridPanel
             ControlCollection = <
@@ -80,12 +80,17 @@ inherited PersonMainForm: TPersonMainForm
     end
   end
   inherited RightPanel: TPanel
+    Left = 1280
+    Height = 596
     inherited RightPageControl: TPageControl
+      Height = 596
       inherited PropertyTabSheet: TTabSheet
+        ExplicitHeight = 566
         inherited ObjectJvScrollMax: TJvScrollMax
+          Height = 566
           inherited ObjectImageJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectImageDBImage: TDBImage
-              ExplicitHeight = 203
+              Height = 0
             end
           end
           object PersonJvScrollMaxBand: TJvScrollMaxBand
@@ -389,7 +394,7 @@ inherited PersonMainForm: TPersonMainForm
             Height = 21
             Expanded = False
             Caption = 'User'
-            ExpandedHeight = 498
+            ExpandedHeight = 547
             ButtonFont.Charset = ANSI_CHARSET
             ButtonFont.Color = clWindowText
             ButtonFont.Height = -11
@@ -458,7 +463,7 @@ inherited PersonMainForm: TPersonMainForm
             object UserAvatarLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 253
+              Top = 303
               Width = 249
               Height = 15
               Cursor = crHandPoint
@@ -488,7 +493,7 @@ inherited PersonMainForm: TPersonMainForm
             end
             object UserAvatarSaveLabel: TLabel
               Left = 242
-              Top = 253
+              Top = 303
               Width = 24
               Height = 15
               Cursor = crHandPoint
@@ -549,7 +554,7 @@ inherited PersonMainForm: TPersonMainForm
             end
             object UserAvatarGenerateLabel: TLabel
               Left = 189
-              Top = 253
+              Top = 303
               Width = 47
               Height = 15
               Cursor = crHandPoint
@@ -562,6 +567,24 @@ inherited PersonMainForm: TPersonMainForm
               Font.Style = [fsUnderline]
               ParentFont = False
               OnClick = UserAvatarGenerateLabelClick
+            end
+            object UserIpLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 253
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Ip Address'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Segoe UI'
+              Font.Style = []
+              ParentFont = False
+              ExplicitWidth = 55
             end
             object UserDBNavigator: TDBNavigator
               AlignWithMargins = True
@@ -623,7 +646,7 @@ inherited PersonMainForm: TPersonMainForm
             object UserAvatarDBImage: TDBImage
               AlignWithMargins = True
               Left = 16
-              Top = 274
+              Top = 324
               Width = 249
               Height = 208
               Margins.Left = 16
@@ -651,6 +674,81 @@ inherited PersonMainForm: TPersonMainForm
                 'Inactive')
               TabOrder = 5
             end
+            object UserIpDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 274
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Color = clYellow
+              DataField = 'FldIp'
+              DataSource = UserDataSource
+              TabOrder = 6
+            end
+          end
+        end
+      end
+      inherited SearchTabSheet: TTabSheet
+        ExplicitHeight = 566
+        inherited SearchResultListBox: TListBox
+          Height = 429
+          ExplicitHeight = 429
+        end
+      end
+      inherited OptionTabSheet: TTabSheet
+        ExplicitHeight = 566
+        inherited OptionJvScrollMax: TJvScrollMax
+          Height = 566
+          ExplicitHeight = 566
+        end
+      end
+    end
+  end
+  inherited StatusBar: TStatusBar
+    Top = 820
+    Width = 1574
+  end
+  inherited MainPanel: TPanel
+    Height = 596
+    inherited MainPageControl: TPageControl
+      inherited ObjectContentPrevTabSheet: TTabSheet
+        inherited ObjectContentPrevTopPanel: TPanel
+          inherited ObjectContentPrevCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited ObjectContentTabSheet: TTabSheet
+        inherited ObjectContentSplitter: TSplitter
+          ExplicitHeight = 536
+        end
+        inherited ObjectContentTopPanel: TPanel
+          inherited ObjectContentCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited ObjectDataTabSheet: TTabSheet
+        inherited ObjectDataTopPanel: TPanel
+          inherited ObjectDataCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited ObjectNoteTabSheet: TTabSheet
+        inherited ObjectNoteTopPanel: TPanel
+          inherited ObjectNoteCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited FilesRioTabSheet: TTabSheet
+        inherited FilesRioTopPanel: TPanel
+          inherited FilesRioInfoLabel: TLabel
+            Height = 31
           end
         end
       end
@@ -677,15 +775,12 @@ inherited PersonMainForm: TPersonMainForm
     Left = 208
     Top = 432
   end
-  inherited MainSoapConnection: TSoapConnection
-    URL = 'http://localhost/WksPersonSoapProject.dll/soap'
-  end
-  object UserDataSource: TDataSource [27]
+  object UserDataSource: TDataSource [26]
     DataSet = UserClientDataSet
     Left = 208
     Top = 488
   end
-  object UserClientDataSet: TClientDataSet [28]
+  object UserClientDataSet: TClientDataSet [27]
     Aggregates = <>
     IndexFieldNames = 'FldPersonId'
     MasterFields = 'FldId'
@@ -701,12 +796,12 @@ inherited PersonMainForm: TPersonMainForm
     Left = 72
     Top = 488
   end
-  object PersonImageList24: TImageList [29]
+  object PersonImageList24: TImageList [28]
     ColorDepth = cd32Bit
     Height = 24
     Width = 24
-    Left = 360
-    Top = 376
+    Left = 376
+    Top = 544
     Bitmap = {
       494C010101000800040018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024
@@ -1012,14 +1107,9 @@ inherited PersonMainForm: TPersonMainForm
       00000000FE3C3F00000000000000000000000000000000000000000000000000
       000000000000}
   end
-  object PersonAction: TActionList [30]
+  object PersonAction: TActionList [29]
     Images = PersonImageList24
-    Left = 568
-    Top = 376
-    object PersonTestAction: TAction
-      Caption = '    Test    '
-      ImageIndex = 0
-      OnExecute = PersonTestActionExecute
-    end
+    Left = 584
+    Top = 544
   end
 end

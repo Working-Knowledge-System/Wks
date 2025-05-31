@@ -19,7 +19,9 @@ uses
   WksSpellcheckFormUnit in 'WksSpellcheckFormUnit.pas' {SpellcheckForm},
   WksSqlEditorFormUnit in 'WksSqlEditorFormUnit.pas' {SqlEditorForm},
   WksTextEditorFormUnit in 'WksTextEditorFormUnit.pas' {TextEditorForm},
-  WksBaseClientMainFormUnit in 'WksBaseClientMainFormUnit.pas' {BaseMainForm};
+  WksBaseClientMainFormUnit in 'WksBaseClientMainFormUnit.pas' {BaseMainForm},
+  WksWordFrameUnit in 'WksWordFrameUnit.pas' {WordFrame: TFrame},
+  WksPasswordGenFormUnit in 'WksPasswordGenFormUnit.pas' {PasswordGenForm};
 
 {$R *.res}
 

@@ -3,9 +3,6 @@
         <ProjectGuid>{0EC2638E-F4C8-4DB7-8B3D-D9ADA4639BAF}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="WksTestProject.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="WksSynHighlighterRTestProject.dproj">
             <Dependencies/>
         </Projects>
@@ -17,15 +14,6 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
-    <Target Name="WksTestProject">
-        <MSBuild Projects="WksTestProject.dproj"/>
-    </Target>
-    <Target Name="WksTestProject:Clean">
-        <MSBuild Projects="WksTestProject.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="WksTestProject:Make">
-        <MSBuild Projects="WksTestProject.dproj" Targets="Make"/>
-    </Target>
     <Target Name="WksSynHighlighterRTestProject">
         <MSBuild Projects="WksSynHighlighterRTestProject.dproj"/>
     </Target>
@@ -36,13 +24,13 @@
         <MSBuild Projects="WksSynHighlighterRTestProject.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="WksTestProject;WksSynHighlighterRTestProject"/>
+        <CallTarget Targets="WksSynHighlighterRTestProject"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="WksTestProject:Clean;WksSynHighlighterRTestProject:Clean"/>
+        <CallTarget Targets="WksSynHighlighterRTestProject:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="WksTestProject:Make;WksSynHighlighterRTestProject:Make"/>
+        <CallTarget Targets="WksSynHighlighterRTestProject:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

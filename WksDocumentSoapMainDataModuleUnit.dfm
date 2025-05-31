@@ -14,7 +14,7 @@ object DocumentMainDataModule: TDocumentMainDataModule
   end
   object DocumentADOTable: TADOTable
     Connection = DocumentADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     IndexFieldNames = 'FldObjectId'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -39,7 +39,7 @@ object DocumentMainDataModule: TDocumentMainDataModule
   end
   object ObjectADOTable: TADOTable
     Connection = DocumentADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     TableName = 'TblObject'
     Left = 240
     Top = 40

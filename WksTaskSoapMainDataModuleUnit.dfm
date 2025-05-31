@@ -14,7 +14,7 @@ object TaskMainDataModule: TTaskMainDataModule
   end
   object TaskADOTable: TADOTable
     Connection = TaskADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     IndexFieldNames = 'FldObjectId'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -39,7 +39,7 @@ object TaskMainDataModule: TTaskMainDataModule
   end
   object ObjectADOTable: TADOTable
     Connection = TaskADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     TableName = 'TblObject'
     Left = 240
     Top = 40

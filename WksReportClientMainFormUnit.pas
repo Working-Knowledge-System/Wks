@@ -12,7 +12,8 @@ uses
   Vcl.Mask, Vcl.ExtCtrls, JvExControls, JvScrollMax, JvExExtCtrls,
   JvExtComponent, WksLogFrameUnit, VirtualTrees, DTDBTreeView, DTClientTree,
   Vcl.ToolWin, JvNetscapeSplitter, Vcl.Grids, Vcl.DBGrids, JvComponentBase,
-  JvThreadTimer, Vcl.AppEvnts, JvClock, Vcl.Menus;
+  JvThreadTimer, Vcl.AppEvnts, JvClock, Vcl.Menus, Winapi.WebView2,
+  Winapi.ActiveX, Vcl.Edge, Vcl.WinXCtrls;
 {$ENDREGION}
 
 {$REGION 'Type'}
@@ -122,7 +123,6 @@ type
     ReportEnvironmentLabel: TLabel;
     ReportExportDBEdit: TDBEdit;
     ReportExportLabel: TLabel;
-    ReportFlagsJvScrollMaxBand: TJvScrollMaxBand;
     ReportFromContentDBCheckBox: TDBCheckBox;
     ReportImageList24: TImageList;
     ReportJvScrollMaxBand: TJvScrollMaxBand;
@@ -180,12 +180,6 @@ type
     ReportParamStyleLabel: TLabel;
     ReportParamTabSheet: TTabSheet;
     ReportParamTopPanel: TPanel;
-    ReportParamsPanelClosedDBCheckBox: TDBCheckBox;
-    ReportParamsPanelOnDBCheckBox: TDBCheckBox;
-    ReportParamsTitleDBCheckBox: TDBCheckBox;
-    ReportReportPanelClosedDBCheckBox: TDBCheckBox;
-    ReportReportPanelOnDBCheckBox: TDBCheckBox;
-    ReportReportTitleOnDBCheckBox: TDBCheckBox;
     ReportSerieDBGrid: TDBGrid;
     ReportSerieDBNavigator: TDBNavigator;
     ReportSerieLabel2: TLabel;
@@ -196,22 +190,28 @@ type
     ReportStoreLabel: TLabel;
     ReportStyleDBEdit: TDBEdit;
     ReportStyleLabel: TLabel;
-    ReportTabSheet: TTabSheet;
     ReportTestAction: TAction;
-    ReportTestToolButton: TToolButton;
-    ReportToolBar: TToolBar;
     ReportValidatorCsvDBEdit: TDBEdit;
     ReportValidatorCsvLabel: TLabel;
     ReportViewerCsvDBEdit: TDBEdit;
     ReportViewerCsvLabel: TLabel;
     SerieClientDataSet: TClientDataSet;
     SerieDataSource: TDataSource;
-    ReportDsHeaderOffDBCheckBox: TDBCheckBox;
-    ReportDsRecordCountOffDBCheckBox: TDBCheckBox;
     ReportDatasetModeDBComboBox: TDBComboBox;
     ReportDatasetModeLabel: TLabel;
+    ReportDatasetFeedbackIfEmptyLabel: TLabel;
+    ReportDatasetFeedbackIfEmptyDBEdit: TDBEdit;
+    ReportReportTitleOnDBCheckBox: TDBCheckBox;
+    ReportReportPanelOnDBCheckBox: TDBCheckBox;
+    ReportReportPanelClosedDBCheckBox: TDBCheckBox;
+    ReportParamsTitleDBCheckBox: TDBCheckBox;
+    ReportParamsPanelOnDBCheckBox: TDBCheckBox;
+    ReportParamsPanelClosedDBCheckBox: TDBCheckBox;
+    ReportDsHeaderOffDBCheckBox: TDBCheckBox;
+    ReportDsRecordCountOffDBCheckBox: TDBCheckBox;
+    ReportParamsOffDBCheckBox: TDBCheckBox;
     procedure FormCreate(Sender: TObject);
-    procedure PostActionExecute(Sender: TObject);
+    procedure ActionPostActionExecute(Sender: TObject);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
     procedure ParamClientDataSetAfterInsert(DataSet: TDataSet);
     procedure DatasetClientDataSetAfterInsert(DataSet: TDataSet);
@@ -223,7 +223,6 @@ type
     procedure ReportClientDataSetReconcileError(DataSet: TCustomClientDataSet; E: EReconcileError; UpdateKind: TUpdateKind; var Action: TReconcileAction);
     procedure ReportDatasetJsonTemplateLabelClick(Sender: TObject);
     procedure ReportDatasetJsonValidateLabelClick(Sender: TObject);
-    procedure ReportTestActionExecute(Sender: TObject);
     procedure OptionFoldingLineShowCheckBoxClick(Sender: TObject);
   private
     { Private declarations }
@@ -271,7 +270,6 @@ begin
   inherited;
 
   {$REGION 'gui'}
-//ReportTestToolButton.Visible := false;
   {$ENDREGION}
 
   {$REGION 'syn'}
@@ -288,11 +286,11 @@ end;
 {$ENDREGION}
 
 {$REGION 'Actions'}
-procedure TReportMainForm.PostActionExecute(Sender: TObject);
+procedure TReportMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // ... continue from ancestor
+  // detail
   if ReportClientDataSet.State = dsEdit then
     ReportDBNavigator.BtnClick(nbPost);
   if ParamClientDataSet.State = dsEdit then
@@ -331,15 +329,6 @@ begin
   end;
   {$ENDREGION}
 
-end;
-{$ENDREGION}
-
-{$REGION 'ReportActions'}
-procedure TReportMainForm.ReportTestActionExecute(Sender: TObject);
-begin
-  inherited;
-
-  TMesRec.NI;
 end;
 {$ENDREGION}
 

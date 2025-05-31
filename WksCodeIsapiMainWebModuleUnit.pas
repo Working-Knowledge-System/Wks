@@ -3,10 +3,10 @@ unit WksCodeIsapiMainWebModuleUnit;
 interface
 
 {$REGION 'Help'}
-(*
+{
   supply CODE (css, csv, html, js, sql, ...) as a single block suitable for web application
   execute volatile (temporary) code
-*)
+}
 {$ENDREGION}
 
 {$REGION 'Use'}
@@ -30,7 +30,7 @@ type
     procedure MainWebModuleBeforeDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
     procedure MainWebModuleAfterDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
     procedure MainWebModuleDefaultHandlerAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
-    procedure MainWebModuleInfoWebActionAction(Sender: TObject;  Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+    procedure MainWebModuleInfoWebActionAction(Sender: TObject;  Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
     procedure MainWebModuleCodeWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
     procedure MainWebModuleLibraryWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
     procedure MainWebModuleVolatileWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
@@ -38,8 +38,9 @@ type
     procedure MainWebModuleJsWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
   private
     { Private declarations }
-    FTic: TTicRec;
-    FWrq: TWrqRec;
+  //FTic: TTicRec;
+  //FWrq: TWrqRec;
+    FWmoRec: TWmoRec;
   public
     { Public declarations }
   end;
@@ -81,44 +82,94 @@ uses
   {$REGION 'Events'}
 procedure TMainWebModule.MainWebModuleCreate(Sender: TObject);
 begin
-  TWmoRec.OnWebModuleCreate;
+
+  {$REGION 'Commands'}
+  SetLength(FWmoRec.CmdRecVec, 3);
+  FWmoRec.CmdRecVec[0].Cmd         := '/';
+  FWmoRec.CmdRecVec[0].Description := 'Default handler';
+  
+  FWmoRec.CmdRecVec[1].Cmd         := '/Info';
+  FWmoRec.CmdRecVec[1].Description := 'Describe module''s info and capabilities (this page)';
+  
+  FWmoRec.CmdRecVec[2].Cmd         := '/Xxx';
+  FWmoRec.CmdRecVec[2].Description := 'Serve a code';
+  {$ENDREGION}
+
+  {$REGION 'Objects'}
+  FWmoRec.Run := 0;
+//FIni := TIniCls.Create;
+  {$ENDREGION}
+
+  {$REGION 'Events'}
+//FWmoRec.OnWebModuleCreate;
+  {$ENDREGION}
+
 end;
 
 procedure TMainWebModule.MainWebModuleDestroy(Sender: TObject);
 begin
-  TWmoRec.OnWebModuleDestroy;
+
+  {$REGION 'Objects'}
+//FIni.Free;
+  {$ENDREGION}
+
+  {$REGION 'Events'}
+//FWmoRec.OnWebModuleDestroy;
+  {$ENDREGION}
+
 end;
 
 procedure TMainWebModule.MainWebModuleException(Sender: TObject; E: Exception; var Handled: boolean);
 begin
-  TWmoRec.OnWebModuleException(Response, E);
+  FWmoRec.OnWebModuleException(Response, E);
+  Handled := true;
 end;
 
 procedure TMainWebModule.MainWebModuleBeforeDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
-  TWmoRec.BeforeDispatch(Request, Response, FWrq, FTic);
+  Inc(FWmoRec.Run);
+//TWmoRec.BeforeDispatch(Request, Response, FWrq, FTic);
+
+  {$REGION 'CustomHeader'}
+  // handle here specific CustomHeader for all webactions or at beginning of each specific webaction
+  // standard ones like "Expires" and "Access-Control-Allow-Origin" are already handled in TWmoRec.BeforeDispatch
+
+  // client no page cache (date in the past for not caching, date in the future a little bit for chaching in the client)
+  //Response.SetCustomHeader('???', '???');
+  {$ENDREGION}
+
+  {$REGION 'ActionAvailabilityLogic'}
+//TMainWebModule(Sender).Actions.Items[0].Enabled := false; // /      DefaultHandler
+//TMainWebModule(Sender).Actions.Items[1].Enabled := false; // /Info  InfoWebAction
+//TMainWebModule(Sender).Actions.Items[2].Enabled := false; // /Xxx   Xxx main handler
+  {$ENDREGION}
+
 end;
 
 procedure TMainWebModule.MainWebModuleAfterDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
-  TWmoRec.AfterDispatch(Request, Response, FWrq, FTic);
+//TWmoRec.AfterDispatch(Request, Response, FWrq, FTic);
 end;
   {$ENDREGION}
 
   {$REGION 'Actions'}
+
+    {$REGION 'Standard'}
 procedure TMainWebModule.MainWebModuleDefaultHandlerAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
   TWrsRec.ResponseSet(Response, THtmRec.PageDefault);
 end;
 
-procedure TMainWebModule.MainWebModuleInfoWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+procedure TMainWebModule.MainWebModuleInfoWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
   TWrsRec.ResponseSet(Response, TJteRec.ServerInfo('Server that supply code (css, html, js, json, text, xml, ...) upon a request', 'Web Broker Isapi', [
     '/', '/Info'
   , '/Code', '/Library', '/Volatile', '/Css', '/Js'
   ]), TCtyRec.CTY_APP_JSON);
 end;
+    {$ENDREGION}
 
+    {$REGION 'Code'}
 procedure TMainWebModule.MainWebModuleCodeWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 var
   ids, mim, ock, oco, res, qfn, qfv, ras, rmt, fbk: string; // oidstr, mimetype, objcontkind, objcontent, result, queryfieldnane, qfvalue, returnas, returnmimetype
@@ -204,7 +255,7 @@ begin
 
   end else if ock = TCodRec.PY.Kind then begin
     mim := giif.NxD(rmt, TCtyRec.CTY_TXT_CSS);
-    res := oco; // TPytRec.Exec(oco);
+    res := oco; // TPythonRec.Exec(oco);
 
   end else if ock = TCodRec.SQL.Kind then begin
          if not TDbaRec.DsFromSql(oco, dst, aff, fbk) then begin
@@ -281,6 +332,8 @@ procedure TMainWebModule.MainWebModuleVolatileWebActionAction(Sender: TObject; R
 begin
   TWrsRec.ResponseSet(Response, THtmRec.PageInfo(TStdRec.StdNotImplemented('MainWebModuleVolatileWebActionAction')));
 end;
+    {$ENDREGION}
+
   {$ENDREGION}
 
 {$ENDREGION}

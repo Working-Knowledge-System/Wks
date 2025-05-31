@@ -1,7 +1,7 @@
 object SystemMainDataModule: TSystemMainDataModule
   OnCreate = SoapDataModuleCreate
-  Height = 619
-  Width = 540
+  Height = 251
+  Width = 1469
   object SystemADOConnection: TADOConnection
     ConnectionString = 
       'Provider=SQLOLEDB.1;Password=secret@123;Persist Security Info=Tr' +
@@ -14,7 +14,6 @@ object SystemMainDataModule: TSystemMainDataModule
   end
   object SystemADOTable: TADOTable
     Connection = SystemADOConnection
-    CursorType = ctStatic
     IndexFieldNames = 'FldObjectId'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -39,7 +38,6 @@ object SystemMainDataModule: TSystemMainDataModule
   end
   object ObjectADOTable: TADOTable
     Connection = SystemADOConnection
-    CursorType = ctStatic
     TableName = 'TblObject'
     Left = 240
     Top = 40
@@ -57,8 +55,8 @@ object SystemMainDataModule: TSystemMainDataModule
       '    DbaSystem.dbo.TblLog'
       'order by'
       '    FldDateTime desc')
-    Left = 240
-    Top = 232
+    Left = 872
+    Top = 40
   end
   object AuditADOQuery: TADOQuery
     Connection = SystemADOConnection
@@ -79,59 +77,61 @@ object SystemMainDataModule: TSystemMainDataModule
       '    DbaSystem.dbo.TblAudit'
       'order by'
       '    FldDateTime desc')
-    Left = 400
-    Top = 232
+    Left = 1032
+    Top = 40
   end
   object LogDataSetProvider: TDataSetProvider
     DataSet = LogADOQuery
-    Left = 240
-    Top = 288
+    Left = 872
+    Top = 152
   end
   object AuditDataSetProvider: TDataSetProvider
     DataSet = AuditADOQuery
-    Left = 400
-    Top = 288
+    Left = 1032
+    Top = 152
   end
-  object ClientsDataSetProvider: TDataSetProvider
-    DataSet = ClientsADOTable
-    Left = 240
-    Top = 488
+  object BinariesDataSetProvider: TDataSetProvider
+    DataSet = BinariesADOTable
+    Left = 1184
+    Top = 152
   end
-  object ChangesDataSetProvider: TDataSetProvider
-    DataSet = ChangesADOTable
-    Left = 400
-    Top = 488
+  object ObjDataSetProvider: TDataSetProvider
+    DataSet = ObjADOTable
+    Left = 560
+    Top = 152
   end
-  object ClientsADOTable: TADOTable
-    Connection = ClientADOConnection
-    CursorType = ctStatic
-    TableName = 'TblClient'
-    Left = 240
-    Top = 376
+  object BinariesADOTable: TADOTable
+    Connection = SystemADOConnection
+    TableName = 'TblBinary'
+    Left = 1184
+    Top = 40
   end
-  object ChangesADOTable: TADOTable
-    Connection = ClientADOConnection
-    CursorType = ctStatic
-    IndexFieldNames = 'FldClient'
-    MasterFields = 'FldClient'
-    MasterSource = ClientsDataSource
-    TableName = 'TblChange'
-    Left = 400
-    Top = 376
+  object ObjADOTable: TADOTable
+    Connection = SystemADOConnection
+    TableName = 'TblObj'
+    Left = 560
+    Top = 40
   end
-  object ClientsDataSource: TDataSource
-    DataSet = ClientsADOTable
-    Left = 240
-    Top = 432
+  object StateADOTable: TADOTable
+    Connection = SystemADOConnection
+    TableName = 'TblState'
+    Left = 720
+    Top = 40
   end
-  object ClientADOConnection: TADOConnection
-    ConnectionString = 
-      'Provider=SQLOLEDB.1;Password=secret@123;Persist Security Info=Tr' +
-      'ue;User ID=sa;Initial Catalog=DbaSystem;Data Source=LOCALHOST'
-    DefaultDatabase = 'DbaClient'
-    LoginPrompt = False
-    Provider = 'SQLOLEDB.1'
-    Left = 80
-    Top = 376
+  object StateDataSetProvider: TDataSetProvider
+    DataSet = StateADOTable
+    Left = 720
+    Top = 152
+  end
+  object RequirementsADOTable: TADOTable
+    Connection = SystemADOConnection
+    TableName = 'TblRequirement'
+    Left = 1336
+    Top = 40
+  end
+  object RequirementsDataSetProvider: TDataSetProvider
+    DataSet = RequirementsADOTable
+    Left = 1336
+    Top = 152
   end
 end

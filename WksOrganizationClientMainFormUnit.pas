@@ -16,7 +16,7 @@ uses
   Vcl.Mask, Vcl.ExtCtrls, JvExControls, JvScrollMax, JvExExtCtrls,
   JvExtComponent, WksLogFrameUnit, VirtualTrees, DTDBTreeView, DTClientTree,
   Vcl.ToolWin, JvNetscapeSplitter, JvComponentBase, JvThreadTimer, Vcl.AppEvnts,
-  JvClock, Vcl.Menus;
+  JvClock, Vcl.Menus, Winapi.WebView2, Winapi.ActiveX, Vcl.Edge, Vcl.WinXCtrls;
 {$ENDREGION}
 
 {$REGION 'Type'}
@@ -46,10 +46,6 @@ type
     OrganizationPhoneLabel: TLabel;
     OrganizationSloganDBEdit: TDBEdit;
     OrganizationSloganLabel: TLabel;
-    OrganizationTabSheet2: TTabSheet;
-    OrganizationTestAction: TAction;
-    OrganizationTestToolButton: TToolButton;
-    OrganizationToolBar: TToolBar;
     OrganizationWwwDBEdit: TDBEdit;
     OrganizationWwwLabel: TLabel;
     OrganizationLogoLoadLabel: TLabel;
@@ -95,7 +91,7 @@ type
     ThemeFontWeightDBComboBox: TDBComboBox;
     ThemeFontWeightLabel: TLabel;
     procedure FormCreate(Sender: TObject);
-    procedure PostActionExecute(Sender: TObject);
+    procedure ActionPostActionExecute(Sender: TObject);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
     procedure OrganizationClientDataSetAfterDelete(DataSet: TDataSet);
     procedure OrganizationClientDataSetAfterInsert(DataSet: TDataSet);
@@ -103,7 +99,6 @@ type
     procedure OrganizationClientDataSetReconcileError(DataSet: TCustomClientDataSet; E: EReconcileError; UpdateKind: TUpdateKind; var Action: TReconcileAction);
     procedure OrganizationLogoLongSaveLabelClick(Sender: TObject);
     procedure OrganizationLogoSaveLabelClick(Sender: TObject);
-    procedure OrganizationTestActionExecute(Sender: TObject);
     procedure OrganizationLogoLongLoadLabelClick(Sender: TObject);
     procedure OrganizationLogoLoadLabelClick(Sender: TObject);
     procedure ThemePrimary60BgColorLabelClick(Sender: TObject);
@@ -145,8 +140,6 @@ begin
   inherited;
 
   {$REGION 'gui'}
-//OrganizationTestToolButton.Visible := false
-
   ThemeDBComboBox.Items.Add('');
   for str in TW3fRec.THEME_NAME_VEC do ThemeDBComboBox.Items.Add(str);
 
@@ -176,11 +169,11 @@ end;
 {$ENDREGION}
 
 {$REGION 'Actions'}
-procedure TOrganizationMainForm.PostActionExecute(Sender: TObject);
+procedure TOrganizationMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // ... continue from ancestor
+  // detail
   if OrganizationClientDataSet.State = dsEdit then
     OrganizationDBNavigator.BtnClick(nbPost);
   if ThemeClientDataSet.State = dsEdit then
@@ -389,15 +382,6 @@ begin
   end;
   {$ENDREGION}
 
-end;
-{$ENDREGION}
-
-{$REGION 'OrganizationActions'}
-procedure TOrganizationMainForm.OrganizationTestActionExecute(Sender: TObject);
-begin
-  inherited;
-
-  TMesRec.NI;
 end;
 {$ENDREGION}
 

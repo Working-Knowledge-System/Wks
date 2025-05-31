@@ -16,12 +16,12 @@ uses
   , Vcl.ComCtrls
   , Vcl.StdCtrls
   , Vcl.ToolWin
+  , Vcl.Grids
+  , Vcl.DBGrids
   , Data.DB
   , System.Actions
   , Vcl.ActnList
   , Vcl.ExtCtrls
-  , JvExExtCtrls
-  , JvNetscapeSplitter
   , Wks000Unit
   ;
 {$ENDREGION}
@@ -54,6 +54,8 @@ type
     LogTabSheet: TTabSheet;
     LogOneStaticText: TStaticText;
     LogOneTimer: TTimer;
+    GridTabSheet: TTabSheet;
+    GridDBGrid: TDBGrid;
     procedure ClearToolButtonClick(Sender: TObject);
     procedure ClearAllToolButtonClick(Sender: TObject);
     procedure WrapToolButtonClick(Sender: TObject);
@@ -62,6 +64,8 @@ type
     procedure OptionSaveButtonClick(Sender: TObject);
     procedure ConsoleSplitterMoved(Sender: TObject);
     procedure LogOneTimerTimer(Sender: TObject);
+    procedure LogTabSheetShow(Sender: TObject);
+    procedure OutputTabSheetShow(Sender: TObject);
   private
     { Private declarations }
     FOptionOutputLineWidthMax: integer;
@@ -85,13 +89,19 @@ type
     procedure Output(IvFormatString: string; IvVarRecVector: array of TVarRec; IvSuccess: boolean); overload;             // if success log green else red
     procedure Output(IvVarRecVector: array of TVarRec; IvColor: TColor = clWindowText); overload;
     procedure OutputDs(IvDs: TDataSet; IvFldVec: TArray<string>);
-    // logone
-    procedure LogOne(IvString: string; IvFbkMode: TFbkModeEnum = fmNone; IvMs: integer = 5000); overload;
-    procedure LogOne(IvFormatString: string; IvVarRecVector: array of TVarRec; IvFbkMode: TFbkModeEnum = fmNone; IvMs: integer = 5000); overload;
     // soap
     procedure LogSoapShow(IvShow: boolean);
     procedure LogSoapRequest(IvStream: TStream);
     procedure LogSoapResponse(IvStream: TStream);
+    // grid
+    procedure GridShow(IvShow: boolean);
+    procedure GridDs(IvDs: TDataSource; IvFldVec: TArray<string> = []);
+    // effimery
+    procedure LogOne(IvFbk: TFbkRec); overload;
+    procedure LogOne(IvString: string; IvFbkMode: TFbkModeEnum = fmNone; IvPersistMs: integer = 3000; IvTimeShow: boolean = false); overload;
+    procedure LogOne(IvFormatString: string; IvVarRecVector: array of TVarRec; IvFbkMode: TFbkModeEnum = fmNone; IvPersistMs: integer = 3000; IvTimeShow: boolean = false); overload;
+    // others
+    procedure LogOrMsg(IvString: string; IvSuccess: boolean);                                                             // if success log else showmessage
   end;
 {$ENDREGION}
 
@@ -115,6 +125,7 @@ begin
   OutputRichEdit.Clear;
   SoapRequestRichEdit.Clear;
   SoapResponseRichEdit.Clear;
+  GridDBGrid.Visible := false;
   LogOneStaticText.Caption          := '';
 //LogRichEdit.Width                 := gini.IntGet('Log/Width'                   , 800    ); *** does not work, see BaseClient FormOnShow ***
   WrapToolButton.Down               := gini.BooGet('Log/Wrap'                    , false  );
@@ -130,6 +141,12 @@ end;
 procedure TLogFrame.LogShow;
 begin
   LogPageControl.ActivePage := LogTabSheet;
+end;
+
+procedure TLogFrame.LogTabSheetShow(Sender: TObject);
+begin
+  LogRichEdit.SetFocus;
+  LogRichEdit.SelStart := Length(LogRichEdit.Text);
 end;
 
 procedure TLogFrame.Log(IvString: string; IvColor: TColor);
@@ -187,6 +204,12 @@ end;
 procedure TLogFrame.OutputShow;
 begin
   LogPageControl.ActivePage := OutputTabSheet;
+end;
+
+procedure TLogFrame.OutputTabSheetShow(Sender: TObject);
+begin
+  OutputRichEdit.SetFocus;
+  OutputRichEdit.SelStart := Length(OutputRichEdit.Text);
 end;
 
 procedure TLogFrame.Output(IvString: string; IvColor: TColor);
@@ -277,7 +300,7 @@ end;
 {$ENDREGION}
 
 {$REGION 'LogOne'}
-procedure TLogFrame.LogOne(IvString: string; IvFbkMode: TFbkModeEnum; IvMs: integer);
+procedure TLogFrame.LogOne(IvString: string; IvFbkMode: TFbkModeEnum; IvPersistMs: integer; IvTimeShow: boolean);
 begin
   // timer
   LogOneTimer.Enabled := false;
@@ -286,8 +309,10 @@ begin
   with LogOneStaticText do begin
     if IvString.IsEmpty then
       Caption := ''
+    else if IvTimeShow then
+      Caption := Format('  %s  %s  ', [FormatDateTime('hh:nn:ss', Time), IvString])
     else
-      Caption := Format(' %s  %s ', [FormatDateTime('hh:nn:ss', Time), IvString]);
+      Caption := Format('  %s  ', [IvString]);
     Width := TCnvRec.CnvTextWidth(Caption, Font);
 
     // fbkmode
@@ -298,8 +323,8 @@ begin
                end;
 
     fmInfo   : begin // blue
-                 Color      := clWhite;
-                 Font.Color := clBlue;
+                 Color      := clBlue;
+                 Font.Color := clWhite;
                end;
 
     fmSuccess: begin // green
@@ -328,23 +353,36 @@ begin
                end;
     end;
 
-    if IvMs <= 0 then
+    if IvPersistMs <= 0 then
       Exit
-    else if IvMs < 1000 then
-      IvMs := 1000;
-    LogOneTimer.Interval := IvMs;
+    else if IvPersistMs < 1000 then
+      IvPersistMs := 1000;
+    LogOneTimer.Interval := IvPersistMs;
     LogOneTimer.Enabled := true;
   end;
 end;
 
-procedure TLogFrame.LogOne(IvFormatString: string; IvVarRecVector: array of TVarRec; IvFbkMode: TFbkModeEnum; IvMs: integer);
+procedure TLogFrame.LogOne(IvFormatString: string; IvVarRecVector: array of TVarRec; IvFbkMode: TFbkModeEnum; IvPersistMs: integer; IvTimeShow: boolean);
 begin
-  LogOne(Format(IvFormatString, IvVarRecVector), IvFbkMode, IvMs);
+  LogOne(Format(IvFormatString, IvVarRecVector), IvFbkMode, IvPersistMs, IvTimeShow);
+end;
+
+procedure TLogFrame.LogOne(IvFbk: TFbkRec);
+begin
+  LogOne(IvFbk.Msg {+ giif.ExFmt(IvFbk.Description, ' (%s)', [IvFbk.Description])}, IvFbk.Mode, IvFbk.PersistMs);
 end;
 
 procedure TLogFrame.LogOneTimerTimer(Sender: TObject);
 begin
   LogOne('', fmNone, 0);
+end;
+
+procedure TLogFrame.LogOrMsg(IvString: string; IvSuccess: boolean);
+begin
+  if IvSuccess then
+    Log(IvString)
+  else
+    TMesRec.W(IvString);
 end;
 {$ENDREGION}
 
@@ -379,6 +417,27 @@ begin
   IvStream.Position := 0;
   SoapResponseRichEdit.Lines.LoadFromStream(IvStream);
   IvStream.Free;
+end;
+{$ENDREGION}
+
+{$REGION 'Grid'}
+procedure TLogFrame.GridShow(IvShow: boolean);
+begin
+  GridTabSheet.TabVisible := IvShow;
+  if IvShow then begin
+    LogPageControl.ActivePage := GridTabSheet;
+  //LogToolBar.Left := 215;
+  end else begin
+    LogPageControl.ActivePage := OutputTabSheet;
+  //LogToolBar.Left := 175;
+  end;
+end;
+
+procedure TLogFrame.GridDs(IvDs: TDataSource; IvFldVec: TArray<string>);
+begin
+  GridDBGrid.DataSource := IvDs;
+  TGriRec.GriFit(GridDBGrid);
+  GridDBGrid.Visible := true;
 end;
 {$ENDREGION}
 

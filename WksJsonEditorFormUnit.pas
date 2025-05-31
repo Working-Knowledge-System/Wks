@@ -28,10 +28,10 @@ uses
   , Vcl.StdCtrls
   , Vcl.ToolWin
   , JvExControls
+  , JvScrollMax
   , JvExExtCtrls
   , JvExtComponent
   , JvNetscapeSplitter
-  , JvScrollMax
   , SynEdit
   , SynEditHighlighter
   , SynEditCodeFolding
@@ -117,5 +117,6 @@ end;
 {$ENDREGION}
 
 end.
+
 
 

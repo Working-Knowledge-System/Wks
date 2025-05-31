@@ -14,7 +14,7 @@ object InvoiceMainDataModule: TInvoiceMainDataModule
   end
   object InvoiceADOTable: TADOTable
     Connection = InvoiceADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     IndexFieldNames = 'FldObjectId'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -39,7 +39,7 @@ object InvoiceMainDataModule: TInvoiceMainDataModule
   end
   object ObjectADOTable: TADOTable
     Connection = InvoiceADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     TableName = 'TblObject'
     Left = 240
     Top = 40

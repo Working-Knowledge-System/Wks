@@ -27,7 +27,7 @@ type
     HTTPSoapDispatcher1: THTTPSoapDispatcher;
     HTTPSoapPascalInvoker1: THTTPSoapPascalInvoker;
     WSDLHTMLPublish1: TWSDLHTMLPublish;
-    procedure TaskMainWebModuleDefaultHandlerAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+    procedure TaskMainWebModuleDefaultHandlerAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
   private
     { Private declarations }
   public
@@ -49,7 +49,7 @@ implementation
 {$ENDREGION}
 
 {$REGION 'Pages'}
-procedure TTaskMainWebModule.TaskMainWebModuleDefaultHandlerAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+procedure TTaskMainWebModule.TaskMainWebModuleDefaultHandlerAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
   WSDLHTMLPublish1.ServiceInfo(Sender, Request, Response, Handled);
 end;

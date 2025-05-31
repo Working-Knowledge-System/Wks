@@ -14,7 +14,7 @@ object FormMainDataModule: TFormMainDataModule
   end
   object FormADOTable: TADOTable
     Connection = FormADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     IndexFieldNames = 'FldObjectId'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -39,7 +39,7 @@ object FormMainDataModule: TFormMainDataModule
   end
   object ObjectADOTable: TADOTable
     Connection = FormADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     TableName = 'TblObject'
     Left = 240
     Top = 40

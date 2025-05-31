@@ -6,6 +6,8 @@ interface
 uses
     Winapi.Windows
   , Winapi.Messages
+  , Winapi.WebView2
+  , Winapi.ActiveX
   , System.Actions
   , System.Classes
   , System.ImageList
@@ -26,6 +28,8 @@ uses
   , Vcl.Menus
   , Vcl.StdCtrls
   , Vcl.ToolWin
+  , Vcl.WinXCtrls
+  , Vcl.Edge
   , Data.DB
   , Datasnap.DBClient
   , Soap.SOAPConn
@@ -64,21 +68,16 @@ type
     InvoiceJvScrollMaxBand: TJvScrollMaxBand;
     InvoiceObjectIdDBEdit: TDBEdit;
     InvoiceObjectIdLabel: TLabel;
-    InvoiceTabSheet: TTabSheet;
-    InvoiceTestAction: TAction;
-    InvoiceTestToolButton: TToolButton;
-    InvoiceToolBar: TToolBar;
     InvoiceValue1DBEdit: TDBEdit;
     InvoiceValue1Label: TLabel;
     procedure FormCreate(Sender: TObject);
+    procedure ActionPostActionExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
-    procedure PostActionExecute(Sender: TObject);
     procedure InvoiceClientDataSetAfterDelete(DataSet: TDataSet);
     procedure InvoiceClientDataSetAfterInsert(DataSet: TDataSet);
     procedure InvoiceClientDataSetAfterPost(DataSet: TDataSet);
     procedure InvoiceClientDataSetReconcileError(DataSet: TCustomClientDataSet; E: EReconcileError; UpdateKind: TUpdateKind; var Action: TReconcileAction);
-    procedure InvoiceTestActionExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -113,7 +112,6 @@ begin
   inherited;
 
   {$REGION 'gui'}
-//InvoiceTestToolButton.Visible := false
   {$ENDREGION}
 
   {$REGION 'ini'}
@@ -140,11 +138,11 @@ end;
 {$ENDREGION}
 
 {$REGION 'Actions'}
-procedure TInvoiceMainForm.PostActionExecute(Sender: TObject);
+procedure TInvoiceMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // ... continue from ancestor
+  // detail
   if InvoiceClientDataSet.State = dsEdit then
     InvoiceDBNavigator.BtnClick(nbPost);
 end;
@@ -175,15 +173,6 @@ begin
   end;
   {$ENDREGION}
 
-end;
-{$ENDREGION}
-
-{$REGION 'InvoiceActions'}
-procedure TInvoiceMainForm.InvoiceTestActionExecute(Sender: TObject);
-begin
-  inherited;
-
-  TMesRec.NI;
 end;
 {$ENDREGION}
 

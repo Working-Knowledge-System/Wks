@@ -14,7 +14,7 @@ object ReportMainDataModule: TReportMainDataModule
   end
   object ReportADOTable: TADOTable
     Connection = ReportADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     IndexFieldNames = 'FldObjectId'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -39,14 +39,14 @@ object ReportMainDataModule: TReportMainDataModule
   end
   object ObjectADOTable: TADOTable
     Connection = ReportADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     TableName = 'TblObject'
     Left = 240
     Top = 40
   end
   object ParamADOTable: TADOTable
     Connection = ReportADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     IndexFieldNames = 'FldObjectId;FldOrder'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -56,7 +56,7 @@ object ReportMainDataModule: TReportMainDataModule
   end
   object DatasetADOTable: TADOTable
     Connection = ReportADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     IndexFieldNames = 'FldObjectId;FldOrder'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -66,7 +66,7 @@ object ReportMainDataModule: TReportMainDataModule
   end
   object ChartADOTable: TADOTable
     Connection = ReportADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     IndexFieldNames = 'FldObjectId;FldDataset'
     MasterFields = 'FldObjectId;FldDataset'
     MasterSource = DatasetDataSource
@@ -76,7 +76,7 @@ object ReportMainDataModule: TReportMainDataModule
   end
   object SerieADOTable: TADOTable
     Connection = ReportADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     IndexFieldNames = 'FldObjectId;FldDataset;FldChart;FldOrder'
     MasterFields = 'FldObjectId;FldDataset;FldChart'
     MasterSource = ChartDataSource

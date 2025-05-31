@@ -2,8 +2,8 @@ object TextEditorForm: TTextEditorForm
   Left = 0
   Top = 0
   Caption = 'TextEditorForm'
-  ClientHeight = 762
-  ClientWidth = 1368
+  ClientHeight = 757
+  ClientWidth = 1348
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,7 +17,7 @@ object TextEditorForm: TTextEditorForm
   object LeftJvNetscapeSplitter: TJvNetscapeSplitter
     Left = 223
     Top = 82
-    Height = 508
+    Height = 503
     Align = alLeft
     MinSize = 1
     Maximized = False
@@ -28,9 +28,9 @@ object TextEditorForm: TTextEditorForm
     ExplicitHeight = 100
   end
   object RightJvNetscapeSplitter: TJvNetscapeSplitter
-    Left = 1135
+    Left = 1115
     Top = 82
-    Height = 508
+    Height = 503
     Align = alRight
     MinSize = 1
     Maximized = False
@@ -42,8 +42,8 @@ object TextEditorForm: TTextEditorForm
   end
   object BottomJvNetscapeSplitter: TJvNetscapeSplitter
     Left = 0
-    Top = 590
-    Width = 1368
+    Top = 585
+    Width = 1348
     Height = 10
     Cursor = crVSplit
     Align = alBottom
@@ -58,12 +58,11 @@ object TextEditorForm: TTextEditorForm
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 1362
+    Width = 1342
     Height = 76
     ActivePage = TopMainTabSheet
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 1358
     object TopMainTabSheet: TTabSheet
       Caption = ' Menu'
       object TopMainToolBar: TToolBar
@@ -203,7 +202,7 @@ object TextEditorForm: TTextEditorForm
     Left = 3
     Top = 82
     Width = 220
-    Height = 508
+    Height = 503
     Margins.Top = 0
     Margins.Right = 0
     Margins.Bottom = 0
@@ -212,21 +211,19 @@ object TextEditorForm: TTextEditorForm
     Caption = 'LeftPanel'
     ShowCaption = False
     TabOrder = 1
-    ExplicitHeight = 507
     object LeftPageControl: TPageControl
       Left = 0
       Top = 0
       Width = 220
-      Height = 508
+      Height = 503
       ActivePage = JsonTabSheet
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 507
       object JsonTabSheet: TTabSheet
         Caption = ' Tree'
         object TreeSplitter: TSplitter
           Left = 0
-          Top = 413
+          Top = 408
           Width = 212
           Height = 3
           Cursor = crVSplit
@@ -238,7 +235,7 @@ object TextEditorForm: TTextEditorForm
           Left = 0
           Top = 22
           Width = 212
-          Height = 391
+          Height = 386
           Align = alClient
           BorderStyle = bsNone
           Colors.BorderColor = 15987699
@@ -284,10 +281,11 @@ object TextEditorForm: TTextEditorForm
         object TreeNodeValueSynEdit: TSynEdit
           AlignWithMargins = True
           Left = 3
-          Top = 419
+          Top = 414
           Width = 206
           Height = 56
           Align = alBottom
+          CaseSensitive = True
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -12
@@ -326,9 +324,7 @@ object TextEditorForm: TTextEditorForm
           Highlighter = SynJSONSyn
           Lines.Strings = (
             'TreeNodeValueSynEdit')
-          Options = [eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoHideShowScrollbars, eoScrollPastEol, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
-          SelectedColor.Alpha = 0.400000005960464500
-          ExplicitTop = 418
+          ScrollbarAnnotations = <>
         end
         object TreeToolBar: TToolBar
           Left = 0
@@ -357,33 +353,31 @@ object TextEditorForm: TTextEditorForm
     Left = 233
     Top = 82
     Width = 446
-    Height = 508
+    Height = 503
     Align = alLeft
     BevelOuter = bvNone
     Caption = 'MainPanel'
     ShowCaption = False
     TabOrder = 2
-    ExplicitHeight = 507
     object MainPageControl: TPageControl
       Left = 0
       Top = 0
       Width = 446
-      Height = 508
+      Height = 503
       Align = alClient
       TabOrder = 0
       OnChange = MainPageControlChange
       OnDragDrop = MainPageControlDragDrop
       OnDragOver = MainPageControlDragOver
       OnMouseDown = MainPageControlMouseDown
-      ExplicitHeight = 507
     end
   end
   object RightPanel: TPanel
     AlignWithMargins = True
-    Left = 1145
+    Left = 1125
     Top = 82
     Width = 220
-    Height = 508
+    Height = 503
     Margins.Left = 0
     Margins.Top = 0
     Margins.Bottom = 0
@@ -392,24 +386,21 @@ object TextEditorForm: TTextEditorForm
     Caption = 'RightPanel'
     ShowCaption = False
     TabOrder = 3
-    ExplicitLeft = 1141
-    ExplicitHeight = 507
     object RightPageControl: TPageControl
       Left = 0
       Top = 0
       Width = 220
-      Height = 508
+      Height = 503
       ActivePage = OptionTabSheet
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 507
       object OptionTabSheet: TTabSheet
         Caption = 'Options'
         object OptionJvScrollMax: TJvScrollMax
           Left = 0
           Top = 0
           Width = 212
-          Height = 478
+          Height = 473
           ButtonFont.Charset = DEFAULT_CHARSET
           ButtonFont.Color = clWindowText
           ButtonFont.Height = -9
@@ -421,7 +412,6 @@ object TextEditorForm: TTextEditorForm
           BevelOuter = bvNone
           ParentColor = True
           TabOrder = 0
-          ExplicitHeight = 477
           object OptionGeneralJvScrollMaxBand: TJvScrollMaxBand
             Width = 206
             Height = 195
@@ -444,7 +434,6 @@ object TextEditorForm: TTextEditorForm
               Align = alTop
               Caption = 'Default Directory'
               OnClick = OptionDirDefaultLabelClick
-              ExplicitLeft = 11
               ExplicitWidth = 89
             end
             object OptionTabWidthLabel: TLabel
@@ -458,7 +447,6 @@ object TextEditorForm: TTextEditorForm
               Align = alTop
               Caption = 'Tab width'
               OnClick = OptionDirDefaultLabelClick
-              ExplicitLeft = 11
               ExplicitWidth = 51
             end
             object OptionDirDefaultEdit: TEdit
@@ -472,8 +460,6 @@ object TextEditorForm: TTextEditorForm
               Align = alTop
               TabOrder = 0
               Text = 'OptionDirDefaultEdit'
-              ExplicitLeft = 11
-              ExplicitWidth = 184
             end
             object OptionTabWidthEdit: TEdit
               AlignWithMargins = True
@@ -487,8 +473,6 @@ object TextEditorForm: TTextEditorForm
               TabOrder = 1
               Text = 'OptionTabWidthEdit'
               OnChange = OptionTabWidthEditChange
-              ExplicitLeft = 11
-              ExplicitWidth = 184
             end
             object OptionSaveBeforeRunCheckBox: TCheckBox
               AlignWithMargins = True
@@ -502,8 +486,6 @@ object TextEditorForm: TTextEditorForm
               Align = alTop
               Caption = 'Save before run'
               TabOrder = 2
-              ExplicitLeft = 11
-              ExplicitWidth = 184
             end
             object OptionFoldAfterOpenCheckBox: TCheckBox
               AlignWithMargins = True
@@ -517,8 +499,6 @@ object TextEditorForm: TTextEditorForm
               Align = alTop
               Caption = 'Fold after open'
               TabOrder = 3
-              ExplicitLeft = 11
-              ExplicitWidth = 184
             end
           end
           object OptionPythonJvScrollMaxBand: TJvScrollMaxBand
@@ -542,7 +522,6 @@ object TextEditorForm: TTextEditorForm
               Margins.Right = 16
               Align = alTop
               Caption = 'Version:'
-              ExplicitLeft = 11
               ExplicitWidth = 41
             end
             object OptionPythonEngineRecycleSpeedButton: TSpeedButton
@@ -603,8 +582,6 @@ object TextEditorForm: TTextEditorForm
               Caption = 'Raw output'
               TabOrder = 0
               OnClick = OptionPythonRawOutputCheckBoxClick
-              ExplicitLeft = 11
-              ExplicitWidth = 184
             end
             object OptionPythonVersionComboBox: TComboBox
               AlignWithMargins = True
@@ -618,8 +595,6 @@ object TextEditorForm: TTextEditorForm
               Style = csDropDownList
               TabOrder = 1
               OnChange = OptionPythonVersionComboBoxChange
-              ExplicitLeft = 11
-              ExplicitWidth = 184
             end
           end
         end
@@ -629,8 +604,8 @@ object TextEditorForm: TTextEditorForm
   object BottomPanel: TPanel
     AlignWithMargins = True
     Left = 3
-    Top = 600
-    Width = 1362
+    Top = 595
+    Width = 1342
     Height = 140
     Margins.Top = 0
     Margins.Bottom = 0
@@ -639,26 +614,35 @@ object TextEditorForm: TTextEditorForm
     Caption = 'BottomPanel'
     ShowCaption = False
     TabOrder = 4
-    ExplicitTop = 599
-    ExplicitWidth = 1358
     inline LogFrame: TLogFrame
       Left = 0
       Top = 0
-      Width = 1362
+      Width = 1342
       Height = 140
       Align = alClient
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0
-      ExplicitWidth = 1358
+      ExplicitWidth = 1342
       inherited LogPageControl: TPageControl
-        Width = 1362
-        ExplicitWidth = 1358
+        Width = 1342
+        ExplicitWidth = 1342
         inherited OutputTabSheet: TTabSheet
-          ExplicitWidth = 1354
+          ExplicitWidth = 1334
           inherited OutputRichEdit: TRichEdit
-            Width = 1352
-            ExplicitWidth = 1348
+            Width = 1332
+            StyleElements = [seFont, seClient, seBorder]
+            ExplicitWidth = 1332
+          end
+        end
+        inherited LogTabSheet: TTabSheet
+          inherited LogRichEdit: TRichEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+        end
+        inherited GridTabSheet: TTabSheet
+          inherited GridDBGrid: TDBGrid
+            Width = 1340
           end
         end
         inherited SoapTabSheet: TTabSheet
@@ -684,16 +668,37 @@ object TextEditorForm: TTextEditorForm
                 Control = LogFrame.SoapResponseRichEdit
                 Row = 1
               end>
+            StyleElements = [seFont, seClient, seBorder]
+            inherited SoapResponseLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited SoapRequestRichEdit: TRichEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited SoapRequestLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited SoapResponseRichEdit: TRichEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
           end
         end
         inherited OptionTabSheet: TTabSheet
           inherited OptionOutputLineWidthMaxLabel: TLabel
             Left = 9
+            StyleElements = [seFont, seClient, seBorder]
             ExplicitLeft = 9
           end
           inherited OptionOutputLinesMaxLabel: TLabel
             Left = 37
+            StyleElements = [seFont, seClient, seBorder]
             ExplicitLeft = 37
+          end
+          inherited OptionOutputLineWidthMaxEdit: TEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited OptionOutputLinesMaxEdit: TEdit
+            StyleElements = [seFont, seClient, seBorder]
           end
         end
       end
@@ -713,8 +718,8 @@ object TextEditorForm: TTextEditorForm
   object StatusBar: TStatusBar
     AlignWithMargins = True
     Left = 3
-    Top = 740
-    Width = 1362
+    Top = 735
+    Width = 1342
     Height = 19
     Margins.Top = 0
     Panels = <

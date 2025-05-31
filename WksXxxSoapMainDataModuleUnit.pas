@@ -19,7 +19,7 @@ uses
 {$REGION 'Type'}
 type
   IXxxMainDataModule = interface(IAppServerSOAP)
-    ['{06F9DEAE-E322-48C9-A5C6-D0CA0383AA22}']
+    ['{06F9DEAE-E322-48C9-A5C6-D0CA0383AA22}'] // *** CHANGE IN NEW OBJ ***
   end;
 
   TXxxMainDataModule = class(TSoapDataModule, IXxxMainDataModule, IAppServerSOAP, IAppServer)
@@ -50,13 +50,15 @@ uses
 {$REGION 'Routine'}
 procedure TWksXxxSoapMainDataModuleUnitCreateInstance(out obj: TObject);
 begin
- obj := TXxxMainDataModule.Create(nil);
+  obj := TXxxMainDataModule.Create(nil);
 end;
 {$ENDREGION}
 
 {$REGION 'TMainDataModule'}
 procedure TXxxMainDataModule.SoapDataModuleCreate(Sender: TObject);
 begin
+  if XxxADOConnection.Connected then
+    XxxADOConnection.Close;
   XxxADOConnection.ConnectionString := DBA_CONNECTION_STR;
 end;
 {$ENDREGION}

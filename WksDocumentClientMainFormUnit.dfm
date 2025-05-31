@@ -1,7 +1,7 @@
 inherited DocumentMainForm: TDocumentMainForm
   Caption = 'DocumentMainForm'
-  ExplicitWidth = 1200
-  ExplicitHeight = 875
+  ExplicitWidth = 1588
+  ExplicitHeight = 879
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
     ExplicitHeight = 605
@@ -15,86 +15,69 @@ inherited DocumentMainForm: TDocumentMainForm
     ExplicitWidth = 1180
   end
   inherited TopPanel: TPanel
-    ExplicitWidth = 1178
+    ExplicitWidth = 1572
     inherited TopPageControl: TPageControl
-      Width = 810
-      ExplicitWidth = 806
-      inherited ClientTabSheet: TTabSheet
-        ExplicitWidth = 802
+      Width = 1156
+      inherited TopClientTabSheet: TTabSheet
+        ExplicitWidth = 1148
       end
-      inherited ActionTabSheet: TTabSheet
-        ExplicitWidth = 802
+      inherited TopActionTabSheet: TTabSheet
+        ExplicitWidth = 1148
       end
       inherited TopTextTabSheet: TTabSheet
-        ExplicitWidth = 802
+        ExplicitWidth = 1148
       end
       inherited TopSearchTabSheet: TTabSheet
-        ExplicitWidth = 802
+        ExplicitWidth = 1148
       end
-      object DocumentTabSheet: TTabSheet
-        Caption = 'Document'
-        ImageIndex = 2
-        object DocumentToolBar: TToolBar
-          Left = 0
-          Top = 0
-          Width = 51
-          Height = 44
-          Align = alLeft
-          AutoSize = True
-          ButtonHeight = 46
-          ButtonWidth = 51
-          Caption = 'DocumentToolBar'
-          Images = DocumentImageList24
-          ShowCaptions = True
-          TabOrder = 0
-          object DocumentTestToolButton: TToolButton
-            Left = 0
-            Top = 0
-            Action = DocumentTestAction
-          end
-        end
+      inherited TopUtilsTabSheet: TTabSheet
+        ExplicitWidth = 1148
       end
     end
     inherited TopPageControl3: TPageControl
-      Left = 882
-      ExplicitLeft = 878
+      Left = 1276
+      ExplicitLeft = 1272
     end
     inherited TopPageControl2: TPageControl
-      Left = 810
-      ExplicitLeft = 806
+      Left = 1156
+      ExplicitLeft = 1152
     end
   end
   inherited LeftPanel: TPanel
-    ExplicitHeight = 587
+    ExplicitHeight = 594
     inherited LeftPageControl: TPageControl
-      Height = 588
-      ExplicitHeight = 587
+      Height = 595
+      ExplicitHeight = 594
       inherited ObjectTreeTabSheet: TTabSheet
-        ExplicitHeight = 558
+        ExplicitHeight = 565
         inherited ObjectNodeInfoLabel: TLabel
-          Top = 543
+          Top = 550
           Width = 292
-          ExplicitTop = 543
+          ExplicitTop = 549
         end
         inherited ObjectDTClientTree: TDTClientTree
-          Height = 518
-          ExplicitHeight = 518
+          Height = 525
+          ExplicitHeight = 525
         end
         inherited ObjectDBNavigator: TDBNavigator
           Hints.Strings = ()
         end
       end
+      inherited WordTabSheet: TTabSheet
+        ExplicitHeight = 565
+      end
     end
   end
   inherited BottomPanel: TPanel
-    ExplicitWidth = 1178
+    ExplicitTop = 679
+    ExplicitWidth = 1576
     inherited LogFrame: TLogFrame
-      ExplicitWidth = 1178
+      ExplicitWidth = 1576
       inherited LogPageControl: TPageControl
-        ExplicitWidth = 1178
+        ExplicitWidth = 1572
         inherited OutputTabSheet: TTabSheet
           inherited OutputRichEdit: TRichEdit
-            ExplicitWidth = 1168
+            ExplicitWidth = 1562
           end
         end
         inherited SoapTabSheet: TTabSheet
@@ -126,13 +109,13 @@ inherited DocumentMainForm: TDocumentMainForm
     end
   end
   inherited RightPanel: TPanel
-    ExplicitLeft = 881
-    ExplicitHeight = 587
+    ExplicitLeft = 1272
+    ExplicitHeight = 594
     inherited RightPageControl: TPageControl
-      ExplicitHeight = 587
+      ExplicitHeight = 594
       inherited PropertyTabSheet: TTabSheet
         inherited ObjectJvScrollMax: TJvScrollMax
-          ExplicitHeight = 557
+          ExplicitHeight = 564
           inherited ObjectImageJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectImageDBImage: TDBImage
               Height = 0
@@ -301,45 +284,88 @@ inherited DocumentMainForm: TDocumentMainForm
     end
   end
   inherited StatusBar: TStatusBar
-    ExplicitTop = 814
-    ExplicitWidth = 1178
+    ExplicitTop = 818
+    ExplicitWidth = 1566
   end
   inherited MainPanel: TPanel
-    ExplicitHeight = 587
+    ExplicitHeight = 594
     inherited MainPageControl: TPageControl
-      Height = 588
-      ExplicitHeight = 587
-      inherited ContentPrevTabSheet: TTabSheet
-        ExplicitHeight = 558
+      Height = 595
+      ExplicitHeight = 594
+      inherited ObjectContentPrevTabSheet: TTabSheet
+        ExplicitHeight = 565
         inherited ObjectContentPrevDBSynEdit: TDBSynEdit
-          Height = 532
-          ExplicitHeight = 532
+          Height = 537
+          ExplicitHeight = 537
+        end
+        inherited ObjectContentPrevTopPanel: TPanel
+          inherited ObjectContentPrevCharCountLabel: TLabel
+            Height = 22
+          end
         end
       end
-      inherited ContentTabSheet: TTabSheet
-        ExplicitHeight = 558
-        inherited ObjectContentDBSynEdit: TDBSynEdit
-          Height = 530
-          ExplicitHeight = 529
+      inherited ObjectContentTabSheet: TTabSheet
+        ExplicitHeight = 565
+        inherited ObjectContentSplitter: TSplitter
+          Height = 537
+          ExplicitHeight = 536
         end
         inherited ObjectContentTopPanel: TPanel
           inherited ObjectContentCharCountLabel: TLabel
             Height = 22
           end
         end
-      end
-      inherited JsonTabSheet: TTabSheet
-        ExplicitHeight = 558
-        inherited ObjectDataDBSynEdit: TDBSynEdit
-          Height = 532
-          ExplicitHeight = 532
+        inherited ObjectContentSplitView: TSplitView
+          Height = 537
+          ExplicitHeight = 536
+          inherited ObjectContentEdgeBrowser: TEdgeBrowser
+            Height = 537
+            ExplicitHeight = 536
+          end
+        end
+        inherited ObjectContentLeftPanel: TPanel
+          Height = 537
+          ExplicitHeight = 536
+          inherited ObjectContentDBSynEdit: TDBSynEdit
+            Height = 429
+            ExplicitHeight = 428
+          end
         end
       end
-      inherited NoteTabSheet: TTabSheet
-        ExplicitHeight = 558
+      inherited ObjectDataTabSheet: TTabSheet
+        ExplicitHeight = 565
+        inherited ObjectDataDBSynEdit: TDBSynEdit
+          Height = 537
+          ExplicitHeight = 537
+        end
+        inherited ObjectDataTopPanel: TPanel
+          inherited ObjectDataCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited ObjectNoteTabSheet: TTabSheet
+        ExplicitHeight = 565
         inherited ObjectNoteDBSynEdit: TDBSynEdit
-          Height = 532
-          ExplicitHeight = 532
+          Height = 537
+          ExplicitHeight = 537
+        end
+        inherited ObjectNoteTopPanel: TPanel
+          inherited ObjectNoteCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited FilesRioTabSheet: TTabSheet
+        ExplicitHeight = 565
+        inherited FilesRioTopPanel: TPanel
+          inherited FilesRioInfoLabel: TLabel
+            Height = 31
+          end
+        end
+        inherited FilesRioTree: TVirtualStringTree
+          Height = 519
+          ExplicitHeight = 519
         end
       end
     end
@@ -372,8 +398,8 @@ inherited DocumentMainForm: TDocumentMainForm
     ColorDepth = cd32Bit
     Height = 24
     Width = 24
-    Left = 360
-    Top = 376
+    Left = 376
+    Top = 544
     Bitmap = {
       494C010101000800040018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024
@@ -681,12 +707,7 @@ inherited DocumentMainForm: TDocumentMainForm
   end
   object DocumentAction: TActionList [28]
     Images = DocumentImageList24
-    Left = 568
-    Top = 376
-    object DocumentTestAction: TAction
-      Caption = '    Test    '
-      ImageIndex = 0
-      OnExecute = DocumentTestActionExecute
-    end
+    Left = 584
+    Top = 544
   end
 end

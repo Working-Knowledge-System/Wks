@@ -1,0 +1,72 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{3ED635C4-E1EF-4528-BC81-4B52E2A1035C}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="WksMqttBaseProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksMqttServerProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksMqttClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksMqttTestProject.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="WksMqttBaseProject">
+        <MSBuild Projects="WksMqttBaseProject.dproj"/>
+    </Target>
+    <Target Name="WksMqttBaseProject:Clean">
+        <MSBuild Projects="WksMqttBaseProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksMqttBaseProject:Make">
+        <MSBuild Projects="WksMqttBaseProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksMqttServerProject">
+        <MSBuild Projects="WksMqttServerProject.dproj"/>
+    </Target>
+    <Target Name="WksMqttServerProject:Clean">
+        <MSBuild Projects="WksMqttServerProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksMqttServerProject:Make">
+        <MSBuild Projects="WksMqttServerProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksMqttClientProject">
+        <MSBuild Projects="WksMqttClientProject.dproj"/>
+    </Target>
+    <Target Name="WksMqttClientProject:Clean">
+        <MSBuild Projects="WksMqttClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksMqttClientProject:Make">
+        <MSBuild Projects="WksMqttClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksMqttTestProject">
+        <MSBuild Projects="WksMqttTestProject.dproj"/>
+    </Target>
+    <Target Name="WksMqttTestProject:Clean">
+        <MSBuild Projects="WksMqttTestProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksMqttTestProject:Make">
+        <MSBuild Projects="WksMqttTestProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="WksMqttBaseProject;WksMqttServerProject;WksMqttClientProject;WksMqttTestProject"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="WksMqttBaseProject:Clean;WksMqttServerProject:Clean;WksMqttClientProject:Clean;WksMqttTestProject:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="WksMqttBaseProject:Make;WksMqttServerProject:Make;WksMqttClientProject:Make;WksMqttTestProject:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

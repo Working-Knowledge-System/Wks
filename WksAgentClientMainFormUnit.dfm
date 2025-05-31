@@ -1,45 +1,21 @@
 inherited AgentMainForm: TAgentMainForm
+  Margins.Top = 8
   Caption = 'AgentMainForm'
-  ClientHeight = 842
-  ClientWidth = 1208
   OnCloseQuery = FormCloseQuery
-  ExplicitWidth = 1220
-  ExplicitHeight = 880
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
-    Height = 593
     ExplicitHeight = 605
   end
   inherited RightJvNetscapeSplitter: TJvNetscapeSplitter
-    Left = 895
-    Height = 593
     ExplicitLeft = 867
     ExplicitHeight = 605
   end
   inherited BottomJvNetscapeSplitter: TJvNetscapeSplitter
-    Top = 670
-    Width = 1208
     ExplicitTop = 688
     ExplicitWidth = 1180
   end
   inherited TopPanel: TPanel
-    Width = 1202
-    ExplicitWidth = 1198
     inherited TopPageControl: TPageControl
-      Width = 830
-      ExplicitWidth = 826
-      inherited ClientTabSheet: TTabSheet
-        ExplicitWidth = 822
-      end
-      inherited ActionTabSheet: TTabSheet
-        ExplicitWidth = 822
-      end
-      inherited TopTextTabSheet: TTabSheet
-        ExplicitWidth = 822
-      end
-      inherited TopSearchTabSheet: TTabSheet
-        ExplicitWidth = 822
-      end
       object AgentTabSheet: TTabSheet
         Caption = 'Agent'
         ImageIndex = 2
@@ -75,16 +51,16 @@ inherited AgentMainForm: TAgentMainForm
         object AgentMonitorPanel: TPanel
           Left = 153
           Top = 0
-          Width = 669
+          Width = 1205
           Height = 44
           Align = alClient
           BevelOuter = bvNone
           Caption = 'AgentMonitorPanel'
           ShowCaption = False
           TabOrder = 1
-          object AgentMonitorRunningLabel: TLabel
-            Left = 8
-            Top = 15
+          object AgentRunningLabel: TLabel
+            Left = 11
+            Top = 24
             Width = 39
             Height = 13
             Hint = 
@@ -92,80 +68,254 @@ inherited AgentMainForm: TAgentMainForm
               'actually executing'
             Caption = 'Running'
             Font.Charset = DEFAULT_CHARSET
-            Font.Color = clGrayText
+            Font.Color = clRed
             Font.Height = -11
             Font.Name = 'Tahoma'
             Font.Style = []
             ParentFont = False
           end
-          object AgentMonitorRunningCountLabel: TLabel
+          object AgentRunningCountLabel: TLabel
             AlignWithMargins = True
-            Left = 53
-            Top = 15
-            Width = 7
-            Height = 14
+            Left = 63
+            Top = 24
+            Width = 6
+            Height = 13
             Caption = '0'
-            Font.Charset = ANSI_CHARSET
+            Font.Charset = DEFAULT_CHARSET
             Font.Color = clRed
             Font.Height = -11
-            Font.Name = 'Courier New'
-            Font.Style = [fsBold]
+            Font.Name = 'Tahoma'
+            Font.Style = []
+            ParentFont = False
+            Layout = tlCenter
+          end
+          object AgentActiveLabel: TLabel
+            Left = 11
+            Top = 8
+            Width = 30
+            Height = 13
+            Hint = 
+              'this shows up only when the thread associated with the Agent is ' +
+              'actually executing'
+            Caption = 'Active'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clGreen
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = []
+            ParentFont = False
+          end
+          object AgentActiveCountLabel: TLabel
+            AlignWithMargins = True
+            Left = 63
+            Top = 8
+            Width = 6
+            Height = 13
+            Caption = '0'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clGreen
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = []
             ParentFont = False
             Layout = tlCenter
           end
         end
       end
     end
-    inherited TopPageControl3: TPageControl
-      Left = 902
-      ExplicitLeft = 898
-    end
-    inherited TopPageControl2: TPageControl
-      Left = 830
-      ExplicitLeft = 826
-    end
   end
   inherited LeftPanel: TPanel
-    Height = 593
-    ExplicitHeight = 592
+    OnResize = LeftPanelResize
     inherited LeftPageControl: TPageControl
-      Height = 593
-      ExplicitHeight = 592
       inherited ObjectTreeTabSheet: TTabSheet
-        ExplicitHeight = 563
-        inherited ObjectNodeInfoLabel: TLabel
-          Top = 548
-          Width = 292
-          ExplicitTop = 548
-        end
-        inherited ObjectDTClientTree: TDTClientTree
-          Height = 523
-          ExplicitHeight = 523
-        end
         inherited ObjectDBNavigator: TDBNavigator
           Hints.Strings = ()
+        end
+      end
+      object AgentActiveTabSheet: TTabSheet
+        Hint = 'Active Agents'
+        Caption = 'Active'
+        ImageIndex = 2
+        OnShow = AgentActiveTabSheetShow
+        object AgentActiveDBNavigator: TDBNavigator
+          Left = 0
+          Top = 0
+          Width = 292
+          Height = 25
+          DataSource = AgentActiveDataSource
+          VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbRefresh]
+          Align = alTop
+          Flat = True
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 0
+        end
+        object AgentActiveDBCtrlGrid: TDBCtrlGrid
+          Left = 0
+          Top = 25
+          Width = 292
+          Height = 545
+          Align = alClient
+          AllowDelete = False
+          AllowInsert = False
+          Color = clWhite
+          DataSource = AgentActiveDataSource
+          Orientation = goHorizontal
+          PanelBorder = gbNone
+          PanelHeight = 52
+          PanelWidth = 292
+          ParentColor = False
+          TabOrder = 1
+          RowCount = 10
+          SelectedColor = clYellow
+          ShowFocus = False
+          object AgentActiveObjectIdDBText: TDBText
+            AlignWithMargins = True
+            Left = 8
+            Top = 8
+            Width = 48
+            Height = 17
+            Margins.Left = 8
+            Margins.Top = 8
+            Margins.Right = 8
+            DataField = 'FldId'
+            DataSource = AgentActiveDataSource
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clRed
+            Font.Height = -12
+            Font.Name = 'Segoe UI'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object AgentActiveObjectDBText: TDBText
+            AlignWithMargins = True
+            Left = 72
+            Top = 8
+            Width = 213
+            Height = 17
+            Margins.Left = 8
+            Margins.Top = 8
+            Margins.Right = 8
+            Alignment = taRightJustify
+            DataField = 'FldObject'
+            DataSource = AgentActiveDataSource
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -12
+            Font.Name = 'Segoe UI'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object AgentActiveRunAtHourDBText: TDBText
+            Left = 95
+            Top = 31
+            Width = 67
+            Height = 17
+            Hint = 'Hour(s)'
+            Alignment = taRightJustify
+            DataField = 'FldRunAtHour'
+            DataSource = AgentActiveDataSource
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clGray
+            Font.Height = -12
+            Font.Name = 'Segoe UI'
+            Font.Style = []
+            ParentFont = False
+          end
+          object AgentActiveRunAtMinuteDBText: TDBText
+            Left = 173
+            Top = 31
+            Width = 53
+            Height = 17
+            Hint = 'Minute(s)'
+            Alignment = taRightJustify
+            DataField = 'FldRunAtMinute'
+            DataSource = AgentActiveDataSource
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clGray
+            Font.Height = -12
+            Font.Name = 'Segoe UI'
+            Font.Style = []
+            ParentFont = False
+          end
+          object AgentActiveRunAtSecondDBText: TDBText
+            Left = 232
+            Top = 31
+            Width = 53
+            Height = 17
+            Hint = 'Second(s)'
+            Alignment = taRightJustify
+            DataField = 'FldRunAtSecond'
+            DataSource = AgentActiveDataSource
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clGray
+            Font.Height = -12
+            Font.Name = 'Segoe UI'
+            Font.Style = []
+            ParentFont = False
+          end
+          object AgentActiveRunAtLabel: TLabel
+            Left = 8
+            Top = 31
+            Width = 69
+            Height = 15
+            Caption = 'run at h:m:s :'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clGray
+            Font.Height = -12
+            Font.Name = 'Segoe UI'
+            Font.Style = []
+            ParentFont = False
+          end
+        end
+      end
+      object RunListTabSheet: TTabSheet
+        Caption = '  Runs'
+        ImageIndex = 2
+        object RunListBox: TListBox
+          AlignWithMargins = True
+          Left = 3
+          Top = 33
+          Width = 286
+          Height = 534
+          Margins.Top = 8
+          Align = alClient
+          BorderStyle = bsNone
+          ItemHeight = 15
+          TabOrder = 0
+          OnClick = RunListBoxClick
+        end
+        object RunListPanel: TPanel
+          Left = 0
+          Top = 0
+          Width = 292
+          Height = 25
+          Align = alTop
+          BevelOuter = bvNone
+          Caption = 'RunListPanel'
+          ShowCaption = False
+          TabOrder = 1
+          object RunInfoListClearLabel: TLabel
+            Left = 8
+            Top = 7
+            Width = 27
+            Height = 15
+            Caption = 'Clear'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clBlue
+            Font.Height = -12
+            Font.Name = 'Segoe UI'
+            Font.Style = [fsUnderline]
+            ParentFont = False
+            OnClick = RunInfoListClearLabelClick
+          end
         end
       end
     end
   end
   inherited BottomPanel: TPanel
-    Top = 680
-    Width = 1202
-    ExplicitTop = 679
-    ExplicitWidth = 1198
     inherited LogFrame: TLogFrame
-      Width = 1202
-      ExplicitWidth = 1198
       inherited LogPageControl: TPageControl
-        Width = 1202
-        ExplicitWidth = 1198
-        inherited OutputTabSheet: TTabSheet
-          ExplicitWidth = 1194
-          inherited OutputRichEdit: TRichEdit
-            Width = 1192
-            ExplicitWidth = 1188
-          end
-        end
         inherited SoapTabSheet: TTabSheet
           inherited SoapGridPanel: TGridPanel
             ControlCollection = <
@@ -195,29 +345,16 @@ inherited AgentMainForm: TAgentMainForm
     end
   end
   inherited RightPanel: TPanel
-    Left = 905
-    Height = 593
-    ExplicitLeft = 901
-    ExplicitHeight = 592
     inherited RightPageControl: TPageControl
-      Height = 593
-      ExplicitHeight = 592
       inherited PropertyTabSheet: TTabSheet
-        ExplicitHeight = 563
         inherited ObjectJvScrollMax: TJvScrollMax
-          Height = 563
-          ExplicitHeight = 562
-          inherited ObjectImageJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectImageDBImage: TDBImage
-              Height = 0
-            end
-          end
+          ExplicitHeight = 569
           object AgentJvScrollMaxBand: TJvScrollMaxBand
             Width = 281
             Height = 21
             Expanded = False
             Caption = 'Agent'
-            ExpandedHeight = 450
+            ExpandedHeight = 124
             ButtonFont.Charset = ANSI_CHARSET
             ButtonFont.Color = clWindowText
             ButtonFont.Height = -11
@@ -237,54 +374,6 @@ inherited AgentMainForm: TAgentMainForm
               Caption = 'Object Id'
               ExplicitWidth = 48
             end
-            object AgentOnSuccessLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 153
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'On Success Run'
-              ExplicitWidth = 84
-            end
-            object AgentDelayMsLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 103
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'Delay (ms)'
-              ExplicitWidth = 56
-            end
-            object AgentOnFailLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 203
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'On Fail Run'
-              ExplicitWidth = 61
-            end
-            object AgentOnEmptyLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 253
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'On Empty Run'
-              ExplicitWidth = 77
-            end
             object AgentObjectIdDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
@@ -302,61 +391,6 @@ inherited AgentMainForm: TAgentMainForm
               ShowHint = True
               TabOrder = 0
             end
-            object AgentOnSuccessDBEdit: TDBEdit
-              AlignWithMargins = True
-              Left = 16
-              Top = 174
-              Width = 249
-              Height = 23
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              DataField = 'FldOnSuccess'
-              DataSource = AgentDataSource
-              TabOrder = 1
-            end
-            object AgentDelayMsDBEdit: TDBEdit
-              AlignWithMargins = True
-              Left = 16
-              Top = 124
-              Width = 249
-              Height = 23
-              Hint = 'Id'
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              DataField = 'FldDelayMs'
-              DataSource = AgentDataSource
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 2
-            end
-            object AgentOnFailDBEdit: TDBEdit
-              AlignWithMargins = True
-              Left = 16
-              Top = 224
-              Width = 249
-              Height = 23
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              DataField = 'FldOnFail'
-              DataSource = AgentDataSource
-              TabOrder = 3
-            end
-            object AgentOnEmptyDBEdit: TDBEdit
-              AlignWithMargins = True
-              Left = 16
-              Top = 274
-              Width = 249
-              Height = 23
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              DataField = 'FldOnEmpty'
-              DataSource = AgentDataSource
-              TabOrder = 4
-            end
             object AgentDBNavigator: TDBNavigator
               AlignWithMargins = True
               Left = 3
@@ -367,152 +401,720 @@ inherited AgentMainForm: TAgentMainForm
               VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
               Align = alTop
               Flat = True
+              TabOrder = 1
+            end
+          end
+          object AgentRunAtJvScrollMaxBand: TJvScrollMaxBand
+            Width = 281
+            Height = 21
+            Expanded = False
+            Caption = 'RunAt'
+            ExpandedHeight = 475
+            ButtonFont.Charset = ANSI_CHARSET
+            ButtonFont.Color = clWindowText
+            ButtonFont.Height = -11
+            ButtonFont.Name = 'Segoe UI'
+            ButtonFont.Style = [fsBold]
+            Beveled = False
+            ParentButtonFont = False
+            object AgentRunAtYearLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 148
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Year (empty or * or csv of years)'
+              ExplicitWidth = 167
+            end
+            object AgentRunAtQuarterLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 35
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Quarter (empty or * or csv of quarters)'
+              ExplicitWidth = 201
+            end
+            object AgentRunAtMonthLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 198
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Month (empty or * or csv of months)'
+              ExplicitWidth = 195
+            end
+            object AgentRunAtWeekLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 85
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Week (empty or * or csv of weeks)'
+              ExplicitWidth = 179
+            end
+            object AgentRunAtDayLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 248
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Day (empty or * or csv of days)'
+              ExplicitWidth = 162
+            end
+            object AgentRunAtSecondLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 411
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Second (empty or * or csv of seconds)'
+              ExplicitWidth = 200
+            end
+            object AgentRunAtMinuteLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 361
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Minute (empty or * or csv of minutes)'
+              ExplicitWidth = 199
+            end
+            object AgentRunAtHourLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 311
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Hour (empty or * or csv of hours)'
+              ExplicitWidth = 175
+            end
+            object AgentRunAtYearDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 169
+              Width = 249
+              Height = 23
+              Hint = 'Id'
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldRunAtYear'
+              DataSource = AgentDataSource
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 0
+            end
+            object AgentRunAtQuarterDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 56
+              Width = 249
+              Height = 23
+              Hint = 'Id'
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldRunAtQuarter'
+              DataSource = AgentDataSource
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 1
+            end
+            object AgentRunAtMonthDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 219
+              Width = 249
+              Height = 23
+              Hint = 'Id'
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldRunAtMonth'
+              DataSource = AgentDataSource
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 2
+            end
+            object AgentRunAtWeekDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 106
+              Width = 249
+              Height = 23
+              Hint = 'Id'
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldRunAtWeek'
+              DataSource = AgentDataSource
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 3
+            end
+            object AgentRunAtDayDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 269
+              Width = 249
+              Height = 23
+              Hint = 'Id'
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldRunAtDay'
+              DataSource = AgentDataSource
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 4
+            end
+            object AgentRunAtSecondDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 432
+              Width = 249
+              Height = 23
+              Hint = 'Id'
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldRunAtSecond'
+              DataSource = AgentDataSource
+              ParentShowHint = False
+              ShowHint = True
               TabOrder = 5
             end
-            object AgentRunSingleDBCheckBox: TDBCheckBox
+            object AgentRunAtMinuteDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 308
+              Top = 382
               Width = 249
-              Height = 17
+              Height = 23
+              Hint = 'Id'
               Margins.Left = 16
-              Margins.Top = 8
               Margins.Right = 16
               Align = alTop
-              Caption = 'Run Once'
-              DataField = 'FldRunSingle'
+              DataField = 'FldRunAtMinute'
               DataSource = AgentDataSource
+              ParentShowHint = False
+              ShowHint = True
               TabOrder = 6
             end
-            object AgentContinuousOnDBCheckBox: TDBCheckBox
+            object AgentRunAtHourDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 336
+              Top = 332
               Width = 249
-              Height = 17
+              Height = 23
+              Hint = 'Id'
               Margins.Left = 16
-              Margins.Top = 8
               Margins.Right = 16
               Align = alTop
-              Caption = 'Run Continuously'
-              DataField = 'FldContinuousOn'
+              DataField = 'FldRunAtHour'
               DataSource = AgentDataSource
+              ParentShowHint = False
+              ShowHint = True
               TabOrder = 7
             end
-            object AgentReportDoDBCheckBox: TDBCheckBox
+          end
+          object AgentEventsJvScrollMaxBand: TJvScrollMaxBand
+            Width = 281
+            Height = 21
+            Expanded = False
+            Caption = 'Events'
+            ExpandedHeight = 198
+            ButtonFont.Charset = ANSI_CHARSET
+            ButtonFont.Color = clWindowText
+            ButtonFont.Height = -11
+            ButtonFont.Name = 'Segoe UI'
+            ButtonFont.Style = [fsBold]
+            Beveled = False
+            ParentButtonFont = False
+            object AgentOnSuccessLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 364
+              Top = 35
               Width = 249
-              Height = 17
+              Height = 15
               Margins.Left = 16
-              Margins.Top = 8
+              Margins.Top = 16
               Margins.Right = 16
               Align = alTop
-              Caption = 'Emit Report'
-              DataField = 'FldReportDo'
-              DataSource = AgentDataSource
-              TabOrder = 8
+              Caption = 'On Success (empty or csv of agent-ids)'
+              ExplicitWidth = 206
             end
-            object AgentOutputDoDBCheckBox: TDBCheckBox
+            object AgentOnFailLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 392
+              Top = 85
               Width = 249
-              Height = 17
+              Height = 15
               Margins.Left = 16
-              Margins.Top = 8
               Margins.Right = 16
               Align = alTop
-              Caption = 'Emit Output'
-              DataField = 'FldOutputDo'
-              DataSource = AgentDataSource
-              TabOrder = 9
+              Caption = 'On Fail (empty or csv of agent-ids)'
+              ExplicitWidth = 183
             end
-            object AgentHistorySaveDBCheckBox: TDBCheckBox
+            object AgentOnEmptyLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 420
+              Top = 135
               Width = 249
-              Height = 17
+              Height = 15
               Margins.Left = 16
-              Margins.Top = 8
               Margins.Right = 16
               Align = alTop
-              Caption = 'Save in History'
-              DataField = 'FldHistorySave'
+              Caption = 'On Empty Run (empty or csv of agent-ids)'
+              ExplicitWidth = 223
+            end
+            object AgentOnSuccessDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 56
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldOnSuccess'
               DataSource = AgentDataSource
-              TabOrder = 10
+              TabOrder = 0
+            end
+            object AgentOnFailDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 106
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldOnFail'
+              DataSource = AgentDataSource
+              TabOrder = 1
+            end
+            object AgentOnEmptyDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 156
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldOnEmpty'
+              DataSource = AgentDataSource
+              TabOrder = 2
             end
           end
         end
       end
-      inherited SearchTabSheet: TTabSheet
-        ExplicitHeight = 563
-        inherited SearchResultListBox: TListBox
-          Height = 426
-          ExplicitHeight = 426
-        end
-      end
       inherited OptionTabSheet: TTabSheet
-        ExplicitHeight = 563
         inherited OptionJvScrollMax: TJvScrollMax
-          Height = 563
-          ExplicitHeight = 563
+          ExplicitHeight = 570
+          object OptionJclJvScrollMaxBand: TJvScrollMaxBand
+            Width = 286
+            Height = 21
+            Expanded = False
+            Caption = 'Jmp'
+            ExpandedHeight = 70
+            Beveled = False
+            DesignSize = (
+              286
+              21)
+            object OptionJmpExePathLabel: TLabel
+              Left = 16
+              Top = 36
+              Width = 82
+              Height = 15
+              Hint = 'JMP Executable path'
+              Caption = 'JMP Executable'
+            end
+            object OptionJmpExePathEdit: TEdit
+              Left = 104
+              Top = 33
+              Width = 161
+              Height = 23
+              Anchors = [akLeft, akTop, akRight]
+              TabOrder = 0
+              Text = 'OptionJmpExePathEdit'
+            end
+          end
         end
       end
     end
   end
   inherited StatusBar: TStatusBar
-    Top = 820
-    Width = 1202
-    ExplicitTop = 819
-    ExplicitWidth = 1198
+    ExplicitTop = 823
+    ExplicitWidth = 1728
   end
   inherited MainPanel: TPanel
-    Height = 593
-    ExplicitHeight = 592
     inherited MainPageControl: TPageControl
-      Height = 593
-      ExplicitHeight = 592
-      inherited ContentPrevTabSheet: TTabSheet
-        ExplicitHeight = 563
-        inherited ObjectContentPrevDBSynEdit: TDBSynEdit
-          Height = 535
-          ExplicitHeight = 535
+      inherited ObjectContentTabSheet: TTabSheet
+        inherited ObjectContentSplitter: TSplitter
+          ExplicitHeight = 536
         end
       end
-      inherited ContentTabSheet: TTabSheet
-        ExplicitHeight = 563
-        inherited ObjectContentDBSynEdit: TDBSynEdit
-          Height = 535
-          ExplicitHeight = 534
-        end
-        inherited ObjectContentTopPanel: TPanel
-          inherited ObjectContentCharCountLabel: TLabel
-            Height = 22
+      object RunInfoTabSheet: TTabSheet
+        Caption = '   Run'
+        ImageIndex = 4
+        OnShow = RunInfoTabSheetShow
+        object RunInfoPanel: TPanel
+          AlignWithMargins = True
+          Left = 3
+          Top = 3
+          Width = 1086
+          Height = 48
+          Align = alTop
+          BevelOuter = bvNone
+          Caption = 'RunInfoPanel'
+          ShowCaption = False
+          TabOrder = 0
+          object RunInfoStartedLabel: TLabel
+            Left = 8
+            Top = 8
+            Width = 43
+            Height = 15
+            Caption = 'Started :'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clGray
+            Font.Height = -12
+            Font.Name = 'Segoe UI'
+            Font.Style = []
+            ParentFont = False
+          end
+          object RunInfoStartedValueLabel: TLabel
+            Left = 66
+            Top = 8
+            Width = 135
+            Height = 15
+            Caption = 'RunInfoStartedValueLabel'
+          end
+          object RunInfoEndedValueLabel: TLabel
+            Left = 261
+            Top = 8
+            Width = 131
+            Height = 15
+            Caption = 'RunInfoEndedValueLabel'
+          end
+          object RunInfoEndedLabel: TLabel
+            Left = 216
+            Top = 8
+            Width = 39
+            Height = 15
+            Caption = 'Ended :'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clGray
+            Font.Height = -12
+            Font.Name = 'Segoe UI'
+            Font.Style = []
+            ParentFont = False
+          end
+          object RunInfoMessageLabel: TLabel
+            Left = 8
+            Top = 29
+            Width = 52
+            Height = 15
+            Caption = 'Message :'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clGray
+            Font.Height = -12
+            Font.Name = 'Segoe UI'
+            Font.Style = []
+            ParentFont = False
+          end
+          object RunInfoMessageValueLabel: TLabel
+            Left = 66
+            Top = 29
+            Width = 152
+            Height = 15
+            Caption = 'RunInfoMessageValueLabel'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -12
+            Font.Name = 'Segoe UI'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object RunInfoElapsedLabel: TLabel
+            Left = 424
+            Top = 8
+            Width = 73
+            Height = 15
+            Caption = 'Elapsed (ms) :'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clGray
+            Font.Height = -12
+            Font.Name = 'Segoe UI'
+            Font.Style = []
+            ParentFont = False
+          end
+          object RunInfoElapsedValueLabel: TLabel
+            Left = 503
+            Top = 8
+            Width = 138
+            Height = 15
+            Caption = 'RunInfoElapsedValueLabel'
+          end
+          object RunInfoAffectedLabel: TLabel
+            Left = 550
+            Top = 8
+            Width = 51
+            Height = 15
+            Caption = 'Affected :'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clGray
+            Font.Height = -12
+            Font.Name = 'Segoe UI'
+            Font.Style = []
+            ParentFont = False
+          end
+          object RunInfoAffectedValueLabel: TLabel
+            Left = 604
+            Top = 8
+            Width = 143
+            Height = 15
+            Caption = 'RunInfoAffectedValueLabel'
           end
         end
-      end
-      inherited JsonTabSheet: TTabSheet
-        ExplicitHeight = 563
-        inherited ObjectDataDBSynEdit: TDBSynEdit
-          Height = 535
-          ExplicitHeight = 535
-        end
-      end
-      inherited NoteTabSheet: TTabSheet
-        ExplicitHeight = 563
-        inherited ObjectNoteDBSynEdit: TDBSynEdit
-          Height = 535
-          ExplicitHeight = 535
+        object RunInfoGridPanel: TGridPanel
+          AlignWithMargins = True
+          Left = 3
+          Top = 57
+          Width = 1086
+          Height = 440
+          Align = alTop
+          BevelOuter = bvNone
+          Caption = 'RunInfoGridPanel'
+          ColumnCollection = <
+            item
+              Value = 50.000000000000000000
+            end
+            item
+              Value = 50.000000000000000000
+            end>
+          ControlCollection = <
+            item
+              Column = 0
+              Control = RunInfoOutputLabel
+              Row = 0
+            end
+            item
+              Column = 1
+              Control = RunInfoReportLabel
+              Row = 0
+            end
+            item
+              Column = 1
+              Control = RunInfoReportRichEdit
+              Row = 1
+            end
+            item
+              Column = 0
+              Control = RunInfoOutputRichEdit
+              Row = 1
+            end>
+          RowCollection = <
+            item
+              SizeStyle = ssAuto
+              Value = 50.000000000000000000
+            end
+            item
+              Value = 100.000000000000000000
+            end>
+          ShowCaption = False
+          TabOrder = 1
+          object RunInfoOutputLabel: TLabel
+            AlignWithMargins = True
+            Left = 3
+            Top = 3
+            Width = 532
+            Height = 23
+            Margins.Right = 8
+            Align = alTop
+            AutoSize = False
+            Caption = '  Agent Output'
+            Color = clBtnFace
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clGray
+            Font.Height = -12
+            Font.Name = 'Segoe UI'
+            Font.Style = []
+            ParentColor = False
+            ParentFont = False
+            Transparent = False
+            Layout = tlCenter
+            ExplicitLeft = 5
+            ExplicitWidth = 256
+          end
+          object RunInfoReportLabel: TLabel
+            AlignWithMargins = True
+            Left = 546
+            Top = 3
+            Width = 532
+            Height = 23
+            Margins.Right = 8
+            Align = alTop
+            AutoSize = False
+            Caption = '  Thread Report'
+            Color = clBtnFace
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clGray
+            Font.Height = -12
+            Font.Name = 'Segoe UI'
+            Font.Style = []
+            ParentColor = False
+            ParentFont = False
+            Transparent = False
+            Layout = tlCenter
+            ExplicitLeft = 277
+            ExplicitWidth = 253
+          end
+          object RunInfoReportRichEdit: TRichEdit
+            AlignWithMargins = True
+            Left = 551
+            Top = 32
+            Width = 527
+            Height = 405
+            Margins.Left = 8
+            Margins.Right = 8
+            Align = alClient
+            BorderStyle = bsNone
+            Font.Charset = ANSI_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -12
+            Font.Name = 'Courier New'
+            Font.Style = []
+            Lines.Strings = (
+              'RunInfoReportRichEdit')
+            ParentFont = False
+            PlainText = True
+            ReadOnly = True
+            ScrollBars = ssBoth
+            TabOrder = 0
+          end
+          object RunInfoOutputRichEdit: TRichEdit
+            AlignWithMargins = True
+            Left = 8
+            Top = 32
+            Width = 527
+            Height = 405
+            Margins.Left = 8
+            Margins.Right = 8
+            Align = alClient
+            BorderStyle = bsNone
+            Font.Charset = ANSI_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -12
+            Font.Name = 'Courier New'
+            Font.Style = []
+            Lines.Strings = (
+              'RunInfoOutputRichEdit')
+            ParentFont = False
+            PlainText = True
+            ReadOnly = True
+            ScrollBars = ssBoth
+            TabOrder = 1
+          end
         end
       end
     end
   end
   object AgentClientDataSet: TClientDataSet [15]
     Aggregates = <>
-    FieldDefs = <>
+    FieldDefs = <
+      item
+        Name = 'FldObjectId'
+        DataType = ftInteger
+      end
+      item
+        Name = 'FldRunAtYear'
+        DataType = ftString
+        Size = 256
+      end
+      item
+        Name = 'FldRunAtQuarter'
+        DataType = ftString
+        Size = 256
+      end
+      item
+        Name = 'FldRunAtMonth'
+        DataType = ftString
+        Size = 256
+      end
+      item
+        Name = 'FldRunAtWeek'
+        DataType = ftString
+        Size = 256
+      end
+      item
+        Name = 'FldRunAtWeekMode'
+        DataType = ftString
+        Size = 256
+      end
+      item
+        Name = 'FldRunAtDay'
+        DataType = ftString
+        Size = 256
+      end
+      item
+        Name = 'FldRunAtHour'
+        DataType = ftString
+        Size = 256
+      end
+      item
+        Name = 'FldRunAtMinute'
+        DataType = ftString
+        Size = 256
+      end
+      item
+        Name = 'FldRunAtSecond'
+        DataType = ftString
+        Size = 256
+      end
+      item
+        Name = 'FldOnSuccess'
+        DataType = ftString
+        Size = 256
+      end
+      item
+        Name = 'FldOnFail'
+        DataType = ftString
+        Size = 256
+      end
+      item
+        Name = 'FldOnEmpty'
+        DataType = ftString
+        Size = 256
+      end>
     IndexDefs = <>
     IndexFieldNames = 'FldObjectId'
     MasterFields = 'FldId'
@@ -544,8 +1146,8 @@ inherited AgentMainForm: TAgentMainForm
     ColorDepth = cd32Bit
     Height = 24
     Width = 24
-    Left = 360
-    Top = 320
+    Left = 376
+    Top = 544
     Bitmap = {
       494C010105000800040018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000003000000001002000000000000048
@@ -1150,26 +1752,44 @@ inherited AgentMainForm: TAgentMainForm
   end
   object AgentAction: TActionList [21]
     Images = AgentImageList24
-    Left = 568
-    Top = 376
+    Left = 584
+    Top = 544
     object AgentTestAction: TAction
       Caption = '    Test    '
+      Hint = 'Just a test'
       ImageIndex = 0
       OnExecute = AgentTestActionExecute
     end
     object AgentRunAction: TAction
       Caption = 'Run'
+      Hint = 'Execute the current Agent'
       ImageIndex = 2
       OnExecute = AgentRunActionExecute
     end
     object AgentActiveAction: TAction
       AutoCheck = True
       Caption = 'Inactive'
+      Hint = 
+        'Activate the scheduler that execute active agents at their speci' +
+        'fic execution time'
       ImageIndex = 3
       OnExecute = AgentActiveActionExecute
     end
   end
-  inherited SysEditImageList24: TImageList
-    Top = 376
+  object AgentActiveClientDataSet: TClientDataSet [32]
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'AgentActiveDataSetProvider'
+    RemoteServer = MainSoapConnection
+    AfterOpen = AgentActiveClientDataSetAfterOpen
+    AfterScroll = AgentActiveClientDataSetAfterScroll
+    AfterRefresh = AgentActiveClientDataSetAfterRefresh
+    Left = 71
+    Top = 487
+  end
+  object AgentActiveDataSource: TDataSource [33]
+    DataSet = AgentActiveClientDataSet
+    Left = 207
+    Top = 487
   end
 end

@@ -14,7 +14,7 @@ object CodeMainDataModule: TCodeMainDataModule
   end
   object CodeADOTable: TADOTable
     Connection = CodeADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     IndexFieldNames = 'FldObjectId'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -39,7 +39,7 @@ object CodeMainDataModule: TCodeMainDataModule
   end
   object ObjectADOTable: TADOTable
     Connection = CodeADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     TableName = 'TblObject'
     Left = 240
     Top = 40

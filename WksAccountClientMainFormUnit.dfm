@@ -1,60 +1,26 @@
 inherited AccountMainForm: TAccountMainForm
   Caption = 'AccountMainForm'
-  ClientHeight = 837
-  ClientWidth = 1268
+  ExplicitWidth = 1592
+  ExplicitHeight = 880
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
-    Height = 588
-    ExplicitHeight = 704
+    ExplicitHeight = 596
   end
   inherited RightJvNetscapeSplitter: TJvNetscapeSplitter
-    Left = 955
-    Height = 588
-    ExplicitHeight = 704
+    ExplicitLeft = 1270
+    ExplicitHeight = 596
   end
   inherited BottomJvNetscapeSplitter: TJvNetscapeSplitter
-    Top = 665
-    Width = 1268
-    ExplicitTop = 787
+    ExplicitTop = 670
+    ExplicitWidth = 1580
   end
   inherited TopPanel: TPanel
-    Width = 1262
-    inherited TopPageControl: TPageControl
-      object AccountTabSheet: TTabSheet
-        Caption = 'Account'
-        ImageIndex = 2
-        object AccountToolBar: TToolBar
-          Left = 0
-          Top = 0
-          Width = 51
-          Height = 44
-          Align = alLeft
-          AutoSize = True
-          ButtonHeight = 46
-          ButtonWidth = 51
-          Caption = 'AccountToolBar'
-          Images = AccountImageList24
-          ShowCaptions = True
-          TabOrder = 0
-          object AccountTestToolButton: TToolButton
-            Left = 0
-            Top = 0
-            Action = AccountTestAction
-          end
-        end
-      end
-    end
+    ExplicitWidth = 1580
   end
   inherited LeftPanel: TPanel
-    Height = 588
+    ExplicitHeight = 596
     inherited LeftPageControl: TPageControl
       inherited ObjectTreeTabSheet: TTabSheet
-        inherited ObjectNodeInfoLabel: TLabel
-          Width = 292
-        end
-        inherited ObjectDTClientTree: TDTClientTree
-          ExplicitHeight = 518
-        end
         inherited ObjectDBNavigator: TDBNavigator
           Hints.Strings = ()
         end
@@ -62,16 +28,15 @@ inherited AccountMainForm: TAccountMainForm
     end
   end
   inherited BottomPanel: TPanel
-    Top = 675
-    Width = 1262
+    ExplicitTop = 680
+    ExplicitWidth = 1580
     inherited LogFrame: TLogFrame
-      Width = 1262
+      ExplicitWidth = 1580
       inherited LogPageControl: TPageControl
-        Width = 1262
+        ExplicitWidth = 1580
         inherited OutputTabSheet: TTabSheet
-          ExplicitWidth = 1254
           inherited OutputRichEdit: TRichEdit
-            Width = 1252
+            ExplicitWidth = 1570
           end
         end
         inherited SoapTabSheet: TTabSheet
@@ -103,61 +68,13 @@ inherited AccountMainForm: TAccountMainForm
     end
   end
   inherited RightPanel: TPanel
-    Left = 965
-    Height = 588
+    ExplicitLeft = 1280
+    ExplicitHeight = 597
     inherited RightPageControl: TPageControl
-      Height = 588
+      ExplicitHeight = 597
       inherited PropertyTabSheet: TTabSheet
-        ExplicitHeight = 558
         inherited ObjectJvScrollMax: TJvScrollMax
-          Height = 558
-          inherited ObjectIdJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectOrderLabel: TLabel
-              Width = 249
-            end
-            inherited ObjectRevLabel: TLabel
-              Width = 249
-            end
-            inherited ObjectPIdLabel: TLabel
-              Width = 249
-            end
-            inherited ObjectIdLabel: TLabel
-              Width = 249
-            end
-            inherited ObjectId8Label: TLabel
-              Width = 249
-            end
-          end
-          inherited ObjectDateJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectCreatedLabel: TLabel
-              Width = 249
-            end
-            inherited ObjectUpdatedLabel: TLabel
-              Width = 249
-            end
-          end
-          inherited ObjectFromJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectFromOrganizationLabel: TLabel
-              Width = 249
-            end
-            inherited ObjectFromMemberLabel: TLabel
-              Width = 249
-            end
-            inherited ObjectFromTeamLabel: TLabel
-              Width = 249
-            end
-            inherited ObjectFromAreaLabel: TLabel
-              Width = 249
-            end
-            inherited ObjectFromDepartmentLabel: TLabel
-              Width = 249
-            end
-          end
-          inherited ObjectApprovalJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectRouteLabel: TLabel
-              Width = 249
-            end
-          end
+          ExplicitHeight = 567
           object AccountJvScrollMaxBand: TJvScrollMaxBand
             Width = 281
             Height = 21
@@ -171,6 +88,9 @@ inherited AccountMainForm: TAccountMainForm
             ButtonFont.Style = [fsBold]
             Beveled = False
             ParentButtonFont = False
+            DesignSize = (
+              281
+              21)
             object AccountObjectIdLabel: TLabel
               AlignWithMargins = True
               Left = 16
@@ -189,16 +109,18 @@ inherited AccountMainForm: TAccountMainForm
               Top = 199
               Width = 249
               Height = 13
+              Hint = 'Click to copy'
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Password'
               Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
+              Font.Color = clBlue
               Font.Height = -11
               Font.Name = 'Tahoma'
-              Font.Style = [fsBold]
+              Font.Style = [fsBold, fsUnderline]
               ParentFont = False
+              OnClick = AccountPasswordLabelClick
               ExplicitWidth = 54
             end
             object AccountUsernameLabel: TLabel
@@ -207,16 +129,18 @@ inherited AccountMainForm: TAccountMainForm
               Top = 151
               Width = 249
               Height = 13
+              Hint = 'Click to copy'
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Username'
               Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
+              Font.Color = clBlue
               Font.Height = -11
               Font.Name = 'Tahoma'
-              Font.Style = [fsBold]
+              Font.Style = [fsBold, fsUnderline]
               ParentFont = False
+              OnClick = AccountUsernameLabelClick
               ExplicitWidth = 58
             end
             object AccountEmailLabel: TLabel
@@ -225,17 +149,34 @@ inherited AccountMainForm: TAccountMainForm
               Top = 103
               Width = 249
               Height = 13
+              Hint = 'Click to copy'
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Email'
               Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
+              Font.Color = clBlue
               Font.Height = -11
               Font.Name = 'Tahoma'
-              Font.Style = [fsBold]
+              Font.Style = [fsBold, fsUnderline]
               ParentFont = False
+              OnClick = AccountEmailLabelClick
               ExplicitWidth = 30
+            end
+            object AccountPasswordGenerateLabel: TLabel
+              Left = 216
+              Top = 197
+              Width = 47
+              Height = 15
+              Anchors = [akTop, akRight]
+              Caption = 'Generate'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlue
+              Font.Height = -12
+              Font.Name = 'Segoe UI'
+              Font.Style = [fsUnderline]
+              ParentFont = False
+              OnClick = AccountPasswordGenerateLabelClick
             end
             object AccountObjectIdDBEdit: TDBEdit
               AlignWithMargins = True
@@ -354,6 +295,13 @@ inherited AccountMainForm: TAccountMainForm
               Margins.Right = 16
               Align = alTop
               Caption = 'Login Hook'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlue
+              Font.Height = -12
+              Font.Name = 'Segoe UI'
+              Font.Style = [fsUnderline]
+              ParentFont = False
+              OnClick = AccountLoginHookLabelClick
               ExplicitWidth = 62
             end
             object AccountLogoutHookDBEdit: TDBEdit
@@ -456,41 +404,18 @@ inherited AccountMainForm: TAccountMainForm
           end
         end
       end
-      inherited SearchTabSheet: TTabSheet
-        ExplicitHeight = 558
-        inherited SearchResultListBox: TListBox
-          Height = 421
-          ExplicitHeight = 421
-        end
-      end
-      inherited OptionTabSheet: TTabSheet
-        ExplicitHeight = 558
-        inherited OptionJvScrollMax: TJvScrollMax
-          Height = 558
-          ExplicitHeight = 558
-        end
-      end
     end
   end
   inherited StatusBar: TStatusBar
-    Top = 815
-    Width = 1262
+    ExplicitTop = 820
+    ExplicitWidth = 1574
   end
   inherited MainPanel: TPanel
-    Height = 588
+    ExplicitHeight = 596
     inherited MainPageControl: TPageControl
-      inherited ContentTabSheet: TTabSheet
-        inherited ObjectContentTopPanel: TPanel
-          inherited ObjectContentCharCountLabel: TLabel
-            Height = 22
-          end
-        end
-      end
-      inherited JsonTabSheet: TTabSheet
-        inherited ObjectDataTopPanel: TPanel
-          inherited ObjectDataCharCountLabel: TLabel
-            Height = 22
-          end
+      inherited ObjectContentTabSheet: TTabSheet
+        inherited ObjectContentSplitter: TSplitter
+          ExplicitHeight = 536
         end
       end
     end
@@ -520,8 +445,8 @@ inherited AccountMainForm: TAccountMainForm
     ColorDepth = cd32Bit
     Height = 24
     Width = 24
-    Left = 360
-    Top = 376
+    Left = 376
+    Top = 544
     Bitmap = {
       494C010101000800040018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024
@@ -829,12 +754,7 @@ inherited AccountMainForm: TAccountMainForm
   end
   object AccountAction: TActionList [28]
     Images = AccountImageList24
-    Left = 568
-    Top = 376
-    object AccountTestAction: TAction
-      Caption = '    Test    '
-      ImageIndex = 0
-      OnExecute = AccountTestActionExecute
-    end
+    Left = 584
+    Top = 544
   end
 end

@@ -1,6 +1,8 @@
 inherited MemberMainForm: TMemberMainForm
   Cursor = crHandPoint
   Caption = 'MemberMainForm'
+  StyleElements = [seFont, seClient, seBorder]
+  ExplicitLeft = -1086
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
     ExplicitHeight = 696
@@ -14,35 +16,129 @@ inherited MemberMainForm: TMemberMainForm
     ExplicitWidth = 1208
   end
   inherited TopPanel: TPanel
+    StyleElements = [seFont, seClient, seBorder]
     inherited TopPageControl: TPageControl
-      object MemberTabSheet2: TTabSheet
-        Caption = 'Member'
-        ImageIndex = 2
-        object MemberToolBar: TToolBar
-          Left = 0
-          Top = 0
-          Width = 51
-          Height = 44
-          Align = alLeft
-          AutoSize = True
-          ButtonHeight = 46
-          ButtonWidth = 51
-          Caption = 'MemberToolBar'
-          Images = MemberImageList24
-          ShowCaptions = True
-          TabOrder = 0
-          object MemberTestToolButton: TToolButton
-            Left = 0
-            Top = 0
-            Action = MemberTestAction
-          end
+      inherited TopSearchTabSheet: TTabSheet
+        inherited SearchReplaceOutLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceInLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceSwapLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceOutEdit: TEdit
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceInEdit: TEdit
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+    end
+    inherited TopPageControl3: TPageControl
+      inherited TimeTabSheet: TTabSheet
+        inherited YearLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MonthLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited DayLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited TimerLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited WeekdayLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited WeekLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited TimerJvClock: TJvClock
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited PersonTabSheet: TTabSheet
+        inherited PersonNameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited PersonSurnameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited PersonSurnameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited PersonNameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited UserTabSheet: TTabSheet
+        inherited UserUsernameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited UserPasswordLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited UserPasswordLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited UserUsernameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited MemberTabSheet: TTabSheet
+        inherited MemberMemberLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MemberMemberLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MemberRoleLevelLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MemberRoleLevelLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited OrganizationTabSheet: TTabSheet
+        inherited OrganizationOrganizationLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited OrganizationNameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited OrganizationNameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited OrganizationOrganizationLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+    end
+    inherited TopPageControl2: TPageControl
+      inherited ObjectTabSheet: TTabSheet
+        inherited ObjectIdDBText: TDBText
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited ObjectKindDBText: TDBText
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited ObjectStateDBText: TDBText
+          StyleElements = [seFont, seClient, seBorder]
         end
       end
     end
   end
   inherited LeftPanel: TPanel
+    StyleElements = [seFont, seClient, seBorder]
     inherited LeftPageControl: TPageControl
       inherited ObjectTreeTabSheet: TTabSheet
+        inherited ObjectNodeInfoLabel: TLabel
+          Width = 292
+          StyleElements = [seFont, seClient, seBorder]
+        end
         inherited ObjectDBNavigator: TDBNavigator
           Hints.Strings = ()
         end
@@ -50,8 +146,19 @@ inherited MemberMainForm: TMemberMainForm
     end
   end
   inherited BottomPanel: TPanel
+    StyleElements = [seFont, seClient, seBorder]
     inherited LogFrame: TLogFrame
       inherited LogPageControl: TPageControl
+        inherited OutputTabSheet: TTabSheet
+          inherited OutputRichEdit: TRichEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+        end
+        inherited LogTabSheet: TTabSheet
+          inherited LogRichEdit: TRichEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+        end
         inherited SoapTabSheet: TTabSheet
           inherited SoapGridPanel: TGridPanel
             ControlCollection = <
@@ -75,21 +182,255 @@ inherited MemberMainForm: TMemberMainForm
                 Control = LogFrame.SoapResponseRichEdit
                 Row = 1
               end>
+            StyleElements = [seFont, seClient, seBorder]
+            inherited SoapResponseLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited SoapRequestRichEdit: TRichEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited SoapRequestLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited SoapResponseRichEdit: TRichEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+        end
+        inherited OptionTabSheet: TTabSheet
+          inherited OptionOutputLineWidthMaxLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited OptionOutputLinesMaxLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited OptionOutputLineWidthMaxEdit: TEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited OptionOutputLinesMaxEdit: TEdit
+            StyleElements = [seFont, seClient, seBorder]
           end
         end
       end
     end
   end
   inherited RightPanel: TPanel
+    StyleElements = [seFont, seClient, seBorder]
     inherited RightPageControl: TPageControl
       inherited PropertyTabSheet: TTabSheet
         inherited ObjectJvScrollMax: TJvScrollMax
+          StyleElements = [seFont, seClient, seBorder]
+          inherited ObjectIdJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectOrderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectRevLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectPIdLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectIdLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectId8Label: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectOrderDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectPIdDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectRevDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectIdDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectId8DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectDateJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectCreatedLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectCreatedDBText: TDBText
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedDBText: TDBText
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedByDBText: TDBText
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedByLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectFromJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectFromOrganizationLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromMemberLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromTeamLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromAreaLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromDepartmentLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromOrganizationDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromMemberDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromTeamDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromAreaDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromDepartmentDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectToJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectToOrganizationLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToMemberLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToTeamLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToAreaLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToDepartmentLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectJobGradeMinLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectJobGradeCalculateLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToOrganizationDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToMemberDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToTeamDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToAreaDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToDepartmentDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectJobGradeMinDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectApprovalJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectRouteLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectRouteDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectImageJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectImageLoadLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageSaveLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageEditLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageFitLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageClearLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageDBImage: TDBImage
+              Height = 0
+            end
+          end
+          inherited ObjectTypeJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectContentKindLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectKindLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDataKindLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectContentKindDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectKindDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDataKindDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectGeneralJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectStateLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSpareLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDescriptionLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectTitleLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSubtitleLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectStateDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSpareDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDescriptionDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectTitleDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSubtitleDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
           object MemberJvScrollMaxBand: TJvScrollMaxBand
             Width = 281
             Height = 21
             Expanded = False
             Caption = 'Member'
-            ExpandedHeight = 518
+            ExpandedHeight = 316
             ButtonFont.Charset = ANSI_CHARSET
             ButtonFont.Color = clWindowText
             ButtonFont.Height = -11
@@ -97,6 +438,9 @@ inherited MemberMainForm: TMemberMainForm
             ButtonFont.Style = [fsBold]
             Beveled = False
             ParentButtonFont = False
+            DesignSize = (
+              281
+              21)
             object MemberObjectIdLabel: TLabel
               AlignWithMargins = True
               Left = 16
@@ -109,34 +453,10 @@ inherited MemberMainForm: TMemberMainForm
               Caption = 'Object Id'
               ExplicitWidth = 48
             end
-            object MemberPIdLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 153
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'PId'
-              ExplicitWidth = 17
-            end
-            object MemberIdLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 103
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'Id'
-              ExplicitWidth = 10
-            end
             object MemberLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 203
+              Top = 153
               Width = 249
               Height = 15
               Margins.Left = 16
@@ -148,7 +468,7 @@ inherited MemberMainForm: TMemberMainForm
             object MemberEmailLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 253
+              Top = 203
               Width = 249
               Height = 15
               Margins.Left = 16
@@ -160,7 +480,7 @@ inherited MemberMainForm: TMemberMainForm
             object MemberStateLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 303
+              Top = 253
               Width = 249
               Height = 15
               Margins.Left = 16
@@ -169,49 +489,14 @@ inherited MemberMainForm: TMemberMainForm
               Caption = 'State'
               ExplicitWidth = 26
             end
-            object MemberJobTitleLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 353
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'Job Title'
-              ExplicitWidth = 43
-            end
-            object MemberJobRoleLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 403
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'Job Role'
-              ExplicitWidth = 44
-            end
-            object MemberJobLevelLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 453
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'Job Level'
-              ExplicitWidth = 48
-            end
             object MemberIdentifierSetLabel: TLabel
-              Left = 150
-              Top = 203
-              Width = 116
+              Left = 110
+              Top = 153
+              Width = 154
               Height = 15
               Cursor = crHandPoint
-              Caption = 'Set = Person identifier'
+              Anchors = [akTop, akRight]
+              Caption = 'Set equal to  Person identifier'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
               Font.Height = -12
@@ -220,27 +505,13 @@ inherited MemberMainForm: TMemberMainForm
               ParentFont = False
               OnClick = MemberIdentifierSetLabelClick
             end
-            object MemberJobSetLabel: TLabel
-              Left = 131
-              Top = 353
-              Width = 135
-              Height = 15
-              Cursor = crHandPoint
-              Caption = 'Set job title, role and level'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clBlue
-              Font.Height = -12
-              Font.Name = 'Segoe UI'
-              Font.Style = [fsUnderline]
-              ParentFont = False
-              OnClick = MemberJobSetLabelClick
-            end
             object MemberEmailGenerateLabel: TLabel
               Left = 219
-              Top = 253
+              Top = 203
               Width = 47
               Height = 15
               Cursor = crHandPoint
+              Anchors = [akTop, akRight]
               Caption = 'Generate'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
@@ -249,6 +520,18 @@ inherited MemberMainForm: TMemberMainForm
               Font.Style = [fsUnderline]
               ParentFont = False
               OnClick = MemberEmailGenerateLabelClick
+            end
+            object MemberNumberLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 103
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Number'
+              ExplicitWidth = 44
             end
             object MemberObjectIdDBEdit: TDBEdit
               AlignWithMargins = True
@@ -267,20 +550,7 @@ inherited MemberMainForm: TMemberMainForm
               ShowHint = True
               TabOrder = 0
             end
-            object MemberPIdDBEdit: TDBEdit
-              AlignWithMargins = True
-              Left = 16
-              Top = 174
-              Width = 249
-              Height = 23
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              DataField = 'FldPId'
-              DataSource = MemberDataSource
-              TabOrder = 1
-            end
-            object MemberIdDBEdit: TDBEdit
+            object MemberNumberDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
               Top = 124
@@ -290,18 +560,16 @@ inherited MemberMainForm: TMemberMainForm
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
-              DataField = 'FldId'
+              DataField = 'FldNumber'
               DataSource = MemberDataSource
-              Enabled = False
               ParentShowHint = False
-              ReadOnly = True
               ShowHint = True
-              TabOrder = 2
+              TabOrder = 1
             end
-            object MemberDBEdit: TDBEdit
+            object MemberMemberDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 224
+              Top = 174
               Width = 249
               Height = 23
               Margins.Left = 16
@@ -309,7 +577,7 @@ inherited MemberMainForm: TMemberMainForm
               Align = alTop
               DataField = 'FldMember'
               DataSource = MemberDataSource
-              TabOrder = 3
+              TabOrder = 2
             end
             object MemberDBNavigator: TDBNavigator
               AlignWithMargins = True
@@ -321,12 +589,12 @@ inherited MemberMainForm: TMemberMainForm
               VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
               Align = alTop
               Flat = True
-              TabOrder = 4
+              TabOrder = 3
             end
             object MemberEmailDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 274
+              Top = 224
               Width = 249
               Height = 23
               Margins.Left = 16
@@ -334,51 +602,12 @@ inherited MemberMainForm: TMemberMainForm
               Align = alTop
               DataField = 'FldEmail'
               DataSource = MemberDataSource
-              TabOrder = 5
-            end
-            object MemberJobTitleDBEdit: TDBEdit
-              AlignWithMargins = True
-              Left = 16
-              Top = 374
-              Width = 249
-              Height = 23
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              DataField = 'FldJobTitle'
-              DataSource = MemberDataSource
-              TabOrder = 6
-            end
-            object MemberJobRoleDBEdit: TDBEdit
-              AlignWithMargins = True
-              Left = 16
-              Top = 424
-              Width = 249
-              Height = 23
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              DataField = 'FldJobRole'
-              DataSource = MemberDataSource
-              TabOrder = 7
-            end
-            object MemberJobLevelDBEdit: TDBEdit
-              AlignWithMargins = True
-              Left = 16
-              Top = 474
-              Width = 249
-              Height = 23
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              DataField = 'FldJobLevel'
-              DataSource = MemberDataSource
-              TabOrder = 8
+              TabOrder = 4
             end
             object MemberStateDBComboBox: TDBComboBox
               AlignWithMargins = True
               Left = 16
-              Top = 324
+              Top = 274
               Width = 249
               Height = 23
               Margins.Left = 16
@@ -390,140 +619,15 @@ inherited MemberMainForm: TMemberMainForm
                 ''
                 'Active'
                 'Inactive')
-              TabOrder = 9
-            end
-          end
-          object MemberLocationJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
-            Height = 21
-            Expanded = False
-            Caption = 'Location'
-            ExpandedHeight = 269
-            ButtonFont.Charset = ANSI_CHARSET
-            ButtonFont.Color = clWindowText
-            ButtonFont.Height = -11
-            ButtonFont.Name = 'Segoe UI'
-            ButtonFont.Style = [fsBold]
-            Beveled = False
-            ParentButtonFont = False
-            object MemberOrganizationLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 53
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'Organization'
-              ExplicitWidth = 68
-            end
-            object MemberAreaLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 103
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'Area'
-              ExplicitWidth = 24
-            end
-            object MemberSiteLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 153
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'Site'
-              ExplicitWidth = 19
-            end
-            object MemberWorkstationLabel: TLabel
-              AlignWithMargins = True
-              Left = 16
-              Top = 203
-              Width = 249
-              Height = 15
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'Workstation'
-              ExplicitWidth = 64
-            end
-            object MemberOrganizationDBEdit: TDBEdit
-              AlignWithMargins = True
-              Left = 16
-              Top = 74
-              Width = 249
-              Height = 23
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              DataField = 'FldOrganization'
-              DataSource = MemberDataSource
-              TabOrder = 0
-            end
-            object MemberAreaDBEdit: TDBEdit
-              AlignWithMargins = True
-              Left = 16
-              Top = 124
-              Width = 249
-              Height = 23
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              DataField = 'FldArea'
-              DataSource = MemberDataSource
-              TabOrder = 1
-            end
-            object MemberDBNavigator3: TDBNavigator
-              AlignWithMargins = True
-              Left = 3
-              Top = 22
-              Width = 275
-              Height = 25
-              DataSource = MemberDataSource
-              VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
-              Align = alTop
-              Flat = True
-              TabOrder = 2
-            end
-            object MemberSiteDBEdit: TDBEdit
-              AlignWithMargins = True
-              Left = 16
-              Top = 174
-              Width = 249
-              Height = 23
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              DataField = 'FldSite'
-              DataSource = MemberDataSource
-              TabOrder = 3
-            end
-            object MemberWorkstationDBEdit: TDBEdit
-              AlignWithMargins = True
-              Left = 16
-              Top = 224
-              Width = 249
-              Height = 23
-              Margins.Left = 16
-              Margins.Right = 16
-              Align = alTop
-              DataField = 'FldWorkstation'
-              DataSource = MemberDataSource
-              TabOrder = 4
+              TabOrder = 5
             end
           end
           object MemberBadgeJvScrollMaxBand: TJvScrollMaxBand
             Width = 281
-            Height = 302
+            Height = 21
+            Expanded = False
             Caption = 'Badge'
-            ExpandedHeight = 302
+            ExpandedHeight = 285
             ButtonFont.Charset = ANSI_CHARSET
             ButtonFont.Color = clWindowText
             ButtonFont.Height = -11
@@ -533,15 +637,16 @@ inherited MemberMainForm: TMemberMainForm
             ParentButtonFont = False
             DesignSize = (
               281
-              302)
+              21)
             object MemberBadgeLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 53
+              Top = 35
               Width = 249
               Height = 15
               Cursor = crHandPoint
               Margins.Left = 16
+              Margins.Top = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Badge'
@@ -588,7 +693,7 @@ inherited MemberMainForm: TMemberMainForm
             object MemberBadgeDBImage: TDBImage
               AlignWithMargins = True
               Left = 16
-              Top = 74
+              Top = 56
               Width = 249
               Height = 208
               Margins.Left = 16
@@ -599,26 +704,587 @@ inherited MemberMainForm: TMemberMainForm
               Proportional = True
               TabOrder = 0
             end
-            object MemberDBNavigator2: TDBNavigator
+          end
+          object MemberStructureJvScrollMaxBand: TJvScrollMaxBand
+            Width = 281
+            Height = 21
+            Expanded = False
+            Caption = 'Structure'
+            ExpandedHeight = 250
+            ButtonFont.Charset = ANSI_CHARSET
+            ButtonFont.Color = clWindowText
+            ButtonFont.Height = -11
+            ButtonFont.Name = 'Segoe UI'
+            ButtonFont.Style = [fsBold]
+            Beveled = False
+            ParentButtonFont = False
+            object MemberOrganizationLabel: TLabel
               AlignWithMargins = True
-              Left = 3
-              Top = 22
-              Width = 275
-              Height = 25
-              DataSource = MemberDataSource
-              VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
+              Left = 16
+              Top = 35
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
               Align = alTop
-              Flat = True
+              Caption = 'Organization'
+              ExplicitWidth = 68
+            end
+            object MemberAreaLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 135
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Area'
+              ExplicitWidth = 24
+            end
+            object MemberDepartmentLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 85
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Department'
+              ExplicitWidth = 63
+            end
+            object MemberTeamLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 185
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Team'
+              ExplicitWidth = 28
+            end
+            object MemberOrganizationDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 56
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldOrganization'
+              DataSource = MemberDataSource
+              TabOrder = 0
+            end
+            object MemberAreaDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 156
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldArea'
+              DataSource = MemberDataSource
               TabOrder = 1
+            end
+            object MemberDepartmentDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 106
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldDepartment'
+              DataSource = MemberDataSource
+              TabOrder = 2
+            end
+            object MemberTeamDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 206
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldTeam'
+              DataSource = MemberDataSource
+              TabOrder = 3
+            end
+          end
+          object MemberLocationJvScrollMaxBand: TJvScrollMaxBand
+            Width = 281
+            Height = 21
+            Expanded = False
+            Caption = 'Location'
+            ExpandedHeight = 250
+            ButtonFont.Charset = ANSI_CHARSET
+            ButtonFont.Color = clWindowText
+            ButtonFont.Height = -11
+            ButtonFont.Name = 'Segoe UI'
+            ButtonFont.Style = [fsBold]
+            Beveled = False
+            ParentButtonFont = False
+            object MemberSiteLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 35
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Site'
+              ExplicitWidth = 19
+            end
+            object MemberWorkstationLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 135
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Workstation'
+              ExplicitWidth = 64
+            end
+            object MemberBuildingLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 85
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Building'
+              ExplicitWidth = 44
+            end
+            object MemberPhoneLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 185
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Phone'
+              ExplicitWidth = 34
+            end
+            object MemberSiteDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 56
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldSite'
+              DataSource = MemberDataSource
+              TabOrder = 0
+            end
+            object MemberWorkstationDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 156
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldWorkstation'
+              DataSource = MemberDataSource
+              TabOrder = 1
+            end
+            object MemberBuildingDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 106
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldBuilding'
+              DataSource = MemberDataSource
+              TabOrder = 2
+            end
+            object MemberPhoneDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 206
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldPhone'
+              DataSource = MemberDataSource
+              TabOrder = 3
+            end
+          end
+          object MemberJobJvScrollMaxBand: TJvScrollMaxBand
+            Width = 281
+            Height = 21
+            Expanded = False
+            Caption = 'Job'
+            ExpandedHeight = 200
+            ButtonFont.Charset = ANSI_CHARSET
+            ButtonFont.Color = clWindowText
+            ButtonFont.Height = -11
+            ButtonFont.Name = 'Segoe UI'
+            ButtonFont.Style = [fsBold]
+            Beveled = False
+            ParentButtonFont = False
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -12
+            Font.Name = 'Segoe UI'
+            Font.Style = []
+            ParentFont = False
+            DesignSize = (
+              281
+              21)
+            object MemberJobTitleLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 35
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Job Title'
+              ExplicitWidth = 43
+            end
+            object MemberJobRoleLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 85
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Job Role'
+              ExplicitWidth = 44
+            end
+            object MemberJobSetLabel: TLabel
+              Left = 131
+              Top = 35
+              Width = 135
+              Height = 15
+              Cursor = crHandPoint
+              Anchors = [akTop, akRight]
+              Caption = 'Set job title, role and level'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlue
+              Font.Height = -12
+              Font.Name = 'Segoe UI'
+              Font.Style = [fsUnderline]
+              ParentFont = False
+              OnClick = MemberJobSetLabelClick
+            end
+            object MemberJobLevelLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 135
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Job Level'
+              ExplicitWidth = 48
+            end
+            object MemberJobTitleDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 56
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldJobTitle'
+              DataSource = MemberDataSource
+              TabOrder = 0
+            end
+            object MemberJobRoleDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 106
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldJobRole'
+              DataSource = MemberDataSource
+              TabOrder = 1
+            end
+            object MemberJobLevelDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 156
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldJobLevel'
+              DataSource = MemberDataSource
+              TabOrder = 2
+            end
+          end
+          object MemberOtherJvScrollMaxBand: TJvScrollMaxBand
+            Width = 281
+            Height = 21
+            Expanded = False
+            Caption = 'Others'
+            ExpandedHeight = 158
+            ButtonFont.Charset = ANSI_CHARSET
+            ButtonFont.Color = clWindowText
+            ButtonFont.Height = -11
+            ButtonFont.Name = 'Segoe UI'
+            ButtonFont.Style = [fsBold]
+            Beveled = False
+            ParentButtonFont = False
+            object MemberUnitLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 35
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Unit'
+              ExplicitWidth = 22
+            end
+            object MemberCostCenterLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 85
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Cost Center'
+              ExplicitWidth = 62
+            end
+            object MemberUnitDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 56
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldUnit'
+              DataSource = MemberDataSource
+              TabOrder = 0
+            end
+            object MemberCostCenterDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 106
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldCostCenter'
+              DataSource = MemberDataSource
+              TabOrder = 1
+            end
+          end
+        end
+      end
+      inherited SearchTabSheet: TTabSheet
+        inherited SearchFilterPanel: TPanel
+          StyleElements = [seFont, seClient, seBorder]
+          inherited SearchLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited ReplaceLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited SearchReplaceSwapLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited SearchInLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited SearchButtonedEdit: TButtonedEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited ReplaceButtonedEdit: TButtonedEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+        end
+        inherited SearchResultListBox: TListBox
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited OptionTabSheet: TTabSheet
+        inherited OptionJvScrollMax: TJvScrollMax
+          StyleElements = [seFont, seClient, seBorder]
+          inherited OptionDateTimeJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionWeekWorkOneStartLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekDayLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekTimeLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekDayEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekTimeEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionInterfaceJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionTabWidthLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionStateDefaultLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFontSizeLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTabWidthJvSpinEdit: TJvSpinEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionStateDefaultComboBox: TComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFontSizeJvSpinEdit: TJvSpinEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionFoldersJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionPersistRootFolderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTempFolderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPersistRootFolderEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTempFolderEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionSecurityJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionCryptoKeyLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionCryptoKeyEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionPythonJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionPythonVersionLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPythonExePathLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPythonVersionComboBox: TComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPythonExePathEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionFilesJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionFilesWorkingFolderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesOnDoubleClickLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesWorkingFolderClearLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesOnDoubleClickComboBox: TComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesWorkingFolderSelectButtonedEdit: TButtonedEdit
+              StyleElements = [seFont, seClient, seBorder]
             end
           end
         end
       end
     end
   end
-  inherited StatusBar: TStatusBar
-    ExplicitTop = 814
-    ExplicitWidth = 1258
+  inherited MainPanel: TPanel
+    StyleElements = [seFont, seClient, seBorder]
+    inherited MainPageControl: TPageControl
+      inherited ObjectContentPrevTabSheet: TTabSheet
+        inherited ObjectContentPrevTopPanel: TPanel
+          inherited ObjectContentPrevCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited ObjectContentTabSheet: TTabSheet
+        inherited ObjectContentSplitter: TSplitter
+          ExplicitHeight = 536
+        end
+        inherited ObjectContentTopPanel: TPanel
+          inherited ObjectContentCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+        inherited ObjectContentSplitView: TSplitView
+          DoubleBuffered = True
+        end
+      end
+      inherited ObjectDataTabSheet: TTabSheet
+        inherited ObjectDataTopPanel: TPanel
+          inherited ObjectDataCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited ObjectNoteTabSheet: TTabSheet
+        inherited ObjectNoteTopPanel: TPanel
+          inherited ObjectNoteCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited FilesRioTabSheet: TTabSheet
+        inherited FilesRioTopPanel: TPanel
+          inherited FilesRioInfoLabel: TLabel
+            Height = 31
+          end
+        end
+      end
+    end
   end
   object MemberClientDataSet: TClientDataSet [15]
     Aggregates = <>
@@ -642,14 +1308,15 @@ inherited MemberMainForm: TMemberMainForm
     Top = 432
   end
   inherited MainSoapConnection: TSoapConnection
+    Connected = True
     URL = 'http://localhost/WksMemberSoapProject.dll/soap'
   end
   object MemberImageList24: TImageList [27]
     ColorDepth = cd32Bit
     Height = 24
     Width = 24
-    Left = 360
-    Top = 376
+    Left = 376
+    Top = 544
     Bitmap = {
       494C010101000800040018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024
@@ -957,12 +1624,7 @@ inherited MemberMainForm: TMemberMainForm
   end
   object MemberAction: TActionList [28]
     Images = MemberImageList24
-    Left = 568
-    Top = 376
-    object MemberTestAction: TAction
-      Caption = '    Test    '
-      ImageIndex = 0
-      OnExecute = MemberTestActionExecute
-    end
+    Left = 584
+    Top = 544
   end
 end

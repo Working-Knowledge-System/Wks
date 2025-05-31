@@ -5,7 +5,11 @@ program WksAgentClientProject;
 uses
   Vcl.Forms,
   WksBaseClientMainFormUnit in 'WksBaseClientMainFormUnit.pas' {BaseMainForm},
-  WksAgentClientMainFormUnit in 'WksAgentClientMainFormUnit.pas' {AgentMainForm};
+  WksAgentClientMainFormUnit in 'WksAgentClientMainFormUnit.pas' {AgentMainForm},
+  WksAgentUnit in 'WksAgentUnit.pas',
+  WksPythonUnit in 'WksPythonUnit.pas',
+  WksSqlUnit in 'WksSqlUnit.pas',
+  WksJslUnit in 'WksJslUnit.pas';
 
 {$R *.res}
 

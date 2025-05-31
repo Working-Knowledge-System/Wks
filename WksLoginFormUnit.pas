@@ -216,8 +216,8 @@ type
     FLoginAttempts: integer;
     procedure FormActivated(var Message: TMessage); message UM_ACTIVATED; // https://stackoverflow.com/questions/6036375/exiting-a-form-using-modalresult
     procedure LogClear;
-    procedure Log(IvString: string; IvFbkMode: TFbkModeEnum = fmInfo; IvSleepMs: integer = TWksRec.LOG_PAUSE_MS); overload;
-    procedure Log(IvFormat: string; const IvArgs: array of const; IvFbkMode: TFbkModeEnum = fmInfo; IvSleepMs: integer = TWksRec.LOG_PAUSE_MS); overload;
+    procedure Log(IvString: string; IvFbkMode: TFbkModeEnum = fmInfo; IvSleepMs: integer = LOG_PAUSE_MS); overload;
+    procedure Log(IvFormat: string; const IvArgs: array of const; IvFbkMode: TFbkModeEnum = fmInfo; IvSleepMs: integer = LOG_PAUSE_MS); overload;
     procedure Log(IvString: string; IvSuccess: boolean); overload;
   //procedure Log(IvFormat: string; const IvArgs: array of const; IvSuccess: boolean); overload;
     procedure ImageRoundDo(IvImage: TImage);
@@ -559,8 +559,8 @@ var
   env, pro: string; // environment, protocol
 begin
   // identity
-  Caption              := Format('%s Login', [TWksRec.ACRONYM]);
-  SystemLabel.Caption  := TWksRec.NAME;
+  Caption              := Format('%s Login', [TSysRec.ACRONYM]);
+  SystemLabel.Caption  := TSysRec.NAME;
   ClientLabel.Caption  := TBynRec.Name;
   VersionLabel.Caption := TBynRec.Ver;
 
@@ -588,8 +588,8 @@ begin
 
   // servertab
   ServerWwwDevEdit.Text      := gini.StrGet('Server/WwwDev'     , 'localhost'          );
-  ServerWwwTestEdit.Text     := gini.StrGet('Server/WwwTest'    , TWksRec.WWW + ':8080');
-  ServerWwwProdEdit.Text     := gini.StrGet('Server/WwwProd'    , TWksRec.WWW    , true);
+  ServerWwwTestEdit.Text     := gini.StrGet('Server/WwwTest'    , TSysRec.WWW + ':8080');
+  ServerWwwProdEdit.Text     := gini.StrGet('Server/WwwProd'    , TSysRec.WWW    , true);
   env                        := gini.StrGet('Server/Environment', 'Prod'         , true);
   pro                        := gini.StrGet('Server/Protocol'   , 'http'         , true);
   ServerProtocolComboBox.ItemIndex := ServerProtocolComboBox.items.IndexOf(pro); ServerProtocolComboBoxChange(nil);
@@ -640,7 +640,7 @@ begin
     //TMesRec.I(fbk);
       NetAndOsUserInfoLabel.Caption := fbk;
       Application.ProcessMessages;
-      Sleep(TWksRec.LONG_PAUSE_MS);
+      Sleep(TSysRec.LONG_PAUSE_MS);
       // exit
     //ExitLabelClick(nil);
       TMesRec.W(fbk);
@@ -801,7 +801,7 @@ begin
   {$REGION 'attempts'}
   if FLoginAttempts >= 3 then begin
     Log('Maximum of %d login attempts exceeded... EXIT', [FLoginAttempts], fmDanger);
-    Sleep(TWksRec.LONG_PAUSE_MS);
+    Sleep(LONG_PAUSE_MS);
     ModalResult := mrAbort; // ---> [ close form and Exit ]
     Exit;
   end else
@@ -924,15 +924,15 @@ begin
 
       {$REGION 'clientrio'}
       Log('Requesting Client existence...', fmInfo);
-      if not TBynRec.ClientExistsRio(fbk) then begin
-        Log('Client warning: your client does not exists on the server, %s', [fbk], fmWarning);
+      if not TSysRec.BinaryExistsRio(TBynRec.BinaryName, fbk) then begin
+        Log('Client warning: your client bynary is not registered on the server, %s', [fbk], fmWarning);
         TMesRec.W(fbk);
         ControlsShow(true);
         Exit;
       end;
       Log('Requesting Client version...', fmInfo);
-      if not TBynRec.ClientVersionIsOkRio(fbk) then begin
-        Log('Client warning: your version is not the latest, %s', [fbk], fmWarning);
+      if not TSysRec.BinaryVersionIsOkRio(TBynRec.BinaryName, TBynRec.Ver, fbk) then begin
+        Log('Client warning: your client bynary  version is not the latest, %s', [fbk], fmWarning);
         TMesRec.W(fbk);
         ControlsShow(true);
       //Exit;
@@ -948,7 +948,7 @@ begin
 
       {$REGION 'systemrio'}
       Log('Requesting System (Wks) data...', fmInfo);
-      if not TWksRec.InitRio(fbk) then begin
+      if not TSysRec.InitRio(fbk) then begin
         Log('System problem: unable to get System (Wks) data, %s', [fbk], fmDanger);
         ControlsShow(true);
         Exit;
@@ -958,7 +958,7 @@ begin
 
       {$REGION 'enter'}
       Log('Entering session %d...', [gwse.SessionId], fmSuccess);
-      Sleep(TWksRec.LONG_PAUSE_MS);
+      Sleep(LONG_PAUSE_MS);
       ModalResult := mrOk;    // ---> [ close form and ENTER ]
       {$ENDREGION}
 
@@ -1019,7 +1019,7 @@ end;
 
 procedure TLoginForm.WksLogoImageClick(Sender: TObject);
 begin
-  TUrlRec.Go(TWksRec.WWW);
+  TUrlRec.Go(TSysRec.WWW);
 end;
 
 procedure TLoginForm.PasswordEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);

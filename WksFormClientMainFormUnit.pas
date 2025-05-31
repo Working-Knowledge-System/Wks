@@ -6,6 +6,8 @@ interface
 uses
     Winapi.Windows
   , Winapi.Messages
+  , Winapi.WebView2
+  , Winapi.ActiveX
   , System.Actions
   , System.Classes
   , System.ImageList
@@ -26,6 +28,8 @@ uses
   , Vcl.Menus
   , Vcl.StdCtrls
   , Vcl.ToolWin
+  , Vcl.Edge
+  , Vcl.WinXCtrls
   , Data.DB
   , Datasnap.DBClient
   , Soap.SOAPConn
@@ -66,23 +70,18 @@ type
     FormObjectIdLabel: TLabel;
     FormPIdDBEdit: TDBEdit;
     FormPIdLabel: TLabel;
-    FormTabSheet: TTabSheet;
-    FormTestAction: TAction;
-    FormTestToolButton: TToolButton;
-    FormToolBar: TToolBar;
     FormValue1DBEdit: TDBEdit;
     FormValue1Label: TLabel;
     FormValue2DBEdit: TDBEdit;
     FormValue2Label: TLabel;
     procedure FormCreate(Sender: TObject);
+    procedure ActionPostActionExecute(Sender: TObject);
     procedure FormClientDataSetAfterDelete(DataSet: TDataSet);
     procedure FormClientDataSetAfterInsert(DataSet: TDataSet);
     procedure FormClientDataSetAfterPost(DataSet: TDataSet);
     procedure FormClientDataSetReconcileError(DataSet: TCustomClientDataSet; E: EReconcileError; UpdateKind: TUpdateKind; var Action: TReconcileAction);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure FormTestActionExecute(Sender: TObject);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
-    procedure PostActionExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -117,7 +116,6 @@ begin
   inherited;
 
   {$REGION 'gui'}
-//FormTestToolButton.Visible := false
   {$ENDREGION}
 
   {$REGION 'ini'}
@@ -144,11 +142,11 @@ end;
 {$ENDREGION}
 
 {$REGION 'Actions'}
-procedure TFormMainForm.PostActionExecute(Sender: TObject);
+procedure TFormMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // ... continue from ancestor
+  // detail
   if FormClientDataSet.State = dsEdit then
     FormDBNavigator.BtnClick(nbPost);
 end;
@@ -179,15 +177,6 @@ begin
   end;
   {$ENDREGION}
 
-end;
-{$ENDREGION}
-
-{$REGION 'FormActions'}
-procedure TFormMainForm.FormTestActionExecute(Sender: TObject);
-begin
-  inherited;
-
-  TMesRec.NI;
 end;
 {$ENDREGION}
 

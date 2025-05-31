@@ -79,12 +79,12 @@ type
     procedure ResetRange; override;
     procedure SetRange(Value: Pointer); override;
     function  GetDefaultAttribute(Index: Integer): TSynHighlighterAttributes; override;
-    function  GetEol: Boolean; override;
+    function  GetEol: boolean; override;
     function  GetKeyWords(TokenKind: Integer): UnicodeString; override;
     function  GetTokenID: TtkTokenKind;
     function  GetTokenAttribute: TSynHighlighterAttributes; override;
     function  GetTokenKind: Integer; override;
-    function  IsIdentChar(AChar: WideChar): Boolean; override;
+    function  IsIdentChar(AChar: WideChar): boolean; override;
     procedure Next; override;
   published
     property CommentAttri   : TSynHighlighterAttributes read FCommentAttri    write FCommentAttri;
@@ -461,7 +461,7 @@ begin
   Result := Ord(fTokenId);
 end;
 
-function  TSynRSyn.IsIdentChar(AChar: WideChar): Boolean;
+function  TSynRSyn.IsIdentChar(AChar: WideChar): boolean;
 begin
   case AChar of
     '_', '0'..'9', 'a'..'z', 'A'..'Z':

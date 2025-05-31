@@ -19,7 +19,7 @@ uses
 {$REGION 'Type'}
 type
   IInvoiceMainDataModule = interface(IAppServerSOAP)
-    ['{06F9DEAE-E322-48C9-A5C6-D0CA0383AA22}']
+    ['{5A8AA1C5-D62B-47B7-8138-F0F5452460FE}']
   end;
 
   TInvoiceMainDataModule = class(TSoapDataModule, IInvoiceMainDataModule, IAppServerSOAP, IAppServer)
@@ -50,13 +50,15 @@ uses
 {$REGION 'Routine'}
 procedure TWksInvoiceSoapMainDataModuleUnitCreateInstance(out obj: TObject);
 begin
- obj := TInvoiceMainDataModule.Create(nil);
+  obj := TInvoiceMainDataModule.Create(nil);
 end;
 {$ENDREGION}
 
 {$REGION 'TMainDataModule'}
 procedure TInvoiceMainDataModule.SoapDataModuleCreate(Sender: TObject);
 begin
+  if InvoiceADOConnection.Connected then
+    InvoiceADOConnection.Close;
   InvoiceADOConnection.ConnectionString := DBA_CONNECTION_STR;
 end;
 {$ENDREGION}

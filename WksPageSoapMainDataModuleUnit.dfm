@@ -14,7 +14,7 @@ object PageMainDataModule: TPageMainDataModule
   end
   object PageADOTable: TADOTable
     Connection = PageADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     IndexFieldNames = 'FldObjectId'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -39,7 +39,7 @@ object PageMainDataModule: TPageMainDataModule
   end
   object ObjectADOTable: TADOTable
     Connection = PageADOConnection
-    CursorType = ctStatic
+    CursorType = ctKeyset
     TableName = 'TblObject'
     Left = 240
     Top = 40
