@@ -9,6 +9,7 @@ uses
   , System.SysUtils
   , System.Variants
   , System.Classes
+  , System.UITypes
   , Vcl.Graphics
   , Vcl.Controls
   , Vcl.StdCtrls
@@ -21,6 +22,7 @@ uses
   , JvNetscapeSplitter
   , WksMqttBaseMainFormtUnit
   , WksMqttClientUnit
+  , WksMqttTypesUnit
   ;
 {$ENDREGION}
 
@@ -67,6 +69,14 @@ type
     ConnectCleanSessionCheckBox: TCheckBox;
     ConnectQosLabel: TLabel;
     ConnectQosComboBox: TComboBox;
+    PublishQosLabel: TLabel;
+    PublishQosComboBox: TComboBox;
+    PublishDupFlagCheckBox: TCheckBox;
+    PublishRetainCheckBox: TCheckBox;
+    PingreqCountComboBox: TComboBox;
+    PingreqCountLabel: TLabel;
+    Label1: TLabel;
+    PingreqPauseMsComboBox: TComboBox;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ServerDisjoinButtonClick(Sender: TObject);
@@ -106,6 +116,8 @@ begin
   // gui
   Caption := 'WKS MQTT Client';
   TopPageControl.ActivePageIndex := 2;
+  PingreqCountComboBox.ItemIndex := 0;
+  PingreqPauseMsComboBox.ItemIndex := 2;
 
   // ini
   MqttProtocolNameEdit.Text                := FIni.ReadString ('Mqtt'   , 'ProtocolName'     , 'MQTT' {this is fixed}               );
@@ -124,9 +136,10 @@ begin
   ConnectCleanSessionCheckBox.Checked      := FIni.ReadBool   ('Connect', 'CleanSession'     , true                                 );
   PublishTopicEdit.Text                    := FIni.ReadString ('Publish', 'Topic'            , 'wks/mqtt/test/helloworld'           );
   PublishMessageEdit.Text                  := FIni.ReadString ('Publish', 'Message '         , 'hello MQTT!'                        );
+  PublishQosComboBox.ItemIndex             := FIni.ReadInteger('Publish', 'Qos'              , 0                                    );
 
   // client
-  FMqttClient := TMQTTClientClass.Create(LogLineLabel, LogRichEdit, RequestHexRichEdit, ResponseHexRichEdit);
+  FMqttClient := TMQTTClientClass.Create(LogRichEdit, RequestHexRichEdit, ResponseHexRichEdit);
   Log('client created');
 end;
 
@@ -149,6 +162,7 @@ begin
   FIni.WriteBool   ('Connect', 'CleanSession'     , ConnectCleanSessionCheckBox.Checked     );
   FIni.WriteString ('Publish', 'Topic'            , PublishTopicEdit.Text                   );
   FIni.WriteString ('Publish', 'Message'          , PublishMessageEdit.Text                 );
+  FIni.WriteInteger('Publish', 'Qos'              , PublishQosComboBox.ItemIndex            );
 
   // client
   if FMQTTClient.IsConnected then
@@ -218,10 +232,22 @@ end;
 
 {$REGION 'PingReqPacketSend'}
 procedure TMainForm.PingRequestPacketSendButtonClick(Sender: TObject);
+var
+  i, count, pause: integer;
 begin
   inherited;
 
-  FMqttClient.PingReqPacketSend;
+  count := StrToIntDef(PingreqCountComboBox.Text  , 1);
+  pause := StrToIntDef(PingreqPauseMsComboBox.Text, 0);
+
+  if count > 10 then
+    if not (MessageDlg(Format('Send %d PINGREQ to the server?', [count]), mtCustom, [mbYes, mbNo], 0) = mrYes) then
+      Exit;
+
+  for i := 1 to count do begin
+    FMqttClient.PingReqPacketSend;
+    Sleep(pause);
+  end;
 end;
 {$ENDREGION}
 
@@ -230,7 +256,7 @@ procedure TMainForm.PublishPacketSendButtonClick(Sender: TObject);
 begin
   inherited;
 
-//FMqttClient.PubishPacketSend;
+  FMqttClient.PublishPacketSend('packtetid001', PublishTopicEdit.Text, PublishMessageEdit.Text, TMQTTQosType(PublishQosComboBox.ItemIndex), PublishDupFlagCheckBox.Checked, PublishRetainCheckBox.Checked);
 end;
 {$ENDREGION}
 

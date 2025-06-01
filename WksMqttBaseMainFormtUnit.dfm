@@ -18,7 +18,7 @@ object BaseForm: TBaseForm
     Left = 0
     Top = 0
     Width = 1008
-    Height = 171
+    Height = 204
     Align = alTop
     BevelOuter = bvNone
     Caption = 'TopPanel'
@@ -26,10 +26,10 @@ object BaseForm: TBaseForm
     TabOrder = 0
     object LogoImage: TImage
       AlignWithMargins = True
-      Left = 931
+      Left = 944
       Top = 26
-      Width = 77
-      Height = 142
+      Width = 64
+      Height = 175
       Margins.Left = 0
       Margins.Top = 26
       Margins.Right = 0
@@ -163,20 +163,19 @@ object BaseForm: TBaseForm
         BED4638899AC76140B8C943FD7047C5E25397D857E67C924C2D36F8C092C08F5
         73B6DECBF3FF0FF5A9A4905C05AF490000000049454E44AE426082}
       Proportional = True
-      ExplicitLeft = 549
-      ExplicitHeight = 77
+      ExplicitLeft = 931
     end
     object TopPageControl: TPageControl
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 928
-      Height = 165
+      Width = 941
+      Height = 198
       Margins.Right = 0
       ActivePage = XxxTabSheet
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 171
+      ExplicitWidth = 928
       object XxxTabSheet: TTabSheet
         Caption = 'Xxx'
         object XxxExitButton: TButton
@@ -193,26 +192,23 @@ object BaseForm: TBaseForm
   end
   object MainPanel: TPanel
     Left = 0
-    Top = 171
+    Top = 204
     Width = 931
-    Height = 430
+    Height = 397
     Align = alLeft
     BevelOuter = bvNone
     Caption = 'MainPanel'
     ShowCaption = False
     TabOrder = 1
-    ExplicitTop = 138
-    ExplicitHeight = 463
     object MainPageControl: TPageControl
       AlignWithMargins = True
       Left = 3
       Top = 3
       Width = 925
-      Height = 424
+      Height = 391
       ActivePage = LogTabSheet
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 457
       object LogTabSheet: TTabSheet
         Caption = '  Log'
         object LogTopPanel: TPanel
@@ -225,16 +221,6 @@ object BaseForm: TBaseForm
           Caption = 'LogTopPanel'
           ShowCaption = False
           TabOrder = 0
-          object LogLineLabel: TLabel
-            Left = 847
-            Top = 0
-            Width = 70
-            Height = 33
-            Align = alRight
-            Caption = 'LogLineLabel'
-            Layout = tlCenter
-            ExplicitHeight = 15
-          end
           object LogClearButton: TButton
             Left = 3
             Top = 4
@@ -250,7 +236,7 @@ object BaseForm: TBaseForm
           Left = 3
           Top = 36
           Width = 911
-          Height = 355
+          Height = 322
           Align = alClient
           Font.Charset = ANSI_CHARSET
           Font.Color = clWindowText
@@ -264,7 +250,6 @@ object BaseForm: TBaseForm
           ScrollBars = ssBoth
           TabOrder = 1
           WordWrap = False
-          ExplicitHeight = 388
         end
       end
       object RequestTabSheet: TTabSheet
@@ -272,7 +257,7 @@ object BaseForm: TBaseForm
         ImageIndex = 1
         object RequestJvNetscapeSplitter: TJvNetscapeSplitter
           Left = 0
-          Top = 177
+          Top = 144
           Width = 917
           Height = 10
           Cursor = crVSplit
@@ -286,7 +271,7 @@ object BaseForm: TBaseForm
         object RequestTxtRichEdit: TRichEdit
           AlignWithMargins = True
           Left = 3
-          Top = 190
+          Top = 157
           Width = 911
           Height = 201
           Align = alBottom
@@ -302,14 +287,13 @@ object BaseForm: TBaseForm
           ScrollBars = ssBoth
           TabOrder = 0
           WordWrap = False
-          ExplicitTop = 223
         end
         object RequestHexRichEdit: TRichEdit
           AlignWithMargins = True
           Left = 3
           Top = 36
           Width = 911
-          Height = 138
+          Height = 105
           Align = alClient
           Font.Charset = ANSI_CHARSET
           Font.Color = clWindowText
@@ -323,7 +307,6 @@ object BaseForm: TBaseForm
           ScrollBars = ssBoth
           TabOrder = 1
           WordWrap = False
-          ExplicitHeight = 171
         end
         object RequestTopPanel: TPanel
           Left = 0
@@ -351,7 +334,7 @@ object BaseForm: TBaseForm
         ImageIndex = 2
         object ResponseJvNetscapeSplitter: TJvNetscapeSplitter
           Left = 0
-          Top = 177
+          Top = 144
           Width = 917
           Height = 10
           Cursor = crVSplit
@@ -367,7 +350,7 @@ object BaseForm: TBaseForm
           Left = 3
           Top = 36
           Width = 911
-          Height = 138
+          Height = 105
           Align = alClient
           Font.Charset = ANSI_CHARSET
           Font.Color = clWindowText
@@ -381,12 +364,11 @@ object BaseForm: TBaseForm
           ScrollBars = ssBoth
           TabOrder = 0
           WordWrap = False
-          ExplicitHeight = 171
         end
         object ResponseTxtRichEdit: TRichEdit
           AlignWithMargins = True
           Left = 3
-          Top = 190
+          Top = 157
           Width = 911
           Height = 201
           Align = alBottom
@@ -402,7 +384,6 @@ object BaseForm: TBaseForm
           ScrollBars = ssBoth
           TabOrder = 1
           WordWrap = False
-          ExplicitTop = 223
         end
         object ResponseTopPanel: TPanel
           Left = 0

@@ -36,7 +36,6 @@ type
     LogRichEdit: TRichEdit;
     RequestHexRichEdit: TRichEdit;
     ResponseHexRichEdit: TRichEdit;
-    LogLineLabel: TLabel;
     RequestTabSheet: TTabSheet;
     RequestTxtRichEdit: TRichEdit;
     ResponseTabSheet: TTabSheet;
@@ -103,7 +102,6 @@ begin
   MainPageControl.ActivePageIndex := 0;
   MainPanel.Align := alClient;
   LogRichEdit.Clear;
-  LogLineLabel.Caption := '';
   RequestHexRichEdit.Clear;
   RequestTxtRichEdit.Clear;
   ResponseHexRichEdit.Clear;
@@ -129,6 +127,7 @@ end;
 procedure TBaseForm.LogClearButtonClick(Sender: TObject);
 begin
   LogRichEdit.Clear;
+  LogRichEdit.Tag := 0;
 end;
 {$ENDREGION}
 

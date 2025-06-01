@@ -7,7 +7,7 @@ inherited MainForm: TMainForm
     inherited TopPageControl: TPageControl
       inherited XxxTabSheet: TTabSheet
         Caption = 'Server'
-        object PortLabel: TLabel [0]
+        object ServerPortLabel: TLabel [0]
           Left = 112
           Top = 12
           Width = 22
@@ -18,31 +18,31 @@ inherited MainForm: TMainForm
           Top = 70
           ExplicitTop = 70
         end
-        object PortEdit: TEdit
+        object ServerPortEdit: TEdit
           Left = 140
           Top = 9
           Width = 59
           Height = 23
           TabOrder = 1
-          Text = 'PortEdit'
+          Text = 'ServerPortEdit'
         end
-        object StopButton: TButton
+        object ServerStopButton: TButton
           Left = 16
           Top = 39
           Width = 75
           Height = 25
           Caption = 'Stop'
           TabOrder = 2
-          OnClick = StopButtonClick
+          OnClick = ServerStopButtonClick
         end
-        object StartButton: TButton
+        object ServerStartButton: TButton
           Left = 16
           Top = 8
           Width = 75
           Height = 25
           Caption = 'Start'
           TabOrder = 3
-          OnClick = StartButtonClick
+          OnClick = ServerStartButtonClick
         end
       end
     end
@@ -53,10 +53,6 @@ inherited MainForm: TMainForm
       inherited LogTabSheet: TTabSheet
         inherited LogTopPanel: TPanel
           StyleElements = [seFont, seClient, seBorder]
-          inherited LogLineLabel: TLabel
-            Height = 33
-            StyleElements = [seFont, seClient, seBorder]
-          end
         end
         inherited LogRichEdit: TRichEdit
           StyleElements = [seFont, seClient, seBorder]
