@@ -94,7 +94,6 @@ uses
 type
   TMqttClass = class
   protected
-    FLogLineLabel: TLabel;                                          // a single line log
     FLogRichEdit: TRichEdit;                                        // here logs normally
     FRequestHexRichEdit: TRichEdit;                                 // here logs request packet raw string
     FResponseHexRichEdit: TRichEdit;                                // here logs response packet raw string
@@ -104,16 +103,15 @@ type
     procedure Log(const AFmt: string; AVarRecVec: array of TVarRec; AWithTime: boolean = true); overload;
     procedure Dmp(const AStr: string);
   public
-    constructor Create(ALogLineLabel: TLabel; ALogRichEdit, ARequestHexRichEdit, AResponseHexRichEdit: TRichEdit); virtual;{}
+    constructor Create(ALogRichEdit, ARequestHexRichEdit, AResponseHexRichEdit: TRichEdit); virtual;{}
   end;
 {$ENDREGION}
 
 implementation
 
 {$REGION 'TMqttClass'}
-constructor TMqttClass.Create(ALogLineLabel: TLabel; ALogRichEdit, ARequestHexRichEdit, AResponseHexRichEdit: TRichEdit);
+constructor TMqttClass.Create(ALogRichEdit, ARequestHexRichEdit, AResponseHexRichEdit: TRichEdit);
 begin
-  FLogLineLabel        := ALogLineLabel;
   FLogRichEdit         := ALogRichEdit;
   FRequestHexRichEdit  := ARequestHexRichEdit;
   FResponseHexRichEdit := AResponseHexRichEdit;
@@ -121,27 +119,28 @@ end;
 
 procedure TMqttClass.Log(const AStr: string; AWithTime: boolean);
 var
-  cnt: integer;
-  str: string;
+  str{, str2}: string;
 begin
-  if SameText(FLogLast, AStr) then begin
-    cnt := StrToIntDef(FLogLineLabel.Caption, 0);
-    Inc(cnt);
-    FLogLineLabel.Caption := cnt.ToString;
-    Exit;
-  end;
-
-  FLogLast := AStr;
-
   if Assigned(FLogRichEdit) then begin
+    // times
+//    if SameText(FLogLast, AStr) then
+//      FLogRichEdit.Tag := FLogRichEdit.Tag + 1;
+//    if FLogRichEdit.Tag > 0 then
+//      str2 := Format(' (%d)', [FLogRichEdit.Tag])
+//    else
+//      str2 := '';
+
+    // last
+    FLogLast := AStr;
+
     // i
     TThread.Synchronize(nil
     , procedure
       begin
         if AWithTime then
-          str := FormatDateTime('dd hh:nn:ss zzz : ', Now) + AStr
+          str := FormatDateTime('dd hh:nn:ss zzz : ', Now) + AStr {+ str2}
         else
-          str := AStr;
+          str := AStr {+ str2};
         FLogRichEdit.Lines.Add(str);
       end
     );
@@ -166,6 +165,275 @@ procedure TMqttClass.Dmp(const AStr: string);
 begin
   Log(AStr, false);
 end;
+{$ENDREGION}
+
+{$REGION 'Use'}
+(*
+  TMqttClass = class
+  protected
+    procedure LogRequest(const AStr: string); overload;
+    procedure LogRequest(const AIdBytes: TIdBytes); overload;
+    procedure LogResponse(const AStr: string); overload;
+    procedure LogResponse(const AIdBytes: TIdBytes); overload;
+    procedure LogWithRequest(const AStr: string; const ARequest: TIdBytes);
+    procedure LogWithResponse(const AStr: string; const AResponse: TIdBytes);
+    procedure BytAdd(const AByte: byte; var APacket: TIdBytes; var AIndex: integer);
+    procedure StrAdd(const AStr: ansistring; var APacket: TIdBytes; var AIndex: integer);
+    function  StrRead(AContext: TIdContext): string;
+    function  IntEat(var AIdBytes: TIdBytes; ACount: integer; ADefault: integer = 0): integer;
+    function  StrEat(var AIdBytes: TIdBytes; ACount: integer; ADefault: string = ''): string;
+    function  StrPrintable(const AStr: string): string;
+    function  StrDebugable(const AStr: string; IvHex: boolean = true): string; overload;
+    function  StrDebugable(const AIdBytes: TIdBytes; IvHex: boolean = true): string; overload;
+  end;
+
+implementation
+
+procedure TMqttClass.LogRequest(const AStr: string);
+begin
+  if Assigned(FLogRequestRichEdit) then begin
+    TThread.Synchronize(nil,
+      procedure
+      begin
+        FLogRequestRichEdit.Lines.Add(AStr);
+      end
+    );
+  end;
+end;
+
+procedure TMqttClass.LogRequest(const AIdBytes: TIdBytes);
+begin
+  if Assigned(FLogRequestRichEdit) then begin
+    TThread.Synchronize(nil,
+      procedure
+      begin
+        FLogRequestRichEdit.Lines.Add(
+        //BytesToStringRaw(AIdBytes)
+          StrDebugable(AIdBytes)
+        );
+      end
+    );
+  end;
+end;
+
+procedure TMqttClass.LogResponse(const AStr: string);
+begin
+  if Assigned(FLogResponseRichEdit) then begin
+    TThread.Synchronize(nil,
+      procedure
+      begin
+        FLogResponseRichEdit.Lines.Add(AStr);
+      end
+    );
+  end;
+end;
+
+procedure TMqttClass.LogResponse(const AIdBytes: TIdBytes);
+begin
+  if Assigned(FLogResponseRichEdit) then begin
+    TThread.Synchronize(nil,
+      procedure
+      begin
+        FLogResponseRichEdit.Lines.Add(
+        //BytesToStringRaw(AIdBytes)
+          StrDebugable(AIdBytes)
+        );
+      end
+    );
+  end;
+end;
+
+procedure TMqttClass.LogWithRequest(const AStr: string; const ARequest: TIdBytes);
+begin
+  Log(AStr);
+  LogRequest(ARequest);
+end;
+
+procedure TMqttClass.LogWithResponse(const AStr: string; const AResponse: TIdBytes);
+begin
+  Log(AStr);
+  LogResponse(AResponse);
+end;
+
+function  TMQTTClass.StrDebugable(const AStr: string; IvHex: boolean): string;
+var
+  i: integer;
+  b: byte;
+  c: char;
+begin
+  Result := '';
+
+  for i := 1 to Length(AStr) do begin // strings are 1 indexed
+    c := AStr[i];
+    b := Ord(c);
+
+    if IvHex then begin
+      Result := Result + ' ' + IntToHex(b, 2);
+
+    end else begin
+      case b of
+      32..255: Result := Result + ' ' + c;
+      else     Result := Result + ' ' + IntToHex(b, 2); // Format('{%d}', [c])
+      end;
+    end;
+  end;
+  Delete(Result, 1, 1);
+end;
+
+function  TMQTTClass.StrDebugable(const AIdBytes: TIdBytes; IvHex: boolean): string;
+var
+  i: integer;
+  b: byte;
+begin
+  Result := '';
+
+  for i := 0 to Length(AIdBytes) -1 do begin // array are 0 indexed
+    b := AIdBytes[i];
+
+    if IvHex then begin
+      Result := Result + ' ' + IntToHex(b, 2);
+
+    end else begin
+      case b of
+      32..255: Result := Result + ' ' + Chr(b);
+      else     Result := Result + ' ' + IntToHex(b, 2); // Format('{%d}', [c])
+      end;
+    end;
+  end;
+  Delete(Result, 1, 1);
+end;
+
+function  TMQTTClass.StrPrintable(const AStr: string): string;
+var
+  i, len: integer;
+  c: char;
+begin
+  len := Length(AStr);
+  if Len = 0 then
+    Exit('');
+
+  Result := AStr;
+  i := 1;
+
+  while i <= Len do begin
+    // a char
+    c := AStr[i];
+
+    // 1) preserve tabs (#9), line feeds (#10), and carriage returns (#13)
+    if (C = #9) or (C = #10) or (C = #13) then begin // #10#13 is a ctrl-string
+      Inc(i);
+
+    // 2) keep ASCII/extended-ASCII (#32..#255) as is
+    end else if ((Ord(C) >= 32) and (Ord(C) <= 255)) then begin
+      Inc(i);
+
+    // 3) convert other whitespace to an ASCII space
+    end else if c.IsWhiteSpace then begin
+      Result[i] := '_';
+      Inc(i);
+
+    // 4) otherwise, skip it
+    end else begin
+      Result[i] := '!';
+      Inc(i);
+      //Delete(Result, i, 1);
+      //Dec(len);
+    end;
+  end;
+end;
+
+procedure TMqttClass.BytAdd(const AByte: byte; var APacket: TIdBytes; var AIndex: integer);
+begin
+  APacket[AIndex] := AByte;
+  Inc(AIndex);
+end;
+
+procedure TMqttClass.StrAdd(const AStr: ansistring; var APacket: TIdBytes; var AIndex: integer);
+var
+  len: word;
+begin
+  len := Length(AStr);
+  APacket[AIndex] := Hi(len);
+  Inc(AIndex);
+  APacket[AIndex] := Lo(len);
+  Inc(AIndex);
+  Move(AStr[1], APacket[AIndex], len);
+  Inc(AIndex, len);
+end;
+
+function  TMQTTClass.StrRead(AContext: TIdContext): string;
+var
+  rbu: TIdBytes; // lengthbytes
+  stz: word; // strlen
+begin
+  // 2-bytes read for length
+  AContext.Connection.IOHandler.ReadBytes(rbu, 2, false);
+  stz := {(rbu[0] shl 8) or} rbu[1];
+  // string actual read
+  Result := AContext.Connection.IOHandler.ReadString(stz, IndyTextEncoding_UTF8);
+end;
+
+function  TMqttClass.IntEat(var AIdBytes: TIdBytes; ACount, ADefault: integer): integer;
+var
+  {i, }remaining: integer;
+begin
+  // init
+  Result := ADefault;
+  if ACount <= 0 then
+    Exit;
+
+  // adjust
+  if ACount > Length(AIdBytes) then
+    ACount := Length(AIdBytes);
+  if ACount <= 0 then
+    Exit;
+
+  // resultload
+       if ACount = 1 then
+    Result := AIdBytes[0]
+  else if ACount = 2 then
+    Result := (AIdBytes[0] shl  8) or AIdBytes[1]
+  else if ACount = 3 then
+    Result := (AIdBytes[0] shl 16) or (AIdBytes[1] shl  8) or AIdBytes[2]
+  else if ACount = 4 then
+    Result := (AIdBytes[0] shl 24) or (AIdBytes[1] shl 16) or (AIdBytes[2] shl 8) or AIdBytes[3]
+  else
+    raise Exception.Create('4 bytes max can be eated');
+
+  // remove extracted bytes from the original array
+  Remaining := Length(AIdBytes) - ACount;
+  if Remaining > 0 then
+    Move(AIdBytes[ACount], AIdBytes[0], Remaining);
+  SetLength(AIdBytes, Remaining);
+end;
+
+function  TMqttClass.StrEat(var AIdBytes: TIdBytes; ACount: integer; ADefault: string): string;
+var
+  i, remaining: integer;
+begin
+  // init
+  Result := '';
+  if ACount <= 0 then
+    Exit;
+
+  // adjust
+  if ACount > Length(AIdBytes) then
+    ACount := Length(AIdBytes);
+  if ACount <= 0 then
+    Exit;
+
+  // resultload
+  SetLength(Result, ACount);
+  for i := 0 to ACount - 1 do
+    Result[i + 1] := Char(AIdBytes[i]);
+
+  // remove extracted bytes from the original array
+  Remaining := Length(AIdBytes) - ACount;
+  if Remaining > 0 then
+    Move(AIdBytes[ACount], AIdBytes[0], Remaining);
+  SetLength(AIdBytes, Remaining);
+end;
+*)
 {$ENDREGION}
 
 end.

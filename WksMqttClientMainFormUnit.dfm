@@ -5,12 +5,8 @@ inherited MainForm: TMainForm
   TextHeight = 15
   inherited TopPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
-    inherited LogoImage: TImage
-      ExplicitLeft = 936
-      ExplicitHeight = 188
-    end
     inherited TopPageControl: TPageControl
-      ActivePage = ConnectRequestTabSheet
+      ActivePage = PingRequestTabSheet
       inherited XxxTabSheet: TTabSheet
         Caption = 'Client'
       end
@@ -111,50 +107,50 @@ inherited MainForm: TMainForm
         Caption = 'CONNECT'
         ImageIndex = 4
         object ConnectKeepAliveSecondsLabel: TLabel
-          Left = 720
-          Top = 13
+          Left = 68
+          Top = 97
           Width = 138
           Height = 15
           Caption = 'Keep alive every (seconds)'
         end
         object ConnectWillTopicLabel: TLabel
-          Left = 200
-          Top = 13
+          Left = 400
+          Top = 12
           Width = 50
           Height = 15
           Caption = 'Will topic'
         end
         object ConnectWillMessageLabel: TLabel
-          Left = 182
-          Top = 42
+          Left = 382
+          Top = 41
           Width = 69
           Height = 15
           Caption = 'Will message'
         end
         object ConnectPasswordLabel: TLabel
-          Left = 451
-          Top = 42
+          Left = 651
+          Top = 41
           Width = 50
           Height = 15
           Caption = 'Password'
         end
         object ConnectUsernameLabel: TLabel
-          Left = 448
-          Top = 13
+          Left = 648
+          Top = 12
           Width = 53
           Height = 15
           Caption = 'Username'
         end
         object ConnectClientIdLabel: TLabel
-          Left = 720
-          Top = 42
+          Left = 196
+          Top = 12
           Width = 10
           Height = 15
           Caption = 'Id'
         end
         object ConnectQosLabel: TLabel
-          Left = 720
-          Top = 71
+          Left = 184
+          Top = 41
           Width = 22
           Height = 15
           Caption = 'QoS'
@@ -169,32 +165,32 @@ inherited MainForm: TMainForm
           OnClick = ConnectPacketSendButtonClick
         end
         object ConnectKeepAliveSecondsEdit: TEdit
-          Left = 864
-          Top = 10
+          Left = 212
+          Top = 94
           Width = 41
           Height = 23
           TabOrder = 1
           Text = 'ConnectKeepAliveSecondsEdit'
         end
         object ConnectWillTopicEdit: TEdit
-          Left = 257
-          Top = 10
+          Left = 457
+          Top = 9
           Width = 177
           Height = 23
           TabOrder = 2
           Text = 'ConnectWillTopicEdit'
         end
         object ConnectWillMessageEdit: TEdit
-          Left = 256
-          Top = 39
+          Left = 456
+          Top = 38
           Width = 178
           Height = 23
           TabOrder = 3
           Text = 'ConnectWillMessageEdit'
         end
         object ConnectWillActiveCheckBox: TCheckBox
-          Left = 211
-          Top = 71
+          Left = 411
+          Top = 70
           Width = 62
           Height = 17
           Alignment = taLeftJustify
@@ -202,8 +198,8 @@ inherited MainForm: TMainForm
           TabOrder = 4
         end
         object ConnectCredentialsActiveCheckBox: TCheckBox
-          Left = 461
-          Top = 71
+          Left = 661
+          Top = 70
           Width = 62
           Height = 17
           Alignment = taLeftJustify
@@ -211,24 +207,24 @@ inherited MainForm: TMainForm
           TabOrder = 5
         end
         object ConnectUsernameEdit: TEdit
-          Left = 507
-          Top = 10
+          Left = 707
+          Top = 9
           Width = 200
           Height = 23
           TabOrder = 6
           Text = 'ConnectUsernameEdit'
         end
         object ConnectPasswordEdit: TEdit
-          Left = 507
-          Top = 39
+          Left = 707
+          Top = 38
           Width = 200
           Height = 23
           TabOrder = 7
           Text = 'ConnectPasswordEdit'
         end
         object ConnectClientIdEdit: TEdit
-          Left = 748
-          Top = 39
+          Left = 212
+          Top = 9
           Width = 157
           Height = 23
           TabOrder = 8
@@ -244,8 +240,8 @@ inherited MainForm: TMainForm
           OnClick = DisconnectPacketSendButtonClick
         end
         object ConnectCleanSessionCheckBox: TCheckBox
-          Left = 668
-          Top = 99
+          Left = 132
+          Top = 69
           Width = 97
           Height = 17
           Alignment = taLeftJustify
@@ -253,11 +249,10 @@ inherited MainForm: TMainForm
           TabOrder = 10
         end
         object ConnectQosComboBox: TComboBox
-          Left = 748
-          Top = 68
+          Left = 212
+          Top = 38
           Width = 157
           Height = 23
-          Enabled = False
           TabOrder = 11
           Text = 'MqttProtocolLevelComboBox'
           Items.Strings = (
@@ -269,6 +264,20 @@ inherited MainForm: TMainForm
       object PingRequestTabSheet: TTabSheet
         Caption = 'PINGREQ'
         ImageIndex = 8
+        object PingreqCountLabel: TLabel
+          Left = 184
+          Top = 12
+          Width = 33
+          Height = 15
+          Caption = 'Count'
+        end
+        object Label1: TLabel
+          Left = 344
+          Top = 12
+          Width = 58
+          Height = 15
+          Caption = 'Pause (ms)'
+        end
         object PingRequestPacketSendButton: TButton
           Left = 16
           Top = 8
@@ -278,13 +287,40 @@ inherited MainForm: TMainForm
           TabOrder = 0
           OnClick = PingRequestPacketSendButtonClick
         end
+        object PingreqCountComboBox: TComboBox
+          Left = 223
+          Top = 9
+          Width = 89
+          Height = 23
+          TabOrder = 1
+          Text = 'PingreqCountComboBox'
+          Items.Strings = (
+            '1'
+            '10'
+            '100'
+            '1000')
+        end
+        object PingreqPauseMsComboBox: TComboBox
+          Left = 408
+          Top = 9
+          Width = 89
+          Height = 23
+          TabOrder = 2
+          Text = 'PingreqCountComboBox'
+          Items.Strings = (
+            '0'
+            '1'
+            '10'
+            '100'
+            '1000')
+        end
       end
       object PublishRequestTabSheet: TTabSheet
         Caption = 'PUBLISH'
         ImageIndex = 3
         DesignSize = (
-          920
-          135)
+          933
+          168)
         object PublishTopicLabel: TLabel
           Left = 216
           Top = 12
@@ -299,6 +335,13 @@ inherited MainForm: TMainForm
           Height = 15
           Caption = 'Publish message'
         end
+        object PublishQosLabel: TLabel
+          Left = 263
+          Top = 70
+          Width = 22
+          Height = 15
+          Caption = 'QoS'
+        end
         object PublishPacketSendButton: TButton
           Left = 16
           Top = 8
@@ -311,20 +354,52 @@ inherited MainForm: TMainForm
         object PublishTopicEdit: TEdit
           Left = 291
           Top = 9
-          Width = 614
+          Width = 627
           Height = 23
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 1
           Text = 'PublishTopicEdit'
+          ExplicitWidth = 614
         end
         object PublishMessageEdit: TEdit
           Left = 291
           Top = 38
-          Width = 614
+          Width = 627
           Height = 23
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 2
           Text = 'PublishMessageEdit'
+          ExplicitWidth = 614
+        end
+        object PublishQosComboBox: TComboBox
+          Left = 291
+          Top = 67
+          Width = 157
+          Height = 23
+          TabOrder = 3
+          Text = 'PublishQosComboBox'
+          Items.Strings = (
+            'QoS 0'
+            'QoS 1'
+            'QoS 2')
+        end
+        object PublishDupFlagCheckBox: TCheckBox
+          Left = 157
+          Top = 96
+          Width = 151
+          Height = 17
+          Alignment = taLeftJustify
+          Caption = 'Retransmitted message'
+          TabOrder = 4
+        end
+        object PublishRetainCheckBox: TCheckBox
+          Left = 248
+          Top = 119
+          Width = 60
+          Height = 17
+          Alignment = taLeftJustify
+          Caption = 'Retain'
+          TabOrder = 5
         end
       end
     end
@@ -335,23 +410,17 @@ inherited MainForm: TMainForm
       inherited LogTabSheet: TTabSheet
         inherited LogTopPanel: TPanel
           StyleElements = [seFont, seClient, seBorder]
-          inherited LogLineLabel: TLabel
-            StyleElements = [seFont, seClient, seBorder]
-          end
         end
         inherited LogRichEdit: TRichEdit
           StyleElements = [seFont, seClient, seBorder]
-          ExplicitHeight = 355
         end
       end
       inherited RequestTabSheet: TTabSheet
         inherited RequestTxtRichEdit: TRichEdit
           StyleElements = [seFont, seClient, seBorder]
-          ExplicitTop = 190
         end
         inherited RequestHexRichEdit: TRichEdit
           StyleElements = [seFont, seClient, seBorder]
-          ExplicitHeight = 138
         end
         inherited RequestTopPanel: TPanel
           StyleElements = [seFont, seClient, seBorder]
@@ -360,11 +429,9 @@ inherited MainForm: TMainForm
       inherited ResponseTabSheet: TTabSheet
         inherited ResponseHexRichEdit: TRichEdit
           StyleElements = [seFont, seClient, seBorder]
-          ExplicitHeight = 138
         end
         inherited ResponseTxtRichEdit: TRichEdit
           StyleElements = [seFont, seClient, seBorder]
-          ExplicitTop = 190
         end
         inherited ResponseTopPanel: TPanel
           StyleElements = [seFont, seClient, seBorder]

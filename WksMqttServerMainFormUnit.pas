@@ -27,14 +27,14 @@ uses
 {$REGION 'Type'}
 type
   TMainForm = class(TBaseForm)
-    PortLabel: TLabel;
-    PortEdit: TEdit;
-    StopButton: TButton;
-    StartButton: TButton;
+    ServerPortLabel: TLabel;
+    ServerPortEdit: TEdit;
+    ServerStopButton: TButton;
+    ServerStartButton: TButton;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure StartButtonClick(Sender: TObject);
-    procedure StopButtonClick(Sender: TObject);
+    procedure ServerStartButtonClick(Sender: TObject);
+    procedure ServerStopButtonClick(Sender: TObject);
     procedure XxxExitButtonClick(Sender: TObject);
   private
     { Private declarations }
@@ -65,24 +65,27 @@ begin
 
   // gui
   Caption := 'WKS MQTT Server';
-  StopButton.Enabled := false;
+  ServerStopButton.Enabled := false;
 
   // ini
-  PortEdit.Text := FIni.ReadString('Host', 'Port', '1883');
+  ServerPortEdit.Text := FIni.ReadString('Host', 'Port', '1883');
 
   // server
-  FMQTTServer := TMQTTServerClass.Create(LogLineLabel, LogRichEdit, RequestHexRichEdit, ResponseHexRichEdit);
+  FMQTTServer := TMQTTServerClass.Create(LogRichEdit, RequestHexRichEdit, ResponseHexRichEdit);
+//  FMQTTServer.OnClientConnect    := ;
+//  FMQTTServer.OnClientDisconnect := ;
+//  FMQTTServer.OnClientMessage    := ;
   Log('server created');
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   // ini
-  FIni.WriteString('Host', 'Port', PortEdit.Text);
+  FIni.WriteString('Host', 'Port', ServerPortEdit.Text);
 
   // server
   if FMQTTServer.IsRunning then
-    StopButton.Click;
+    ServerStopButton.Click;
   FMQTTServer.Free;
 
   inherited;
@@ -100,38 +103,81 @@ begin
 
   // server stop
   if FMQTTServer.IsRunning then
-    StopButton.Click;
+    ServerStopButton.Click;
 
   inherited;
 end;
 {$ENDREGION}
 
 {$REGION 'Server'}
-procedure TMainForm.StartButtonClick(Sender: TObject);
+procedure TMainForm.ServerStartButtonClick(Sender: TObject);
 var
   prt: integer;
 begin
   inherited;
 
+  // tcpserver and broker start
   try
-    prt := StrToIntDef(PortEdit.Text, 1883);
+    prt := StrToIntDef(ServerPortEdit.Text, 1883);
     FMQTTServer.Start(prt);
-    StartButton.Enabled := false;
-    StopButton.Enabled := true;
+    ServerStartButton.Enabled := false;
+    ServerStopButton.Enabled := true;
   except
     on e: Exception do
       ShowMessage(e.Message);
   end;
 end;
 
-procedure TMainForm.StopButtonClick(Sender: TObject);
+procedure TMainForm.ServerStopButtonClick(Sender: TObject);
 begin
   inherited;
 
+  // broker and tcpserver stop
   FMQTTServer.Stop;
-  StartButton.Enabled := true;
-  StopButton.Enabled := false;
+  ServerStartButton.Enabled := true;
+  ServerStopButton.Enabled := false;
 end;
+{$ENDREGION}
+
+{$REGION 'Zzz'}
+{
+1. Basic Message Handling
+
+procedure TForm1.ServerOnMessage(const ATopic: string; const APayload: TBytes; AQoS: TMQTTQOSType; ARetain: Boolean);
+begin
+  Memo1.Lines.Add(Format('Message: Topic=%s, QoS=%d, Payload=%s', [ATopic, Ord(AQoS), TEncoding.UTF8.GetString(APayload)]));
+end;
+
+2. Advanced Message Interception
+
+procedure TForm1.ServerOnMessagePublish(Args: TMessagePublishEvent);
+begin
+  // Log all published messages
+  LogMessage(Args.SenderClientID, Args.Topic, Args.Payload);
+
+  // Reject messages from unauthorized clients
+  if not IsClientAuthorized(Args.SenderClientID, Args.Topic) then begin
+    Args.Accept := False;
+    Args.Handled := True;
+  end;
+
+  // Modify payload for specific topics
+  if Args.Topic = 'sensor/data' then begin
+    Args.Payload := SanitizeSensorData(Args.Payload);
+  end;
+end;
+
+3. Authentication Handling
+
+procedure TForm1.ServerOnAuthenticate(Args: TAuthenticationEvent);
+begin
+  // Custom authentication logic
+  Args.Accept := (Args.Username = 'admin') and (Args.Password = 'securepassword');
+
+  if not Args.Accept then
+    LogAuthAttempt(Args.Username, 'Failed authentication');
+end;
+}
 {$ENDREGION}
 
 end.
