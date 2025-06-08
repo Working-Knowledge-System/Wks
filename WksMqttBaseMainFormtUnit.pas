@@ -47,6 +47,10 @@ type
     ResponseTopPanel: TPanel;
     ResponseClearButton: TButton;
     XxxExitButton: TButton;
+    LogVerboseCheckBox: TCheckBox;
+    LogRawCharCheckBox: TCheckBox;
+    LogRawHexCheckBox: TCheckBox;
+    LogRawAsciiCheckBox: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure LogClearButtonClick(Sender: TObject);
@@ -109,11 +113,13 @@ begin
 
   // ini
   FIni := TIniFile.Create(ChangeFileExt(Application.ExeName, '.ini'));
+  LogVerboseCheckBox.Checked := FIni.ReadBool('Log', 'Verbose', false);
 end;
 
 procedure TBaseForm.FormDestroy(Sender: TObject);
 begin
   // ini
+  FIni.WriteBool('Log', 'Verbose', LogVerboseCheckBox.Checked);
   FIni.Free;
 end;
 

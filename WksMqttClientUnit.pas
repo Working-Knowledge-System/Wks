@@ -24,6 +24,7 @@ type
     FTCPClient: TIdTCPClient;
     FKeepAlivePingTimer: TTimer;
     FPacketIdCounter: word;
+    FIsConnected: boolean; // set to true if has received the the CONNACK packet
 
     // tcpipclient events
 //    FOnTcpClientJoined: TNotifyEvent;
@@ -51,23 +52,26 @@ type
 
     // utils
     function  NextPacketIdGet: word;
+    function IsJoinedGet: boolean;
   public
     constructor Create(ALogRichEdit, ARequestHexRichEdit, AResponseHexRichEdit: TRichEdit); override;
     destructor Destroy; override;
     procedure Join(AHost: string; APort: integer);
     procedure Disjoin;
-    procedure ConnectPacketSend(IvProtocolLevel, IvQos: byte; AClientId, AWillTopic, AWillMessage, AUsername, APassword: string; IvCleanSession: boolean = true; AKeepAliveSeconds: word = 60);
+    procedure ConnectPacketSend(IvProtocolLevel, IvQos: byte; AClientIdentifier, AWillTopic, AWillMessage, AUsername, APassword: string; IvCleanSession: boolean = true; AKeepAliveSeconds: word = 60);
     procedure PingReqPacketSend;
-    procedure PublishPacketSend(APacketIdentifier, ATopicName, AApplicationMessage: string; AQosLevel: TMQTTQoSType; ADupFlag: boolean; ARetain: boolean);
+    procedure PublishPacketSend(APacketIdentifier: word; ATopicName, AApplicationMessage: string; AQosLevel: TMQTTQoSType; ADupFlag: boolean; ARetain: boolean);
+    procedure SubscribePacketSend(APacketIdentifier: word; ASubscribeTopicRecVec: TMQTTSubscribeTopicRecVec);
     procedure DisconnectPacketSend;
 
-    function  IsJoined{TcpClientJoined}: boolean;        // tcpclient is connected to tcpserver
-    function  IsConnected{MqttClientConnected}: boolean; // mqttclient is connected mqttbroker
+    procedure KeepAlivePingTimerReset;
 
 //    property OnBrokerConnected   : TNotifyEvent   read FOnBrokerConnected    write FOnBrokerConnected;
 //    property OnBrokerDisconnected: TNotifyEvent   read FOnBrokerDisconnected write FOnBrokerDisconnected;
     property OnBrokerMessage: TOnMQTTMessage read FOnBrokerMessage write FOnBrokerMessage;
     property NextPacketId: word read NextPacketIdGet;
+    property IsJoined{TcpClientJoined}: boolean read IsJoinedGet;         // tcpclient is connected to tcpserver
+    property IsConnected{MqttClientConnected}: boolean read FIsConnected; // mqttclient is connected to mqttbroker
   end;
 {$ENDREGION}
 
@@ -93,6 +97,7 @@ begin
 
   // keep alive timer
   FKeepAlivePingTimer := TTimer.Create(nil);
+  FKeepAlivePingTimer.Enabled := false;
   FKeepAlivePingTimer.OnTimer := KeepAlivePingTimerHandler;
 
   // other
@@ -110,15 +115,15 @@ begin
   inherited;
 end;
 
-function  TMqttClientClass.IsJoined: boolean;
+function TMqttClientClass.IsJoinedGet: boolean;
 begin
   Result := FTCPClient.Connected;
 end;
 
-function  TMqttClientClass.IsConnected: boolean;
-begin
-  Result := FTCPClient.Connected; // *** nop, check if the server has an active connection about ***
-end;
+//function  TMqttClientClass.IsConnected: boolean;
+//begin
+//  Result := FTCPClient.Connected; // *** nop, check if the server has an active connection about, so if has received the CONNACK packet ***
+//end;
 
 procedure TMqttClientClass.Join(AHost: string; APort: integer);
 begin
@@ -126,7 +131,7 @@ begin
   if FTCPClient.Connected then
     raise Exception.Create('client is already joined with the server');
 
-  Log('client joining server...');
+  if LogVerbose then Log('client joining server...');
   try
     FTCPClient.Host := AHost;
     FTCPClient.Port := APort;
@@ -140,12 +145,12 @@ end;
 
 procedure TMqttClientClass.Disjoin;
 begin
-  Log('client disjoining...');
+  if LogVerbose then Log('client disjoining...');
   try
     FKeepAlivePingTimer.Enabled := false;
     Log('client keep-alive ping timer stopped');
 
-    FTCPClient.IOHandler.CloseGracefully;
+    FTCPClient.IOHandler.CloseGracefully; // from the tcpip server
     Log('client join closed gracefully');
 
     FTCPClient.Disconnect; // from the tcpip server
@@ -156,7 +161,7 @@ begin
   end;
 end;
 
-procedure TMqttClientClass.ConnectPacketSend(IvProtocolLevel, IvQos: byte; AClientId, AWillTopic, AWillMessage, AUsername, APassword: string; IvCleanSession: boolean; AKeepAliveSeconds: word);
+procedure TMqttClientClass.ConnectPacketSend(IvProtocolLevel, IvQos: byte; AClientIdentifier, AWillTopic, AWillMessage, AUsername, APassword: string; IvCleanSession: boolean; AKeepAliveSeconds: word);
 
   {$REGION 'protocoll'}
 {
@@ -167,12 +172,12 @@ procedure TMqttClientClass.ConnectPacketSend(IvProtocolLevel, IvQos: byte; AClie
   |-----------|-----------| |-----------------------------------------------------------------------------------------------------------------------| |--------------|
   |type | flgs|           | |         strlen        |                  Protocol Name                | prot lev  | connflags |  keepalive every sec  | |              |
   |-----------|-----------| |-----------------------|-----------------------------------------------|-----------|-----------|-----------------------| |              |
-  | byte 0    | byte 1    | | byte 5    | byte 6    | byte 7    | byte 8    | byte 9    | byte 10   | byte 11   | byte 12   | byte 13   | byte 14   | |  byte 15...  |
+  | byte 0    | byte 1-4  | | byte 5    | byte 6    | byte 7    | byte 8    | byte 9    | byte 10   | byte 11   | byte 12   | byte 13   | byte 14   | |  byte 15...  |
   |-----------|-----------| |-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------------------| |--------------|
-  | 0001 0000 |           | | 0000 0000 | 0000 0100 | 0100 1101 | 0101 0001 | 0101 0100 | 0101 0100 | 0000 0100 | 0000 0000 | 0000 0000   0000 0000 | |              |
-  |        16 |           | |         0 |         4 |        77 |        81 |        84 |        84 |         4 |         4 |         0          60 | |              |
-  |       $10 |           | |       $00 |       $04 |       $4D |       $51 |       $54 |       $54 |       $04 |       $00 |       $00         $3C | |              |
-  |         . |           | |         . |         . |         M |         Q |         T |         T |         . |         . |         .           < | |              |
+  | 0001 0000 | 0000 0000 | | 0000 0000 | 0000 0100 | 0100 1101 | 0101 0001 | 0101 0100 | 0101 0100 | 0000 0100 | 0000 0000 | 0000 0000   0000 0000 | |              |
+  |        16 |         0 | |         0 |         4 |        77 |        81 |        84 |        84 |         4 |         4 |         0          60 | |              |
+  |       $10 |       $00 | |       $00 |       $04 |       $4D |       $51 |       $54 |       $54 |       $04 |       $00 |       $00         $3C | |              |
+  |         . |         . | |         . |         . |         M |         Q |         T |         T |         . |         . |         .           < | |              |
    -----------------------   -----------------------------------------------------------------------------------------------------------------------   --------------
 
 
@@ -262,7 +267,7 @@ var
   {$ENDREGION}
 
 begin
-  Log('CONNECT packet send...');
+  if LogVerbose then Log('CONNECT packet send...');
 
   {$REGION 'packet'}
   packet := TMQTTPacketClass.Create;
@@ -271,7 +276,7 @@ begin
     {$REGION 'remaininglenght'}
     remainlen :=
       10
-    + VarLenFieldLength(AClientID)
+    + VarLenFieldLength(AClientIdentifier)
     + VarLenFieldLength(AWillTopic)
     + VarLenFieldLength(AWillMessage)
     + VarLenFieldLength(AUsername)
@@ -313,22 +318,21 @@ begin
     {$ENDREGION}
 
     {$REGION 'payload'}
-                                  Packet.StringWrite(AClientID);    // clientidentifier
+                                  Packet.StringWrite(AClientIdentifier); // clientidentifier
     if willflag then begin
-                                  Packet.StringWrite(AWillTopic);   // willtopic
-                                  Packet.StringWrite(AWillMessage); // willmessage
+                                  Packet.StringWrite(AWillTopic);        // willtopic
+                                  Packet.StringWrite(AWillMessage);      // willmessage
     end;
-    if not AUsername.IsEmpty then Packet.StringWrite(AUsername);    // username
-    if not APassword.IsEmpty then Packet.StringWrite(APassword);    // password
+    if not AUsername.IsEmpty then Packet.StringWrite(AUsername);         // username
+    if not APassword.IsEmpty then Packet.StringWrite(APassword);         // password
     {$ENDREGION}
 
     {$REGION 'send'}
-    FTCPClient.IOHandler.Write(packet.Stream, 0, true); // true indicates WriteByteCount for the server to read it!
-    Log('CONNECT packet sent    (%d bytes)', [packet.Len]);
-    Log('                       (%s)'      , [packet.AsAscii]);
-    Log('                       (%s)'      , [packet.AsHex]);
-    Log('                       (%s)'      , [packet.AsChar]);
-//    Log();
+    FTCPClient.IOHandler.Write(packet.Stream, 0, not true); // true indicates WriteByteCount for the server to read it!
+    if LogVerbose  then Log('CONNECT packet sent    (%d bytes)', [packet.Len]);
+    if LogRawAscii then Log('                       (%s)'      , [packet.AsAscii]);
+    if LogRawHex   then Log('                       (%s)'      , [packet.AsHex]);
+    if LogRawChar  then Log('                       (%s)'      , [packet.AsChar]);
     {$ENDREGION}
 
   finally
@@ -337,6 +341,7 @@ begin
   {$ENDREGION}
 
   {$REGION 'postprocess'}
+if FIsConnected then begin
   // start the keep-alive timer
   FKeepAlivePingTimer.Interval := AKeepAliveSeconds * 1000;
   FKeepAlivePingTimer.Enabled := true;
@@ -344,6 +349,7 @@ begin
   // fire event
 //if Assigned(FOnConnected) then
 //  FOnConnected(Self);
+end;
   {$ENDREGION}
 
 end;
@@ -403,7 +409,7 @@ var
   {$ENDREGION}
 
 begin
-  Log('DISCONNECT packet send...');
+  if LogVerbose then Log('DISCONNECT packet send...');
 
   {$REGION 'packet'}
   packet := TMQTTPacketClass.Create;
@@ -427,11 +433,11 @@ begin
     {$ENDREGION}
 
     {$REGION 'send'}
-    FTCPClient.IOHandler.Write(packet.Stream, 0, true);
-    Log('DISCONNECT packet sent (%d bytes)', [packet.Len]);
-    Log('                       (%s)'      , [packet.AsAscii]);
-    Log('                       (%s)'      , [packet.AsHex]);
-    Log('                       (%s)'      , [packet.AsChar]);
+    FTCPClient.IOHandler.Write(packet.Stream, 0, not true);
+    if LogVerbose  then Log('DISCONNECT packet sent (%d bytes)', [packet.Len]);
+    if LogRawAscii then Log('                       (%s)'      , [packet.AsAscii]);
+    if LogRawHex   then Log('                       (%s)'      , [packet.AsHex]);
+    if LogRawChar  then Log('                       (%s)'      , [packet.AsChar]);
     {$ENDREGION}
 
   finally
@@ -477,7 +483,7 @@ var
   {$ENDREGION}
 
 begin
-  Log('PINGREQ packet send...');
+  if LogVerbose then Log('PINGREQ packet send...');
 
   {$REGION 'packet'}
   packet := TMQTTPacketClass.Create;
@@ -501,11 +507,11 @@ begin
     {$ENDREGION}
 
     {$REGION 'send'}
-    FTCPClient.IOHandler.Write(packet.Stream, 0, true);
-    Log('PINGREQ packet sent    (%d bytes)', [packet.Len]);
-    Log('                       (%s)'      , [packet.AsAscii]);
-    Log('                       (%s)'      , [packet.AsHex]);
-    Log('                       (%s)'      , [packet.AsChar]);
+    FTCPClient.IOHandler.Write(packet.Stream, 0, not true);
+    if LogVerbose  then Log('PINGREQ packet sent    (%d bytes)', [packet.Len]);
+    if LogRawAscii then Log('                       (%s)'      , [packet.AsAscii]);
+    if LogRawHex   then Log('                       (%s)'      , [packet.AsHex]);
+    if LogRawChar  then Log('                       (%s)'      , [packet.AsChar]);
     {$ENDREGION}
 
   finally
@@ -519,7 +525,7 @@ begin
 
 end;
 
-procedure TMqttClientClass.PublishPacketSend(APacketIdentifier, ATopicName, AApplicationMessage: string; AQosLevel: TMQTTQoSType; ADupFlag: boolean; ARetain: boolean);
+procedure TMqttClientClass.PublishPacketSend(APacketIdentifier: word; ATopicName, AApplicationMessage: string; AQosLevel: TMQTTQoSType; ADupFlag: boolean; ARetain: boolean);
 
   {$REGION 'protocoll'}
 {
@@ -652,22 +658,22 @@ procedure TMqttClientClass.PublishPacketSend(APacketIdentifier, ATopicName, AApp
 var
   packet: TMQTTPacketClass;
   ctrlbyte, ctrlflags: byte;
-  remainlen: cardinal;
+  remainlen: integer;
   msg: TMQTTMessageRec;
   {$ENDREGION}
 
 begin
-  Log('PUBLISH packet send...');
+  if LogVerbose then Log('PUBLISH packet send...');
 
   {$REGION 'packet'}
   packet := TMQTTPacketClass.Create;
   try
 
     {$REGION 'remaininglenght'}
-    remainlen :=
-      VarLenFieldLength(ATopicName)
-    + VarLenFieldLength(APacketIdentifier)
-    + VarLenFieldLength(AApplicationMessage);
+    remainlen := VarLenFieldLength(ATopicName);
+  if (AQosLevel = qostAT_LEAST_ONCE) or (AQosLevel = qostEXACTLY_ONCE) then
+    remainlen := remainlen + 2; // apacketidentifier
+    remainlen := remainlen + {VarLenField}Length(AApplicationMessage); // *** just the length of the string, no 2bytes prefix for strlen! ***
     {$ENDREGION}
 
     {$REGION 'fixedheader'}
@@ -682,19 +688,22 @@ begin
 
     {$REGION 'variableheader'}
     packet.StringWrite(ATopicName);
-    packet.StringWrite(APacketIdentifier);
+  if (AQosLevel = qostAT_LEAST_ONCE) or (AQosLevel = qostEXACTLY_ONCE) then begin
+    packet.ByteWrite(Hi(APacketIdentifier));
+    packet.ByteWrite(Lo(APacketIdentifier));
+  end;
     {$ENDREGION}
 
     {$REGION 'payload'}
-    packet.StringWrite(AApplicationMessage);
+    packet.BytesWrite(TEncoding.UTF8.GetBytes(AApplicationMessage)); // *** not a variable field, no 2bytes len prefix! ***
     {$ENDREGION}
 
     {$REGION 'send'}
-    FTCPClient.IOHandler.Write(packet.Stream, 0, true);
-    Log('PINGREQ packet sent    (%d bytes)', [packet.Len]);
-    Log('                       (%s)'      , [packet.AsAscii]);
-    Log('                       (%s)'      , [packet.AsHex]);
-    Log('                       (%s)'      , [packet.AsChar]);
+    FTCPClient.IOHandler.Write(packet.Stream, 0, not true);
+    if LogVerbose  then Log('PINGREQ packet sent    (%d bytes)', [packet.Len]);
+    if LogRawAscii then Log('                       (%s)'      , [packet.AsAscii]);
+    if LogRawHex   then Log('                       (%s)'      , [packet.AsHex]);
+    if LogRawChar  then Log('                       (%s)'      , [packet.AsChar]);
     {$ENDREGION}
 
   finally
@@ -711,11 +720,11 @@ begin
   packet := TMQTTPacketClass.Create;
   try
     // Writing a message
-    msg.TopicName                  := ATopicName;
-    msg.ApplicationMessage         := TEncoding.UTF8.GetBytes(AApplicationMessage);
-    msg.QoS                        := AQosLevel;
-    msg.Retain                     := ARetain;
-    msg.PacketIdOrClientIdentifier := 1;
+    msg.TopicName          := ATopicName;
+    msg.ApplicationMessage := TEncoding.UTF8.GetBytes(AApplicationMessage);
+    msg.QoS                := AQosLevel;
+    msg.Retain             := ARetain;
+    msg.PacketIdentifier   := 1;
     packet.MessageWrite(msg);
 
     // Reading back
@@ -730,15 +739,47 @@ begin
 
 end;
 
+procedure TMqttClientClass.SubscribePacketSend(APacketIdentifier: word; ASubscribeTopicRecVec: TMQTTSubscribeTopicRecVec);
+
+  {$REGION 'protocoll'}
+{
+   -----------------------   -----------------------   -----------------------------------------------------------------------------------------------------------------------------
+  | FIXED HEADER (2 bytes)| | VARIABLE HEADER       | |   PAY LOAD                                                                                                                  |
+  |-----------------------| | (2 bytes)             | |                                                                                                                             |
+  |CTRL PACKET| REMAINLEN | |                       | |   0-M bytes                                                                                                                 |
+  |-----------|-----------| |-----------------------| |------------------------------------------------------------      ------------------------------------------------------------
+  |type | flgs|           | |       packet id       | |        str len        |     topic filter 1    | Req. QoA  |     |        str len        |     topic filter N    | Req. QoA  |
+  |-----------|-----------| |-----------------------| |-----------------------|-----------------------|-----------|     |-----------------------|-----------------------|-----------|
+  | byte 0    | byte 1-4  | | byte  MSB | byte  LSB | | byte  MSB | byte  LSB | byte  ... | byte  ... | byte      | ... | byte  MSB | byte  LSB | byte  ... | byte  ... | byte      |
+  |-----------|-----------| |-----------|-----------| |-----------|-----------|-----------|-----------|-----------|     |-----------|-----------|-----------|-----------|-----------|
+  | 0001 0000 | 0000 0000 | | 0000 0000 | 0000 0000 | | 0000 0000 | 0000 0000 | 0000 0000 | 0000 0000 | 0000 00XX |     | 0000 0000 | 0000 0000 | 0000 0000 | 0000 0000 | 0000 00XX |
+  |        16 |         0 | |         0 |         0 | |         0 |         0 |         0 |         0 |         0 |     |         0 |         0 |         0 |         0 |         0 |
+  |       $10 |       $00 | |       $00 |       $00 | |       $00 |       $00 |       $00 |       $00 |       $00 |     |       $00 |       $00 |       $00 |       $00 |       $00 |
+  |         . |         . | |         . |         . | |         . |         . |         . |         . |         . |     |         . |         . |         . |         . |         . |
+   -----------------------   -----------------------   -----------------------------------------------------------       -----------------------------------------------------------
+
+}
+  {$ENDREGION}
+
+  {$REGION 'var'}
+var
+  packet: TMQTTPacketClass;
+  remainlen: cardinal;
+  {$ENDREGION}
+
+begin
+
+end;
+
   {$REGION 'TCPClientHandlers'}
 procedure TMqttClientClass.OnServerJoinedHandler(Sender: TObject);
 begin
-  Log('client joined to server %s:%d', [FTCPClient.Host, FTCPClient.Port]);
+  //Log('client joined to server %s:%d', [FTCPClient.Host, FTCPClient.Port]);
 end;
 
 procedure TMqttClientClass.OnServerDisjoinedHandler(Sender: TObject);
 begin
-  Log('client disjoined from server %s:%d', [FTCPClient.Host, FTCPClient.Port]);
+  //Log('client disjoined from server %s:%d', [FTCPClient.Host, FTCPClient.Port]);
 end;
 
 procedure TMqttClientClass.OnServerDataReceivedHandler;
@@ -766,10 +807,10 @@ begin
     size := io.ReadInt32;
     io.ReadStream(packet.Stream, {-1}size, false);
     packet.Stream.Position := 0;
-    Log('received bytes         (%d bytes)', [packet.Len]);
-    Log('                       (%s)'      , [packet.AsAscii]);
-    Log('                       (%s)'      , [packet.AsHex]);
-    Log('                       (%s)'      , [packet.AsChar]);
+    if LogVerbose  then Log('received bytes         (%d bytes)', [packet.Len]);
+    if LogRawAscii then Log('                       (%s)'      , [packet.AsAscii]);
+    if LogRawHex   then Log('                       (%s)'      , [packet.AsHex]);
+    if LogRawChar  then Log('                       (%s)'      , [packet.AsChar]);
 
     // read 1st byte for packettype andflags
     ctrlbyte := packet.ByteRead;
@@ -784,7 +825,7 @@ begin
         // handle connection acknowledgement
       end;
       ptPUBLISH: begin
-        Log('received PUBLISH (3) packet');
+        if LogVerbose then Log('received PUBLISH (3) packet');
 
         // handle message from server related to subsciptions
         appmessage := packet.MessageRead;
@@ -792,17 +833,16 @@ begin
 
         // send acknowledgements based on QoS
 //        case appmessage.QoS of
-//          qostAT_LEAST_ONCE: PubAckSend(appmessage.PacketIdOrClientIdentifier);
-//          qostEXACTLY_ONCE : PubRecSend(appmessage.PacketIdOrClientIdentifier);
+//          qostAT_LEAST_ONCE: PubAckSend(appmessage.PacketIdentifier);
+//          qostEXACTLY_ONCE : PubRecSend(appmessage.PacketIdentifier);
 //        end;
       end;
 
       ptPINGRESP: begin
-        Log('received PINGRESP (13) packet');
+        if LogVerbose then Log('received PINGRESP (13) packet');
 
         // reset ping timer
-        FKeepAlivePingTimer.Enabled := false;
-        FKeepAlivePingTimer.Enabled := true;
+        KeepAlivePingTimerReset;
       end;
     end;
   finally
@@ -814,12 +854,12 @@ end;
   {$REGION 'BrokerHandlers'}
 procedure TMqttClientClass.OnConnectedHandler(Sender: TObject);
 begin
-  Log('client connected to broker %s:%d', [FTCPClient.Host, FTCPClient.Port]);
+  if LogVerbose then Log('client connected to broker %s:%d', [FTCPClient.Host, FTCPClient.Port]);
 end;
 
 procedure TMqttClientClass.OnDisconnectedHandler(Sender: TObject);
 begin
-  Log('client disconnected from broker %s:%d', [FTCPClient.Host, FTCPClient.Port]);
+  if LogVerbose then Log('client disconnected from broker %s:%d', [FTCPClient.Host, FTCPClient.Port]);
 end;
   {$ENDREGION}
 
@@ -828,7 +868,14 @@ end;
 {$REGION 'KeepAliveTimer'}
 procedure TMqttClientClass.KeepAlivePingTimerHandler(Sender: TObject);
 begin
+  // send keep alive PINGREQ
+  PingReqPacketSend;
+end;
 
+procedure TMqttClientClass.KeepAlivePingTimerReset;
+begin
+  FKeepAlivePingTimer.Enabled := false;
+  FKeepAlivePingTimer.Enabled := true;
 end;
 {$ENDREGION}
 

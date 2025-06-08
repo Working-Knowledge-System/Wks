@@ -98,12 +98,21 @@ type
     FRequestHexRichEdit: TRichEdit;                                 // here logs request packet raw string
     FResponseHexRichEdit: TRichEdit;                                // here logs response packet raw string
     FLogLast: string;                                               // hold the last logged message (to avoid logging same stuff)
+    FLogVerbose: boolean;
+    FLogRawAscii: boolean;
+    FLogRawHex: boolean;
+    FLogRawChar: boolean;
   protected
     procedure Log(const AStr: string; AWithTime: boolean = true); overload;
     procedure Log(const AFmt: string; AVarRecVec: array of TVarRec; AWithTime: boolean = true); overload;
     procedure Dmp(const AStr: string);
   public
-    constructor Create(ALogRichEdit, ARequestHexRichEdit, AResponseHexRichEdit: TRichEdit); virtual;{}
+    constructor Create(ALogRichEdit, ARequestHexRichEdit, AResponseHexRichEdit: TRichEdit); virtual;
+
+    property LogVerbose : boolean read FLogVerbose  write FLogVerbose ;
+    property LogRawAscii: boolean read FLogRawAscii write FLogRawAscii;
+    property LogRawHex  : boolean read FLogRawHex   write FLogRawHex  ;
+    property LogRawChar : boolean read FLogRawChar  write FLogRawChar ;
   end;
 {$ENDREGION}
 
@@ -115,6 +124,10 @@ begin
   FLogRichEdit         := ALogRichEdit;
   FRequestHexRichEdit  := ARequestHexRichEdit;
   FResponseHexRichEdit := AResponseHexRichEdit;
+  FLogVerbose          := false;
+  FLogRawAscii         := false;
+  FLogRawHex           := false;
+  FLogRawChar          := true;
 end;
 
 procedure TMqttClass.Log(const AStr: string; AWithTime: boolean);
@@ -167,7 +180,7 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION 'Use'}
+{$REGION 'Zzz'}
 (*
   TMqttClass = class
   protected
@@ -434,6 +447,31 @@ begin
   SetLength(AIdBytes, Remaining);
 end;
 *)
+{$ENDREGION}
+
+{$REGION 'Zzz'}
+{
+  procedure BytesSplitAtNullChar(const fullpacket: TIdBytes; var AIdBytesVec: TBytesVec);
+  var
+    i: int64;
+    bts: TIdBytes;
+  begin
+    SetLength(AIdBytesVec, 0);
+    SetLength(bts, 0);
+    for i := Low(fullpacket) to High(fullpacket) do begin
+      if (fullpacket[i] <> $0) and (i <= High(fullpacket)) then begin
+        SetLength(bts, Length(bts) + 1);
+        bts[High(bts)] := fullpacket[i];
+      end else begin
+        SetLength(bts, Length(bts) + 1);
+        bts[High(bts)] := $0;
+        SetLength(AIdBytesVec, Length(AIdBytesVec) + 1);
+        AIdBytesVec[High(AIdBytesVec)] := bts;
+        SetLength(bts, 0);
+      end;
+    end;
+  end;
+}
 {$ENDREGION}
 
 end.

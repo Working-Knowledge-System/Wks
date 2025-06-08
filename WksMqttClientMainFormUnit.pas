@@ -77,6 +77,10 @@ type
     PingreqCountLabel: TLabel;
     Label1: TLabel;
     PingreqPauseMsComboBox: TComboBox;
+    PublishCountLabel: TLabel;
+    PublishPauseMsLabel: TLabel;
+    PublishCountComboBox: TComboBox;
+    PublishPauseMsComboBox: TComboBox;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ServerDisjoinButtonClick(Sender: TObject);
@@ -116,8 +120,6 @@ begin
   // gui
   Caption := 'WKS MQTT Client';
   TopPageControl.ActivePageIndex := 2;
-  PingreqCountComboBox.ItemIndex := 0;
-  PingreqPauseMsComboBox.ItemIndex := 2;
 
   // ini
   MqttProtocolNameEdit.Text                := FIni.ReadString ('Mqtt'   , 'ProtocolName'     , 'MQTT' {this is fixed}               );
@@ -134,9 +136,13 @@ begin
   ConnectCredentialsActiveCheckBox.Checked := FIni.ReadBool   ('Connect', 'CredentialsActive', true                                 );
   ConnectKeepAliveSecondsEdit.Text         := FIni.ReadString ('Connect', 'KeepAliveSeconds' , '60'                                 );
   ConnectCleanSessionCheckBox.Checked      := FIni.ReadBool   ('Connect', 'CleanSession'     , true                                 );
+  PingreqCountComboBox.ItemIndex           := FIni.ReadInteger('Pingreq', 'Count'            , 0                                    );
+  PingreqPauseMsComboBox.ItemIndex         := FIni.ReadInteger('Pingreq', 'PauseMs'          , 2                                    );
   PublishTopicEdit.Text                    := FIni.ReadString ('Publish', 'Topic'            , 'wks/mqtt/test/helloworld'           );
   PublishMessageEdit.Text                  := FIni.ReadString ('Publish', 'Message '         , 'hello MQTT!'                        );
   PublishQosComboBox.ItemIndex             := FIni.ReadInteger('Publish', 'Qos'              , 0                                    );
+  PublishCountComboBox.ItemIndex           := FIni.ReadInteger('Publish', 'Count'            , 0                                    );
+  PublishPauseMsComboBox.ItemIndex         := FIni.ReadInteger('Publish', 'PauseMs'          , 2                                    );
 
   // client
   FMqttClient := TMQTTClientClass.Create(LogRichEdit, RequestHexRichEdit, ResponseHexRichEdit);
@@ -160,12 +166,16 @@ begin
   FIni.WriteBool   ('Connect', 'CredentialsActive', ConnectCredentialsActiveCheckBox.Checked);
   FIni.WriteString ('Connect', 'KeepAliveSeconds ', ConnectKeepAliveSecondsEdit.Text        );
   FIni.WriteBool   ('Connect', 'CleanSession'     , ConnectCleanSessionCheckBox.Checked     );
+  FIni.WriteInteger('Pingreq', 'Count'            , PingreqCountComboBox.ItemIndex          );
+  FIni.WriteInteger('Pingreq', 'PauseMs'          , PingreqPauseMsComboBox.ItemIndex        );
   FIni.WriteString ('Publish', 'Topic'            , PublishTopicEdit.Text                   );
   FIni.WriteString ('Publish', 'Message'          , PublishMessageEdit.Text                 );
   FIni.WriteInteger('Publish', 'Qos'              , PublishQosComboBox.ItemIndex            );
+  FIni.WriteInteger('Publish', 'Count'            , PublishCountComboBox.ItemIndex          );
+  FIni.WriteInteger('Publish', 'PauseMs'          , PublishPauseMsComboBox.ItemIndex        );
 
-  // client
-  if FMQTTClient.IsConnected then
+  // disjoin from tcpserver
+  if FMQTTClient.IsJoined then
     ServerDisjoinButton.Click;
   FMqttClient.Free;
 
@@ -241,7 +251,7 @@ begin
   pause := StrToIntDef(PingreqPauseMsComboBox.Text, 0);
 
   if count > 10 then
-    if not (MessageDlg(Format('Send %d PINGREQ to the server?', [count]), mtCustom, [mbYes, mbNo], 0) = mrYes) then
+    if not (MessageDlg(Format('Send %d PINGREQ to the broker?', [count]), mtCustom, [mbYes, mbNo], 0) = mrYes) then
       Exit;
 
   for i := 1 to count do begin
@@ -253,10 +263,26 @@ end;
 
 {$REGION 'PublishPacketSend'}
 procedure TMainForm.PublishPacketSendButtonClick(Sender: TObject);
+var
+  i, count, pause: integer;
+  msg: string;
 begin
   inherited;
 
-  FMqttClient.PublishPacketSend('packtetid001', PublishTopicEdit.Text, PublishMessageEdit.Text, TMQTTQosType(PublishQosComboBox.ItemIndex), PublishDupFlagCheckBox.Checked, PublishRetainCheckBox.Checked);
+  count := StrToIntDef(PublishCountComboBox.Text  , 1);
+  pause := StrToIntDef(PublishPauseMsComboBox.Text, 0);
+
+  if count > 10 then
+    if not (MessageDlg(Format('Send %d PUBLISH to the broker?', [count]), mtCustom, [mbYes, mbNo], 0) = mrYes) then
+      Exit;
+
+  for i := 1 to count do begin
+    msg := PublishMessageEdit.Text;
+    if msg.Contains('$Counter$') then
+      msg := StringReplace(msg, '$Counter$', Format('%5d', [i]), [treplaceFlag.rfReplaceAll]);
+    FMqttClient.PublishPacketSend(10000+i, PublishTopicEdit.Text, msg, TMQTTQosType(PublishQosComboBox.ItemIndex), PublishDupFlagCheckBox.Checked, PublishRetainCheckBox.Checked);
+    Sleep(pause);
+  end;
 end;
 {$ENDREGION}
 

@@ -2,11 +2,14 @@ inherited MainForm: TMainForm
   Anchors = [akTop, akRight]
   Caption = 'MainForm'
   StyleElements = [seFont, seClient, seBorder]
+  ExplicitWidth = 1024
+  ExplicitHeight = 640
   TextHeight = 15
   inherited TopPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited TopPageControl: TPageControl
-      ActivePage = PingRequestTabSheet
+      ActivePage = ServerTabSheet
+      ExplicitWidth = 941
       inherited XxxTabSheet: TTabSheet
         Caption = 'Client'
       end
@@ -265,15 +268,15 @@ inherited MainForm: TMainForm
         Caption = 'PINGREQ'
         ImageIndex = 8
         object PingreqCountLabel: TLabel
-          Left = 184
-          Top = 12
+          Left = 16
+          Top = 46
           Width = 33
           Height = 15
           Caption = 'Count'
         end
         object Label1: TLabel
-          Left = 344
-          Top = 12
+          Left = 16
+          Top = 96
           Width = 58
           Height = 15
           Caption = 'Pause (ms)'
@@ -288,8 +291,8 @@ inherited MainForm: TMainForm
           OnClick = PingRequestPacketSendButtonClick
         end
         object PingreqCountComboBox: TComboBox
-          Left = 223
-          Top = 9
+          Left = 16
+          Top = 67
           Width = 89
           Height = 23
           TabOrder = 1
@@ -301,8 +304,8 @@ inherited MainForm: TMainForm
             '1000')
         end
         object PingreqPauseMsComboBox: TComboBox
-          Left = 408
-          Top = 9
+          Left = 16
+          Top = 117
           Width = 89
           Height = 23
           TabOrder = 2
@@ -342,6 +345,20 @@ inherited MainForm: TMainForm
           Height = 15
           Caption = 'QoS'
         end
+        object PublishCountLabel: TLabel
+          Left = 16
+          Top = 46
+          Width = 33
+          Height = 15
+          Caption = 'Count'
+        end
+        object PublishPauseMsLabel: TLabel
+          Left = 16
+          Top = 96
+          Width = 58
+          Height = 15
+          Caption = 'Pause (ms)'
+        end
         object PublishPacketSendButton: TButton
           Left = 16
           Top = 8
@@ -359,7 +376,6 @@ inherited MainForm: TMainForm
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 1
           Text = 'PublishTopicEdit'
-          ExplicitWidth = 614
         end
         object PublishMessageEdit: TEdit
           Left = 291
@@ -369,7 +385,6 @@ inherited MainForm: TMainForm
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 2
           Text = 'PublishMessageEdit'
-          ExplicitWidth = 614
         end
         object PublishQosComboBox: TComboBox
           Left = 291
@@ -400,6 +415,33 @@ inherited MainForm: TMainForm
           Alignment = taLeftJustify
           Caption = 'Retain'
           TabOrder = 5
+        end
+        object PublishCountComboBox: TComboBox
+          Left = 16
+          Top = 67
+          Width = 89
+          Height = 23
+          TabOrder = 6
+          Text = 'PublishCountComboBox'
+          Items.Strings = (
+            '1'
+            '10'
+            '100'
+            '1000')
+        end
+        object PublishPauseMsComboBox: TComboBox
+          Left = 16
+          Top = 117
+          Width = 89
+          Height = 23
+          TabOrder = 7
+          Text = 'PublishPauseMsComboBox'
+          Items.Strings = (
+            '0'
+            '1'
+            '10'
+            '100'
+            '1000')
         end
       end
     end
