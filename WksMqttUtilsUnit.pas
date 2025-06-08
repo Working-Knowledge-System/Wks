@@ -12,12 +12,13 @@ uses
 
 {$REGION 'Routines'}
 function  VarLenFieldLength(AString: string): integer; // 2bytes + stringlength
-function  StrFromStreamRead(AStream: TStream): string;
+function  StrFromStreamRead(AStream: TStream): string; // read UTF8 encoded string
 function  BytesFromHex(const AHex: string): TBytes;
-function  AsciiFromStream(AStream: TStream): string; // 192 126  32   0 ...
-function  HexFromStream(AStream: TStream): string;   //  C0  7F  20  00 ...
-function  CharFromStream(AStream: TStream): string;  //   À   ~   _   .
-function  DumpFromStream(AStream: TStream): string;  // *** da rivedere ***
+function  AsciiFromStream(AStream: TStream): string;   // 192 126  32   0 ...
+function  HexFromStream(AStream: TStream): string;     //  C0  7F  20  00 ...
+function  HexFromBytes(ABytes: TBytes): string;
+function  CharFromStream(AStream: TStream): string;    //   À   ~   _   .
+function  DumpFromStream(AStream: TStream): string;    // *** da rivedere ***
 {$ENDREGION}
 
 implementation
@@ -34,7 +35,7 @@ end;
 function  StrFromStreamRead(AStream: TStream): string;
 var
   len: word;
-  buf: TBytes; // buffer
+  bytes: TBytes; // buffer
 begin
   // attempts to read exactly 2 bytes from the stream, starting at the current position
   // then advances the current position in the stream by the number of bytes actually read
@@ -45,13 +46,18 @@ begin
   len := Swap(len);
 
   // dimension the receiving buffer
-  SetLength(buf, len);
+  SetLength(bytes, len);
 
   // fill the buffer reading len chars that form the string
-  AStream.ReadBuffer(buf[0], len);
+  AStream.ReadBuffer(bytes[0], len);
 
   // return the encoded bytes as a UTF8 string
-  Result := TEncoding.UTF8.GetString(buf);
+  try
+    Result := TEncoding.UTF8.GetString(bytes);
+  except
+    on e: Exception do
+      Result := Format('ERROR: %e (%s)', [e.Message,  HexFromBytes(bytes)]);
+  end;
 end;
 
 function  BytesFromHex(const AHex: string): TBytes;
@@ -112,6 +118,19 @@ begin
     Delete(Result, 1, 1);
   finally
     AStream.Position := oldpos;
+  end;
+end;
+
+function  HexFromBytes(ABytes: TBytes): string;
+const
+  HEX_SYMBOLS = '0123456789ABCDEF';
+var
+  i: integer;
+begin
+  SetLength(Result, 2 * Length(ABytes));
+  for i :=  0 to Length(ABytes) - 1 do begin
+    Result[1 + 2*i + 0] := HEX_SYMBOLS[1 + ABytes[i] shr 4];
+    Result[1 + 2*i + 1] := HEX_SYMBOLS[1 + ABytes[i] and $0F];
   end;
 end;
 

@@ -27,7 +27,7 @@ type
   {$ENDREGION}
 
   {$REGION 'QoS'}
-  TMQTTQoS = 0..2;
+  //TMQTTQoS = 0..2;
 
   TMQTTQoSType = (
     qostAT_MOST_ONCE  = 0 // QoS 0 = fire and forget
@@ -49,7 +49,7 @@ type
     QoS: TMQTTQoSType;
     Retain: boolean;
     TopicName: string;
-    PacketIdOrClientIdentifier: word;
+    PacketIdentifier: word;
     ApplicationMessage: TBytes;
   end;
 
@@ -160,8 +160,7 @@ type
     constructor Create;
     destructor Destroy; override;
 
-    function  StringRead: string;
-    procedure StringWrite(const AString: string);
+    procedure StreamFromBytes(ABytes: TBytes);
     function  ByteRead: byte;
     procedure ByteWrite(AByte: byte);
     function  WordRead: word;
@@ -170,6 +169,9 @@ type
     procedure BytesWrite(const AData: TBytes);
     function  RemainingLengthRead: integer;
     procedure RemainingLengthWrite(ALength: integer);
+    function  StringRead: string;
+    function  StringReadLen(ALength: integer): string;
+    procedure StringWrite(const AString: string);
     function  MessageRead: TMQTTMessageRec;
     procedure MessageWrite(const AMessage: TMQTTMessageRec);
 
@@ -195,7 +197,7 @@ type
   TMQTTConnectFlags = packed record
     CleanSession: boolean;
     WillFlag: boolean;
-    WillQoS: TMQTTQoS;
+    WillQoS: TMQTTQoSType;
     WillRetain: boolean;
     PasswordFlag: boolean;
     UsernameFlag: boolean;
@@ -212,7 +214,7 @@ type
     ProtocolLevel: byte;  // 4 (3.1.1)
     ConnectFlags: TMQTTConnectFlags;
     KeepAlive: word;
-    ClientID: string;
+    ClientIdentifier: string;
     WillTopic: string;
     WillMessage: string;
     Username: string;
@@ -245,7 +247,7 @@ type
 
   TMQTTPublishFlags = packed record
     DupFlag: boolean;
-    QoSLevel: TMQTTQoS;
+    QoSLevel: TMQTTQoSType;
     Retain: boolean;
   public
     procedure FromByte(AByte: byte);
@@ -257,8 +259,53 @@ type
     RemainingLength: byte;
     PublishFlags: TMQTTPublishFlags;
     TopicName: string;
-    ClientIdentifier: string;
+    PacketIdentifier: word;
     ApplicationMessage: string;
+    function  DumpGet: string;
+  public
+    property Dump: string read DumpGet;
+  end;
+  {$ENDREGION}
+
+  {$REGION 'Subscribe'}
+  TMQTTSubscribeReturnCode = (
+    subscribercSUBSCRIBE_ACCEPTED = 0
+  );
+
+  TMQTTSubscribeTopicRec = record
+    TopicFilter: string;
+    RequestedQoS: TMQTTQoSType;
+  end;
+
+  TMQTTSubscribeTopicRecVec = array of TMQTTSubscribeTopicRec;
+
+  TMQTTSubscribePacketRec = record
+    PacketType: TMQTTPacketType;
+    RemainingLength: byte;
+    PacketIdentifier: word;
+    SubscribeTopicRecVec: TMQTTSubscribeTopicRecVec;
+    function  DumpGet: string;
+  public
+    property Dump: string read DumpGet;
+  end;
+  {$ENDREGION}
+
+  {$REGION 'Unsubscribe'}
+  TMQTTUnsubscribeReturnCode = (
+    unsubscribercUNSUBSCRIBE_ACCEPTED = 0
+  );
+
+  TMQTTUnsubscribeTopicRec = record
+    TopicFilter: string;
+  end;
+
+  TMQTTUnsubscribeTopicRecVec = array of TMQTTUnsubscribeTopicRec;
+
+  TMQTTUnsubscribePacketRec = record
+    PacketType: TMQTTPacketType;
+    RemainingLength: byte;
+    PacketIdentifier: word;
+    UnsubscribeTopicRecVec: TMQTTUnsubscribeTopicRecVec;
     function  DumpGet: string;
   public
     property Dump: string read DumpGet;
@@ -278,6 +325,18 @@ type
     function  DumpGet: string;
   public
     property Dump: string read DumpGet;
+  end;
+  {$ENDREGION}
+
+  {$REGION 'StreamDecoder'}
+  TMQTTStreamDecoder = class
+  private
+    FBuffer: TBytes;
+    //FOffset: Integer;
+    //procedure BufferCompact;
+  public
+    procedure DataAppend(const ABytes: TBytes);
+    function  PacketTryExtract(out APacket: TBytes): boolean;
   end;
   {$ENDREGION}
 
@@ -431,6 +490,12 @@ begin
   Result := '<not implemented>';
 end;
 
+procedure TMQTTPacketClass.StreamFromBytes(ABytes: TBytes);
+begin
+  Stream.WriteBuffer(ABytes[0], Length(ABytes));
+  Stream.Position := 0;
+end;
+
 function  TMQTTPacketClass.ByteRead: byte;
 begin
   FStream.Read(Result, SizeOf(Byte));
@@ -439,74 +504,6 @@ end;
 procedure TMQTTPacketClass.ByteWrite(AByte: byte);
 begin
   FStream.Write(AByte, SizeOf(Byte));
-end;
-
-function  TMQTTPacketClass.MessageRead: TMQTTMessageRec;
-var
-  FixedHeader: byte;
-  PacketType: TMQTTPacketType;
-  QoSByte: byte;
-  RemainingLength: integer;
-begin
-  FStream.Position := 0;
-  FixedHeader := ByteRead;
-  PacketType := TMQTTPacketType((FixedHeader and $F0) shr 4);
-
-  case PacketType of
-    ptPUBLISH: begin
-      RemainingLength := RemainingLengthRead;
-      Result.TopicName := StringRead;
-
-      // qos read
-      QoSByte := (FixedHeader and $06) shr 1;
-      Result.QoS := TMQTTQOSType(QoSByte);
-
-      if Result.QoS > qostAT_MOST_ONCE then
-        Result.PacketIdOrClientIdentifier := WordRead;
-
-      // payload read
-      SetLength(Result.ApplicationMessage, RemainingLength - (FStream.Position - 1));
-      if Length(Result.ApplicationMessage) > 0 then
-        FStream.Read(Result.ApplicationMessage[0], Length(Result.ApplicationMessage));
-    end;
-
-    // Handle other packet types...
-
-    else
-      raise Exception.Create('Unsupported packet type in ReadMessage');
-  end;
-end;
-
-procedure TMQTTPacketClass.MessageWrite(const AMessage: TMQTTMessageRec);
-var
-  FixedHeader: byte;
-  RemainingLength: integer;
-  VarHeaderSize: integer;
-begin
-  FStream.Clear;
-
-  // Fixed Header
-  FixedHeader := Byte(ptPUBLISH) shl 4;
-  if AMessage.Retain then
-    FixedHeader := FixedHeader or $01;
-  FixedHeader := FixedHeader or (Byte(AMessage.QoS) shl 1);
-  if AMessage.DupFlag then
-    FixedHeader := FixedHeader or $08;
-  ByteWrite(FixedHeader);
-
-  // remaining length
-  VarHeaderSize := 2 + Length(AMessage.TopicName) + IfThen(AMessage.QoS > qostAT_MOST_ONCE, 2, 0);
-  RemainingLength := VarHeaderSize + Length(AMessage.ApplicationMessage);
-  RemainingLengthWrite(RemainingLength);
-
-  // variable header
-  StringWrite(AMessage.TopicName);
-  if AMessage.QoS > qostAT_MOST_ONCE then
-    WordWrite(AMessage.PacketIdOrClientIdentifier);
-
-  // payload
-  if Length(AMessage.ApplicationMessage) > 0 then
-    FStream.Write(AMessage.ApplicationMessage[0], Length(AMessage.ApplicationMessage));
 end;
 
 function  TMQTTPacketClass.BytesRead(ALength: integer): TBytes;
@@ -522,6 +519,62 @@ begin
   // efficiently writes byte arrays without copying
   if Length(AData) > 0 then
     FStream.Write(AData[0], Length(AData));
+end;
+
+function  TMQTTPacketClass.StringRead: string; // *** DUPLICATE in StrUTF8FromStreamRead ***
+var
+  len: word;
+  bytes: TBytes;
+begin
+  len := WordRead;
+  if len > 0 then begin
+    SetLength(bytes, len);
+    FStream.Read(bytes[0], len);
+    try
+      Result := TEncoding.UTF8.GetString(bytes);
+    except
+      on e: Exception do
+        Result := Format('ERROR: %s (%s)', [e.Message,  HexFromBytes(bytes)]);
+    end;
+  end else
+    Result := '';
+end;
+
+function  TMQTTPacketClass.StringReadLen(ALength: integer): string;
+var
+  bytes: TBytes;
+begin
+  bytes := BytesRead(ALength);
+  try
+    Result := TEncoding.UTF8.GetString(bytes);
+  except
+    on e: Exception do
+      Result := Format('ERROR: %s (%s)', [e.Message,  HexFromBytes(bytes)]);
+  end;
+end;
+
+procedure TMQTTPacketClass.StringWrite(const AString: string);
+var
+  bytes: TBytes;
+  len: Word;
+begin
+  bytes := TEncoding.UTF8.GetBytes(AString);
+  len := Length(bytes);
+  WordWrite(len);
+  if len > 0 then
+    FStream.Write(bytes[0], len);
+end;
+
+function  TMQTTPacketClass.WordRead: word;
+begin
+  FStream.Read(Result, SizeOf(Word));
+  Result := Swap(Result); // MQTT uses big-endian (network byte order)
+end;
+
+procedure TMQTTPacketClass.WordWrite(AWord: word);
+begin
+  AWord := Swap(AWord); // convert to big-endian
+  FStream.Write(AWord, SizeOf(Word));
 end;
 
 function  TMQTTPacketClass.RemainingLengthRead: integer;
@@ -571,40 +624,72 @@ begin
   until ALength = 0;
 end;
 
-function  TMQTTPacketClass.StringRead: string; // *** DUPLICATE in StrUTF8FromStreamRead ***
+function  TMQTTPacketClass.MessageRead: TMQTTMessageRec;
 var
-  len: word;
-  bytes: TBytes;
+  FixedHeader: byte;
+  PacketType: TMQTTPacketType;
+  QoSByte: byte;
+  RemainingLength: integer;
 begin
-  len := WordRead;
-  SetLength(bytes, len);
-  if len > 0 then
-    FStream.Read(bytes[0], len);
-  Result := TEncoding.UTF8.GetString(bytes);
+  FStream.Position := 0;
+  FixedHeader := ByteRead;
+  PacketType := TMQTTPacketType((FixedHeader and $F0) shr 4);
+
+  case PacketType of
+    ptPUBLISH: begin
+      RemainingLength := RemainingLengthRead;
+      Result.TopicName := StringRead;
+
+      // qos read
+      QoSByte := (FixedHeader and $06) shr 1;
+      Result.QoS := TMQTTQOSType(QoSByte);
+
+      if Result.QoS > qostAT_MOST_ONCE then
+        Result.PacketIdentifier := WordRead;
+
+      // payload read
+      SetLength(Result.ApplicationMessage, RemainingLength - (FStream.Position - 1));
+      if Length(Result.ApplicationMessage) > 0 then
+        FStream.Read(Result.ApplicationMessage[0], Length(Result.ApplicationMessage));
+    end;
+
+    // Handle other packet types...
+
+    else
+      raise Exception.Create('Unsupported packet type in ReadMessage');
+  end;
 end;
 
-procedure TMQTTPacketClass.StringWrite(const AString: string);
+procedure TMQTTPacketClass.MessageWrite(const AMessage: TMQTTMessageRec);
 var
-  bytes: TBytes;
-  len: Word;
+  FixedHeader: byte;
+  RemainingLength: integer;
+  VarHeaderSize: integer;
 begin
-  bytes := TEncoding.UTF8.GetBytes(AString);
-  len := Length(bytes);
-  WordWrite(len);
-  if len > 0 then
-    FStream.Write(bytes[0], len);
-end;
+  FStream.Clear;
 
-function  TMQTTPacketClass.WordRead: word;
-begin
-  FStream.Read(Result, SizeOf(Word));
-  Result := Swap(Result); // MQTT uses big-endian (network byte order)
-end;
+  // Fixed Header
+  FixedHeader := Byte(ptPUBLISH) shl 4;
+  if AMessage.Retain then
+    FixedHeader := FixedHeader or $01;
+  FixedHeader := FixedHeader or (Byte(AMessage.QoS) shl 1);
+  if AMessage.DupFlag then
+    FixedHeader := FixedHeader or $08;
+  ByteWrite(FixedHeader);
 
-procedure TMQTTPacketClass.WordWrite(AWord: word);
-begin
-  AWord := Swap(AWord); // convert to big-endian
-  FStream.Write(AWord, SizeOf(Word));
+  // remaining length
+  VarHeaderSize := 2 + Length(AMessage.TopicName) + IfThen(AMessage.QoS > qostAT_MOST_ONCE, 2, 0);
+  RemainingLength := VarHeaderSize + Length(AMessage.ApplicationMessage);
+  RemainingLengthWrite(RemainingLength);
+
+  // variable header
+  StringWrite(AMessage.TopicName);
+  if AMessage.QoS > qostAT_MOST_ONCE then
+    WordWrite(AMessage.PacketIdentifier);
+
+  // payload
+  if Length(AMessage.ApplicationMessage) > 0 then
+    FStream.Write(AMessage.ApplicationMessage[0], Length(AMessage.ApplicationMessage));
 end;
 
 function  TMQTTPacketClass.LenGet: integer;
@@ -631,12 +716,12 @@ end;
 {$REGION 'TMQTTConnectFlags'}
 procedure TMQTTConnectFlags.FromByte(AByte: byte);
 begin
-  CleanSession :=          (AByte and $02) <>  0;
-  WillFlag     :=          (AByte and $04) <>  0;
-  WillQoS      := TMQTTQoS((AByte and $18) shr 3);
-  WillRetain   :=          (AByte and $20) <>  0;
-  PasswordFlag :=          (AByte and $40) <>  0;
-  UsernameFlag :=          (AByte and $80) <>  0;
+  CleanSession :=              (AByte and $02) <>  0;
+  WillFlag     :=              (AByte and $04) <>  0;
+  WillQoS      := TMQTTQoSType((AByte and $18) shr 3);
+  WillRetain   :=              (AByte and $20) <>  0;
+  PasswordFlag :=              (AByte and $40) <>  0;
+  UsernameFlag :=              (AByte and $80) <>  0;
 end;
 
 function TMQTTConnectFlags.ToByte: byte;
@@ -652,9 +737,9 @@ begin
   + sLineBreak   + Format('Remaining Length:    %d', [RemainingLength])
   + sLineBreak   + Format('Protocol Name:       %s', [ProtocolName])
   + sLineBreak   + Format('Protocol Level:      %d', [ProtocolLevel])
-  + sLineBreak   + Format('Client ID:           %s', [ClientID])
+  + sLineBreak   + Format('Client Identifier:   %s', [ClientIdentifier])
   + sLineBreak   + Format('Will Flag:           %s', [BoolToStr(ConnectFlags.WillFlag    , true)])
-  + sLineBreak   + Format('Will QoS:            %d', [ConnectFlags.WillQoS])
+  + sLineBreak   + Format('Will QoS:            %d', [integer(ConnectFlags.WillQoS)])
   + sLineBreak   + Format('Will Retain:         %s', [BoolToStr(ConnectFlags.WillRetain  , true)])
   + sLineBreak   + Format('Username Flag:       %s', [BoolToStr(ConnectFlags.UsernameFlag, true)])
   + sLineBreak   + Format('Password Flag:       %s', [BoolToStr(ConnectFlags.PasswordFlag, true)])
@@ -690,17 +775,17 @@ begin
     stream.ReadBuffer(ProtocolLevel, 1);
     stream.ReadBuffer(flags, 1);
 
-    ConnectFlags.CleanSession :=          (flags and $02) <>  0;
-    ConnectFlags.WillFlag     :=          (flags and $04) <>  0;
-    ConnectFlags.WillQoS      := TMQTTQoS((flags and $18) shr 3);
-    ConnectFlags.WillRetain   :=          (flags and $20) <>  0;
-    ConnectFlags.PasswordFlag :=          (flags and $40) <>  0;
-    ConnectFlags.UsernameFlag :=          (flags and $80) <>  0;
+    ConnectFlags.CleanSession :=              (flags and $02) <>  0;
+    ConnectFlags.WillFlag     :=              (flags and $04) <>  0;
+    ConnectFlags.WillQoS      := TMQTTQoSType((flags and $18) shr 3);
+    ConnectFlags.WillRetain   :=              (flags and $20) <>  0;
+    ConnectFlags.PasswordFlag :=              (flags and $40) <>  0;
+    ConnectFlags.UsernameFlag :=              (flags and $80) <>  0;
 
     stream.ReadBuffer(KeepAlive, 2);
     KeepAlive := Swap(KeepAlive);
 
-    ClientID := StrFromStreamRead(stream);
+    ClientIdentifier := StrFromStreamRead(stream);
 
     if ConnectFlags.WillFlag then begin
       WillTopic   := StrFromStreamRead(stream);
@@ -729,9 +814,9 @@ end;
 {$REGION 'TMQTTPublishFlags'}
 procedure TMQTTPublishFlags.FromByte(AByte: byte);
 begin
-  DupFlag      :=          (AByte and $08) <>  0;
-  QoSLevel     := TMQTTQoS((AByte and $06) shr 1);
-  Retain       :=          (AByte and $01) <>  0;
+  DupFlag      :=              (AByte and $08) <>  0;
+  QoSLevel     := TMQTTQoSType((AByte and $06) shr 1);
+  Retain       :=              (AByte and $01) <>  0;
 end;
 
 function TMQTTPublishFlags.ToByte: byte;
@@ -746,11 +831,27 @@ begin
   Result        := Format('Packet Type:         %d', [Byte(PacketType)])
   + sLineBreak   + Format('Remaining Length:    %d', [RemainingLength])
   + sLineBreak   + Format('Dup Flag:            %s', [BoolToStr(PublishFlags.DupFlag, true)])
-  + sLineBreak   + Format('QoS Level:           %d', [PublishFlags.QoSLevel])
+  + sLineBreak   + Format('QoS Level:           %d', [integer(PublishFlags.QoSLevel)])
   + sLineBreak   + Format('Retain:              %s', [BoolToStr(PublishFlags.Retain, true)])
   + sLineBreak   + Format('Topic Name:          %s', [TopicName])
-  + sLineBreak   + Format('Client Identifier:   %s', [ClientIdentifier])
+  + sLineBreak   + Format('Packet Identifier:   %d', [PacketIdentifier])
   + sLineBreak   + Format('Application Message: %s', [ApplicationMessage]);
+end;
+{$ENDREGION}
+
+{$REGION 'TMQTTSubscribePacketRec'}
+function TMQTTSubscribePacketRec.DumpGet: string;
+begin
+  Result        := Format('Packet Type:         %d', [Byte(PacketType)])
+  + sLineBreak   + Format('Remaining Length:    %d', [RemainingLength]);
+end;
+{$ENDREGION}
+
+{$REGION 'TMQTTUnsubscribePacketRec'}
+function TMQTTUnsubscribePacketRec.DumpGet: string;
+begin
+  Result        := Format('Packet Type:         %d', [Byte(PacketType)])
+  + sLineBreak   + Format('Remaining Length:    %d', [RemainingLength]);
 end;
 {$ENDREGION}
 
@@ -759,6 +860,109 @@ function TMQTTDisconnectPacketRec.DumpGet: string;
 begin
   Result        := Format('Packet Type:         %d', [Byte(PacketType)])
   + sLineBreak   + Format('Remaining Length:    %d', [RemainingLength]);
+end;
+{$ENDREGION}
+
+{$REGION 'TMQTTStreamDecoder'}
+//procedure TMQTTStreamDecoder.DataAppend(const ABytes: TBytes);
+//var
+//  newlen: integer;
+//begin
+//  newlen := Length(FBuffer) - FOffset + Length(ABytes);
+//  SetLength(FBuffer, newlen);
+//  Move(FBuffer[FOffset], FBuffer[0], newlen - Length(ABytes));
+//  Move(ABytes[0], FBuffer[newlen - Length(ABytes)], Length(ABytes));
+//  FOffset := 0;
+//end;
+
+//procedure TMQTTStreamDecoder.BufferCompact;
+//var
+//  validlen: integer;
+//begin
+//  validlen := Length(FBuffer) - FOffset;
+//  if validlen > 0 then
+//    Move(FBuffer[FOffset], FBuffer[0], validlen);
+//  SetLength(FBuffer, validlen);
+//  FOffset := 0;
+//end;
+
+//procedure TMQTTStreamDecoder.DataAppend(const ABytes: TBytes);
+//var
+//  taillen, oldlen, newlen: integer;
+//begin
+//  BufferCompact;
+//
+//  taillen := Length(FBuffer) - FOffset;
+//  oldlen := Length(ABytes);
+//  newlen := TailLen + oldlen;
+//
+//  SetLength(FBuffer, newlen);
+//
+//  if taillen > 0 then
+//    Move(FBuffer[FOffset], FBuffer[0], taillen);
+//
+//  Move(ABytes[0], FBuffer[taillen], oldlen);
+//  FOffset := 0;
+//end;
+
+procedure TMQTTStreamDecoder.DataAppend(const ABytes: TBytes);
+var
+  startlen: integer;
+begin
+  startlen := Length(FBuffer);
+  SetLength(FBuffer, startlen + Length(ABytes));
+  Move(ABytes[0], FBuffer[startlen], Length(ABytes));
+end;
+
+function TMQTTStreamDecoder.PacketTryExtract(out APacket: TBytes): boolean;
+var
+  i, remlen, multiplier, lenlen, totallen: integer;
+  encbyte: byte;
+begin
+  Result := false;
+
+  if Length(FBuffer) {- FOffset} < 2 then
+    Exit;
+
+  i := {FOffset +} 1;
+  RemLen := 0;
+  Multiplier := 1;
+  LenLen := 0;
+
+//  try
+    repeat
+      if i >= Length(FBuffer) then
+        Exit;
+      encbyte := FBuffer[i];
+      Inc(lenlen);
+      Inc(i);
+      remlen := remlen + (encbyte and 127) * multiplier;
+      multiplier := multiplier * 128;
+
+//      if Multiplier > 128 * 128 * 128 then begin
+//        AFbk := 'Malformed Remaining Length in MQTT packet';
+//        Exit;
+//      end;
+    until (encbyte and 128) = 0;
+
+    totallen := 1 + lenlen + remlen;
+
+    if {FOffset +} TotalLen > Length(FBuffer) then
+      Exit;
+
+    SetLength(APacket, totallen);
+    Move(FBuffer[{FOffset}0], APacket[0], totallen);
+  //  Inc(FOffset, totallen);
+
+    Delete(FBuffer, 0, totallen);
+
+    Result := true;
+//  except
+//    on e: Exception do begin
+//      AFbk := 'Error decoding MQTT packet: ' + e.Message;
+//      Exit;
+//    end;
+//  end;
 end;
 {$ENDREGION}
 

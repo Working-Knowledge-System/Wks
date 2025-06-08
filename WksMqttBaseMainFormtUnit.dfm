@@ -175,7 +175,6 @@ object BaseForm: TBaseForm
       ActivePage = XxxTabSheet
       Align = alClient
       TabOrder = 0
-      ExplicitWidth = 928
       object XxxTabSheet: TTabSheet
         Caption = 'Xxx'
         object XxxExitButton: TButton
@@ -229,6 +228,38 @@ object BaseForm: TBaseForm
             Caption = 'Clear'
             TabOrder = 0
             OnClick = LogClearButtonClick
+          end
+          object LogVerboseCheckBox: TCheckBox
+            Left = 104
+            Top = 9
+            Width = 81
+            Height = 17
+            Caption = 'Verbose'
+            TabOrder = 1
+          end
+          object LogRawCharCheckBox: TCheckBox
+            Left = 365
+            Top = 9
+            Width = 81
+            Height = 17
+            Caption = 'Raw chars'
+            TabOrder = 2
+          end
+          object LogRawHexCheckBox: TCheckBox
+            Left = 278
+            Top = 9
+            Width = 81
+            Height = 17
+            Caption = 'Raw hex'
+            TabOrder = 3
+          end
+          object LogRawAsciiCheckBox: TCheckBox
+            Left = 191
+            Top = 9
+            Width = 81
+            Height = 17
+            Caption = 'Raw ascii'
+            TabOrder = 4
           end
         end
         object LogRichEdit: TRichEdit

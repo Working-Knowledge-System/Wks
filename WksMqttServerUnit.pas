@@ -11,10 +11,13 @@ uses
   , Vcl.ComCtrls
   , IdGlobal
   , IdException
+  , IdStack
   , IdContext
+//, IdCustomTCPServer
+//, IdIOHandlerSocket
+//, IdTCPConnection
   , IdTCPServer
   , IdIOHandler
-  , IdIOHandlerSocket
   , WksMqttUnit
   , WksMqttTypesUnit
   ;
@@ -33,6 +36,12 @@ type
 
   // client pingreq event
   TOnMQTTClientPublish = procedure(Sender: TMQTTServerClass; ClientID: string; var Accept: boolean; Reason: TMQTTPublishReturnCode) of object;
+
+  // client subscribe event
+  TOnMQTTClientSubscribe = procedure(Sender: TMQTTServerClass; ClientID: string; var Accept: boolean; Reason: TMQTTSubscribeReturnCode) of object;
+
+  // client unsubscribe event
+  TOnMQTTClientUnsubscribe = procedure(Sender: TMQTTServerClass; ClientID: string; var Accept: boolean; Reason: TMQTTUnsubscribeReturnCode) of object;
 
   // client disconnection event
   TOnMQTTClientDisconnect = procedure(Sender: TMQTTServerClass; ClientID: string; var Accept: boolean; Reason: TMQTTDisconnectReturnCode) of object;
@@ -119,20 +128,20 @@ type
     ErrorMessage: string;
   end;
 
-  TMQTTServerClass = class(TMQTTClass)
+  TMQTTServerClass = class(TMQTTClass) // *** chande to TMQTTBrokerClass ***
   private
     // fields
     FTCPServer: TIdTCPServer;
     FSessions: TDictionary<string, TMQTTSessionClass>;
     FRetainedMessages: TDictionary<string, TMQTTMessageRec>;
 
-    FOnClientConnect   : TOnMQTTClientConnect;
+    FOnClientConnect    : TOnMQTTClientConnect;
+    FOnClientPingReq    : TOnMQTTClientPingReq;
+    FOnClientPublish    : TOnMQTTClientPublish;
+    FOnClientSubscribe  : TOnMQTTClientSubscribe;
+    FOnClientUnsubscribe: TOnMQTTClientUnsubscribe;
+    FOnClientMessage    : TOnMQTTMessage;
     FOnClientDisconnect: TOnMQTTClientDisconnect;
-    FOnClientPingReq   : TOnMQTTClientPingReq;
-    FOnClientPublish   : TOnMQTTClientPublish;
-    FOnClientMessage   : TOnMQTTMessage;
-//    FOnSubscribe       : TOnSubscriptionHandler;
-//    FOnUnsubscribe     : TOnUnsubscriptionHandler;
 //    FOnMessageDeliver  : TOnMessageDeliveryHandler;
 //    FOnRetainedMessage : TOnRetainedMessageHandler;
 //    FOnAuthenticate    : TOnAuthenticationHandler;
@@ -171,11 +180,11 @@ type
     procedure PubCompSend(ASession: TMQTTSessionClass; APacketID: Word);
 
     // subscriberoutines
-    procedure SubscribePacketProcess(ASession: TMQTTSessionClass; APacket: TMQTTPacketClass);
+    function  SubscribePacketProcess(ASession: TMQTTSessionClass; APacket: TMQTTPacketClass; out ASubscribePacket: TMQTTSubscribePacketRec): TMQTTSubscribeReturnCode;
     procedure SubAckSend(ASession: TMQTTSessionClass; APacketID: Word; AGrantedQoS: array of TMQTTQOSType);
 
     // unsubscriberoutines
-    procedure UnsubscribePacketProcess(ASession: TMQTTSessionClass; APacket: TMQTTPacketClass);
+    function  UnsubscribePacketProcess(ASession: TMQTTSessionClass; APacket: TMQTTPacketClass; out AUnsubscribePacket: TMQTTUnsubscribePacketRec): TMQTTUnsubscribeReturnCode;
     procedure UnsubAckSend(ASession: TMQTTSessionClass; APacketID: Word);
 
     // pingroutines
@@ -220,9 +229,9 @@ begin
   FTCPServer.OnDisconnect := OnClientDisjoinedHandler;
   FTCPServer.OnExecute    := OnClientDataReceivedHandler;
 
-  // stores
-  FSessions := TDictionary<string, TMQTTSessionClass>.Create;
-  FRetainedMessages := TDictionary<string, TMQTTMessageRec>.Create;
+  // broker
+  FSessions         := TDictionary<string, TMQTTSessionClass>.Create; // store ...
+  FRetainedMessages := TDictionary<string, TMQTTMessageRec>.Create;   // store ...
 end;
 
 destructor TMQTTServerClass.Destroy;
@@ -365,18 +374,23 @@ begin
   AConnectPacket.KeepAlive := APacket.WordRead;
 
   // clientidentifier read
-  AConnectPacket.ClientID := APacket.StringRead;
+  AConnectPacket.ClientIdentifier := APacket.StringRead;
 
+  // will
+if AConnectPacket.ConnectFlags.WillFlag then begin
   // willtopic read
   AConnectPacket.WillTopic := APacket.StringRead;
 
   // willmessage read
   AConnectPacket.WillMessage := APacket.StringRead;
+end;
 
   // username read
+if AConnectPacket.ConnectFlags.UsernameFlag then
   AConnectPacket.Username := APacket.StringRead;
 
   // password read
+if AConnectPacket.ConnectFlags.PasswordFlag then
   AConnectPacket.Password := APacket.StringRead;
 
   // default to accepting connection
@@ -386,7 +400,7 @@ begin
 
   {$REGION 'validate'}
   // validate client ID
-  if AConnectPacket.ClientID.IsEmpty and not AConnectPacket.ConnectFlags.CleanSession then begin
+  if AConnectPacket.ClientIdentifier.IsEmpty and not AConnectPacket.ConnectFlags.CleanSession then begin
     accept := false;
     Result := conrcIDENTIFIER_REJECTED;
   end;
@@ -395,18 +409,21 @@ begin
   {$REGION 'postprocess'}
   // fire connection event
   if Assigned(FOnClientConnect) then
-    FOnClientConnect(Self, AConnectPacket.ClientID, accept, Result);
+    FOnClientConnect(Self, AConnectPacket.ClientIdentifier, accept, Result);
 
   // exit
   if not accept then
     Exit;
 
   // create or retrieve session
-  if not FSessions.TryGetValue(AConnectPacket.ClientID, ASession) then begin
-    ASession := TMQTTSessionClass.Create(AConnectPacket.ClientID, AConnectPacket.ConnectFlags.CleanSession);
-    FSessions.Add(AConnectPacket.ClientID, ASession);
+  if not FSessions.TryGetValue(AConnectPacket.ClientIdentifier, ASession) then begin
+    ASession := TMQTTSessionClass.Create(AConnectPacket.ClientIdentifier, AConnectPacket.ConnectFlags.CleanSession);
+    FSessions.Add(AConnectPacket.ClientIdentifier, ASession);
   end else
     ASession.LastContactUpdate;
+  {$ENDREGION}
+
+  {$REGION 'sendback'}
   {$ENDREGION}
 
 end;
@@ -416,31 +433,38 @@ begin
 
 end;
 
-procedure TMQTTServerClass.SubscribePacketProcess(ASession: TMQTTSessionClass; APacket: TMQTTPacketClass);
-//var
-//  topicname: string;
-//  qos: TMQTTQOSType;
-begin
-//  while not APacket.Stream.Eof do begin
-//    topicname := APacket.StringRead;
-//    qos := TMQTTQOSType(APacket.ByteRead);
-//    ASession.SubscriptionAdd(topicname, qos);
-//  end;
-
-//  SubAckSend(ASession, PacketID, GrantedQoS);
-end;
-
-procedure TMQTTServerClass.SubAckSend(ASession: TMQTTSessionClass; APacketID: Word; AGrantedQoS: array of TMQTTQOSType);
+function  TMQTTServerClass.PingReqPacketProcess(ASession: TMQTTSessionClass; APacket: TMQTTPacketClass; out APingreqPacket: TMQTTPingreqPacketRec): TMQTTPingreqReturnCode;
+var
+  accept: boolean;
 begin
 
+  {$REGION 'decode'}
+  // type
+  APingreqPacket.PacketType := TMQTTPacketType((APacket.ByteRead and $F0) shr 4);
+
+  // remaininglength read
+  APingreqPacket.RemainingLength := APacket.RemainingLengthRead;
+
+  // default to accepting disconnection
+  Accept := true;
+  Result := pingreqrcPINGREQ_ACCEPTED;
+  {$ENDREGION}
+
+  {$REGION 'validate'}
+  {$ENDREGION}
+
+  {$REGION 'postprocess'}
+  // fire pingreq event
+  if Assigned(FOnClientPingReq) then
+    FOnClientPingReq(Self, ASession.ClientID, accept, Result);
+  {$ENDREGION}
+
+  {$REGION 'sendback'}
+  {$ENDREGION}
+
 end;
 
-procedure TMQTTServerClass.UnsubscribePacketProcess(ASession: TMQTTSessionClass; APacket: TMQTTPacketClass);
-begin
-
-end;
-
-procedure TMQTTServerClass.UnsubAckSend(ASession: TMQTTSessionClass; APacketID: Word);
+procedure TMQTTServerClass.PingRespSend(ASession: TMQTTSessionClass);
 begin
 
 end;
@@ -450,6 +474,7 @@ var
   accept: boolean;
   ctrlbyte, flags: byte;
   appmessage: TMQTTMessageRec;
+  appmessagelen: integer;
 //args: TMessagePublishEvent;
 begin
 
@@ -462,18 +487,23 @@ begin
 
   // remaininglength read
   APublishPacket.RemainingLength := APacket.RemainingLengthRead;
+  appmessagelen := APublishPacket.RemainingLength;
 
   // publish flags read
   APublishPacket.PublishFlags.FromByte(ctrlbyte and $0F);
 
   // topic name read
   APublishPacket.TopicName := APacket.StringRead;
+  appmessagelen := appmessagelen - 2 - Length(APublishPacket.TopicName);
 
-  // client identifier read
-  APublishPacket.ClientIdentifier := APacket.StringRead;
+  // packet identifier read
+  if APublishPacket.PublishFlags.QoSLevel in [qostAT_LEAST_ONCE, qostEXACTLY_ONCE] then begin
+    APublishPacket.PacketIdentifier := APacket.WordRead;
+    appmessagelen := appmessagelen - 2;
+  end;
 
   // application message read
-  APublishPacket.ApplicationMessage := APacket.StringRead;
+  APublishPacket.ApplicationMessage := APacket.StringReadLen(appmessagelen);
 
   // default to accepting publishing
   Accept := true;
@@ -487,6 +517,9 @@ begin
   // fire publishing event
   if Assigned(FOnClientPublish) then
     FOnClientPublish(Self, ASession.ClientID, accept, Result);
+  {$ENDREGION}
+
+  {$REGION 'sendback'}
   {$ENDREGION}
 
   {$REGION 'zzz'}
@@ -506,8 +539,8 @@ begin
 
   // handle QoS acknowledgements
   case appmessage.QoS of
-    qostAT_LEAST_ONCE: PubAckSend(ASession, appmessage.PacketIdOrClientIdentifier);
-    qostEXACTLY_ONCE : PubRecSend(ASession, appmessage.PacketIdOrClientIdentifier);
+    qostAT_LEAST_ONCE: PubAckSend(ASession, appmessage.PacketIdentifier);
+    qostEXACTLY_ONCE : PubRecSend(ASession, appmessage.PacketIdentifier);
   end;
   }
   {$ENDREGION}
@@ -556,35 +589,108 @@ begin
 
 end;
 
-function  TMQTTServerClass.PingReqPacketProcess(ASession: TMQTTSessionClass; APacket: TMQTTPacketClass; out APingreqPacket: TMQTTPingreqPacketRec): TMQTTPingreqReturnCode;
+function  TMQTTServerClass.SubscribePacketProcess(ASession: TMQTTSessionClass; APacket: TMQTTPacketClass; out ASubscribePacket: TMQTTSubscribePacketRec): TMQTTSubscribeReturnCode;
 var
   accept: boolean;
+  len: integer;
+  topicfilter: string;
+  requestedqos: TMQTTQOSType;
 begin
 
   {$REGION 'decode'}
   // type
-  APingreqPacket.PacketType := TMQTTPacketType((APacket.ByteRead and $F0) shr 4);
+  ASubscribePacket.PacketType := TMQTTPacketType((APacket.ByteRead and $F0) shr 4);
 
   // remaininglength read
-  APingreqPacket.RemainingLength := APacket.RemainingLengthRead;
+  ASubscribePacket.RemainingLength := APacket.RemainingLengthRead;
+
+  // packet identifier read
+  ASubscribePacket.PacketIdentifier := APacket.WordRead;
+
+  // payload = topicfilters list
+  while APacket.Stream.Position < APacket.Stream.Size do begin
+    len := Length(ASubscribePacket.SubscribeTopicRecVec);
+    SetLength(ASubscribePacket.SubscribeTopicRecVec, len + 1);
+    topicfilter := APacket.StringRead;
+    ASubscribePacket.SubscribeTopicRecVec[len].TopicFilter  := topicfilter;
+    requestedqos := TMQTTQOSType(APacket.ByteRead);
+    ASubscribePacket.SubscribeTopicRecVec[len].RequestedQoS := requestedqos;
+
+    //ASession.SubscriptionAdd(topicfilter, requestedqos);
+  end;
 
   // default to accepting disconnection
-  Accept := true;
-  Result := pingreqrcPINGREQ_ACCEPTED;
+  accept := true;
+  Result := subscribercSUBSCRIBE_ACCEPTED;
   {$ENDREGION}
 
   {$REGION 'validate'}
   {$ENDREGION}
 
   {$REGION 'postprocess'}
-  // fire disconnection event
-  if Assigned(FOnClientPingReq) then
-    FOnClientPingReq(Self, ASession.ClientID, accept, Result);
+  // fire subscribe event
+  if Assigned(FOnClientSubscribe) then
+    FOnClientSubscribe(Self, ASession.ClientID, accept, Result);
+  {$ENDREGION}
+
+  {$REGION 'sendback'}
+//  SubAckSend(ASession, PacketID, GrantedQoS);
   {$ENDREGION}
 
 end;
 
-procedure TMQTTServerClass.PingRespSend(ASession: TMQTTSessionClass);
+procedure TMQTTServerClass.SubAckSend(ASession: TMQTTSessionClass; APacketID: Word; AGrantedQoS: array of TMQTTQOSType);
+begin
+
+end;
+
+function  TMQTTServerClass.UnsubscribePacketProcess(ASession: TMQTTSessionClass; APacket: TMQTTPacketClass; out AUnsubscribePacket: TMQTTUnsubscribePacketRec): TMQTTUnsubscribeReturnCode;
+var
+  accept: boolean;
+  len: integer;
+  topicfilter: string;
+begin
+
+  {$REGION 'decode'}
+  // type
+  AUnsubscribePacket.PacketType := TMQTTPacketType((APacket.ByteRead and $F0) shr 4);
+
+  // remaininglength read
+  AUnsubscribePacket.RemainingLength := APacket.RemainingLengthRead;
+
+  // packet identifier read
+  AUnsubscribePacket.PacketIdentifier := APacket.WordRead;
+
+  // payload = topicfilters list
+  while APacket.Stream.Position < APacket.Stream.Size do begin
+    len := Length(AUnsubscribePacket.UnsubscribeTopicRecVec);
+    SetLength(AUnsubscribePacket.UnsubscribeTopicRecVec, len + 1);
+    topicfilter := APacket.StringRead;
+    AUnsubscribePacket.UnsubscribeTopicRecVec[len].TopicFilter  := topicfilter;
+
+    //ASession.SubscriptionRemove(topicfilter);
+  end;
+
+  // default to accepting disconnection
+  Accept := true;
+  Result := unsubscribercUNSUBSCRIBE_ACCEPTED;
+  {$ENDREGION}
+
+  {$REGION 'validate'}
+  {$ENDREGION}
+
+  {$REGION 'postprocess'}
+  // fire unsubscribe event
+  if Assigned(FOnClientUnsubscribe) then
+    FOnClientUnsubscribe(Self, ASession.ClientID, accept, Result);
+  {$ENDREGION}
+
+  {$REGION 'sendback'}
+  {$ENDREGION}
+
+end;
+
+procedure TMQTTServerClass.UnsubAckSend(ASession: TMQTTSessionClass; APacketID: Word);
 begin
 
 end;
@@ -617,6 +723,9 @@ begin
   // fire disconnection event
   if Assigned(FOnClientDisconnect) then
     FOnClientDisconnect(Self, ASession.ClientID, accept, Result);
+  {$ENDREGION}
+
+  {$REGION 'sendback'}
   {$ENDREGION}
 
 end;
@@ -692,10 +801,12 @@ procedure TMQTTServerClass.OnClientDataReceivedHandler(AContext: TIdContext); //
   {$REGION 'var'}
 var
   io: TIdIOHandler{TIdIOHandlerSocket};
-//bytes{, buffer}: TIdBytes;
-  response: TBytes;
-  size: cardinal;
+  bytes, response{, buffer}: TIdBytes;
+  packetbytes: TBytes;
+  size{, packetnumber}: cardinal;
   ctrlbyte: byte;
+  ip: string;
+  decoder: TMQTTStreamDecoder;
   packet: TMQTTPacketClass;
   packettype: TMQTTPacketType;
   session: TMQTTSessionClass;
@@ -705,158 +816,322 @@ var
   pingreqpacketrec: TMQTTPingreqPacketRec;
   publishreturncode: TMQTTPublishReturnCode;
   publishpacketrec: TMQTTPublishPacketRec;
+  subscribereturncode: TMQTTSubscribeReturnCode;
+  subscribepacketrec: TMQTTSubscribePacketRec;
+  unsubscribereturncode: TMQTTUnsubscribeReturnCode;
+  unsubscribepacketrec: TMQTTUnsubscribePacketRec;
   disconnectreturncode: TMQTTDisconnectReturnCode;
   disconnectpacketrec: TMQTTDisconnectPacketRec;
   {$ENDREGION}
 
 begin
+  decoder := TMQTTStreamDecoder.Create;
   packet := TMQTTPacketClass.Create;
   try
     while AContext.Connection.Connected do begin
-      try
-        // zip
-        io := AContext.Connection.IOHandler;
-      //io := AContext.Connection.Socket;
+      // zip
+      io := AContext.Connection.IOHandler{AContext.Connection.Socket};
 
-        // exit
-        if io.InputBufferIsEmpty then begin
-          io.CheckForDataOnSource(10);
-          if io.InputBufferIsEmpty then
-            Exit;
-        end;
+      // exit
+      if io.InputBufferIsEmpty then begin
+        io.CheckForDataOnSource(10);
+        if io.InputBufferIsEmpty then
+          Exit;
+      end;
 //        if not io.Readable then begin
 //          io.CheckForDataOnSource(10);
 //          if io.InputBufferIsEmpty then
 //            Exit;
 //        end;
 
-        // read all in a bytes buffer
-//        io.InputBuffer.ExtractToBytes(bytes, -1, False, -1); // or: io.ReadBytes(RawBytes, -1, False);
-//        Log('received %d bytes      (%d bytes)', [Length(bytes)]);
+      // clientip
+      ip := AContext.Binding.PeerIP;
 
-        // read 1st byte for packettype andflags
-//        ctrlbyte := bytes[0];
+      // read all in a bytes buffer
+      io.InputBuffer.ExtractToBytes(bytes, -1, False, -1); // or: io.ReadBytes(RawBytes, -1, False);
 
-        // read all in the packet's stream
-        size := io.ReadInt32;
-        packet.Stream.Clear;
-        io.ReadStream(packet.Stream, {-1}size, false);
-        packet.Stream.Position := 0;
-        Log('received bytes         (%d bytes)', [packet.Len]);
-//        Log('                       (%s)'      , [packet.AsAscii]);
-//        Log('                       (%s)'      , [packet.AsHex]);
-//        Log('                       (%s)'      , [packet.AsChar]);
+      // addtodecoder
+      decoder.DataAppend(TBytes(bytes));
 
-        // read 1st byte for packettype andflags
-        ctrlbyte := packet.ByteRead;
-        packet.Stream.Position := 0;
+      // packetbypacket
+//      packetnumber := 0;
+      while Decoder.PacketTryExtract(packetbytes) do begin
+        try
+          // count
+//          Inc(packetnumber);
 
-        // type
-        packettype := TMQTTPacketType((ctrlbyte and $F0) shr 4);
+          // read all in the packet's stream
+          packet.Stream.Clear;
+          // i
+        //size := io.ReadInt32;
+        //io.ReadStream(packet.Stream, {-1}size, false);
+          // ii
+        //packet.StreamFromBytes(TBytes(bytes));
+          // iii
+          packet.StreamFromBytes(packetbytes);
 
-        // session
-        session := SessionGet({AContext}'client001');
+          // log
+          if LogVerbose then
+            Log('%s: received %d bytes', [ip, packet.Len]);
+          if LogRawAscii then
+            Log('%s: (%s)'             , [ip, packet.AsAscii]);
+          if LogRawHex then
+            Log('%s: (%s)'             , [ip, packet.AsHex]);
+          if LogRawChar then
+            Log('%s: (%s)'             , [ip, packet.AsChar]);
 
-        // process the various packets types
-        case packettype of
-          ptRESERVED   : begin
-            Log('received RESERVED (0) packet');
-            Dmp(packet.AsChar);
-          end;
-          ptCONNECT    : begin
-            Log('received CONNECT (1) packet');
-            connectreturncode := ConnectPacketProcess(session, packet, connectpacketrec);
-            Dmp(connectpacketrec.Dump);
-          end;
-//          ptCONNACK    : begin
-//            Log('received CONNACK (2) packet');
-//          end;
-          ptPUBLISH    : begin
-            Log('received PUBLISH (3) packet');
-            publishreturncode := PublishPacketProcess(session, packet, publishpacketrec);
-            Dmp(publishpacketrec.Dump);
-          end;
-//          ptPUBACK     : begin
-//            Log('received PUBACK (4) packet');
-//          end;
-//          ptPUBREC     : begin
-//            Log('received PUBREC (5) packet');
-//          end;
-//          ptPUBREL     : begin
-//            Log('received PUBREL (6) packet');
-//          end;
-//          ptPUBCOMP    : begin
-//            Log('received PUBCOMP (7) packet');
-//          end;
-//          ptSUBSCRIBE  : begin
-//            Log('received SUBSCRIBE (8) packet');
-//          end;
-//          ptSUBACK     : begin
-//            Log('received SUBACK (9) packet');
-//          end;
-//          ptUNSUBSCRIBE: begin
-//            Log('received UNSUBSCRIBE (10) packet');
-//          end;
-//          ptUNSUBACK   : begin
-//            Log('received UNSUBACK (11) packet');
-//          end;
-          ptPINGREQ    : begin
-//            Log('received PINGREQ (12) packet');
-            pingreqreturncode := PingReqPacketProcess(session, packet, pingreqpacketrec);
-//            Dmp(pingreqpacketrec.Dump);
+          // read 1st byte for packettype and flags
+          ctrlbyte := packet.ByteRead;
+          packet.Stream.Position := 0;
 
-            {$REGION 'reply'}
-//            SetLength(response, 2);
-//            response[0] := $D0;          // = 1101 0000   control packet type (PINGRESP)
-//            response[1] := $00;          // = 0000 0000   remaining length (always 0)
-//            io.Write(TIdBytes(response));
-//            Log('reply    PINGRESP (13)')
+          // type
+          packettype := TMQTTPacketType((ctrlbyte and $F0) shr 4);
+
+          // session
+          session := SessionGet({AContext}'client001');
+
+          // process the various packets types
+          case packettype of
+
+            {$REGION 'RESERVED 0 packet'}
+            ptRESERVED   : begin
+              if LogVerbose then
+                Log('%s: received RESERVED (0) packet', [ip]);
+//              if Verbose then
+//                Dmp(packet.AsChar);
+            end;
             {$ENDREGION}
 
+            {$REGION 'CONNECT 1 packet'}
+            ptCONNECT    : begin
+              if LogVerbose then
+                Log('%s: received CONNECT (1) packet', [ip]);
+              connectreturncode := ConnectPacketProcess(session, packet, connectpacketrec);
+              if LogVerbose then
+                Dmp(connectpacketrec.Dump);
+
+              {$REGION 'reply CONNACK 2'}
+              SetLength(response, 4);
+              response[0] := $20; // 0010 0000   type=2, flags=reseeved
+              response[1] := $02; // remaining length
+              response[2] := $00; // nosessionpresent=$00, sessionpresentflag=$01
+              response[3] := $00; // 0=connectionaccepted, 1=connectionrefusedunacceptableprotocollevel, ...
+              io.Write(response);
+              if LogVerbose then
+                Log('%s: reply    CONNACK (2)', [ip]);
+              {$ENDREGION}
+
+            end;
+
+  //          ptCONNACK    : begin
+  //            Log('%s: received CONNACK (2) packet', [ip]);
+  //          end;
+            {$ENDREGION}
+
+            {$REGION 'PUBLISH 3 packet'}
+            ptPUBLISH    : begin
+              if LogVerbose then
+                Log('%s: received PUBLISH (3) packet', [ip]);
+              publishreturncode := PublishPacketProcess(session, packet, publishpacketrec);
+              if LogVerbose then
+                Dmp(publishpacketrec.Dump);
+
+              {$REGION 'reply PUBACK 4'}
+              // reply nothing
+              if          publishpacketrec.PublishFlags.QoSLevel = qostAT_MOST_ONCE then begin
+                // ...
+
+              // reply with a PUBACK packet (server send it only when qos level is 1, at least once delivery)
+              end else if publishpacketrec.PublishFlags.QoSLevel = qostAT_LEAST_ONCE then begin
+                SetLength(response, 4);
+                response[0] := $40;                                   // PUBACK 4
+                response[1] := $02;                                   // remaining length (2 bytes)
+                response[2] := Hi(publishpacketrec.PacketIdentifier); //
+                response[3] := Lo(publishpacketrec.PacketIdentifier); //
+                io.Write(response);
+                if LogVerbose then
+                  Log('%s: reply    PUBACK (4)', [ip]);
+
+              // ...
+              end else if publishpacketrec.PublishFlags.QoSLevel = qostEXACTLY_ONCE then begin
+                raise Exception.Create('Error, PUBLISH with QoS - 2 not implemented!');
+              end;
+              {$ENDREGION}
+
+            end;
+
+  //          ptPUBACK     : begin
+  //            if LogVerbose then
+//                Log('%s: received PUBACK (4) packet', [ip]);
+  //          end;
+
+  //          ptPUBREC     : begin
+  //            if LogVerbose then
+//                Log('%s: received PUBREC (5) packet', [ip]);
+  //          end;
+
+  //          ptPUBREL     : begin
+  //            if LogVerbose then
+//                Log('%s: received PUBREL (6) packet', [ip]);
+  //          end;
+
+  //          ptPUBCOMP    : begin
+  //            if LogVerbose then
+//                Log('%s: received PUBCOMP (7) packet', [ip]);
+  //          end;
+            {$ENDREGION}
+
+            {$REGION 'SUBSCRIBE 8 packet'}
+            ptSUBSCRIBE  : begin
+              if LogVerbose then
+                Log('%s: received SUBSCRIBE (8) packet', [ip]);
+              subscribereturncode := SubscribePacketProcess(session, packet, subscribepacketrec);
+              if LogVerbose then
+                Dmp(subscribepacketrec.Dump);
+
+              {$REGION 'reply SUBACK 9'}
+              SetLength(response, 5);
+              response[0] := $90;                                                              // = 1001 0000   control packet type (SUBACK)
+              response[1] := $03;                                                              // = 0000 0000   remaining length (always 3)
+              response[2] := Hi(subscribepacketrec.PacketIdentifier);                          // MSB
+              response[3] := Lo(subscribepacketrec.PacketIdentifier);                          // LSB
+              response[4] := integer(subscribepacketrec.SubscribeTopicRecVec[0].RequestedQoS); // requested QoS level
+
+              io.Write(TIdBytes(response));
+              if LogVerbose then
+                Log('%s: reply    SUBACK (9)', [ip]);
+              {$ENDREGION}
+
+            end;
+
+  //          ptSUBACK     : begin
+  //            if LogVerbose then
+//                Log('%s: received SUBACK (9) packet', [ip]);
+  //          end;
+            {$ENDREGION}
+
+            {$REGION 'UNSUBSCRIBE 10 packet'}
+            ptUNSUBSCRIBE: begin
+              if LogVerbose then
+                Log('%s: received UNSUBSCRIBE (10) packet', [ip]);
+              unsubscribereturncode := UnsubscribePacketProcess(session, packet, unsubscribepacketrec);
+              if LogVerbose then
+                Dmp(unsubscribepacketrec.Dump);
+
+              {$REGION 'reply UNSUBACK 11'}
+              SetLength(response, 4);
+              response[0] := $0B;                                                              // = 1011 0000   control packet type (UNSUBACK)
+              response[1] := $02;                                                              // = 0000 0010   remaining length (always 2)
+              response[2] := Hi(unsubscribepacketrec.PacketIdentifier);                        // MSB
+              response[3] := Lo(unsubscribepacketrec.PacketIdentifier);                        // LSB
+
+              io.Write(TIdBytes(response));
+              if LogVerbose then
+                Log('%s: reply    UNSUBACK (11)', [ip]);
+              {$ENDREGION}
+
+            end;
+
+  //          ptUNSUBACK   : begin
+  //            if LogVerbose then
+//                Log('%s: received UNSUBACK (11) packet', [ip]);
+  //          end;
+            {$ENDREGION}
+
+            {$REGION 'PINGREQ 12 packet'}
+            ptPINGREQ    : begin
+              if LogVerbose then
+                Log('%s: received PINGREQ (12) packet', [ip]);
+              pingreqreturncode := PingReqPacketProcess(session, packet, pingreqpacketrec);
+              if LogVerbose then
+                Dmp(pingreqpacketrec.Dump);
+
+              {$REGION 'reply PINGRESP 13'}
+              SetLength(response, 2);
+              response[0] := $D0;          // = 1101 0000   control packet type (PINGRESP)
+              response[1] := $00;          // = 0000 0000   remaining length (always 0)
+              io.Write(TIdBytes(response));
+              if LogVerbose then
+                Log('%s: reply    PINGRESP (13)', [ip]);
+              {$ENDREGION}
+
+            end;
+
+  //          ptPINGRESP   : begin
+  //            if LogVerbose then
+//                Log('%s: received PINGRESP (13) packet', [ip]);
+  //          end;
+            {$ENDREGION}
+
+            {$REGION 'DISCONNECT 14 packet'}
+            ptDISCONNECT : begin
+              if LogVerbose then
+                Log('%s: received DISCONNECT (14) packet', [ip]);
+              disconnectreturncode := DisconnectPacketProcess(session, packet, disconnectpacketrec);
+              if LogVerbose then
+                Dmp(disconnectpacketrec.Dump);
+
+              // tcpconnectionclose
+              AContext.Connection.Disconnect;
+//              io.Close;
+//              io.CloseGracefully;
+              //if LogVerbose then
+//                Log('%s: client tcp connection closed', [ip]);
+            end;
+            {$ENDREGION}
+
+            {$REGION 'RESERVED 15 packet'}
+            ptRESERVED2  : begin
+              if LogVerbose then
+                Log('%s: received RESERVED (15) packet', [ip]);
+//              if Verbose then
+//                Dmp(packet.AsChar);
+            end;
+            {$ENDREGION}
+
+          else
+            Log('%s: received UNKNOWN packet', [ip]);
           end;
-//          ptPINGRESP   : begin
-//            Log('received PINGRESP (13) packet');
-//          end;
-          ptDISCONNECT : begin
-            Log('received DISCONNECT (14) packet');
-            disconnectreturncode := DisconnectPacketProcess(session, packet, disconnectpacketrec);
-            Dmp(disconnectpacketrec.Dump);
 
-            // tcpclose ?
-            //AContext.Connection.Disconnect;
-            //Log('client tcp connection closed');
+          {$REGION 'zzz'}
+          // bufferload
+        //SetLength(buffer, Length(bytes));
+        //Move(bytes[0], buffer[1], Length(bytes));
+
+          // do stuff with buffer
+        //BytesToRaw(bytes, buffer[1], Length(bytes));
+
+          // bho
+  //        AContext.Connection.CheckForGracefulDisconnect;
+      //  calls ReadFromStack() with a timeout of 1 millis (which calls CheckForDisconnect() internally),
+      //  and is responsible for setting the ClosedGracefully property as needed
+      //  CheckForDisconnect() closes the underlying socket and IOHandler than triggers
+      //  the OnDisconnect event only if the ClosedGracefully property is set to true,
+      //  meaning the otherside of the connection closed the connection on its end
+          {$ENDREGION}
+
+        except
+          on e: EIdConnClosedGracefully do begin
+            Log('%s: Client disconnected gracefully', [ip]);
           end;
-          ptRESERVED2  : begin
-            Log('received RESERVED (15) packet');
+          on e: EIdSocketError do begin
+            if e.LastError = 10054 then
+              Log('%s: Connection reset by peer', [ip])
+            else
+              Log('%s: Socket error: %s', [ip, e.Message]);
           end;
-        else
-            Log('received UNKNOWN packet');
-        end;
+          on e: Exception do begin // general error
+            Log('%s: %s', [ip, e.Message]);
 
-
-        // bufferload
-      //SetLength(buffer, Length(bytes));
-      //Move(bytes[0], buffer[1], Length(bytes));
-
-        // do stuff with buffer
-      //BytesToRaw(bytes, buffer[1], Length(bytes));
-
-        // bho
-//        AContext.Connection.CheckForGracefulDisconnect;
-    //  calls ReadFromStack() with a timeout of 1 millis (which calls CheckForDisconnect() internally),
-    //  and is responsible for setting the ClosedGracefully property as needed
-    //  CheckForDisconnect() closes the underlying socket and IOHandler than triggers
-    //  the OnDisconnect event only if the ClosedGracefully property is set to true,
-    //  meaning the otherside of the connection closed the connection on its end
-      except
-        on e: Exception do begin
-          Log(e.Message);
-          AContext.Connection.Disconnect;
+            // disconnect client
+            AContext.Connection.Disconnect;
+          end;
         end;
       end;
     end;
   finally
     packet.Free;
+    decoder.Free;
   end;
 end;
   {$ENDREGION}
