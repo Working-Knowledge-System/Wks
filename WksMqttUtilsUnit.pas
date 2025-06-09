@@ -172,7 +172,7 @@ end;
 
 function  DumpFromStream(AStream: TStream): string;
 const
-  PRINTABLE_ASCII = [' '..'~', '¡'..'ÿ']; // ASCII 32..126 , 161..255 are printable
+  PRINTABLE_ASCII = [' '..'~', '¡'..'ÿ']; // ascii 32..126 , 161..255 are printable
   BYTES_PER_LINE = 16;
   showoffset = true;
   showhex    = true;
@@ -230,7 +230,7 @@ begin
         else
           LineStr := LineStr + '.';
 
-        // add ASCII section after hex for complete lines
+        // add ascii section after hex for complete lines
         //if (i mod BYTES_PER_LINE = BYTES_PER_LINE - 1) or (i = bytecount - 1) then begin
           if ShowHex then
             Result := Result + '  '; // Separator between hex and ASCII

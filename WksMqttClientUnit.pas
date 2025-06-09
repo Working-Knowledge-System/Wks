@@ -9,6 +9,9 @@ uses
   , Vcl.StdCtrls
   , Vcl.ComCtrls
   , Vcl.ExtCtrls
+  , IdGlobal
+  , IdException
+  , IdStack
   , IdTCPClient
   , IdIOHandler
   , WksMqttUnit
@@ -38,7 +41,7 @@ type
     // tcpipclient events handlers
     procedure OnServerJoinedHandler(Sender: TObject);
     procedure OnServerDisjoinedHandler(Sender: TObject);
-    procedure OnServerDataReceivedHandler;
+    procedure OnServerDataReceivedHandler; // OnBrokerPacketProcess; *** incoming packets ***
 
     // broker events handlers
     procedure OnConnectedHandler(Sender: TObject{AContext: TIdContext});    // to the broker
@@ -46,9 +49,6 @@ type
 
     // keep alive routines
     procedure KeepAlivePingTimerHandler(Sender: TObject);
-
-    // message routine
-    procedure MessageDo(const ATopic: string; const AApplicationMessage: TBytes; AQoS: TMQTTQOSType; ARetain: boolean);
 
     // utils
     function  NextPacketIdGet: word;
@@ -59,16 +59,17 @@ type
     procedure Join(AHost: string; APort: integer);
     procedure Disjoin;
     procedure ConnectPacketSend(IvProtocolLevel, IvQos: byte; AClientIdentifier, AWillTopic, AWillMessage, AUsername, APassword: string; IvCleanSession: boolean = true; AKeepAliveSeconds: word = 60);
-    procedure PingReqPacketSend;
-    procedure PublishPacketSend(APacketIdentifier: word; ATopicName, AApplicationMessage: string; AQosLevel: TMQTTQoSType; ADupFlag: boolean; ARetain: boolean);
+    procedure PublishPacketSend(APacketIdentifier: word; ATopicName, AApplicationMessage: string; AQosLevel: TMQTTQoSType = qostAT_MOST_ONCE; ADupFlag: boolean = False; ARetain: boolean = false);
     procedure SubscribePacketSend(APacketIdentifier: word; ASubscribeTopicRecVec: TMQTTSubscribeTopicRecVec);
+    procedure UnsubscribePacketSend(APacketIdentifier: word; ASubscribeTopicRecVec: TMQTTSubscribeTopicRecVec);
+    procedure PingReqPacketSend;
     procedure DisconnectPacketSend;
-
     procedure KeepAlivePingTimerReset;
 
 //    property OnBrokerConnected   : TNotifyEvent   read FOnBrokerConnected    write FOnBrokerConnected;
 //    property OnBrokerDisconnected: TNotifyEvent   read FOnBrokerDisconnected write FOnBrokerDisconnected;
     property OnBrokerMessage: TOnMQTTMessage read FOnBrokerMessage write FOnBrokerMessage;
+
     property NextPacketId: word read NextPacketIdGet;
     property IsJoined{TcpClientJoined}: boolean read IsJoinedGet;         // tcpclient is connected to tcpserver
     property IsConnected{MqttClientConnected}: boolean read FIsConnected; // mqttclient is connected to mqttbroker
@@ -771,6 +772,11 @@ begin
 
 end;
 
+procedure TMqttClientClass.UnsubscribePacketSend(APacketIdentifier: word; ASubscribeTopicRecVec: TMQTTSubscribeTopicRecVec);
+begin
+
+end;
+
   {$REGION 'TCPClientHandlers'}
 procedure TMqttClientClass.OnServerJoinedHandler(Sender: TObject);
 begin
@@ -784,69 +790,142 @@ end;
 
 procedure TMqttClientClass.OnServerDataReceivedHandler;
 var
-  io: TIdIOHandler{TIdIOHandlerSocket};
+  decoder: TMQTTStreamDecoder;
   packet: TMQTTPacketClass;
-  size: cardinal;
+  io: TIdIOHandler;
+  ip: string;
+  bytes: TIdBytes;
+  packetbytes: TBytes;
   ctrlbyte: byte;
   packettype: TMQTTPacketType;
-  appmessage: TMQTTMessageRec;
+
+//  size{, packetnumber}: cardinal;
+//  appmessage: TMQTTMessageRec;
+//  fixedheader: byte;
 begin
+  decoder := TMQTTStreamDecoder.Create;
   packet := TMQTTPacketClass.Create;
   try
-    // zip
-    io := FTCPClient.IOHandler;
+    while FTCPClient.Connected do begin
+      // zip
+      io := FTCPClient.IOHandler;
 
-    // exit
-//    if io.InputBufferIsEmpty or (not io.Readable) then begin
-//      io.CheckForDataOnSource(10);
-//      if io.InputBufferIsEmpty then
-//        Exit;
-//    end;
-
-    // read all in the packet's stream
-    size := io.ReadInt32;
-    io.ReadStream(packet.Stream, {-1}size, false);
-    packet.Stream.Position := 0;
-    if LogVerbose  then Log('received bytes         (%d bytes)', [packet.Len]);
-    if LogRawAscii then Log('                       (%s)'      , [packet.AsAscii]);
-    if LogRawHex   then Log('                       (%s)'      , [packet.AsHex]);
-    if LogRawChar  then Log('                       (%s)'      , [packet.AsChar]);
-
-    // read 1st byte for packettype andflags
-    ctrlbyte := packet.ByteRead;
-    packet.Stream.Position := 0;
-
-    // type
-    packettype := TMQTTPacketType((ctrlbyte and $F0) shr 4);
-
-    // process the various packets types
-    case packettype of
-      ptCONNACK: begin
-        // handle connection acknowledgement
+      // exit
+      if io.InputBufferIsEmpty then begin
+        io.CheckForDataOnSource(10);
+        if io.InputBufferIsEmpty then
+          Exit;
       end;
-      ptPUBLISH: begin
-        if LogVerbose then Log('received PUBLISH (3) packet');
-
-        // handle message from server related to subsciptions
-        appmessage := packet.MessageRead;
-        MessageDo(appmessage.TopicName, appmessage.ApplicationMessage, appmessage.QoS, appmessage.Retain);
-
-        // send acknowledgements based on QoS
-//        case appmessage.QoS of
-//          qostAT_LEAST_ONCE: PubAckSend(appmessage.PacketIdentifier);
-//          qostEXACTLY_ONCE : PubRecSend(appmessage.PacketIdentifier);
+//        if not io.Readable then begin
+//          io.CheckForDataOnSource(10);
+//          if io.InputBufferIsEmpty then
+//            Exit;
 //        end;
+
+      // serverip
+      ip := FTCPClient.BoundIP;
+
+      // read all in a bytes buffer
+      io.InputBuffer.ExtractToBytes(bytes, -1, False, -1); // or: io.ReadBytes(bytes, -1, False);
+
+      // addtodecoder
+      decoder.DataAppend(TBytes(bytes));
+
+      // packetbypacket
+//      packetnumber := 0;
+      while decoder.PacketTryExtract(packetbytes) do begin
+        try
+          // count
+//          Inc(packetnumber);
+
+          // read all in the packet's stream
+          packet.Stream.Clear;
+          packet.StreamFromBytes(packetbytes);
+
+          // log
+          if LogVerbose then
+            Log('%s: received %d bytes', [ip, packet.Len]);
+          if LogRawAscii then
+            Log('%s: (%s)'             , [ip, packet.AsAscii]);
+          if LogRawHex then
+            Log('%s: (%s)'             , [ip, packet.AsHex]);
+          if LogRawChar then
+            Log('%s: (%s)'             , [ip, packet.AsChar]);
+
+          // read 1st byte for packettype and flags
+          ctrlbyte := packet.ByteRead;
+          packet.Stream.Position := 0;
+
+          // type
+          packettype := TMQTTPacketType((ctrlbyte and $F0) shr 4);
+
+          // process the various packets types
+          case packettype of
+
+            {$REGION 'CONNACK 1 packet'}
+            ptCONNACK: begin
+              if LogVerbose then
+                Log('%s: received RESERVED (0) packet', [ip]);
+//              if Verbose then
+//                Dmp(packet.AsChar);
+
+              // handle connection acknowledgement
+              // ...
+            end;
+            {$ENDREGION}
+
+            {$REGION 'PUBLISH 3 packet'}
+            ptPUBLISH: begin
+              if LogVerbose then Log('received PUBLISH (3) packet');
+
+              // handle message from server related to subsciptions
+//              appmessage := packet.MessageRead;
+              // ...
+
+              // send acknowledgements based on qos
+      //        case appmessage.QoS of
+      //          qostAT_LEAST_ONCE: PubAckSend(appmessage.PacketIdentifier);
+      //          qostEXACTLY_ONCE : PubRecSend(appmessage.PacketIdentifier);
+      //        end;
+            end;
+            {$ENDREGION}
+
+            {$REGION 'PINGRESP 13 packet'}
+            ptPINGRESP: begin
+              if LogVerbose then Log('received PINGRESP (13) packet');
+
+              // reset ping timer
+              KeepAlivePingTimerReset;
+            end;
+            {$ENDREGION}
+
+          else
+            Log('%s: received UNKNOWN packet', [ip]);
+          end;
+
+        except
+          on e: EIdConnClosedGracefully do begin
+            Log('%s: Server disconnected gracefully', [ip]);
+          end;
+          on e: EIdSocketError do begin
+            if e.LastError = 10054 then
+              Log('%s: Connection reset by peer', [ip])
+            else
+              Log('%s: Socket error: %s', [ip, e.Message]);
+          end;
+          on e: Exception do begin // general error
+            Log('%s: %s', [ip, e.Message]);
+
+            // disconnect client
+            FTCPClient.Disconnect;
+          end;
+        end;
       end;
 
-      ptPINGRESP: begin
-        if LogVerbose then Log('received PINGRESP (13) packet');
-
-        // reset ping timer
-        KeepAlivePingTimerReset;
-      end;
     end;
   finally
     packet.Free;
+    decoder.Free;
   end;
 end;
   {$ENDREGION}
@@ -876,13 +955,6 @@ procedure TMqttClientClass.KeepAlivePingTimerReset;
 begin
   FKeepAlivePingTimer.Enabled := false;
   FKeepAlivePingTimer.Enabled := true;
-end;
-{$ENDREGION}
-
-{$REGION 'Message'}
-procedure TMqttClientClass.MessageDo(const ATopic: string; const AApplicationMessage: TBytes; AQoS: TMQTTQOSType; ARetain: boolean);
-begin
-
 end;
 {$ENDREGION}
 
@@ -939,8 +1011,8 @@ begin
   BytAdd($00              , packet, index);
   BytAdd(AKeepAliveSeconds, packet, index);
 
-  // clientid
-  StrAdd(AnsiString(FClientId), packet, index);
+  // clientidentifier
+  StrAdd(AnsiString(FClientIdentifier), packet, index);
 
   // last will and testament
   if FWillTopic <> '' then begin

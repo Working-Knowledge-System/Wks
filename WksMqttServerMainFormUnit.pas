@@ -153,10 +153,10 @@ end;
 procedure TForm1.ServerOnMessagePublish(Args: TMessagePublishEvent);
 begin
   // Log all published messages
-  LogMessage(Args.SenderClientID, Args.Topic, Args.Payload);
+  LogMessage(Args.SenderClientIdentifier, Args.Topic, Args.Payload);
 
   // Reject messages from unauthorized clients
-  if not IsClientAuthorized(Args.SenderClientID, Args.Topic) then begin
+  if not IsClientAuthorized(Args.SenderClientIdentifier, Args.Topic) then begin
     Args.Accept := False;
     Args.Handled := True;
   end;

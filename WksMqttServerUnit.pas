@@ -28,33 +28,35 @@ type
   // forward declaration
   TMQTTServerClass = class;
 
-  // client connection event
-  TOnMQTTClientConnect = procedure(Sender: TMQTTServerClass; ClientID: string; var Accept: boolean; var ReturnCode: TMQTTConnectReturnCode) of object;
+  {$REGION 'events'}
+  // client connection packet event
+  TOnMQTTClientConnect = procedure(Sender: TMQTTServerClass; ClientIdentifier: string; var Accept: boolean; var ReturnCode: TMQTTConnectReturnCode) of object;
 
-  // client pingreq event
-  TOnMQTTClientPingreq = procedure(Sender: TMQTTServerClass; ClientID: string; var Accept: boolean; Reason: TMQTTPingreqReturnCode) of object;
+  // client publish packet event
+  TOnMQTTClientPublish = procedure(Sender: TMQTTServerClass; ClientIdentifier: string; var Accept: boolean; Reason: TMQTTPublishReturnCode) of object;
 
-  // client pingreq event
-  TOnMQTTClientPublish = procedure(Sender: TMQTTServerClass; ClientID: string; var Accept: boolean; Reason: TMQTTPublishReturnCode) of object;
+  // client subscribe packet event
+  TOnMQTTClientSubscribe = procedure(Sender: TMQTTServerClass; ClientIdentifier: string; var Accept: boolean; Reason: TMQTTSubscribeReturnCode) of object;
 
-  // client subscribe event
-  TOnMQTTClientSubscribe = procedure(Sender: TMQTTServerClass; ClientID: string; var Accept: boolean; Reason: TMQTTSubscribeReturnCode) of object;
+  // client unsubscribe packet event
+  TOnMQTTClientUnsubscribe = procedure(Sender: TMQTTServerClass; ClientIdentifier: string; var Accept: boolean; Reason: TMQTTUnsubscribeReturnCode) of object;
 
-  // client unsubscribe event
-  TOnMQTTClientUnsubscribe = procedure(Sender: TMQTTServerClass; ClientID: string; var Accept: boolean; Reason: TMQTTUnsubscribeReturnCode) of object;
+  // client pingreq packet event
+  TOnMQTTClientPingreq = procedure(Sender: TMQTTServerClass; ClientIdentifier: string; var Accept: boolean; Reason: TMQTTPingreqReturnCode) of object;
 
-  // client disconnection event
-  TOnMQTTClientDisconnect = procedure(Sender: TMQTTServerClass; ClientID: string; var Accept: boolean; Reason: TMQTTDisconnectReturnCode) of object;
+  // client disconnection packet event
+  TOnMQTTClientDisconnect = procedure(Sender: TMQTTServerClass; ClientIdentifier: string; var Accept: boolean; Reason: TMQTTDisconnectReturnCode) of object;
+  {$ENDREGION}
 
-  // event argument base class
-  TMQTTEventArguments = class
+  {$REGION 'events handlers arguments'}
+  TMQTTEventArgs = class // event arguments base class
   public
-    Handled: boolean;  // set to True to prevent default handling
+    Handled: boolean;  // set to true to prevent default handling
   end;
 
-  TMQTTClientConnectEvent = class(TMQTTEventArguments)
+  TMQTTClientConnectEventArgs = class(TMQTTEventArgs) // message publication event (when a client connect to broker)
   public
-    ClientID: string;
+    ClientIdentifier: string;
     Username: string;
     Password: string;
     Accept: boolean;
@@ -63,16 +65,9 @@ type
     Session: TMQTTSessionClass;
   end;
 
-  TMQTTClientDisconnectEvent = class(TMQTTEventArguments)
+  TMQTTClientPublishEventArgs = class(TMQTTEventArgs) // message publication event (when a client publishes)
   public
-    ClientID: string;
-    Reason: string;
-    Session: TMQTTSessionClass;
-  end;
-
-  TMQTTMessagePublishEvent = class(TMQTTEventArguments)
-  public
-    SenderClientID: string;
+    SenderClientIdentifier: string;
     Topic: string;
     Payload: TBytes;
     QoS: TMQTTQOSType;
@@ -80,33 +75,40 @@ type
     Accept: boolean;
   end;
 
-  TMQTTMessageDeliveryEvent = class(TMQTTEventArguments)
+  TMQTTClientSubscribeEventArgs = class(TMQTTEventArgs) // subscribe event ()
   public
-    TargetClientID: string;
-    Topic: string;
-    Payload: TBytes;
-    QoS: TMQTTQOSType;
-    Retain: boolean;
-    Accept: boolean;
-  end;
-
-  TMQTTSubscriptionEvent = class(TMQTTEventArguments)
-  public
-    ClientID: string;
+    ClientIdentifier: string;
     TopicFilter: string;
     RequestedQoS: TMQTTQOSType;
     GrantedQoS: TMQTTQOSType;
     Accept: boolean;
   end;
 
-  TMQTTUnsubscriptionEvent = class(TMQTTEventArguments)
+  TMQTTClientUnsubscribeEventArgs = class(TMQTTEventArgs) // unsubscribe event ()
   public
-    ClientID: string;
+    ClientIdentifier: string;
     TopicFilter: string;
     Accept: boolean;
   end;
 
-  TMQTTRetainedMessageEvent = class(TMQTTEventArguments)
+  TMQTTClientDisconnectEventArgs = class(TMQTTEventArgs) // message publication event (when a client disconnect to broker)
+  public
+    ClientIdentifier: string;
+    Reason: string;
+    Session: TMQTTSessionClass;
+  end;
+
+  TMQTTMessageDeliveryEvent = class(TMQTTEventArgs) // message delivery event (before delivering to a subscriber)
+  public
+    TargetClientIdentifier: string;
+    Topic: string;
+    Payload: TBytes;
+    QoS: TMQTTQOSType;
+    Retain: boolean;
+    Accept: boolean;
+  end;
+
+  TMQTTRetainedMessageEvent = class(TMQTTEventArgs) // retainedmessage event
   public
     Topic: string;
     Payload: TBytes;
@@ -115,24 +117,37 @@ type
     Accept: boolean;
   end;
 
-  TMQTTAuthenticationEvent = class(TMQTTEventArguments)
+  TMQTTAuthenticationEvent = class(TMQTTEventArgs) // authentication event
   public
     Username: string;
     Password: string;
     Accept: boolean;
   end;
 
-  TErrorEvent = class(TMQTTEventArguments)
+  TErrorEvent = class(TMQTTEventArgs) // error event
   public
     ErrorCode: integer;
     ErrorMessage: string;
   end;
+  {$ENDREGION}
+
+  {$REGION 'events handlers'}
+  TClientConnectHandler     = reference to procedure(Args: TMQTTClientConnectEventArgs);
+  TClientPublishHandler     = reference to procedure(Args: TMQTTClientPublishEventArgs);
+  TClientSubscribeHandler   = reference to procedure(Args: TMQTTClientSubscribeEventArgs);
+  TClientUnsubscribeHandler = reference to procedure(Args: TMQTTClientUnsubscribeEventArgs);
+  TClientDisconnectHandler  = reference to procedure(Args: TMQTTClientDisconnectEventArgs);
+  TMessageDeliveryHandler   = reference to procedure(Args: TMQTTMessageDeliveryEvent);
+  TRetainedMessageHandler   = reference to procedure(Args: TMQTTRetainedMessageEvent);
+  TAuthenticationHandler    = reference to procedure(Args: TMQTTAuthenticationEvent);
+  TErrorHandler             = reference to procedure(Args: TErrorEvent);
+  {$ENDREGION}
 
   TMQTTServerClass = class(TMQTTClass) // *** chande to TMQTTBrokerClass ***
   private
     // fields
-    FTCPServer: TIdTCPServer;
-    FSessions: TDictionary<string, TMQTTSessionClass>;
+    FTCPServer       : TIdTCPServer;
+    FSessions        : TDictionary<string, TMQTTSessionClass>;       // sessions with subscriptions
     FRetainedMessages: TDictionary<string, TMQTTMessageRec>;
 
     FOnClientConnect    : TOnMQTTClientConnect;
@@ -169,9 +184,6 @@ type
     function  ConnectPacketProcess(ASession: TMQTTSessionClass; APacket: TMQTTPacketClass; out AConnectPacket: TMQTTConnectPacketRec): TMQTTConnectReturnCode;
     procedure ConnAckSend(AContext: TIdContext; AReturnCode: TMQTTConnectReturnCode);
 
-    // disconnectroutines
-    function  DisconnectPacketProcess(ASession: TMQTTSessionClass; APacket: TMQTTPacketClass; out ADisconnectPacket: TMQTTDisconnectPacketRec): TMQTTDisconnectReturnCode;
-
     // publishroutines
     function  PublishPacketProcess(ASession: TMQTTSessionClass; APacket: TMQTTPacketClass; out APublishPacket: TMQTTPublishPacketRec): TMQTTPublishReturnCode;
     procedure PubAckSend(ASession: TMQTTSessionClass; APacketID: Word);
@@ -191,14 +203,17 @@ type
     function  PingReqPacketProcess(ASession: TMQTTSessionClass; APacket: TMQTTPacketClass; out APingreqPacket: TMQTTPingreqPacketRec): TMQTTPingreqReturnCode;
     procedure PingRespSend(ASession: TMQTTSessionClass);
 
-    // forwardroutines
+    // disconnectroutines
+    function  DisconnectPacketProcess(ASession: TMQTTSessionClass; APacket: TMQTTPacketClass; out ADisconnectPacket: TMQTTDisconnectPacketRec): TMQTTDisconnectReturnCode;
+
+    // forwardroutines (delivery to subscribers)
     procedure ApplicationMessageBroadcast(AMessage: TMQTTMessageRec);
 
     // topicsroutines
     function  TopicMatchesFilter(ATopicName, ATopicFilter: string): boolean;
 
     // utils
-  //function ClientIdValidate(const AClientId: string): boolean;
+  //function ClientIdentifierValidate(const AClientIdentifier: string): boolean;
   public
     constructor Create(ALogRichEdit, ARequestHexRichEdit, AResponseHexRichEdit: TRichEdit); override;
     destructor Destroy; override;
@@ -207,12 +222,12 @@ type
     function IsRunning: boolean;      // tcpserver is active
     function HasConnections: boolean; // mqttbroker has active mqttclients connections
     function ClientCount: Integer;
-    function SessionGet(AClientID: string): TMQTTSessionClass;
+    function SessionGet(AClientIdentifier: string): TMQTTSessionClass;
 
     // event properties
-    property OnClientConnect: TOnMQTTClientConnect       read FOnClientConnect    write FOnClientConnect;
+    property OnClientConnect   : TOnMQTTClientConnect    read FOnClientConnect    write FOnClientConnect;
     property OnClientDisconnect: TOnMQTTClientDisconnect read FOnClientDisconnect write FOnClientDisconnect;
-    property OnClientMessage: TOnMQTTMessage             read FOnClientMessage    write FOnClientMessage;
+    property OnClientMessage   : TOnMQTTMessage          read FOnClientMessage    write FOnClientMessage;
   end;
 {$ENDREGION}
 
@@ -236,12 +251,14 @@ end;
 
 destructor TMQTTServerClass.Destroy;
 var
-  ses: TMQTTSessionClass;
+  session: TMQTTSessionClass;
 begin
-  // stores
-  for ses in FSessions.Values do
-    ses.Free;
+  // sessions
+  for session in FSessions.Values do
+    session.Free;
   FSessions.Free;
+
+  // retainedmessages
   FRetainedMessages.Free;
 
   // tcpserver
@@ -310,7 +327,7 @@ begin
       if Assigned(ses) then begin
         // notify disconnection event
         if Assigned(FOnClientDisconnect) then
-          FOnClientDisconnect(Self, ses.ClientId, accept, disconrcSERVER_STOPPING);
+          FOnClientDisconnect(Self, ses.ClientIdentifier, accept, disconrcSERVER_STOPPING);
 
         // send DISCONNECT packet if connection is still active
         if cxt.Connection.Connected then begin
@@ -342,7 +359,7 @@ begin
   // clean up sessions that requested clean session
   for ses in FSessions.Values do begin
     if ses.CleanSession then begin
-      FSessions.Remove(ses.ClientId);
+      FSessions.Remove(ses.ClientIdentifier);
       ses.Free;
     end;
   end;
@@ -406,15 +423,17 @@ if AConnectPacket.ConnectFlags.PasswordFlag then
   end;
   {$ENDREGION}
 
-  {$REGION 'postprocess'}
+  {$REGION 'events'}
   // fire connection event
   if Assigned(FOnClientConnect) then
     FOnClientConnect(Self, AConnectPacket.ClientIdentifier, accept, Result);
+  {$ENDREGION}
 
   // exit
   if not accept then
     Exit;
 
+  {$REGION 'session'}
   // create or retrieve session
   if not FSessions.TryGetValue(AConnectPacket.ClientIdentifier, ASession) then begin
     ASession := TMQTTSessionClass.Create(AConnectPacket.ClientIdentifier, AConnectPacket.ConnectFlags.CleanSession);
@@ -433,42 +452,6 @@ begin
 
 end;
 
-function  TMQTTServerClass.PingReqPacketProcess(ASession: TMQTTSessionClass; APacket: TMQTTPacketClass; out APingreqPacket: TMQTTPingreqPacketRec): TMQTTPingreqReturnCode;
-var
-  accept: boolean;
-begin
-
-  {$REGION 'decode'}
-  // type
-  APingreqPacket.PacketType := TMQTTPacketType((APacket.ByteRead and $F0) shr 4);
-
-  // remaininglength read
-  APingreqPacket.RemainingLength := APacket.RemainingLengthRead;
-
-  // default to accepting disconnection
-  Accept := true;
-  Result := pingreqrcPINGREQ_ACCEPTED;
-  {$ENDREGION}
-
-  {$REGION 'validate'}
-  {$ENDREGION}
-
-  {$REGION 'postprocess'}
-  // fire pingreq event
-  if Assigned(FOnClientPingReq) then
-    FOnClientPingReq(Self, ASession.ClientID, accept, Result);
-  {$ENDREGION}
-
-  {$REGION 'sendback'}
-  {$ENDREGION}
-
-end;
-
-procedure TMQTTServerClass.PingRespSend(ASession: TMQTTSessionClass);
-begin
-
-end;
-
 function  TMQTTServerClass.PublishPacketProcess(ASession: TMQTTSessionClass; APacket: TMQTTPacketClass; out APublishPacket: TMQTTPublishPacketRec): TMQTTPublishReturnCode;
 var
   accept: boolean;
@@ -477,6 +460,10 @@ var
   appmessagelen: integer;
 //args: TMessagePublishEvent;
 begin
+
+  {$REGION 'zzz'}
+//  appmessage := APacket.MessageRead;
+  {$ENDREGION}
 
   {$REGION 'decode'}
   // ctrlbyte
@@ -513,31 +500,49 @@ begin
   {$REGION 'validate'}
   {$ENDREGION}
 
-  {$REGION 'postprocess'}
+  {$REGION 'events'}
   // fire publishing event
   if Assigned(FOnClientPublish) then
-    FOnClientPublish(Self, ASession.ClientID, accept, Result);
+    FOnClientPublish(Self, ASession.ClientIdentifier, accept, Result);
+  {$ENDREGION}
+
+  // exit
+  if not accept then
+    Exit;
+
+  {$REGION 'retainedmessage'}
+  // store retained message (only if qos = 1 or 2 ?)
+  if APublishPacket.PublishFlags.Retain then begin
+    if Length(APublishPacket.ApplicationMessage) > 0 then begin
+      appmessage.DupFlag            := APublishPacket.PublishFlags.DupFlag;
+      appmessage.QoS                := APublishPacket.PublishFlags.QoSLevel;
+      appmessage.Retain             := APublishPacket.PublishFlags.Retain;
+      appmessage.TopicName          := APublishPacket.TopicName;
+      appmessage.PacketIdentifier   := APublishPacket.PacketIdentifier;
+      appmessage.ApplicationMessage := BytesOf(APublishPacket.ApplicationMessage);
+      FRetainedMessages.AddOrSetValue(APublishPacket.TopicName, appmessage)
+    end else
+      FRetainedMessages.Remove(APublishPacket.TopicName);
+  end;
+  {$ENDREGION}
+
+  {$REGION 'session'}
+  // create or retrieve session
+//  if not FSessions.TryGetValue(ASession.ClientIdentifier, ASession) then begin
+//    ASession := TMQTTSessionClass.Create(ASession.ClientIdentifier, {APublishPacket.PublishFlags.CleanSession}true);
+//    FSessions.Add(ASession.ClientIdentifier, ASession);
+//  end else
+//    ASession.LastContactUpdate;
+  {$ENDREGION}
+
+  {$REGION 'broadcast'}
+  // forward to subscribers
+  //ApplicationMessageBroadcast(appmessage);
   {$ENDREGION}
 
   {$REGION 'sendback'}
-  {$ENDREGION}
-
-  {$REGION 'zzz'}
   {
-  appmessage := APacket.MessageRead;
-
-  // store retained message
-  if appmessage.Retain then begin
-    if Length(appmessage.ApplicationMessage) > 0 then
-      FRetainedMessages.AddOrSetValue(appmessage.TopicName, appmessage)
-    else
-      FRetainedMessages.Remove(appmessage.TopicName);
-  end;
-
-  // forward to subscribers
-  ApplicationMessageBroadcast(appmessage);
-
-  // handle QoS acknowledgements
+  // handle qos acknowledgements
   case appmessage.QoS of
     qostAT_LEAST_ONCE: PubAckSend(ASession, appmessage.PacketIdentifier);
     qostEXACTLY_ONCE : PubRecSend(ASession, appmessage.PacketIdentifier);
@@ -549,7 +554,7 @@ begin
   {
   args := TMessagePublishEvent.Create;
   try
-    args.SenderClientID := ASession.ClientID;
+    args.SenderClientIdentifier := ASession.ClientIdentifier;
     args.Topic := AMessage.Topic;
     args.Payload := AMessage.Payload;
     args.QoS := AMessage.QoS;
@@ -595,6 +600,7 @@ var
   len: integer;
   topicfilter: string;
   requestedqos: TMQTTQOSType;
+  //session: TMQTTSessionClass;
 begin
 
   {$REGION 'decode'}
@@ -627,10 +633,22 @@ begin
   {$REGION 'validate'}
   {$ENDREGION}
 
-  {$REGION 'postprocess'}
+  {$REGION 'sessionsubscription'}
+      // store session with subscription
+//      if not FSessions.TryGetValue(topicfilter, ASession) then begin
+//        ASession.SubscriptionAdd(topicfilter, qostAT_LEAST_ONCE);
+//        Log('topicfilter/subscriberslist not found in sessions... added a new empty subscriberslist with new topicfilter %s', [topicfilter]);
+//      end;
+//    if not subscriberslist.Contains(AContext) then begin
+//      subscriberslist.Add(AContext);
+//      Log('subscriber not found in subscriberslist... added new subscriber');
+//    end;
+  {$ENDREGION}
+
+  {$REGION 'events'}
   // fire subscribe event
   if Assigned(FOnClientSubscribe) then
-    FOnClientSubscribe(Self, ASession.ClientID, accept, Result);
+    FOnClientSubscribe(Self, ASession.ClientIdentifier, accept, Result);
   {$ENDREGION}
 
   {$REGION 'sendback'}
@@ -679,10 +697,10 @@ begin
   {$REGION 'validate'}
   {$ENDREGION}
 
-  {$REGION 'postprocess'}
+  {$REGION 'events'}
   // fire unsubscribe event
   if Assigned(FOnClientUnsubscribe) then
-    FOnClientUnsubscribe(Self, ASession.ClientID, accept, Result);
+    FOnClientUnsubscribe(Self, ASession.ClientIdentifier, accept, Result);
   {$ENDREGION}
 
   {$REGION 'sendback'}
@@ -691,6 +709,42 @@ begin
 end;
 
 procedure TMQTTServerClass.UnsubAckSend(ASession: TMQTTSessionClass; APacketID: Word);
+begin
+
+end;
+
+function  TMQTTServerClass.PingReqPacketProcess(ASession: TMQTTSessionClass; APacket: TMQTTPacketClass; out APingreqPacket: TMQTTPingreqPacketRec): TMQTTPingreqReturnCode;
+var
+  accept: boolean;
+begin
+
+  {$REGION 'decode'}
+  // type
+  APingreqPacket.PacketType := TMQTTPacketType((APacket.ByteRead and $F0) shr 4);
+
+  // remaininglength read
+  APingreqPacket.RemainingLength := APacket.RemainingLengthRead;
+
+  // default to accepting disconnection
+  Accept := true;
+  Result := pingreqrcPINGREQ_ACCEPTED;
+  {$ENDREGION}
+
+  {$REGION 'validate'}
+  {$ENDREGION}
+
+  {$REGION 'events'}
+  // fire pingreq event
+  if Assigned(FOnClientPingReq) then
+    FOnClientPingReq(Self, ASession.ClientIdentifier, accept, Result);
+  {$ENDREGION}
+
+  {$REGION 'sendback'}
+  {$ENDREGION}
+
+end;
+
+procedure TMQTTServerClass.PingRespSend(ASession: TMQTTSessionClass);
 begin
 
 end;
@@ -715,17 +769,28 @@ begin
   {$REGION 'validate'}
   {$ENDREGION}
 
-  {$REGION 'reply'}
-  // nothing
-  {$ENDREGION}
+  // exit
+  if not accept then
+    Exit;
 
-  {$REGION 'postprocess'}
-  // fire disconnection event
-  if Assigned(FOnClientDisconnect) then
-    FOnClientDisconnect(Self, ASession.ClientID, accept, Result);
-  {$ENDREGION}
+  if Assigned(ASession) then begin
+
+    {$REGION 'events'}
+    // fire disconnection event
+    if Assigned(FOnClientDisconnect) then
+      FOnClientDisconnect(Self, ASession.ClientIdentifier, accept, Result);
+    {$ENDREGION}
+
+    {$REGION 'will'}
+    // handle will message if exists
+//    if not ASession.WillMessage.TopicName.IsEmpty then
+//      PublishPacketProcess(nil, ASession.WillMessage);
+    {$ENDREGION}
+
+  end;
 
   {$REGION 'sendback'}
+  // nothing
   {$ENDREGION}
 
 end;
@@ -733,12 +798,23 @@ end;
 procedure TMQTTServerClass.ApplicationMessageBroadcast(AMessage: TMQTTMessageRec);
 var
   session: TMQTTSessionClass;
-  subscription: TSubscription;
+  subscription: TMQTTSubscription;
 begin
+  {
+  sessions
+    |__session1
+    |    |__subscription2.1 (topicfiletr, qos)
+    |    |__subscription2.2
+    |    |__...
+    |
+    |__session2
+         |__...
+  }
+
   for session in FSessions.Values do begin
-    for subscription in Session.Subscriptions do begin
+    for subscription in session.Subscriptions do begin
       if TopicMatchesFilter(AMessage.TopicName, subscription.TopicFilter) then begin
-        // send message to client with appropriate QoS
+        // delivery sending a message to subscriber client with appropriate QoS
 //        PublishSend(session, AMessage.TopicName, AMessage.ApplicationMessage, subscription.QoS, False);
       end;
     end;
@@ -775,9 +851,9 @@ begin
   end;
 end;
 
-function  TMQTTServerClass.SessionGet(AClientID: string): TMQTTSessionClass;
+function  TMQTTServerClass.SessionGet(AClientIdentifier: string): TMQTTSessionClass;
 begin
-  if not FSessions.TryGetValue(AClientID, Result) then
+  if not FSessions.TryGetValue(AClientIdentifier, Result) then
     Result := nil;
 end;
 
@@ -786,14 +862,14 @@ procedure TMQTTServerClass.OnClientJoinedHandler(AContext: TIdContext);
 begin
   Log('client %d joined from: %s', [AContext.Binding.ID, AContext.Binding.PeerIP]);
 
-//Accept := IsClientAllowed(ClientID);
+//Accept := IsClientAllowed(ClientIdentifier);
 //if not Accept then
 //  ReturnCode := rcNOT_AUTHORIZED;
 end;
 
 procedure TMQTTServerClass.OnClientDisjoinedHandler(AContext: TIdContext);
 begin
-  Log('client %d disjoined from: %s reason: %s', [AContext.Binding.ID{ClientId}, AContext.Binding.PeerIP, 'AReason']);
+  Log('client %d disjoined from: %s reason: %s', [AContext.Binding.ID{ClientIdentifier}, AContext.Binding.PeerIP, 'AReason']);
 end;
 
 procedure TMQTTServerClass.OnClientDataReceivedHandler(AContext: TIdContext); // IncomingPacketProcess
@@ -855,7 +931,7 @@ begin
 
       // packetbypacket
 //      packetnumber := 0;
-      while Decoder.PacketTryExtract(packetbytes) do begin
+      while decoder.PacketTryExtract(packetbytes) do begin
         try
           // count
 //          Inc(packetnumber);
@@ -1139,7 +1215,7 @@ end;
   {$REGION 'BrokerHandlers'}
 procedure TMQTTServerClass.OnConnectHandler(AContext: TIdContext);
 var
-  cid: string;  // clientid
+  cid: string;  // clientidentifier
   cls: boolean; // cleansession
   session: TMQTTSessionClass;
 //  args: TClientConnectEvent;
@@ -1164,10 +1240,10 @@ begin
   args := TClientConnectEvent.Create;
   try
     // populate arguments from connection request
-    args.ClientID := ...;
-    args.Username := ...;
-    args.Password := ...;
-    args.Accept := true; // default to accepting connection
+    args.ClientIdentifier := ...;
+    args.Username         := ...;
+    args.Password         := ...;
+    args.Accept           := true; // default to accepting connection
 
     // trigger event
     if Assigned(FOnClientConnect) then
@@ -1195,7 +1271,7 @@ begin
   session := AContext.Data as TMQTTSessionClass;
   if Assigned(session) then begin
     if Assigned(FOnClientDisconnect) then
-      FOnClientDisconnect(Self, session.ClientId, accept, disconrcCLIENT_DISCONNECTED);
+      FOnClientDisconnect(Self, session.ClientIdentifier, accept, disconrcCLIENT_DISCONNECTED);
 
     // handle will message if exists
 //    if session.WillMessage.Topic <> '' then
