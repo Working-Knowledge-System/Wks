@@ -1,26 +1,37 @@
+
+# Eu
+This project is inspired to "Integrate" and "Productive 4.0" European projects funded during the period 2010 - 2020.
+
+![EuFlag_110x64](https://github.com/user-attachments/assets/da092afb-ed75-4c3c-bc4e-21195d834e0b)
+![EuIntegrate_200x64](https://github.com/user-attachments/assets/0e6c8ddf-229c-4bec-b7cc-e6b4eab850ca)
+![EuProductive4 0_324x64](https://github.com/user-attachments/assets/93efead0-d586-4619-a830-059b34f2d878)
+
 # Wks
-A **Working Knowledge System** for the industry, companies or organizations.
+Wks is a **Working Knowledge System** for the industry, companies or organizations.
 
-Wks is an experimental system that try to manage company or organization assets and activities within a **single unified framework** of collaborative software modules.
+It is an experimental system that try to manage company or organization assets, activities and data within a **single unified framework** of collaborative software modules.
 
-The system's goal is to incrementally incorporate and manage assets and activities in a self-sufficient manner, minimizing external dependencies and vendor lock-ins as much as possible.
+It will also try to incorporata the "Industry 4.0" principles.
 
-The name **Wks** and the acronym **WKS** are inspired by the concept that assets, activities and knowledge should be *absorbed* by the system incrementally during the normal daily *working* processes of a company, organization or team.
-It does not assume that everything is already known and predefined, recognizing that usually each entity is unique and diverse.
+The system's goal is to eliminate files & folders and incrementally incorporate and manage assets, activities and data in a self-sufficient manner, minimizing external dependencies and vendor lock-ins as much as possible.
 
-Currently, the system is in an early stage. It resides in a development environment on the cloud and does not yet have any real installations in place.
-However, it is actively seeking real use cases to address.
+The name **Wks** and the acronym **WKS** are inspired by the concept that assets, activities, data and knowledge should be *absorbed* by the system incrementally during the normal daily *working* processes of a company, organization or team.
+It does not assume that everything is already known and predefined up front.
+
+Currently, the system is in an experimental early stage. It resides in a development environment on the cloud and does not yet have any real installations in place.
+However, it is actively seeking for real use cases to address.
 
 # Technologies
 The system uses a variety of technologies, languages, and libraries, prioritizing open-source solutions:
 
 - Object Pascal
 - ISAPI, SOAP, REST
-- MS SQL Server, MongoDB, Redis
-- MQTT, NATS
+- MS SQL Server, MongoDB, Redis, DuckDB
+- MQTT, NATS, UNS
 - HTML, CSS, JavaScript
 - W3CSS, W3JS, Pico
 - HTMX, Alpine, Datastar
+- ESP8266, ESP32
 
 # Objects
 The system comprises an *open* collection of unique Objects.
@@ -44,7 +55,7 @@ You maintain your data yourself in a single place, eliminating the need to repea
 Other Wks entities simply reference this information.
 
 A person, upon entering any virtual software world, becomes a **User** and may have one or more **Accounts** to access software systems.
-Now, to access Wks, a person needs a single account consisting of three pieces of information:
+So, to access Wks, a person needs an account consisting of three pieces of information:
 
 - The organization identifier
 - Their personal username
@@ -53,15 +64,17 @@ Now, to access Wks, a person needs a single account consisting of three pieces o
 In addition to classic account information, a Wks account includes the "Organization" token, allowing the system to immediately place you in the correct context.
 Also those information have no need to be excanged/transmitted/copied between individuals or other organizations.
 
-The Organization module collects all instances of companies/organizations, each with relevant basic and advanced information. This information does not need to be exchanged, transmitted, or copied between individuals or other organizations. It is maintained directly by members of each organization and referenced in real time by other parties.
+The Organization module collects all instances of companies/organizations, each with relevant basic and advanced information.
+This information does not need to be exchanged, transmitted, or copied between individuals or other organizations.
+It is maintained directly by members of each organization and referenced in real time by other parties.
 
-The process is as follows: "Once a Person becomes a User, with their Account, they enter their Organization and become a Member".
-As a member, they can now create other objects such as *Documents*, write *Codes*, design *Agents*, etc., which are automatically recorded and tracked in the correct *context*.
-There is no longer a need to organize materials in shared directories/folders or SharePoint sites.
-Assets and activities are created without needing to be manually organized; they are already in the appropriate context.
+The process is as follows: "A Person becomes a User once he/she have an Account, then become a Member whe he/she enter an Organization".
+As a member, they can now create and maintain objects such as *Documents*, write *Codes*, design *Agents*, etc., which are automatically recorded and tracked in the correct *context*.
+There is no longer the need to organize data in files & folders in shared directories or SharePoint sites.
+Assets and activities are created without the need to be manually organized; they are already in the appropriate context.
 
 Finally, each object/activity is automatically shared with members of your team and with all other members in the upper hierarchy.
-If needed, objects can also be shared with other companies/members by setting additional sharing properties.
+If needed, objects can also be shared with other organizations/members by setting additional sharing properties.
 
 More objects to come include:
 
@@ -77,4 +90,5 @@ More objects to come include:
 - Report
 - Spc
 - Task
+
 
