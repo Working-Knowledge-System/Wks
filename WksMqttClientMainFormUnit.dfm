@@ -144,7 +144,7 @@ inherited MainForm: TMainForm
           Height = 15
           Caption = 'Username'
         end
-        object ConnectClientIdLabel: TLabel
+        object ConnectClientIdentifierLabel: TLabel
           Left = 196
           Top = 12
           Width = 10
@@ -225,13 +225,13 @@ inherited MainForm: TMainForm
           TabOrder = 7
           Text = 'ConnectPasswordEdit'
         end
-        object ConnectClientIdEdit: TEdit
+        object ConnectClientIdentifierEdit: TEdit
           Left = 212
           Top = 9
           Width = 157
           Height = 23
           TabOrder = 8
-          Text = 'ConnectClientIdEdit'
+          Text = 'ConnectClientIdentifierEdit'
         end
         object DisconnectPacketSendButton: TButton
           Left = 16

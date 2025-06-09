@@ -3,7 +3,7 @@
         <ProjectGuid>{07BC5A12-5022-46E3-8F1C-DBC460D7FACE}</ProjectGuid>
         <MainSource>WksMqttBaseProject.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <ProjectName Condition="'$(ProjectName)'==''">WksMqttBaseProject</ProjectName>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
