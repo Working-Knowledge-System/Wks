@@ -7,6 +7,7 @@ uses
     Winapi.Windows
   , Winapi.Messages
   , System.SysUtils
+  , System.StrUtils
   , System.Variants
   , System.Classes
   , System.UITypes
@@ -22,7 +23,7 @@ uses
   , JvNetscapeSplitter
   , WksMqttBaseMainFormtUnit
   , WksMqttClientUnit
-  , WksMqttTypesUnit
+  , WksMqttTypesUnit, SynEdit, SynEditHighlighter, SynHighlighterGeneral
   ;
 {$ENDREGION}
 
@@ -81,6 +82,11 @@ type
     PublishPauseMsLabel: TLabel;
     PublishCountComboBox: TComboBox;
     PublishPauseMsComboBox: TComboBox;
+    SubscribeRequestTabSheet: TTabSheet;
+    SubscribePacketSendButton: TButton;
+    UnsubscribePacketSendButton: TButton;
+    SubscribeTopicFilterListMemo: TMemo;
+    SubscribeTopicFilterListLabel: TLabel;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ServerDisjoinButtonClick(Sender: TObject);
@@ -90,6 +96,8 @@ type
     procedure PingRequestPacketSendButtonClick(Sender: TObject);
     procedure XxxExitButtonClick(Sender: TObject);
     procedure DisconnectPacketSendButtonClick(Sender: TObject);
+    procedure SubscribePacketSendButtonClick(Sender: TObject);
+    procedure UnsubscribePacketSendButtonClick(Sender: TObject);
   private
     { Private declarations }
     FMqttClient: TMQTTClientClass;
@@ -122,57 +130,59 @@ begin
   TopPageControl.ActivePageIndex := 2;
 
   // ini
-  MqttProtocolNameEdit.Text                := FIni.ReadString ('Mqtt'   , 'ProtocolName'     , 'MQTT' {this is fixed}                   );
-  MqttProtocolLevelComboBox.ItemIndex      := FIni.ReadInteger('Mqtt'   , 'ProtocolLevel'    , 4 {3.1.1}                                );
-  ServerHostEdit.Text                      := FIni.ReadString ('Server' , 'Host'             , 'www.wks.cloud'                          );
-  ServerPortEdit.Text                      := FIni.ReadString ('Server' , 'Port'             , '1883'                                   );
-  ConnectClientIdentifierEdit.Text         := FIni.ReadString ('Connect', 'ClientIdentifier' , 'client001'                              );
-  ConnectQosComboBox.ItemIndex             := FIni.ReadInteger('Connect', 'Qos'              , 0                                        );
-  ConnectWillTopicEdit.Text                := FIni.ReadString ('Connect', 'WillTopic'        , 'wks/mqtt/clients/$ClientIdentifier$/wlt');
-  ConnectWillMessageEdit.Text              := FIni.ReadString ('Connect', 'WillMessage'      , 'I have done here folks!'                );
-  ConnectWillActiveCheckBox.Checked        := FIni.ReadBool   ('Connect', 'WillActive'       , true                                     );
-  ConnectUsernameEdit.Text                 := FIni.ReadString ('Connect', 'Username'         , 'username'                               );
-  ConnectPasswordEdit.Text                 := FIni.ReadString ('Connect', 'Password'         , 'password'                               );
-  ConnectCredentialsActiveCheckBox.Checked := FIni.ReadBool   ('Connect', 'CredentialsActive', true                                     );
-  ConnectKeepAliveSecondsEdit.Text         := FIni.ReadString ('Connect', 'KeepAliveSeconds' , '60'                                     );
-  ConnectCleanSessionCheckBox.Checked      := FIni.ReadBool   ('Connect', 'CleanSession'     , true                                     );
-  PingreqCountComboBox.ItemIndex           := FIni.ReadInteger('Pingreq', 'Count'            , 0                                        );
-  PingreqPauseMsComboBox.ItemIndex         := FIni.ReadInteger('Pingreq', 'PauseMs'          , 2                                        );
-  PublishTopicEdit.Text                    := FIni.ReadString ('Publish', 'Topic'            , 'wks/mqtt/test/helloworld'               );
-  PublishMessageEdit.Text                  := FIni.ReadString ('Publish', 'Message '         , 'hello MQTT!'                            );
-  PublishQosComboBox.ItemIndex             := FIni.ReadInteger('Publish', 'Qos'              , 0                                        );
-  PublishCountComboBox.ItemIndex           := FIni.ReadInteger('Publish', 'Count'            , 0                                        );
-  PublishPauseMsComboBox.ItemIndex         := FIni.ReadInteger('Publish', 'PauseMs'          , 2                                        );
+  MqttProtocolNameEdit.Text                := FIni.ReadString ('Mqtt'     , 'ProtocolName'     , 'MQTT' {this is fixed}                   );
+  MqttProtocolLevelComboBox.ItemIndex      := FIni.ReadInteger('Mqtt'     , 'ProtocolLevel'    , 4 {3.1.1}                                );
+  ServerHostEdit.Text                      := FIni.ReadString ('Server'   , 'Host'             , 'www.wks.cloud'                          );
+  ServerPortEdit.Text                      := FIni.ReadString ('Server'   , 'Port'             , '1883'                                   );
+  ConnectClientIdentifierEdit.Text         := FIni.ReadString ('Connect'  , 'ClientIdentifier' , 'client001'                              );
+  ConnectQosComboBox.ItemIndex             := FIni.ReadInteger('Connect'  , 'Qos'              , 0                                        );
+  ConnectWillTopicEdit.Text                := FIni.ReadString ('Connect'  , 'WillTopic'        , 'wks/mqtt/clients/$ClientIdentifier$/wlt');
+  ConnectWillMessageEdit.Text              := FIni.ReadString ('Connect'  , 'WillMessage'      , 'I have done here folks!'                );
+  ConnectWillActiveCheckBox.Checked        := FIni.ReadBool   ('Connect'  , 'WillActive'       , true                                     );
+  ConnectUsernameEdit.Text                 := FIni.ReadString ('Connect'  , 'Username'         , 'username'                               );
+  ConnectPasswordEdit.Text                 := FIni.ReadString ('Connect'  , 'Password'         , 'password'                               );
+  ConnectCredentialsActiveCheckBox.Checked := FIni.ReadBool   ('Connect'  , 'CredentialsActive', true                                     );
+  ConnectKeepAliveSecondsEdit.Text         := FIni.ReadString ('Connect'  , 'KeepAliveSeconds' , '60'                                     );
+  ConnectCleanSessionCheckBox.Checked      := FIni.ReadBool   ('Connect'  , 'CleanSession'     , true                                     );
+  PingreqCountComboBox.ItemIndex           := FIni.ReadInteger('Pingreq'  , 'Count'            , 0                                        );
+  PingreqPauseMsComboBox.ItemIndex         := FIni.ReadInteger('Pingreq'  , 'PauseMs'          , 2                                        );
+  PublishTopicEdit.Text                    := FIni.ReadString ('Publish'  , 'Topic'            , 'wks/mqtt/test/helloworld'               );
+  PublishMessageEdit.Text                  := FIni.ReadString ('Publish'  , 'Message '         , 'hello MQTT!'                            );
+  PublishQosComboBox.ItemIndex             := FIni.ReadInteger('Publish'  , 'Qos'              , 0                                        );
+  PublishCountComboBox.ItemIndex           := FIni.ReadInteger('Publish'  , 'Count'            , 0                                        );
+  PublishPauseMsComboBox.ItemIndex         := FIni.ReadInteger('Publish'  , 'PauseMs'          , 2                                        );
+  SubscribeTopicFilterListMemo.Text        := FIni.ReadString ('Subscribe', 'TopicFilterList'  , 'wks/mqtt/system/*,0'                    ).Replace('|', sLineBreak);
 
   // client
-  FMqttClient := TMQTTClientClass.Create(LogRichEdit, RequestHexRichEdit, ResponseHexRichEdit);
+  FMqttClient := TMQTTClientClass.Create(LogSynEdit.Lines, LogVerboseCheckBox, LogRawAsciiCheckBox, LogRawHexCheckBox, LogRawCharCheckBox);
   Log('client created');
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   // ini
-  FIni.WriteString ('Mqtt'   , 'ProtocolName'     , MqttProtocolNameEdit.Text               );
-  FIni.WriteInteger('Mqtt'   , 'ProtocolLevel'    , MqttProtocolLevelComboBox.ItemIndex     );
-  FIni.WriteString ('Server' , 'Host'             , ServerHostEdit.Text                     );
-  FIni.WriteString ('Server' , 'Port'             , ServerPortEdit.Text                     );
-  FIni.WriteString ('Connect', 'ClientIdentifier' , ConnectClientIdentifierEdit.Text        );
-  FIni.WriteInteger('Connect', 'Qos'              , ConnectQosComboBox.ItemIndex            );
-  FIni.WriteString ('Connect', 'WillTopic'        , ConnectWillTopicEdit.Text               );
-  FIni.WriteString ('Connect', 'WillMessage'      , ConnectWillMessageEdit.Text             );
-  FIni.WriteBool   ('Connect', 'WillActive'       , ConnectWillActiveCheckBox.Checked       );
-  FIni.WriteString ('Connect', 'Username'         , ConnectUsernameEdit.Text                );
-  FIni.WriteString ('Connect', 'Password'         , ConnectPasswordEdit.Text                );
-  FIni.WriteBool   ('Connect', 'CredentialsActive', ConnectCredentialsActiveCheckBox.Checked);
-  FIni.WriteString ('Connect', 'KeepAliveSeconds ', ConnectKeepAliveSecondsEdit.Text        );
-  FIni.WriteBool   ('Connect', 'CleanSession'     , ConnectCleanSessionCheckBox.Checked     );
-  FIni.WriteInteger('Pingreq', 'Count'            , PingreqCountComboBox.ItemIndex          );
-  FIni.WriteInteger('Pingreq', 'PauseMs'          , PingreqPauseMsComboBox.ItemIndex        );
-  FIni.WriteString ('Publish', 'Topic'            , PublishTopicEdit.Text                   );
-  FIni.WriteString ('Publish', 'Message'          , PublishMessageEdit.Text                 );
-  FIni.WriteInteger('Publish', 'Qos'              , PublishQosComboBox.ItemIndex            );
-  FIni.WriteInteger('Publish', 'Count'            , PublishCountComboBox.ItemIndex          );
-  FIni.WriteInteger('Publish', 'PauseMs'          , PublishPauseMsComboBox.ItemIndex        );
+  FIni.WriteString ('Mqtt'     , 'ProtocolName'     , MqttProtocolNameEdit.Text               );
+  FIni.WriteInteger('Mqtt'     , 'ProtocolLevel'    , MqttProtocolLevelComboBox.ItemIndex     );
+  FIni.WriteString ('Server'   , 'Host'             , ServerHostEdit.Text                     );
+  FIni.WriteString ('Server'   , 'Port'             , ServerPortEdit.Text                     );
+  FIni.WriteString ('Connect'  , 'ClientIdentifier' , ConnectClientIdentifierEdit.Text        );
+  FIni.WriteInteger('Connect'  , 'Qos'              , ConnectQosComboBox.ItemIndex            );
+  FIni.WriteString ('Connect'  , 'WillTopic'        , ConnectWillTopicEdit.Text               );
+  FIni.WriteString ('Connect'  , 'WillMessage'      , ConnectWillMessageEdit.Text             );
+  FIni.WriteBool   ('Connect'  , 'WillActive'       , ConnectWillActiveCheckBox.Checked       );
+  FIni.WriteString ('Connect'  , 'Username'         , ConnectUsernameEdit.Text                );
+  FIni.WriteString ('Connect'  , 'Password'         , ConnectPasswordEdit.Text                );
+  FIni.WriteBool   ('Connect'  , 'CredentialsActive', ConnectCredentialsActiveCheckBox.Checked);
+  FIni.WriteString ('Connect'  , 'KeepAliveSeconds ', ConnectKeepAliveSecondsEdit.Text        );
+  FIni.WriteBool   ('Connect'  , 'CleanSession'     , ConnectCleanSessionCheckBox.Checked     );
+  FIni.WriteInteger('Pingreq'  , 'Count'            , PingreqCountComboBox.ItemIndex          );
+  FIni.WriteInteger('Pingreq'  , 'PauseMs'          , PingreqPauseMsComboBox.ItemIndex        );
+  FIni.WriteString ('Publish'  , 'Topic'            , PublishTopicEdit.Text                   );
+  FIni.WriteString ('Publish'  , 'Message'          , PublishMessageEdit.Text                 );
+  FIni.WriteInteger('Publish'  , 'Qos'              , PublishQosComboBox.ItemIndex            );
+  FIni.WriteInteger('Publish'  , 'Count'            , PublishCountComboBox.ItemIndex          );
+  FIni.WriteInteger('Publish'  , 'PauseMs'          , PublishPauseMsComboBox.ItemIndex        );
+  FIni.WriteString ('Subscribe', 'TopicFilterList'  , string(SubscribeTopicFilterListMemo.Text).Replace(sLineBreak, '|'));
 
   // disjoin from tcpserver
   if FMQTTClient.IsJoined then
@@ -280,9 +290,56 @@ begin
     msg := PublishMessageEdit.Text;
     if msg.Contains('$Counter$') then
       msg := StringReplace(msg, '$Counter$', Format('%5d', [i]), [treplaceFlag.rfReplaceAll]);
-    FMqttClient.PublishPacketSend(10000+i, PublishTopicEdit.Text, msg, TMQTTQosType(PublishQosComboBox.ItemIndex), PublishDupFlagCheckBox.Checked, PublishRetainCheckBox.Checked);
+    FMqttClient.PublishPacketSend(FMqttClient.NextPacketId, PublishTopicEdit.Text, msg, TMQTTQosType(PublishQosComboBox.ItemIndex), PublishDupFlagCheckBox.Checked, PublishRetainCheckBox.Checked);
     Sleep(pause);
   end;
+end;
+{$ENDREGION}
+
+{$REGION 'SubscribePacketSend'}
+procedure TMainForm.SubscribePacketSendButtonClick(Sender: TObject);
+var
+  row: string;
+  i, count: integer;
+  rowsvec, tokenvec: TArray<string>;
+  subscribevec: TMQTTSubscribeTopicRecVec;
+begin
+  inherited;
+
+  SubscribeTopicFilterListMemo.Text := string(SubscribeTopicFilterListMemo.Text).Trim;
+  count := SubscribeTopicFilterListMemo.Lines.Count;
+  SetLength(subscribevec, count);
+  for i := 0 to count - 1 do begin
+    row := SubscribeTopicFilterListMemo.Lines[i];
+    if not row.Contains(',') then
+      row := row + ',0';
+    tokenvec := SplitString(row, ',');
+    subscribevec[i].TopicFilter  := tokenvec[0];
+    subscribevec[i].RequestedQoS := TMQTTQoSType(StrToIntDef(tokenvec[1], 0));
+  end;
+
+  FMqttClient.SubscribePacketSend(FMqttClient.NextPacketId, subscribevec);
+end;
+{$ENDREGION}
+
+{$REGION 'UnsubscribePacketSend'}
+procedure TMainForm.UnsubscribePacketSendButtonClick(Sender: TObject);
+var
+  i, count: integer;
+  row: string;
+  unsubscribevec: TMQTTUnsubscribeTopicRecVec;
+begin
+  inherited;
+
+  SubscribeTopicFilterListMemo.Text := string(SubscribeTopicFilterListMemo.Text).Trim;
+  count := SubscribeTopicFilterListMemo.Lines.Count;
+  SetLength(unsubscribevec, count);
+  for i := 0 to count - 1 do begin
+    row := SubscribeTopicFilterListMemo.Lines[i];
+    unsubscribevec[i].TopicFilter := row.Remove(row.IndexOf(','));
+  end;
+
+  FMqttClient.UnsubscribePacketSend(FMqttClient.NextPacketId, unsubscribevec);
 end;
 {$ENDREGION}
 

@@ -3,7 +3,6 @@ program WksMqttBaseProject;
 uses
   Vcl.Forms,
   WksMqttBaseMainFormtUnit in 'WksMqttBaseMainFormtUnit.pas' {BaseForm},
-  WksMqttUnit in 'WksMqttUnit.pas',
   WksMqttTypesUnit in 'WksMqttTypesUnit.pas',
   WksMqttUtilsUnit in 'WksMqttUtilsUnit.pas',
   WksMqttServerUnit in 'WksMqttServerUnit.pas',

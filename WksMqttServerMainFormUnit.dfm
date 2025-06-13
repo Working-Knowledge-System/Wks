@@ -54,31 +54,6 @@ inherited MainForm: TMainForm
         inherited LogTopPanel: TPanel
           StyleElements = [seFont, seClient, seBorder]
         end
-        inherited LogRichEdit: TRichEdit
-          StyleElements = [seFont, seClient, seBorder]
-        end
-      end
-      inherited RequestTabSheet: TTabSheet
-        inherited RequestTxtRichEdit: TRichEdit
-          StyleElements = [seFont, seClient, seBorder]
-        end
-        inherited RequestHexRichEdit: TRichEdit
-          StyleElements = [seFont, seClient, seBorder]
-        end
-        inherited RequestTopPanel: TPanel
-          StyleElements = [seFont, seClient, seBorder]
-        end
-      end
-      inherited ResponseTabSheet: TTabSheet
-        inherited ResponseHexRichEdit: TRichEdit
-          StyleElements = [seFont, seClient, seBorder]
-        end
-        inherited ResponseTxtRichEdit: TRichEdit
-          StyleElements = [seFont, seClient, seBorder]
-        end
-        inherited ResponseTopPanel: TPanel
-          StyleElements = [seFont, seClient, seBorder]
-        end
       end
     end
   end

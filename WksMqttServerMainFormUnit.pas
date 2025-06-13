@@ -17,10 +17,10 @@ uses
   , Vcl.ComCtrls
   , Vcl.ExtCtrls
   , Vcl.Imaging.pngimage
-  , JvExExtCtrls
-  , JvNetscapeSplitter
+//  , JvExExtCtrls
+//  , JvNetscapeSplitter
   , WksMqttBaseMainFormtUnit
-  , WksMqttServerUnit
+  , WksMqttServerUnit, SynEdit, SynEditHighlighter, SynHighlighterGeneral
   ;
 {$ENDREGION}
 
@@ -71,7 +71,7 @@ begin
   ServerPortEdit.Text := FIni.ReadString('Host', 'Port', '1883');
 
   // server
-  FMQTTServer := TMQTTServerClass.Create(LogRichEdit, RequestHexRichEdit, ResponseHexRichEdit);
+  FMQTTServer := TMQTTServerClass.Create(LogSynEdit.Lines, LogVerboseCheckBox, LogRawAsciiCheckBox, LogRawHexCheckBox, LogRawCharCheckBox);
 //  FMQTTServer.OnClientConnect    := ;
 //  FMQTTServer.OnClientDisconnect := ;
 //  FMQTTServer.OnClientMessage    := ;

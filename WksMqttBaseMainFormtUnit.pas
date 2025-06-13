@@ -17,7 +17,11 @@ uses
   , Vcl.Dialogs
   , Vcl.StdCtrls
   , Vcl.ComCtrls
-  , Vcl.ExtCtrls, JvExExtCtrls, JvNetscapeSplitter
+  , Vcl.ExtCtrls
+  , SynEdit
+  , SynEditTypes
+  , SynEditHighlighter
+  , SynHighlighterGeneral
   ;
 {$ENDREGION}
 
@@ -33,29 +37,16 @@ type
     LogTabSheet: TTabSheet;
     LogTopPanel: TPanel;
     LogClearButton: TButton;
-    LogRichEdit: TRichEdit;
-    RequestHexRichEdit: TRichEdit;
-    ResponseHexRichEdit: TRichEdit;
-    RequestTabSheet: TTabSheet;
-    RequestTxtRichEdit: TRichEdit;
-    ResponseTabSheet: TTabSheet;
-    ResponseTxtRichEdit: TRichEdit;
-    ResponseJvNetscapeSplitter: TJvNetscapeSplitter;
-    RequestJvNetscapeSplitter: TJvNetscapeSplitter;
-    RequestTopPanel: TPanel;
-    RequestClearButton: TButton;
-    ResponseTopPanel: TPanel;
-    ResponseClearButton: TButton;
     XxxExitButton: TButton;
     LogVerboseCheckBox: TCheckBox;
     LogRawCharCheckBox: TCheckBox;
     LogRawHexCheckBox: TCheckBox;
     LogRawAsciiCheckBox: TCheckBox;
+    LogSynEdit: TSynEdit;
+    SynMqttSyn: TSynGeneralSyn;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure LogClearButtonClick(Sender: TObject);
-    procedure RequestClearButtonClick(Sender: TObject);
-    procedure ResponseClearButtonClick(Sender: TObject);
     procedure XxxExitButtonClick(Sender: TObject);
   protected
     FIni: TIniFile;
@@ -82,21 +73,6 @@ implementation
 //  ;
 {$ENDREGION}
 
-{$REGION 'Routine'}
-procedure TBaseForm.Log(AStr: string);
-var
-  str: string;
-begin
-  str := FormatDateTime('dd hh:nn:ss zzz : ', Now) + AStr;
-  LogRichEdit.Lines.Add(str);
-end;
-
-procedure TBaseForm.Log(AFmt: string; AVarRecVec: array of TVarRec);
-begin
-  Log(Format(AFmt, AVarRecVec));
-end;
-{$ENDREGION}
-
 {$REGION 'Form'}
 procedure TBaseForm.FormCreate(Sender: TObject);
 begin
@@ -105,21 +81,23 @@ begin
   TopPageControl.ActivePageIndex := 0;
   MainPageControl.ActivePageIndex := 0;
   MainPanel.Align := alClient;
-  LogRichEdit.Clear;
-  RequestHexRichEdit.Clear;
-  RequestTxtRichEdit.Clear;
-  ResponseHexRichEdit.Clear;
-  ResponseTxtRichEdit.Clear;
+  LogClearButton.Click;
 
   // ini
   FIni := TIniFile.Create(ChangeFileExt(Application.ExeName, '.ini'));
-  LogVerboseCheckBox.Checked := FIni.ReadBool('Log', 'Verbose', false);
+  LogVerboseCheckBox.Checked  := FIni.ReadBool('Log', 'Verbose', true);
+  LogRawAsciiCheckBox.Checked := FIni.ReadBool('Log', 'RawAsci', true);
+  LogRawHexCheckBox.Checked   := FIni.ReadBool('Log', 'RawHex' , true);
+  LogRawCharCheckBox.Checked  := FIni.ReadBool('Log', 'RawChar', true);
 end;
 
 procedure TBaseForm.FormDestroy(Sender: TObject);
 begin
   // ini
-  FIni.WriteBool('Log', 'Verbose', LogVerboseCheckBox.Checked);
+  FIni.WriteBool('Log', 'Verbose', LogVerboseCheckBox.Checked );
+  FIni.WriteBool('Log', 'RawAsci', LogRawAsciiCheckBox.Checked);
+  FIni.WriteBool('Log', 'RawHex' , LogRawHexCheckBox.Checked  );
+  FIni.WriteBool('Log', 'RawChar', LogRawCharCheckBox.Checked );
   FIni.Free;
 end;
 
@@ -130,26 +108,29 @@ end;
 {$ENDREGION}
 
 {$REGION 'Log'}
+procedure TBaseForm.Log(AStr: string);
+var
+  str: string;
+begin
+  LogSynEdit.BeginUpdate;
+  try
+    str := FormatDateTime('dd hh:nn:ss zzz : ', Now) + AStr;
+    LogSynEdit.Lines.Add(str);
+    LogSynEdit.CaretXY := BufferCoord(1, LogSynEdit.Lines.Count);
+    LogSynEdit.EnsureCursorPosVisible;
+  finally
+    LogSynEdit.EndUpdate;
+  end;
+end;
+
+procedure TBaseForm.Log(AFmt: string; AVarRecVec: array of TVarRec);
+begin
+  Log(Format(AFmt, AVarRecVec));
+end;
+
 procedure TBaseForm.LogClearButtonClick(Sender: TObject);
 begin
-  LogRichEdit.Clear;
-  LogRichEdit.Tag := 0;
-end;
-{$ENDREGION}
-
-{$REGION 'Request'}
-procedure TBaseForm.RequestClearButtonClick(Sender: TObject);
-begin
-  RequestHexRichEdit.Clear;
-  RequestTxtRichEdit.Clear;
-end;
-{$ENDREGION}
-
-{$REGION 'Response'}
-procedure TBaseForm.ResponseClearButtonClick(Sender: TObject);
-begin
-  ResponseHexRichEdit.Clear;
-  ResponseTxtRichEdit.Clear;
+  LogSynEdit.Clear;
 end;
 {$ENDREGION}
 
