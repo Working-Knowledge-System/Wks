@@ -2,17 +2,123 @@ unit WksMqttTypesUnit;
 
 interface
 
+{$REGION 'Help'}
+{
+  CONNECTION FLAGS
+  ================
+  ...
+
+
+  TOPICS
+  ======
+
+  Topic can be anyting, altough this is the common practice
+
+  - try to use only small leters
+
+  - avoid a Leading Forward Slash
+    it introduces an unnecessary topic level with a zero character: /myhome/groundfloor/livingroom
+
+  - avoid Spaces and Special Chars, use only printable ASCII chars (32..196)
+
+  System Topics
+  -------------
+  Topics that start with a $ symbol are reserved for internal MQTT server statistics exposed to clients as information
+  These topics are not included in the subscription when using the multi-level wildcard (#)
+  Publishing messages to topics starting with $ is not permitted
+
+  examples:
+
+  $/broker/clients/connected      number of clients currently connected to the MQTT broker
+
+  $/broker/clients/disconnected   number of clients that have disconnected from the MQTT broker
+
+  $/broker/clients/total          total number of clients (connected and disconnected) that have interacted with the MQTT broker
+
+  $/broker/messages/sent          count of messages sent by the MQTT broker
+
+  $/broker/uptime                 duration the MQTT broker has been running (in minutes?)
+
+  Normal Topics
+  -------------
+  Any string of ASCII chars not starting with / and with / as separators for each level
+
+  example:
+
+  myhome/groundfloor/livingroom/temperature
+  myhome/groundfloor/livingroom/humidity
+  myhome/groundfloor/livingroom/brightness
+  myhome/groundfloor/kitchen/temperature
+  myhome/groundfloor/kitchen/humidity
+  myhome/groundfloor/kitchen/brightness
+  myhome/groundfloor/kitchen/refrigerator/temperature
+
+
+  NOTES
+  =====
+
+  the MQTT protocol specifies that the server is supposed to monitor the client’s keep-alive PINGREQ and disconnect it if it doesn’t send the PINGREQ within that period
+  but we can implement the server explicitly and periodically send a PINGREQ to ALL connected clients and expect a PINGRESP in return
+  if a client fails to respond the server can register the event and close the connection with that client
+
+
+  This design provides a solid foundation for a complete MQTT 3.1.1 implementation in Delphi
+
+  Indy TCP server automatically handles connections in separate threads
+  The server implementation should handle multiple concurrent clients. Consider thread safety in session management
+
+  Session Management: The server should maintain sessions for clients that connect with CleanSession=False
+  Retained Messages: The server should store retained messages and deliver them to new subscribers
+
+  Will Message: The client should support specifying a will message in the CONNECT packet
+  Keep Alive: Both client and server should monitor connection activity and disconnect inactive clients.
+
+  WordRead and WordWrite handle network byte order (big-endian) conversion using Swap
+  MQTT protocol requires all multi-byte values to be big-endian
+
+  Strings are properly encoded/decoded using UTF-8
+  Length prefixes are correctly written as 2-byte values
+}
+{$ENDREGION}
+
 {$REGION 'Use'}
 uses
     System.Classes
   , System.SysUtils
   , System.Math
   , System.Generics.Collections
+  , Vcl.StdCtrls
+//  , SynEdit
+//  , SynEditTypes
   ;
 {$ENDREGION}
 
 {$REGION 'Type'}
 type
+
+  {$REGION 'TMqttClass'}
+  TMqttClass = class
+  protected
+    FLogStrings: TStrings;
+  //FLogSynEdit: TCustomSynEdit;
+    FLogVerbose: TCheckBox;
+    FLogRawAscii: TCheckBox;
+    FLogRawHex: TCheckBox;
+    FLogRawChar: TCheckBox;
+  protected
+    procedure Log(const AStr: string; AWithTime: boolean = true); overload;
+    procedure Log(const AFmt: string; AVarRecVec: array of TVarRec; AWithTime: boolean = true); overload;
+    procedure Dmp(const AStr: string);
+  public
+    constructor Create(ALogStrings: TStrings; ALogVerbose, ALogRawAscii, ALogRawHex, ALogRawChar: TCheckBox){; overload}; virtual;
+  //constructor Create(ALogSynEdit: TCustomSynEdit; ALogVerbose, ALogRawAscii, ALogRawHex, ALogRawChar: TCheckBox); overload; virtual;
+
+    property LogVerbose : TCheckBox read FLogVerbose  write FLogVerbose ;
+    property LogRawAscii: TCheckBox read FLogRawAscii write FLogRawAscii;
+    property LogRawHex  : TCheckBox read FLogRawHex   write FLogRawHex  ;
+    property LogRawChar : TCheckBox read FLogRawChar  write FLogRawChar ;
+  end;
+  {$ENDREGION}
 
   {$REGION 'Protocol'}
   TMQTTVersionLevel = 1..5; // 1 = 1.2  2 = 3.0  3 = 3.1  4 = 3.1.1  5 = 5.0
@@ -36,13 +142,6 @@ type
   );
   {$ENDREGION}
 
-  {$REGION 'Subscription'}
-  TMQTTSubscription = record
-    TopicFilter: string;
-    QoS: TMQTTQOSType;
-  end;
-  {$ENDREGION}
-
   {$REGION 'Message'}
   TMQTTMessageRec = record {TMQTTApplicationMessage}
     DupFlag: boolean;
@@ -64,46 +163,12 @@ type
   TOnMQTTMessage = reference to procedure(const ATopicName: string; const AApplicationMessage: TBytes; AQoSLevel: TMQTTQOSType; ARetain: boolean);
   {$ENDREGION}
 
-  {$REGION 'Session'}
-  TMQTTSessionClass = class
-  private
-    FClientIdentifier: string;
-    FCleanSession: boolean;
-    FSubscriptions: TList<TMQTTSubscription>;
-    FInFlightQoS1: TObjectDictionary<Word, TMQTTMessageInFlight>;
-    FInFlightQoS2: TObjectDictionary<Word, TMQTTMessageInFlight>;
-    FMessageQueue: TList<TMQTTMessageRec>;
-    FPacketIdNext: word;
-    FLastContact: TDateTime;
-    FWillMessage: TMQTTMessageRec;
-    function PacketIdGenerate: word;
-  public
-    constructor Create(const AClientIdentifier: string; ACleanSession: boolean);
-    destructor Destroy; override;
-
-    procedure LastContactUpdate;
-    function  SubscriptionAdd(const ATopicFilter: string; AQoS: TMQTTQoSType): boolean;
-    procedure SubscriptionRemove(const ATopicFilter: string);
-    function  SubscriptionExists(const ATopicFilter: string): boolean;
-    procedure MessageQueue(const AMessage: TMQTTMessageRec);
-    function  MessageDequeue: TMQTTMessageRec;
-
-    property ClientIdentifier: string                                    read FClientIdentifier;
-    property CleanSession: boolean                                       read FCleanSession;
-    property Subscriptions: TList<TMQTTSubscription>                     read FSubscriptions;
-    property LastContact: TDateTime                                      read FLastContact;
-    property WillMessage: TMQTTMessageRec                                read FWillMessage write FWillMessage;
-    property InFlightQoS1: TObjectDictionary<Word, TMQTTMessageInFlight> read FInFlightQoS1;
-    property InFlightQoS2: TObjectDictionary<Word, TMQTTMessageInFlight> read FInFlightQoS2;
-  end;
-  {$ENDREGION}
-
   {$REGION 'Packet'}
 {
    -----------------------------------------------------------   -------------   -------------
   |                FIXED HEADER (2..5 bytes)                  | | VAR. HEADER | |  PAY LOAD   |
   |-----------------------------------------------------------| |             | |             |
-  |CTRL PACKET|                 REMAINING LEN                 | |  0-N bytes  | |  0-M bytes  |
+  | CTRL BYTE |                 REMAINING LEN                 | |  0-N bytes  | |  0-M bytes  |
   |-----------|-----------------------------------------------| |<----------->| |<----------->|
   |type | flgs|                                               | |             | |             |
   |-----------|-----------------------------------------------| |             | |             |
@@ -329,6 +394,40 @@ type
   end;
   {$ENDREGION}
 
+  {$REGION 'Session'}
+  TMQTTSessionClass = class
+  private
+    FClientIdentifier: string;
+    FCleanSession: boolean;
+    FSubscriptions: TList<TMQTTSubscribeTopicRec>;
+    FInFlightQoS1: TObjectDictionary<Word, TMQTTMessageInFlight>;
+    FInFlightQoS2: TObjectDictionary<Word, TMQTTMessageInFlight>;
+    FMessageQueue: TList<TMQTTMessageRec>;
+    FPacketIdNext: word;
+    FLastContact: TDateTime;
+    FWillMessage: TMQTTMessageRec;
+    function PacketIdGenerate: word;
+  public
+    constructor Create(const AClientIdentifier: string; ACleanSession: boolean);
+    destructor Destroy; override;
+
+    procedure LastContactUpdate;
+    function  SubscriptionAdd(const ATopicFilter: string; AQoS: TMQTTQoSType): boolean;
+    procedure SubscriptionRemove(const ATopicFilter: string);
+    function  SubscriptionExists(const ATopicFilter: string): boolean;
+    procedure MessageQueue(const AMessage: TMQTTMessageRec);
+    function  MessageDequeue: TMQTTMessageRec;
+
+    property ClientIdentifier: string                                    read FClientIdentifier;
+    property CleanSession: boolean                                       read FCleanSession;
+    property Subscriptions: TList<TMQTTSubscribeTopicRec>                     read FSubscriptions;
+    property LastContact: TDateTime                                      read FLastContact;
+    property WillMessage: TMQTTMessageRec                                read FWillMessage write FWillMessage;
+    property InFlightQoS1: TObjectDictionary<Word, TMQTTMessageInFlight> read FInFlightQoS1;
+    property InFlightQoS2: TObjectDictionary<Word, TMQTTMessageInFlight> read FInFlightQoS2;
+  end;
+  {$ENDREGION}
+
   {$REGION 'StreamDecoder'}
   TMQTTStreamDecoder = class
   private
@@ -349,6 +448,63 @@ implementation
 uses
     WksMqttUtilsUnit
   ;
+{$ENDREGION}
+
+{$REGION 'TMqttClass'}
+constructor TMqttClass.Create(ALogStrings: TStrings; ALogVerbose, ALogRawAscii, ALogRawHex, ALogRawChar: TCheckBox);
+begin
+  FLogStrings  := ALogStrings;
+//FLogSynEdit  := ALogSynEdit;
+  FLogVerbose  := ALogVerbose;
+  FLogRawAscii := ALogRawAscii;
+  FLogRawHex   := ALogRawHex;
+  FLogRawChar  := ALogRawChar;
+end;
+
+procedure TMqttClass.Log(const AStr: string; AWithTime: boolean);
+var
+  sls: TStringList;
+begin
+  // exit
+  if not Assigned(FLogStrings) then
+    Exit;
+
+  // log
+  TThread.Synchronize(nil
+//TThread.Queue(TThread.CurrentThread
+  , procedure
+    begin
+      FLogStrings.BeginUpdate;
+      try
+        if AWithTime then
+          FLogStrings.Add(FormatDateTime('dd hh:nn:ss zzz : ', Now) + AStr)
+        else begin
+          sls := TStringList.Create;
+          try
+            sls.Text := AStr; // this splits the text into lines
+            FLogStrings.AddStrings(sls);
+          finally
+            sls.Free;
+          end;
+        end;
+//        FLogSynEdit.CaretXY := BufferCoord(1, FLogSynEdit.Lines.Count);
+//        FLogSynEdit.EnsureCursorPosVisible;
+      finally
+        FLogStrings.EndUpdate;
+      end;
+    end
+  );
+end;
+
+procedure TMqttClass.Log(const AFmt: string; AVarRecVec: array of TVarRec; AWithTime: boolean);
+begin
+  Log(Format(AFmt, AVarRecVec), AWithTime);
+end;
+
+procedure TMqttClass.Dmp(const AStr: string);
+begin
+  Log(AStr, false);
+end;
 {$ENDREGION}
 
 {$REGION 'TMQTTSession'}
@@ -382,7 +538,7 @@ constructor TMQTTSessionClass.Create(const AClientIdentifier: string; ACleanSess
 begin
   FClientIdentifier := AClientIdentifier;
   FCleanSession     := ACleanSession;
-  FSubscriptions    := TList<TMQTTSubscription>.Create;
+  FSubscriptions    := TList<TMQTTSubscribeTopicRec>.Create;
   FMessageQueue     := TList<TMQTTMessageRec>.Create;
   FInFlightQoS1     := TObjectDictionary<Word, TMQTTMessageInFlight>.Create([doOwnsValues]);
   FInFlightQoS2     := TObjectDictionary<Word, TMQTTMessageInFlight>.Create([doOwnsValues]);
@@ -429,7 +585,7 @@ end;
 function  TMQTTSessionClass.SubscriptionAdd(const ATopicFilter: string; AQoS: TMQTTQoSType): boolean;
 var
   i: integer;
-  sub: TMQTTSubscription;
+  sub: TMQTTSubscribeTopicRec;
 begin
   Result := false;
 
@@ -437,7 +593,7 @@ begin
   for i := 0 to FSubscriptions.Count - 1 do begin
     if SameText(FSubscriptions[i].TopicFilter, ATopicFilter) then begin
       sub := FSubscriptions[i];
-      sub.QoS := AQoS;
+      sub.RequestedQoS := AQoS;
       FSubscriptions[i] := sub;
       Exit(true);
     end;
@@ -445,7 +601,7 @@ begin
 
   // otherwise add a new subscription
   sub.TopicFilter := ATopicFilter;
-  sub.QoS := AQoS;
+  sub.RequestedQoS := AQoS;
   FSubscriptions.Add(sub);
   Result := true;
 end;
@@ -958,8 +1114,10 @@ begin
 
     totallen := 1 + lenlen + remlen;
 
-    if {FOffset +} TotalLen > Length(FBuffer) then
+    if {FOffset +} TotalLen > Length(FBuffer) then begin
+//      AFbk := 'Malformed Remaining Length in MQTT packet';
       Exit;
+    end;
 
     SetLength(APacket, totallen);
     Move(FBuffer[{FOffset}0], APacket[0], totallen);
@@ -975,6 +1133,300 @@ begin
 //    end;
 //  end;
 end;
+{$ENDREGION}
+
+{$REGION 'Zzz'}
+(*
+  TMqttClass = class
+  protected
+    procedure LogRequest(const AStr: string); overload;
+    procedure LogRequest(const AIdBytes: TIdBytes); overload;
+    procedure LogResponse(const AStr: string); overload;
+    procedure LogResponse(const AIdBytes: TIdBytes); overload;
+    procedure LogWithRequest(const AStr: string; const ARequest: TIdBytes);
+    procedure LogWithResponse(const AStr: string; const AResponse: TIdBytes);
+    procedure BytAdd(const AByte: byte; var APacket: TIdBytes; var AIndex: integer);
+    procedure StrAdd(const AStr: ansistring; var APacket: TIdBytes; var AIndex: integer);
+    function  StrRead(AContext: TIdContext): string;
+    function  IntEat(var AIdBytes: TIdBytes; ACount: integer; ADefault: integer = 0): integer;
+    function  StrEat(var AIdBytes: TIdBytes; ACount: integer; ADefault: string = ''): string;
+    function  StrPrintable(const AStr: string): string;
+    function  StrDebugable(const AStr: string; IvHex: boolean = true): string; overload;
+    function  StrDebugable(const AIdBytes: TIdBytes; IvHex: boolean = true): string; overload;
+  end;
+
+implementation
+
+procedure TMqttClass.LogRequest(const AStr: string);
+begin
+  if Assigned(FLogRequestRichEdit) then begin
+    TThread.Synchronize(nil,
+      procedure
+      begin
+        FLogRequestRichEdit.Lines.Add(AStr);
+      end
+    );
+  end;
+end;
+
+procedure TMqttClass.LogRequest(const AIdBytes: TIdBytes);
+begin
+  if Assigned(FLogRequestRichEdit) then begin
+    TThread.Synchronize(nil,
+      procedure
+      begin
+        FLogRequestRichEdit.Lines.Add(
+        //BytesToStringRaw(AIdBytes)
+          StrDebugable(AIdBytes)
+        );
+      end
+    );
+  end;
+end;
+
+procedure TMqttClass.LogResponse(const AStr: string);
+begin
+  if Assigned(FLogResponseRichEdit) then begin
+    TThread.Synchronize(nil,
+      procedure
+      begin
+        FLogResponseRichEdit.Lines.Add(AStr);
+      end
+    );
+  end;
+end;
+
+procedure TMqttClass.LogResponse(const AIdBytes: TIdBytes);
+begin
+  if Assigned(FLogResponseRichEdit) then begin
+    TThread.Synchronize(nil,
+      procedure
+      begin
+        FLogResponseRichEdit.Lines.Add(
+        //BytesToStringRaw(AIdBytes)
+          StrDebugable(AIdBytes)
+        );
+      end
+    );
+  end;
+end;
+
+procedure TMqttClass.LogWithRequest(const AStr: string; const ARequest: TIdBytes);
+begin
+  Log(AStr);
+  LogRequest(ARequest);
+end;
+
+procedure TMqttClass.LogWithResponse(const AStr: string; const AResponse: TIdBytes);
+begin
+  Log(AStr);
+  LogResponse(AResponse);
+end;
+
+function  TMQTTClass.StrDebugable(const AStr: string; IvHex: boolean): string;
+var
+  i: integer;
+  b: byte;
+  c: char;
+begin
+  Result := '';
+
+  for i := 1 to Length(AStr) do begin // strings are 1 indexed
+    c := AStr[i];
+    b := Ord(c);
+
+    if IvHex then begin
+      Result := Result + ' ' + IntToHex(b, 2);
+
+    end else begin
+      case b of
+      32..255: Result := Result + ' ' + c;
+      else     Result := Result + ' ' + IntToHex(b, 2); // Format('{%d}', [c])
+      end;
+    end;
+  end;
+  Delete(Result, 1, 1);
+end;
+
+function  TMQTTClass.StrDebugable(const AIdBytes: TIdBytes; IvHex: boolean): string;
+var
+  i: integer;
+  b: byte;
+begin
+  Result := '';
+
+  for i := 0 to Length(AIdBytes) -1 do begin // array are 0 indexed
+    b := AIdBytes[i];
+
+    if IvHex then begin
+      Result := Result + ' ' + IntToHex(b, 2);
+
+    end else begin
+      case b of
+      32..255: Result := Result + ' ' + Chr(b);
+      else     Result := Result + ' ' + IntToHex(b, 2); // Format('{%d}', [c])
+      end;
+    end;
+  end;
+  Delete(Result, 1, 1);
+end;
+
+function  TMQTTClass.StrPrintable(const AStr: string): string;
+var
+  i, len: integer;
+  c: char;
+begin
+  len := Length(AStr);
+  if Len = 0 then
+    Exit('');
+
+  Result := AStr;
+  i := 1;
+
+  while i <= Len do begin
+    // a char
+    c := AStr[i];
+
+    // 1) preserve tabs (#9), line feeds (#10), and carriage returns (#13)
+    if (C = #9) or (C = #10) or (C = #13) then begin // #10#13 is a ctrl-string
+      Inc(i);
+
+    // 2) keep ASCII/extended-ASCII (#32..#255) as is
+    end else if ((Ord(C) >= 32) and (Ord(C) <= 255)) then begin
+      Inc(i);
+
+    // 3) convert other whitespace to an ASCII space
+    end else if c.IsWhiteSpace then begin
+      Result[i] := '_';
+      Inc(i);
+
+    // 4) otherwise, skip it
+    end else begin
+      Result[i] := '!';
+      Inc(i);
+      //Delete(Result, i, 1);
+      //Dec(len);
+    end;
+  end;
+end;
+
+procedure TMqttClass.BytAdd(const AByte: byte; var APacket: TIdBytes; var AIndex: integer);
+begin
+  APacket[AIndex] := AByte;
+  Inc(AIndex);
+end;
+
+procedure TMqttClass.StrAdd(const AStr: ansistring; var APacket: TIdBytes; var AIndex: integer);
+var
+  len: word;
+begin
+  len := Length(AStr);
+  APacket[AIndex] := Hi(len);
+  Inc(AIndex);
+  APacket[AIndex] := Lo(len);
+  Inc(AIndex);
+  Move(AStr[1], APacket[AIndex], len);
+  Inc(AIndex, len);
+end;
+
+function  TMQTTClass.StrRead(AContext: TIdContext): string;
+var
+  rbu: TIdBytes; // lengthbytes
+  stz: word; // strlen
+begin
+  // 2-bytes read for length
+  AContext.Connection.IOHandler.ReadBytes(rbu, 2, false);
+  stz := {(rbu[0] shl 8) or} rbu[1];
+  // string actual read
+  Result := AContext.Connection.IOHandler.ReadString(stz, IndyTextEncoding_UTF8);
+end;
+
+function  TMqttClass.IntEat(var AIdBytes: TIdBytes; ACount, ADefault: integer): integer;
+var
+  {i, }remaining: integer;
+begin
+  // init
+  Result := ADefault;
+  if ACount <= 0 then
+    Exit;
+
+  // adjust
+  if ACount > Length(AIdBytes) then
+    ACount := Length(AIdBytes);
+  if ACount <= 0 then
+    Exit;
+
+  // resultload
+       if ACount = 1 then
+    Result := AIdBytes[0]
+  else if ACount = 2 then
+    Result := (AIdBytes[0] shl  8) or AIdBytes[1]
+  else if ACount = 3 then
+    Result := (AIdBytes[0] shl 16) or (AIdBytes[1] shl  8) or AIdBytes[2]
+  else if ACount = 4 then
+    Result := (AIdBytes[0] shl 24) or (AIdBytes[1] shl 16) or (AIdBytes[2] shl 8) or AIdBytes[3]
+  else
+    raise Exception.Create('4 bytes max can be eated');
+
+  // remove extracted bytes from the original array
+  Remaining := Length(AIdBytes) - ACount;
+  if Remaining > 0 then
+    Move(AIdBytes[ACount], AIdBytes[0], Remaining);
+  SetLength(AIdBytes, Remaining);
+end;
+
+function  TMqttClass.StrEat(var AIdBytes: TIdBytes; ACount: integer; ADefault: string): string;
+var
+  i, remaining: integer;
+begin
+  // init
+  Result := '';
+  if ACount <= 0 then
+    Exit;
+
+  // adjust
+  if ACount > Length(AIdBytes) then
+    ACount := Length(AIdBytes);
+  if ACount <= 0 then
+    Exit;
+
+  // resultload
+  SetLength(Result, ACount);
+  for i := 0 to ACount - 1 do
+    Result[i + 1] := Char(AIdBytes[i]);
+
+  // remove extracted bytes from the original array
+  Remaining := Length(AIdBytes) - ACount;
+  if Remaining > 0 then
+    Move(AIdBytes[ACount], AIdBytes[0], Remaining);
+  SetLength(AIdBytes, Remaining);
+end;
+*)
+{$ENDREGION}
+
+{$REGION 'Zzz'}
+{
+  procedure BytesSplitAtNullChar(const fullpacket: TIdBytes; var AIdBytesVec: TBytesVec);
+  var
+    i: int64;
+    bts: TIdBytes;
+  begin
+    SetLength(AIdBytesVec, 0);
+    SetLength(bts, 0);
+    for i := Low(fullpacket) to High(fullpacket) do begin
+      if (fullpacket[i] <> $0) and (i <= High(fullpacket)) then begin
+        SetLength(bts, Length(bts) + 1);
+        bts[High(bts)] := fullpacket[i];
+      end else begin
+        SetLength(bts, Length(bts) + 1);
+        bts[High(bts)] := $0;
+        SetLength(AIdBytesVec, Length(AIdBytesVec) + 1);
+        AIdBytesVec[High(AIdBytesVec)] := bts;
+        SetLength(bts, 0);
+      end;
+    end;
+  end;
+}
 {$ENDREGION}
 
 end.

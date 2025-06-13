@@ -3,7 +3,7 @@
         <ProjectGuid>{07BC5A12-5022-46E3-8F1C-DBC460D7FACE}</ProjectGuid>
         <MainSource>WksMqttBaseProject.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <ProjectName Condition="'$(ProjectName)'==''">WksMqttBaseProject</ProjectName>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
@@ -102,7 +102,6 @@
         <DCCReference Include="WksMqttBaseMainFormtUnit.pas">
             <Form>BaseForm</Form>
         </DCCReference>
-        <DCCReference Include="WksMqttUnit.pas"/>
         <DCCReference Include="WksMqttTypesUnit.pas"/>
         <DCCReference Include="WksMqttUtilsUnit.pas"/>
         <DCCReference Include="WksMqttServerUnit.pas"/>
@@ -138,6 +137,12 @@
             </Platforms>
             <Deployment Version="4">
                 <DeployFile LocalName="..\..\X\Win32\Debug\WksMqttBaseProject.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>WksMqttBaseProject.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\X\Win32\Release\WksMqttBaseProject.exe" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>WksMqttBaseProject.exe</RemoteName>
                         <Overwrite>true</Overwrite>
@@ -1094,6 +1099,7 @@
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win64x" Name="$(PROJECTNAME)"/>
             </Deployment>
+            <ModelSupport>False</ModelSupport>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>

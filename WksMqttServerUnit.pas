@@ -18,7 +18,7 @@ uses
 //, IdTCPConnection
   , IdTCPServer
   , IdIOHandler
-  , WksMqttUnit
+  , SynEdit
   , WksMqttTypesUnit
   ;
 {$ENDREGION}
@@ -215,7 +215,7 @@ type
     // utils
   //function ClientIdentifierValidate(const AClientIdentifier: string): boolean;
   public
-    constructor Create(ALogRichEdit, ARequestHexRichEdit, AResponseHexRichEdit: TRichEdit); override;
+    constructor Create(ALogStrings: TStrings; ALogVerbose, ALogRawAscii, ALogRawHex, ALogRawChar: TCheckBox); override;
     destructor Destroy; override;
     procedure Start(APort: Word = 1883);
     procedure Stop;
@@ -234,9 +234,9 @@ type
 implementation
 
 {$REGION 'TMQTTServerClass'}
-constructor TMQTTServerClass.Create(ALogRichEdit, ARequestHexRichEdit, AResponseHexRichEdit: TRichEdit);
+constructor TMQTTServerClass.Create(ALogStrings: TStrings; ALogVerbose, ALogRawAscii, ALogRawHex, ALogRawChar: TCheckBox);
 begin
-  inherited Create(ALogRichEdit, ARequestHexRichEdit, AResponseHexRichEdit);
+  inherited Create(ALogStrings, ALogVerbose, ALogRawAscii, ALogRawHex, ALogRawChar);
 
   // tcpserver
   FTCPServer := TIdTCPServer.Create(nil);
@@ -798,7 +798,7 @@ end;
 procedure TMQTTServerClass.ApplicationMessageBroadcast(AMessage: TMQTTMessageRec);
 var
   session: TMQTTSessionClass;
-  subscription: TMQTTSubscription;
+  subscription: TMQTTSubscribeTopicRec;
 begin
   {
   sessions
@@ -856,8 +856,9 @@ begin
   if not FSessions.TryGetValue(AClientIdentifier, Result) then
     Result := nil;
 end;
+{$ENDREGION}
 
-  {$REGION 'TCPServerHandlers'}
+{$REGION 'TCPServerHandlers'}
 procedure TMQTTServerClass.OnClientJoinedHandler(AContext: TIdContext);
 begin
   Log('client %d joined from: %s', [AContext.Binding.ID, AContext.Binding.PeerIP]);
@@ -879,7 +880,7 @@ var
   io: TIdIOHandler{TIdIOHandlerSocket};
   bytes, response{, buffer}: TIdBytes;
   packetbytes: TBytes;
-  size{, packetnumber}: cardinal;
+  size: cardinal;
   ctrlbyte: byte;
   ip: string;
   decoder: TMQTTStreamDecoder;
@@ -930,31 +931,19 @@ begin
       decoder.DataAppend(TBytes(bytes));
 
       // packetbypacket
-//      packetnumber := 0;
       while decoder.PacketTryExtract(packetbytes) do begin
         try
-          // count
-//          Inc(packetnumber);
-
           // read all in the packet's stream
           packet.Stream.Clear;
-          // i
         //size := io.ReadInt32;
         //io.ReadStream(packet.Stream, {-1}size, false);
-          // ii
-        //packet.StreamFromBytes(TBytes(bytes));
-          // iii
-          packet.StreamFromBytes(packetbytes);
+          packet.StreamFromBytes({TBytes(bytes)}packetbytes);
 
           // log
-          if LogVerbose then
-            Log('%s: received %d bytes', [ip, packet.Len]);
-          if LogRawAscii then
-            Log('%s: (%s)'             , [ip, packet.AsAscii]);
-          if LogRawHex then
-            Log('%s: (%s)'             , [ip, packet.AsHex]);
-          if LogRawChar then
-            Log('%s: (%s)'             , [ip, packet.AsChar]);
+          if LogVerbose.Checked  then Log('%s: received %d bytes', [ip, packet.Len]);
+          if LogRawAscii.Checked then Log('%s: (%s)'             , [ip, packet.AsAscii]);
+          if LogRawHex.Checked   then Log('%s: (%s)'             , [ip, packet.AsHex]);
+          if LogRawChar.Checked  then Log('%s: (%s)'             , [ip, packet.AsChar]);
 
           // read 1st byte for packettype and flags
           ctrlbyte := packet.ByteRead;
@@ -971,19 +960,19 @@ begin
 
             {$REGION 'RESERVED 0 packet'}
             ptRESERVED   : begin
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Log('%s: received RESERVED (0) packet', [ip]);
-//              if Verbose then
-//                Dmp(packet.AsChar);
+              if LogVerbose.Checked then
+                Dmp(packet.AsChar);
             end;
             {$ENDREGION}
 
             {$REGION 'CONNECT 1 packet'}
             ptCONNECT    : begin
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Log('%s: received CONNECT (1) packet', [ip]);
               connectreturncode := ConnectPacketProcess(session, packet, connectpacketrec);
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Dmp(connectpacketrec.Dump);
 
               {$REGION 'reply CONNACK 2'}
@@ -993,23 +982,24 @@ begin
               response[2] := $00; // nosessionpresent=$00, sessionpresentflag=$01
               response[3] := $00; // 0=connectionaccepted, 1=connectionrefusedunacceptableprotocollevel, ...
               io.Write(response);
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Log('%s: reply    CONNACK (2)', [ip]);
               {$ENDREGION}
 
             end;
 
   //          ptCONNACK    : begin
-  //            Log('%s: received CONNACK (2) packet', [ip]);
+  //            if LogVerbose.Checked then
+  //              Log('%s: received CONNACK (2) packet', [ip]);
   //          end;
             {$ENDREGION}
 
             {$REGION 'PUBLISH 3 packet'}
             ptPUBLISH    : begin
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Log('%s: received PUBLISH (3) packet', [ip]);
               publishreturncode := PublishPacketProcess(session, packet, publishpacketrec);
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Dmp(publishpacketrec.Dump);
 
               {$REGION 'reply PUBACK 4'}
@@ -1025,7 +1015,7 @@ begin
                 response[2] := Hi(publishpacketrec.PacketIdentifier); //
                 response[3] := Lo(publishpacketrec.PacketIdentifier); //
                 io.Write(response);
-                if LogVerbose then
+                if LogVerbose.Checked then
                   Log('%s: reply    PUBACK (4)', [ip]);
 
               // ...
@@ -1037,32 +1027,32 @@ begin
             end;
 
   //          ptPUBACK     : begin
-  //            if LogVerbose then
+  //            if LogVerbose.Checked then
 //                Log('%s: received PUBACK (4) packet', [ip]);
   //          end;
 
   //          ptPUBREC     : begin
-  //            if LogVerbose then
+  //            if LogVerbose.Checked then
 //                Log('%s: received PUBREC (5) packet', [ip]);
   //          end;
 
   //          ptPUBREL     : begin
-  //            if LogVerbose then
+  //            if LogVerbose.Checked then
 //                Log('%s: received PUBREL (6) packet', [ip]);
   //          end;
 
   //          ptPUBCOMP    : begin
-  //            if LogVerbose then
+  //            if LogVerbose.Checked then
 //                Log('%s: received PUBCOMP (7) packet', [ip]);
   //          end;
             {$ENDREGION}
 
             {$REGION 'SUBSCRIBE 8 packet'}
             ptSUBSCRIBE  : begin
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Log('%s: received SUBSCRIBE (8) packet', [ip]);
               subscribereturncode := SubscribePacketProcess(session, packet, subscribepacketrec);
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Dmp(subscribepacketrec.Dump);
 
               {$REGION 'reply SUBACK 9'}
@@ -1074,24 +1064,24 @@ begin
               response[4] := integer(subscribepacketrec.SubscribeTopicRecVec[0].RequestedQoS); // requested QoS level
 
               io.Write(TIdBytes(response));
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Log('%s: reply    SUBACK (9)', [ip]);
               {$ENDREGION}
 
             end;
 
   //          ptSUBACK     : begin
-  //            if LogVerbose then
+  //            if LogVerbose.Checked then
 //                Log('%s: received SUBACK (9) packet', [ip]);
   //          end;
             {$ENDREGION}
 
             {$REGION 'UNSUBSCRIBE 10 packet'}
             ptUNSUBSCRIBE: begin
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Log('%s: received UNSUBSCRIBE (10) packet', [ip]);
               unsubscribereturncode := UnsubscribePacketProcess(session, packet, unsubscribepacketrec);
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Dmp(unsubscribepacketrec.Dump);
 
               {$REGION 'reply UNSUBACK 11'}
@@ -1102,24 +1092,24 @@ begin
               response[3] := Lo(unsubscribepacketrec.PacketIdentifier);                        // LSB
 
               io.Write(TIdBytes(response));
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Log('%s: reply    UNSUBACK (11)', [ip]);
               {$ENDREGION}
 
             end;
 
   //          ptUNSUBACK   : begin
-  //            if LogVerbose then
+  //            if LogVerbose.Checked then
 //                Log('%s: received UNSUBACK (11) packet', [ip]);
   //          end;
             {$ENDREGION}
 
             {$REGION 'PINGREQ 12 packet'}
             ptPINGREQ    : begin
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Log('%s: received PINGREQ (12) packet', [ip]);
               pingreqreturncode := PingReqPacketProcess(session, packet, pingreqpacketrec);
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Dmp(pingreqpacketrec.Dump);
 
               {$REGION 'reply PINGRESP 13'}
@@ -1127,41 +1117,41 @@ begin
               response[0] := $D0;          // = 1101 0000   control packet type (PINGRESP)
               response[1] := $00;          // = 0000 0000   remaining length (always 0)
               io.Write(TIdBytes(response));
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Log('%s: reply    PINGRESP (13)', [ip]);
               {$ENDREGION}
 
             end;
 
   //          ptPINGRESP   : begin
-  //            if LogVerbose then
+  //            if LogVerbose.Checked then
 //                Log('%s: received PINGRESP (13) packet', [ip]);
   //          end;
             {$ENDREGION}
 
             {$REGION 'DISCONNECT 14 packet'}
             ptDISCONNECT : begin
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Log('%s: received DISCONNECT (14) packet', [ip]);
               disconnectreturncode := DisconnectPacketProcess(session, packet, disconnectpacketrec);
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Dmp(disconnectpacketrec.Dump);
 
               // tcpconnectionclose
               AContext.Connection.Disconnect;
 //              io.Close;
 //              io.CloseGracefully;
-              //if LogVerbose then
+              //if LogVerbose.Checked then
 //                Log('%s: client tcp connection closed', [ip]);
             end;
             {$ENDREGION}
 
             {$REGION 'RESERVED 15 packet'}
             ptRESERVED2  : begin
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Log('%s: received RESERVED (15) packet', [ip]);
-//              if Verbose then
-//                Dmp(packet.AsChar);
+              if LogVerbose.Checked then
+                Dmp(packet.AsChar);
             end;
             {$ENDREGION}
 
@@ -1210,9 +1200,9 @@ begin
     decoder.Free;
   end;
 end;
-  {$ENDREGION}
+{$ENDREGION}
 
-  {$REGION 'BrokerHandlers'}
+{$REGION 'BrokerHandlers'}
 procedure TMQTTServerClass.OnConnectHandler(AContext: TIdContext);
 var
   cid: string;  // clientidentifier
@@ -1278,14 +1268,6 @@ begin
 //      PublishPacketProcess(nil, session.WillMessage);
   end;
 end;
-  {$ENDREGION}
-
-{$ENDREGION}
-
-{$REGION 'Zzz'}
-(*
-
-*)
 {$ENDREGION}
 
 end.

@@ -14,7 +14,7 @@ uses
   , IdStack
   , IdTCPClient
   , IdIOHandler
-  , WksMqttUnit
+  , SynEdit
   , WksMqttTypesUnit
   ;
 {$ENDREGION}
@@ -54,14 +54,14 @@ type
     function  NextPacketIdGet: word;
     function IsJoinedGet: boolean;
   public
-    constructor Create(ALogRichEdit, ARequestHexRichEdit, AResponseHexRichEdit: TRichEdit); override;
+    constructor Create(ALogStrings: TStrings; ALogVerbose, ALogRawAscii, ALogRawHex, ALogRawChar: TCheckBox); override;
     destructor Destroy; override;
     procedure Join(AHost: string; APort: integer);
     procedure Disjoin;
     procedure ConnectPacketSend(IvProtocolLevel, IvQos: byte; AClientIdentifier, AWillTopic, AWillMessage, AUsername, APassword: string; IvCleanSession: boolean = true; AKeepAliveSeconds: word = 60);
     procedure PublishPacketSend(APacketIdentifier: word; ATopicName, AApplicationMessage: string; AQosLevel: TMQTTQoSType = qostAT_MOST_ONCE; ADupFlag: boolean = False; ARetain: boolean = false);
     procedure SubscribePacketSend(APacketIdentifier: word; ASubscribeTopicRecVec: TMQTTSubscribeTopicRecVec);
-    procedure UnsubscribePacketSend(APacketIdentifier: word; ASubscribeTopicRecVec: TMQTTSubscribeTopicRecVec);
+    procedure UnsubscribePacketSend(APacketIdentifier: word; AUnsubscribeTopicRecVec: TMQTTUnsubscribeTopicRecVec);
     procedure PingReqPacketSend;
     procedure DisconnectPacketSend;
     procedure KeepAlivePingTimerReset;
@@ -85,9 +85,9 @@ uses
 {$ENDREGION}
 
 {$REGION 'TMqttClientClass'}
-constructor TMqttClientClass.Create(ALogRichEdit, ARequestHexRichEdit, AResponseHexRichEdit: TRichEdit);
+constructor TMqttClientClass.Create(ALogStrings: TStrings; ALogVerbose, ALogRawAscii, ALogRawHex, ALogRawChar: TCheckBox);
 begin
-  inherited Create(ALogRichEdit,  ARequestHexRichEdit, AResponseHexRichEdit);
+  inherited Create(ALogStrings, ALogVerbose, ALogRawAscii, ALogRawHex, ALogRawChar);
 
   // tcpclient
   FTCPClient := TIdTCPClient.Create(nil);
@@ -132,7 +132,7 @@ begin
   if FTCPClient.Connected then
     raise Exception.Create('client is already joined with the server');
 
-  if LogVerbose then Log('client joining server...');
+ Log('client joining server...');
   try
     FTCPClient.Host := AHost;
     FTCPClient.Port := APort;
@@ -146,7 +146,7 @@ end;
 
 procedure TMqttClientClass.Disjoin;
 begin
-  if LogVerbose then Log('client disjoining...');
+  Log('client disjoining...');
   try
     FKeepAlivePingTimer.Enabled := false;
     Log('client keep-alive ping timer stopped');
@@ -169,7 +169,7 @@ procedure TMqttClientClass.ConnectPacketSend(IvProtocolLevel, IvQos: byte; AClie
    -----------------------   -----------------------------------------------------------------------------------------------------------------------   --------------
   | FIXED HEADER (2 bytes)| | VARIABLE HEADER (10 bytes)                                                                                            | |   PAY LOAD   |
   |-----------------------| |                                                                                                                       | |              |
-  |CTRL PACKET| REMAINLEN | |                                                                                                                       | |   0-M bytes  |
+  | CTRL BYTE | REMAINLEN | |                                                                                                                       | |   0-M bytes  |
   |-----------|-----------| |-----------------------------------------------------------------------------------------------------------------------| |--------------|
   |type | flgs|           | |         strlen        |                  Protocol Name                | prot lev  | connflags |  keepalive every sec  | |              |
   |-----------|-----------| |-----------------------|-----------------------------------------------|-----------|-----------|-----------------------| |              |
@@ -268,7 +268,7 @@ var
   {$ENDREGION}
 
 begin
-  if LogVerbose then Log('CONNECT packet send...');
+  if LogVerbose.Checked then Log('CONNECT packet send...');
 
   {$REGION 'packet'}
   packet := TMQTTPacketClass.Create;
@@ -330,10 +330,10 @@ begin
 
     {$REGION 'send'}
     FTCPClient.IOHandler.Write(packet.Stream, 0, not true); // true indicates WriteByteCount for the server to read it!
-    if LogVerbose  then Log('CONNECT packet sent    (%d bytes)', [packet.Len]);
-    if LogRawAscii then Log('                       (%s)'      , [packet.AsAscii]);
-    if LogRawHex   then Log('                       (%s)'      , [packet.AsHex]);
-    if LogRawChar  then Log('                       (%s)'      , [packet.AsChar]);
+    if LogVerbose.Checked  then Log('CONNECT packet sent    (%d bytes)', [packet.Len]);
+    if LogRawAscii.Checked then Log('                       (%s)'      , [packet.AsAscii]);
+    if LogRawHex.Checked   then Log('                       (%s)'      , [packet.AsHex]);
+    if LogRawChar.Checked  then Log('                       (%s)'      , [packet.AsChar]);
     {$ENDREGION}
 
   finally
@@ -341,17 +341,21 @@ begin
   end;
   {$ENDREGION}
 
-  {$REGION 'postprocess'}
 if FIsConnected then begin
+
+  {$REGION 'timer'}
   // start the keep-alive timer
   FKeepAlivePingTimer.Interval := AKeepAliveSeconds * 1000;
   FKeepAlivePingTimer.Enabled := true;
+  {$ENDREGION}
 
+  {$REGION 'events'}
   // fire event
 //if Assigned(FOnConnected) then
 //  FOnConnected(Self);
-end;
   {$ENDREGION}
+
+end;
 
 end;
 
@@ -389,7 +393,7 @@ procedure TMqttClientClass.DisconnectPacketSend;
    -----------------------
   | FIXED HEADER (2bytes) |
   |-----------------------|
-  |CTRL PACKET| REMAINLEN |
+  | CTRL BYTE | REMAINLEN |
   |-----------|-----------|
   |type | flgs|           |
   |-----------|-----------|
@@ -410,7 +414,7 @@ var
   {$ENDREGION}
 
 begin
-  if LogVerbose then Log('DISCONNECT packet send...');
+  if LogVerbose.Checked then Log('DISCONNECT packet send...');
 
   {$REGION 'packet'}
   packet := TMQTTPacketClass.Create;
@@ -435,10 +439,10 @@ begin
 
     {$REGION 'send'}
     FTCPClient.IOHandler.Write(packet.Stream, 0, not true);
-    if LogVerbose  then Log('DISCONNECT packet sent (%d bytes)', [packet.Len]);
-    if LogRawAscii then Log('                       (%s)'      , [packet.AsAscii]);
-    if LogRawHex   then Log('                       (%s)'      , [packet.AsHex]);
-    if LogRawChar  then Log('                       (%s)'      , [packet.AsChar]);
+    if LogVerbose.Checked  then Log('DISCONNECT packet sent (%d bytes)', [packet.Len]);
+    if LogRawAscii.Checked then Log('                       (%s)'      , [packet.AsAscii]);
+    if LogRawHex.Checked   then Log('                       (%s)'      , [packet.AsHex]);
+    if LogRawChar.Checked  then Log('                       (%s)'      , [packet.AsChar]);
     {$ENDREGION}
 
   finally
@@ -446,7 +450,7 @@ begin
   end;
   {$ENDREGION}
 
-  {$REGION 'postprocess'}
+  {$REGION 'events'}
   // close tcpip connection (eventually the gui should be updated)
   //FTCPClient.Disconnect;  *** for now we disconnect the tcpclient manually ***
 
@@ -463,7 +467,7 @@ procedure TMqttClientClass.PingReqPacketSend;
    -----------------------
   | FIXED HEADER (2bytes) |
   |-----------------------|
-  |CTRL PACKET| REMAINLEN |
+  | CTRL BYTE | REMAINLEN |
   |-----------|-----------|
   |type | flgs|           |
   |-----------|-----------|
@@ -484,7 +488,7 @@ var
   {$ENDREGION}
 
 begin
-  if LogVerbose then Log('PINGREQ packet send...');
+  if LogVerbose.Checked then Log('PINGREQ packet send...');
 
   {$REGION 'packet'}
   packet := TMQTTPacketClass.Create;
@@ -509,10 +513,10 @@ begin
 
     {$REGION 'send'}
     FTCPClient.IOHandler.Write(packet.Stream, 0, not true);
-    if LogVerbose  then Log('PINGREQ packet sent    (%d bytes)', [packet.Len]);
-    if LogRawAscii then Log('                       (%s)'      , [packet.AsAscii]);
-    if LogRawHex   then Log('                       (%s)'      , [packet.AsHex]);
-    if LogRawChar  then Log('                       (%s)'      , [packet.AsChar]);
+    if LogVerbose.Checked  then Log('PINGREQ packet sent    (%d bytes)', [packet.Len]);
+    if LogRawAscii.Checked then Log('                       (%s)'      , [packet.AsAscii]);
+    if LogRawHex.Checked   then Log('                       (%s)'      , [packet.AsHex]);
+    if LogRawChar.Checked  then Log('                       (%s)'      , [packet.AsChar]);
     {$ENDREGION}
 
   finally
@@ -520,7 +524,7 @@ begin
   end;
   {$ENDREGION}
 
-  {$REGION 'postprocess'}
+  {$REGION 'events'}
   // none
   {$ENDREGION}
 
@@ -664,7 +668,7 @@ var
   {$ENDREGION}
 
 begin
-  if LogVerbose then Log('PUBLISH packet send...');
+  if LogVerbose.Checked then Log('PUBLISH packet send...');
 
   {$REGION 'packet'}
   packet := TMQTTPacketClass.Create;
@@ -701,10 +705,10 @@ begin
 
     {$REGION 'send'}
     FTCPClient.IOHandler.Write(packet.Stream, 0, not true);
-    if LogVerbose  then Log('PINGREQ packet sent    (%d bytes)', [packet.Len]);
-    if LogRawAscii then Log('                       (%s)'      , [packet.AsAscii]);
-    if LogRawHex   then Log('                       (%s)'      , [packet.AsHex]);
-    if LogRawChar  then Log('                       (%s)'      , [packet.AsChar]);
+    if LogVerbose.Checked  then Log('PINGREQ packet sent    (%d bytes)', [packet.Len]);
+    if LogRawAscii.Checked then Log('                       (%s)'      , [packet.AsAscii]);
+    if LogRawHex.Checked   then Log('                       (%s)'      , [packet.AsHex]);
+    if LogRawChar.Checked  then Log('                       (%s)'      , [packet.AsChar]);
     {$ENDREGION}
 
   finally
@@ -712,7 +716,7 @@ begin
   end;
   {$ENDREGION}
 
-  {$REGION 'postprocess'}
+  {$REGION 'events'}
   // none
   {$ENDREGION}
 
@@ -745,20 +749,98 @@ procedure TMqttClientClass.SubscribePacketSend(APacketIdentifier: word; ASubscri
   {$REGION 'protocoll'}
 {
    -----------------------   -----------------------   -----------------------------------------------------------------------------------------------------------------------------
-  | FIXED HEADER (2 bytes)| | VARIABLE HEADER       | |   PAY LOAD                                                                                                                  |
+  | FIXEDHEADER (2-5bytes)| | VARIABLE HEADER       | |   PAY LOAD                                                                                                                  |
   |-----------------------| | (2 bytes)             | |                                                                                                                             |
-  |CTRL PACKET| REMAINLEN | |                       | |   0-M bytes                                                                                                                 |
-  |-----------|-----------| |-----------------------| |------------------------------------------------------------      ------------------------------------------------------------
+  | CTRL BYTE | REMAINLEN | |                       | |   0-M bytes                                                                                                                 |
+  |-----------|-----------| |-----------------------| |------------------------------------------------------------------------------------------------------------------------------
   |type | flgs|           | |       packet id       | |        str len        |     topic filter 1    | Req. QoA  |     |        str len        |     topic filter N    | Req. QoA  |
   |-----------|-----------| |-----------------------| |-----------------------|-----------------------|-----------|     |-----------------------|-----------------------|-----------|
   | byte 0    | byte 1-4  | | byte  MSB | byte  LSB | | byte  MSB | byte  LSB | byte  ... | byte  ... | byte      | ... | byte  MSB | byte  LSB | byte  ... | byte  ... | byte      |
   |-----------|-----------| |-----------|-----------| |-----------|-----------|-----------|-----------|-----------|     |-----------|-----------|-----------|-----------|-----------|
-  | 0001 0000 | 0000 0000 | | 0000 0000 | 0000 0000 | | 0000 0000 | 0000 0000 | 0000 0000 | 0000 0000 | 0000 00XX |     | 0000 0000 | 0000 0000 | 0000 0000 | 0000 0000 | 0000 00XX |
-  |        16 |         0 | |         0 |         0 | |         0 |         0 |         0 |         0 |         0 |     |         0 |         0 |         0 |         0 |         0 |
-  |       $10 |       $00 | |       $00 |       $00 | |       $00 |       $00 |       $00 |       $00 |       $00 |     |       $00 |       $00 |       $00 |       $00 |       $00 |
+  | 1000 0000 | 0000 0000 | | 0000 0000 | 0000 0000 | | 0000 0000 | 0000 0000 | 0000 0000 | 0000 0000 | 0000 00XX |     | 0000 0000 | 0000 0000 | 0000 0000 | 0000 0000 | 0000 00XX |
+  |       128 |         0 | |         0 |         0 | |         0 |         0 |         0 |         0 |         0 |     |         0 |         0 |         0 |         0 |         0 |
+  |       $80 |       $00 | |       $00 |       $00 | |       $00 |       $00 |       $00 |       $00 |       $00 |     |       $00 |       $00 |       $00 |       $00 |       $00 |
   |         . |         . | |         . |         . | |         . |         . |         . |         . |         . |     |         . |         . |         . |         . |         . |
-   -----------------------   -----------------------   -----------------------------------------------------------       -----------------------------------------------------------
+   -----------------------   -----------------------   -----------------------------------------------------------------------------------------------------------------------------
+}
+  {$ENDREGION}
 
+  {$REGION 'var'}
+var
+  packet: TMQTTPacketClass;
+  remainlen: integer;
+  ctrlbyte: byte;
+  i: integer;
+  {$ENDREGION}
+
+begin
+  if LogVerbose.Checked then Log('SUBSCRIBE packet send...');
+
+  {$REGION 'packet'}
+  packet := TMQTTPacketClass.Create;
+  try
+
+    {$REGION 'remaininglenght'}
+    remainlen := 1 + 1 + 1 + 1;
+    for i := Low(ASubscribeTopicRecVec) to High(ASubscribeTopicRecVec) do
+      remainlen := remainlen + VarLenFieldLength(ASubscribeTopicRecVec[i].TopicFilter) + 1;
+    {$ENDREGION}
+
+    {$REGION 'fixedheader'}
+    ctrlbyte := Byte(ptSUBSCRIBE) shl 4; // $08  1000 0000
+    packet.ByteWrite(ctrlbyte);
+    packet.RemainingLengthWrite(remainlen);
+    {$ENDREGION}
+
+    {$REGION 'variableheader'}
+    packet.ByteWrite(Hi(APacketIdentifier));
+    packet.ByteWrite(Lo(APacketIdentifier));
+    {$ENDREGION}
+
+    {$REGION 'payload'}
+    for i := Low(ASubscribeTopicRecVec) to High(ASubscribeTopicRecVec) do begin
+      packet.StringWrite(ASubscribeTopicRecVec[i].TopicFilter);
+      packet.WordWrite(Ord(ASubscribeTopicRecVec[i].RequestedQoS));
+    end;
+    {$ENDREGION}
+
+    {$REGION 'send'}
+    FTCPClient.IOHandler.Write(packet.Stream, 0, not true);
+    if LogVerbose.Checked  then Log('SUBSCRIBE packet sent  (%d bytes)', [packet.Len]);
+    if LogRawAscii.Checked then Log('                       (%s)'      , [packet.AsAscii]);
+    if LogRawHex.Checked   then Log('                       (%s)'      , [packet.AsHex]);
+    if LogRawChar.Checked  then Log('                       (%s)'      , [packet.AsChar]);
+    {$ENDREGION}
+
+  finally
+    packet.Free;
+  end;
+  {$ENDREGION}
+
+  {$REGION 'events'}
+  // ?
+  {$ENDREGION}
+
+end;
+
+procedure TMqttClientClass.UnsubscribePacketSend(APacketIdentifier: word; AUnsubscribeTopicRecVec: TMQTTUnsubscribeTopicRecVec);
+
+  {$REGION 'protocoll'}
+{
+   -----------------------  -----------------------   -----------------------------------------------------------------------------------------------------
+  | FIXEDHEADER (2-5bytes)|| VARIABLE HEADER       | |   PAY LOAD                                                                                          |
+  |-----------------------|| (2 bytes)             | |                                                                                                     |
+  | CTRL BYTE | REMAINLEN ||                       | |   0-M bytes                                                                                         |
+  |-----------|-----------||-----------------------| |------------------------------------------------------------------------------------------------------
+  |type | flgs|           ||       packet id       | |        str len        |     topic filter 1    |     |        str len        |     topic filter N    |
+  |-----------|-----------||-----------------------| |-----------------------|-----------------------|     |-----------------------|-----------------------|
+  | byte 0    | byte 1-4  || byte  MSB | byte  LSB | | byte  MSB | byte  LSB | byte  ... | byte  ... | ... | byte  MSB | byte  LSB | byte  ... | byte  ... |
+  |-----------|-----------||-----------|-----------| |-----------|-----------|-----------|-----------|     |-----------|-----------|-----------|-----------|
+  | 1010 0000 | 0000 0000 || 0000 0000 | 0000 0000 | | 0000 0000 | 0000 0000 | 0000 0000 | 0000 0000 |     | 0000 0000 | 0000 0000 | 0000 0000 | 0000 0000 |
+  |       160 |         0 ||         0 |         0 | |         0 |         0 |         0 |         0 |     |         0 |         0 |         0 |         0 |
+  |       $A0 |       $00 ||       $00 |       $00 | |       $00 |       $00 |       $00 |       $00 |     |       $00 |       $00 |       $00 |       $00 |
+  |         . |         . ||         . |         . | |         . |         . |         . |         . |     |         . |         . |         . |         . |
+   -----------------------  -----------------------   -----------------------------------------------------------------------------------------------------
 }
   {$ENDREGION}
 
@@ -766,18 +848,60 @@ procedure TMqttClientClass.SubscribePacketSend(APacketIdentifier: word; ASubscri
 var
   packet: TMQTTPacketClass;
   remainlen: cardinal;
+  ctrlbyte: byte;
+  i: integer;
   {$ENDREGION}
 
 begin
+  if LogVerbose.Checked then Log('UNSUBSCRIBE packet send...');
+
+  {$REGION 'packet'}
+  packet := TMQTTPacketClass.Create;
+  try
+
+    {$REGION 'remaininglenght'}
+    remainlen := 1 + 1 {+ 1 + 1};
+    for i := Low(AUnsubscribeTopicRecVec) to High(AUnsubscribeTopicRecVec) do
+      remainlen := remainlen + VarLenFieldLength(AUnsubscribeTopicRecVec[i].TopicFilter);
+    {$ENDREGION}
+
+    {$REGION 'fixedheader'}
+    ctrlbyte := Byte(ptUNSUBSCRIBE) shl 4; // $A0  1010 0000
+    packet.ByteWrite(ctrlbyte);
+    packet.RemainingLengthWrite(remainlen);
+    {$ENDREGION}
+
+    {$REGION 'variableheader'}
+    packet.ByteWrite(Hi(APacketIdentifier));
+    packet.ByteWrite(Lo(APacketIdentifier));
+    {$ENDREGION}
+
+    {$REGION 'payload'}
+    for i := Low(AUnsubscribeTopicRecVec) to High(AUnsubscribeTopicRecVec) do
+      packet.StringWrite(AUnsubscribeTopicRecVec[i].TopicFilter);
+    {$ENDREGION}
+
+    {$REGION 'send'}
+    FTCPClient.IOHandler.Write(packet.Stream, 0, not true);
+    if LogVerbose.Checked  then Log('UNSUBSCRIBE packet sent(%d bytes)', [packet.Len]);
+    if LogRawAscii.Checked then Log('                       (%s)'      , [packet.AsAscii]);
+    if LogRawHex.Checked   then Log('                       (%s)'      , [packet.AsHex]);
+    if LogRawChar.Checked  then Log('                       (%s)'      , [packet.AsChar]);
+    {$ENDREGION}
+
+  finally
+    packet.Free;
+  end;
+  {$ENDREGION}
+
+  {$REGION 'events'}
+  // ?
+  {$ENDREGION}
 
 end;
+{$ENDREGION}
 
-procedure TMqttClientClass.UnsubscribePacketSend(APacketIdentifier: word; ASubscribeTopicRecVec: TMQTTSubscribeTopicRecVec);
-begin
-
-end;
-
-  {$REGION 'TCPClientHandlers'}
+{$REGION 'TCPClientHandlers'}
 procedure TMqttClientClass.OnServerJoinedHandler(Sender: TObject);
 begin
   //Log('client joined to server %s:%d', [FTCPClient.Host, FTCPClient.Port]);
@@ -843,14 +967,10 @@ begin
           packet.StreamFromBytes(packetbytes);
 
           // log
-          if LogVerbose then
-            Log('%s: received %d bytes', [ip, packet.Len]);
-          if LogRawAscii then
-            Log('%s: (%s)'             , [ip, packet.AsAscii]);
-          if LogRawHex then
-            Log('%s: (%s)'             , [ip, packet.AsHex]);
-          if LogRawChar then
-            Log('%s: (%s)'             , [ip, packet.AsChar]);
+          if LogVerbose.Checked  then Log('%s: received %d bytes', [ip, packet.Len]);
+          if LogRawAscii.Checked then Log('%s: (%s)'             , [ip, packet.AsAscii]);
+          if LogRawHex.Checked   then Log('%s: (%s)'             , [ip, packet.AsHex]);
+          if LogRawChar.Checked  then Log('%s: (%s)'             , [ip, packet.AsChar]);
 
           // read 1st byte for packettype and flags
           ctrlbyte := packet.ByteRead;
@@ -864,9 +984,9 @@ begin
 
             {$REGION 'CONNACK 1 packet'}
             ptCONNACK: begin
-              if LogVerbose then
+              if LogVerbose.Checked then
                 Log('%s: received RESERVED (0) packet', [ip]);
-//              if Verbose then
+//              if LogVerbose.Checked then
 //                Dmp(packet.AsChar);
 
               // handle connection acknowledgement
@@ -876,7 +996,7 @@ begin
 
             {$REGION 'PUBLISH 3 packet'}
             ptPUBLISH: begin
-              if LogVerbose then Log('received PUBLISH (3) packet');
+              if LogVerbose.Checked then Log('received PUBLISH (3) packet');
 
               // handle message from server related to subsciptions
 //              appmessage := packet.MessageRead;
@@ -892,7 +1012,7 @@ begin
 
             {$REGION 'PINGRESP 13 packet'}
             ptPINGRESP: begin
-              if LogVerbose then Log('received PINGRESP (13) packet');
+              if LogVerbose.Checked then Log('received PINGRESP (13) packet');
 
               // reset ping timer
               KeepAlivePingTimerReset;
@@ -928,20 +1048,20 @@ begin
     decoder.Free;
   end;
 end;
-  {$ENDREGION}
+{$ENDREGION}
 
-  {$REGION 'BrokerHandlers'}
+{$REGION 'BrokerHandlers'}
 procedure TMqttClientClass.OnConnectedHandler(Sender: TObject);
 begin
-  if LogVerbose then Log('client connected to broker %s:%d', [FTCPClient.Host, FTCPClient.Port]);
+  if LogVerbose.Checked then
+    Log('client connected to broker %s:%d', [FTCPClient.Host, FTCPClient.Port]);
 end;
 
 procedure TMqttClientClass.OnDisconnectedHandler(Sender: TObject);
 begin
-  if LogVerbose then Log('client disconnected from broker %s:%d', [FTCPClient.Host, FTCPClient.Port]);
+  if LogVerbose.Checked then
+    Log('client disconnected from broker %s:%d', [FTCPClient.Host, FTCPClient.Port]);
 end;
-  {$ENDREGION}
-
 {$ENDREGION}
 
 {$REGION 'KeepAliveTimer'}

@@ -192,7 +192,7 @@ object BaseForm: TBaseForm
   object MainPanel: TPanel
     Left = 0
     Top = 204
-    Width = 931
+    Width = 849
     Height = 397
     Align = alLeft
     BevelOuter = bvNone
@@ -203,7 +203,7 @@ object BaseForm: TBaseForm
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 925
+      Width = 843
       Height = 391
       ActivePage = LogTabSheet
       Align = alClient
@@ -213,7 +213,7 @@ object BaseForm: TBaseForm
         object LogTopPanel: TPanel
           Left = 0
           Top = 0
-          Width = 917
+          Width = 835
           Height = 33
           Align = alTop
           BevelOuter = bvNone
@@ -262,181 +262,89 @@ object BaseForm: TBaseForm
             TabOrder = 4
           end
         end
-        object LogRichEdit: TRichEdit
-          AlignWithMargins = True
-          Left = 3
-          Top = 36
-          Width = 911
-          Height = 322
+        object LogSynEdit: TSynEdit
+          Left = 0
+          Top = 33
+          Width = 835
+          Height = 328
           Align = alClient
-          Font.Charset = ANSI_CHARSET
+          Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
-          Font.Height = -12
-          Font.Name = 'Courier New'
+          Font.Height = -11
+          Font.Name = 'Consolas'
           Font.Style = []
-          Lines.Strings = (
-            'LogRichEdit')
-          ParentFont = False
-          PlainText = True
-          ScrollBars = ssBoth
+          Font.Quality = fqClearTypeNatural
           TabOrder = 1
-          WordWrap = False
-        end
-      end
-      object RequestTabSheet: TTabSheet
-        Caption = 'Request'
-        ImageIndex = 1
-        object RequestJvNetscapeSplitter: TJvNetscapeSplitter
-          Left = 0
-          Top = 144
-          Width = 917
-          Height = 10
-          Cursor = crVSplit
-          Align = alBottom
-          Maximized = False
-          Minimized = False
-          ButtonCursor = crDefault
-          ExplicitTop = 0
-          ExplicitWidth = 252
-        end
-        object RequestTxtRichEdit: TRichEdit
-          AlignWithMargins = True
-          Left = 3
-          Top = 157
-          Width = 911
-          Height = 201
-          Align = alBottom
-          Font.Charset = ANSI_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -12
-          Font.Name = 'Courier New'
-          Font.Style = []
+          UseCodeFolding = False
+          BorderStyle = bsNone
+          Gutter.DigitCount = 5
+          Gutter.Font.Charset = DEFAULT_CHARSET
+          Gutter.Font.Color = clWindowText
+          Gutter.Font.Height = -11
+          Gutter.Font.Name = 'Consolas'
+          Gutter.Font.Style = []
+          Gutter.Font.Quality = fqClearTypeNatural
+          Gutter.ShowLineNumbers = True
+          Gutter.Bands = <
+            item
+              Kind = gbkMarks
+              Width = 13
+            end
+            item
+              Kind = gbkLineNumbers
+            end
+            item
+              Kind = gbkFold
+            end
+            item
+              Kind = gbkTrackChanges
+            end
+            item
+              Kind = gbkMargin
+              Width = 3
+            end>
+          Highlighter = SynMqttSyn
           Lines.Strings = (
-            'RequestTxtRichEdit')
-          ParentFont = False
-          PlainText = True
-          ScrollBars = ssBoth
-          TabOrder = 0
-          WordWrap = False
-        end
-        object RequestHexRichEdit: TRichEdit
-          AlignWithMargins = True
-          Left = 3
-          Top = 36
-          Width = 911
-          Height = 105
-          Align = alClient
-          Font.Charset = ANSI_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -12
-          Font.Name = 'Courier New'
-          Font.Style = []
-          Lines.Strings = (
-            'RequestHexRichEdit')
-          ParentFont = False
-          PlainText = True
-          ScrollBars = ssBoth
-          TabOrder = 1
-          WordWrap = False
-        end
-        object RequestTopPanel: TPanel
-          Left = 0
-          Top = 0
-          Width = 917
-          Height = 33
-          Align = alTop
-          BevelOuter = bvNone
-          Caption = 'LogTopPanel'
-          ShowCaption = False
-          TabOrder = 2
-          object RequestClearButton: TButton
-            Left = 3
-            Top = 4
-            Width = 75
-            Height = 25
-            Caption = 'Clear'
-            TabOrder = 0
-            OnClick = RequestClearButtonClick
-          end
-        end
-      end
-      object ResponseTabSheet: TTabSheet
-        Caption = 'Response'
-        ImageIndex = 2
-        object ResponseJvNetscapeSplitter: TJvNetscapeSplitter
-          Left = 0
-          Top = 144
-          Width = 917
-          Height = 10
-          Cursor = crVSplit
-          Align = alBottom
-          Maximized = False
-          Minimized = False
-          ButtonCursor = crDefault
-          ExplicitTop = 0
-          ExplicitWidth = 252
-        end
-        object ResponseHexRichEdit: TRichEdit
-          AlignWithMargins = True
-          Left = 3
-          Top = 36
-          Width = 911
-          Height = 105
-          Align = alClient
-          Font.Charset = ANSI_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -12
-          Font.Name = 'Courier New'
-          Font.Style = []
-          Lines.Strings = (
-            'ResponseHexRichEdit')
-          ParentFont = False
-          PlainText = True
-          ScrollBars = ssBoth
-          TabOrder = 0
-          WordWrap = False
-        end
-        object ResponseTxtRichEdit: TRichEdit
-          AlignWithMargins = True
-          Left = 3
-          Top = 157
-          Width = 911
-          Height = 201
-          Align = alBottom
-          Font.Charset = ANSI_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -12
-          Font.Name = 'Courier New'
-          Font.Style = []
-          Lines.Strings = (
-            'ResponseTxtRichEdit')
-          ParentFont = False
-          PlainText = True
-          ScrollBars = ssBoth
-          TabOrder = 1
-          WordWrap = False
-        end
-        object ResponseTopPanel: TPanel
-          Left = 0
-          Top = 0
-          Width = 917
-          Height = 33
-          Align = alTop
-          BevelOuter = bvNone
-          Caption = 'LogTopPanel'
-          ShowCaption = False
-          TabOrder = 2
-          object ResponseClearButton: TButton
-            Left = 3
-            Top = 4
-            Width = 75
-            Height = 25
-            Caption = 'Clear'
-            TabOrder = 0
-            OnClick = ResponseClearButtonClick
-          end
+            'LogSynEdit')
+          ScrollbarAnnotations = <
+            item
+              AnnType = sbaCarets
+              AnnPos = sbpFullWidth
+              FullRow = False
+            end
+            item
+              AnnType = sbaBookmark
+              AnnPos = sbpLeft
+              FullRow = True
+            end
+            item
+              AnnType = sbaTrackChanges
+              AnnPos = sbpRight
+              FullRow = True
+            end>
         end
       end
     end
+  end
+  object SynMqttSyn: TSynGeneralSyn
+    DetectPreprocessor = False
+    KeyAttri.Foreground = clBrown
+    KeyWords.Strings = (
+      'CONNACK'
+      'CONNECT'
+      'DISCONNECT'
+      'PINGREQ'
+      'PINGRESP'
+      'PUBACK'
+      'PUBCOMP'
+      'PUBLISH'
+      'PUBREC'
+      'PUBREL'
+      'SUBACK'
+      'SUBSCRIBE'
+      'UNSUBACK'
+      'UNSUBSCRIBE')
+    Left = 920
+    Top = 240
   end
 end
