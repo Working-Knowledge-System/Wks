@@ -88,6 +88,7 @@ uses
   , System.Math
   , System.Generics.Collections
   , Vcl.StdCtrls
+  , Data.Win.ADODB
 //  , SynEdit
 //  , SynEditTypes
   ;
@@ -96,7 +97,17 @@ uses
 {$REGION 'Type'}
 type
 
-  {$REGION 'TMqttClass'}
+  {$REGION 'TcpSession'}
+  TTCPSessionDataClass = class
+  public
+    Ip: string;          // clientip
+    UId: string;         // connectionuid
+    Event: string;       // Connect, Disconnect
+    DateTime: TDateTime; // eventdatetime
+  end;
+  {$ENDREGION}
+
+  {$REGION 'Mqtt'}
   TMqttClass = class
   protected
     FLogStrings: TStrings;
@@ -121,9 +132,9 @@ type
   {$ENDREGION}
 
   {$REGION 'Protocol'}
-  TMQTTVersionLevel = 1..5; // 1 = 1.2  2 = 3.0  3 = 3.1  4 = 3.1.1  5 = 5.0
+  TMqttVersionLevel = 1..5; // 1 = 1.2  2 = 3.0  3 = 3.1  4 = 3.1.1  5 = 5.0
 
-  TMQTTVersion = (
+  TMqttVersion = (
     mv12             // 1 = 1.2
   , mv30             // 2 = 3.0
   , mv31             // 3 = 3.1
@@ -133,9 +144,9 @@ type
   {$ENDREGION}
 
   {$REGION 'QoS'}
-  //TMQTTQoS = 0..2;
+  //TMqttQoS = 0..2;
 
-  TMQTTQoSType = (
+  TMqttQoSType = (
     qostAT_MOST_ONCE  = 0 // QoS 0 = fire and forget
   , qostAT_LEAST_ONCE = 1 // QoS 1 = at least once delivery (PUBACK required)
   , qostEXACTLY_ONCE  = 2 // QoS 2 = exactly once delivery (PUBREC, PUBREL, PUBCOMP sequence)
@@ -143,24 +154,24 @@ type
   {$ENDREGION}
 
   {$REGION 'Message'}
-  TMQTTMessageRec = record {TMQTTApplicationMessage}
+  TMqttMessageRec = record {TMqttApplicationMessage}
     DupFlag: boolean;
-    QoS: TMQTTQoSType;
+    QoS: TMqttQoSType;
     Retain: boolean;
     TopicName: string;
     PacketIdentifier: word;
     ApplicationMessage: TBytes;
   end;
 
-  TMQTTMessageInFlight = class
+  TMqttMessageInFlight = class
     PacketID: Word;
-    Message: TMQTTMessageRec;
+    Message: TMqttMessageRec;
     Timestamp: TDateTime;
     RetryCount: Integer;
   end;
 
   // basic message event type (used in both client and server)
-  TOnMQTTMessage = reference to procedure(const ATopicName: string; const AApplicationMessage: TBytes; AQoSLevel: TMQTTQOSType; ARetain: boolean);
+  TOnMQTTMessage = reference to procedure(const ATopicName: string; const AApplicationMessage: TBytes; AQoSLevel: TMqttQOSType; ARetain: boolean);
   {$ENDREGION}
 
   {$REGION 'Packet'}
@@ -185,7 +196,7 @@ type
    payload is present in some commands (CONNECT, ...)
 }
 
-  TMQTTPacketType = (
+  TMqttPacketType = (
   // Commant                            ControlByte
   //                dec      hex  asc   type + flags  Direction           Description
   // -----------------------------------------------------------------------------------------------------------------------------------------
@@ -213,7 +224,7 @@ type
   , ptRESERVED2   = 15  //   $F0   ð    1111   0000   forbidden           reserv
   );
 
-  TMQTTPacketClass = class
+  TMqttPacketClass = class
   private
     FStream: TMemoryStream;
     function  LenGet: integer;
@@ -237,8 +248,8 @@ type
     procedure StringWrite(const AString: string);
     function  RemainingLengthRead: integer;
     procedure RemainingLengthWrite(ALength: integer);
-    function  MessageRead: TMQTTMessageRec;
-    procedure MessageWrite(const AMessage: TMQTTMessageRec);
+    function  MessageRead: TMqttMessageRec;
+    procedure MessageWrite(const AMessage: TMqttMessageRec);
 
     property Stream: TMemoryStream read FStream;
     property Len: integer          read LenGet;
@@ -250,7 +261,7 @@ type
   {$ENDREGION}
 
   {$REGION 'Connect'}
-  TMQTTConnectReturnCode = (
+  TMqttConnectReturnCode = (
     conrcCONNECTION_ACCEPTED      = 0 // Connection Accepted
   , conrcUNACCEPTABLE_PROTOCOL    = 1 // Connection Refused: unacceptable protocol version
   , conrcIDENTIFIER_REJECTED      = 2 // Connection Refused: identifier rejected
@@ -260,10 +271,10 @@ type
                                       // 6-255 Reserved for future use
   );
 
-  TMQTTConnectFlags = packed record
+  TMqttConnectFlags = packed record
     CleanSession: boolean;
     WillFlag: boolean;
-    WillQoS: TMQTTQoSType;
+    WillQoS: TMqttQoSType;
     WillRetain: boolean;
     PasswordFlag: boolean;
     UsernameFlag: boolean;
@@ -272,13 +283,13 @@ type
     function  ToByte: byte;
   end;
 
-  TMQTTConnectPacketRec = {class(TMQTTPacketClass)}record
+  TMqttConnectPacketRec = {class(TMqttPacketClass)}record
   {private}
-    PacketType: TMQTTPacketType;
+    PacketType: TMqttPacketType;
     RemainingLength: byte;
     ProtocolName: string; // MQTT (fixed)
     ProtocolLevel: byte;  // 4 (3.1.1)
-    ConnectFlags: TMQTTConnectFlags;
+    ConnectFlags: TMqttConnectFlags;
     KeepAlive: word;
     ClientIdentifier: string;
     WillTopic: string;
@@ -293,12 +304,12 @@ type
   {$ENDREGION}
 
   {$REGION 'Pingreq'}
-  TMQTTPingreqReturnCode = (
+  TMqttPingreqReturnCode = (
     pingreqrcPINGREQ_ACCEPTED = 0
   );
 
-  TMQTTPingreqPacketRec = record
-    PacketType: TMQTTPacketType;
+  TMqttPingreqPacketRec = record
+    PacketType: TMqttPacketType;
     RemainingLength: byte;
     function  DumpGet: string;
   public
@@ -307,23 +318,23 @@ type
   {$ENDREGION}
 
   {$REGION 'Publish'}
-  TMQTTPublishReturnCode = (
+  TMqttPublishReturnCode = (
     publishrcPUBLISH_ACCEPTED = 0
   );
 
-  TMQTTPublishFlags = packed record
+  TMqttPublishFlags = packed record
     DupFlag: boolean;
-    QoSLevel: TMQTTQoSType;
+    QoSLevel: TMqttQoSType;
     Retain: boolean;
   public
     procedure FromByte(AByte: byte);
     function  ToByte: byte;
   end;
 
-  TMQTTPublishPacketRec = record
-    PacketType: TMQTTPacketType;
+  TMqttPublishPacketRec = record
+    PacketType: TMqttPacketType;
     RemainingLength: byte;
-    PublishFlags: TMQTTPublishFlags;
+    PublishFlags: TMqttPublishFlags;
     TopicName: string;
     PacketIdentifier: word;
     ApplicationMessage: string;
@@ -334,22 +345,22 @@ type
   {$ENDREGION}
 
   {$REGION 'Subscribe'}
-  TMQTTSubscribeReturnCode = (
+  TMqttSubscribeReturnCode = (
     subscribercSUBSCRIBE_ACCEPTED = 0
   );
 
-  TMQTTSubscribeTopicRec = record
+  TMqttSubscribeTopicRec = record
     TopicFilter: string;
-    RequestedQoS: TMQTTQoSType;
+    RequestedQoS: TMqttQoSType;
   end;
 
-  TMQTTSubscribeTopicRecVec = array of TMQTTSubscribeTopicRec;
+  TMqttSubscribeTopicRecVec = array of TMqttSubscribeTopicRec;
 
-  TMQTTSubscribePacketRec = record
-    PacketType: TMQTTPacketType;
+  TMqttSubscribePacketRec = record
+    PacketType: TMqttPacketType;
     RemainingLength: byte;
     PacketIdentifier: word;
-    SubscribeTopicRecVec: TMQTTSubscribeTopicRecVec;
+    SubscribeTopicRecVec: TMqttSubscribeTopicRecVec;
     function  DumpGet: string;
   public
     property Dump: string read DumpGet;
@@ -357,21 +368,21 @@ type
   {$ENDREGION}
 
   {$REGION 'Unsubscribe'}
-  TMQTTUnsubscribeReturnCode = (
+  TMqttUnsubscribeReturnCode = (
     unsubscribercUNSUBSCRIBE_ACCEPTED = 0
   );
 
-  TMQTTUnsubscribeTopicRec = record
+  TMqttUnsubscribeTopicRec = record
     TopicFilter: string;
   end;
 
-  TMQTTUnsubscribeTopicRecVec = array of TMQTTUnsubscribeTopicRec;
+  TMqttUnsubscribeTopicRecVec = array of TMqttUnsubscribeTopicRec;
 
-  TMQTTUnsubscribePacketRec = record
-    PacketType: TMQTTPacketType;
+  TMqttUnsubscribePacketRec = record
+    PacketType: TMqttPacketType;
     RemainingLength: byte;
     PacketIdentifier: word;
-    UnsubscribeTopicRecVec: TMQTTUnsubscribeTopicRecVec;
+    UnsubscribeTopicRecVec: TMqttUnsubscribeTopicRecVec;
     function  DumpGet: string;
   public
     property Dump: string read DumpGet;
@@ -379,14 +390,14 @@ type
   {$ENDREGION}
 
   {$REGION 'Disconnect'}
-  TMQTTDisconnectReturnCode = (
+  TMqttDisconnectReturnCode = (
     disconrcDISCONNECTION_ACCEPTED = 0
   , disconrcSERVER_STOPPING        = 1
   , disconrcCLIENT_DISCONNECTED    = 2
   );
 
-  TMQTTDisconnectPacketRec = record
-    PacketType: TMQTTPacketType;
+  TMqttDisconnectPacketRec = record
+    PacketType: TMqttPacketType;
     RemainingLength: byte;
     function  DumpGet: string;
   public
@@ -394,42 +405,8 @@ type
   end;
   {$ENDREGION}
 
-  {$REGION 'Session'}
-  TMQTTSessionClass = class
-  private
-    FClientIdentifier: string;
-    FCleanSession: boolean;
-    FSubscriptions: TList<TMQTTSubscribeTopicRec>;
-    FInFlightQoS1: TObjectDictionary<Word, TMQTTMessageInFlight>;
-    FInFlightQoS2: TObjectDictionary<Word, TMQTTMessageInFlight>;
-    FMessageQueue: TList<TMQTTMessageRec>;
-    FPacketIdNext: word;
-    FLastContact: TDateTime;
-    FWillMessage: TMQTTMessageRec;
-    function PacketIdGenerate: word;
-  public
-    constructor Create(const AClientIdentifier: string; ACleanSession: boolean);
-    destructor Destroy; override;
-
-    procedure LastContactUpdate;
-    function  SubscriptionAdd(const ATopicFilter: string; AQoS: TMQTTQoSType): boolean;
-    procedure SubscriptionRemove(const ATopicFilter: string);
-    function  SubscriptionExists(const ATopicFilter: string): boolean;
-    procedure MessageQueue(const AMessage: TMQTTMessageRec);
-    function  MessageDequeue: TMQTTMessageRec;
-
-    property ClientIdentifier: string                                    read FClientIdentifier;
-    property CleanSession: boolean                                       read FCleanSession;
-    property Subscriptions: TList<TMQTTSubscribeTopicRec>                     read FSubscriptions;
-    property LastContact: TDateTime                                      read FLastContact;
-    property WillMessage: TMQTTMessageRec                                read FWillMessage write FWillMessage;
-    property InFlightQoS1: TObjectDictionary<Word, TMQTTMessageInFlight> read FInFlightQoS1;
-    property InFlightQoS2: TObjectDictionary<Word, TMQTTMessageInFlight> read FInFlightQoS2;
-  end;
-  {$ENDREGION}
-
   {$REGION 'StreamDecoder'}
-  TMQTTStreamDecoder = class
+  TMqttStreamDecoder = class
   private
     FBuffer: TBytes;
     //FOffset: Integer;
@@ -437,6 +414,56 @@ type
   public
     procedure DataAppend(const ABytes: TBytes);
     function  PacketTryExtract(out APacket: TBytes): boolean;
+  end;
+  {$ENDREGION}
+
+  {$REGION 'Session'}
+  TMqttSessionDataClass = class
+  private
+    FClientIp: string;
+    FClientIdentifier: string;
+    FCleanSession: boolean;
+    FSubscriptions: TList<TMqttSubscribeTopicRec>;
+    FInFlightQoS1: TObjectDictionary<Word, TMqttMessageInFlight>;
+    FInFlightQoS2: TObjectDictionary<Word, TMqttMessageInFlight>;
+    FMessageQueue: TList<TMqttMessageRec>;
+    FPacketIdNext: word;
+    FLastContact: TDateTime;
+    FWillMessage: TMqttMessageRec;
+    function PacketIdGenerate: word;
+  public
+    constructor Create(const AClientIdentifier: string; ACleanSession: boolean);
+    destructor Destroy; override;
+
+    procedure LastContactUpdate;
+    function  SubscriptionAdd(const ATopicFilter: string; AQoS: TMqttQoSType): boolean;
+    procedure SubscriptionRemove(const ATopicFilter: string);
+    function  SubscriptionExists(const ATopicFilter: string): boolean;
+    procedure MessageQueue(const AMessage: TMqttMessageRec);
+    function  MessageDequeue: TMqttMessageRec;
+
+    property ClientIdentifier: string                                    read FClientIdentifier;
+    property CleanSession: boolean                                       read FCleanSession;
+    property Subscriptions: TList<TMqttSubscribeTopicRec>                read FSubscriptions;
+    property LastContact: TDateTime                                      read FLastContact;
+    property WillMessage: TMqttMessageRec                                read FWillMessage write FWillMessage;
+    property InFlightQoS1: TObjectDictionary<Word, TMqttMessageInFlight> read FInFlightQoS1;
+    property InFlightQoS2: TObjectDictionary<Word, TMqttMessageInFlight> read FInFlightQoS2;
+  end;
+  {$ENDREGION}
+
+  {$REGION 'LogWorker'}
+  TMqttLogWorker = class(TThread)
+  private
+    FDataList: TThreadList<TTCPSessionDataClass>;
+    FConn: TADOConnection;
+    procedure FlushToDb;
+  protected
+    procedure Execute; override;
+  public
+    constructor Create(AConn: TADOConnection);
+    destructor Destroy; override;
+    procedure Enqueue(const ATCPSessionDataClass: TTCPSessionDataClass);
   end;
   {$ENDREGION}
 
@@ -507,7 +534,7 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION 'TMQTTSession'}
+{$REGION 'TMqttSession'}
 {
   Tracks client-specific state including subscriptions and queued messages
   Manages both QoS 1 and QoS 2 in-flight messages
@@ -534,19 +561,19 @@ end;
   Last contact timestamp for keep-alive management
   Automatic session cleanup based on connection state
 }
-constructor TMQTTSessionClass.Create(const AClientIdentifier: string; ACleanSession: boolean);
+constructor TMqttSessionDataClass.Create(const AClientIdentifier: string; ACleanSession: boolean);
 begin
   FClientIdentifier := AClientIdentifier;
   FCleanSession     := ACleanSession;
-  FSubscriptions    := TList<TMQTTSubscribeTopicRec>.Create;
-  FMessageQueue     := TList<TMQTTMessageRec>.Create;
-  FInFlightQoS1     := TObjectDictionary<Word, TMQTTMessageInFlight>.Create([doOwnsValues]);
-  FInFlightQoS2     := TObjectDictionary<Word, TMQTTMessageInFlight>.Create([doOwnsValues]);
+  FSubscriptions    := TList<TMqttSubscribeTopicRec>.Create;
+  FMessageQueue     := TList<TMqttMessageRec>.Create;
+  FInFlightQoS1     := TObjectDictionary<Word, TMqttMessageInFlight>.Create([doOwnsValues]);
+  FInFlightQoS2     := TObjectDictionary<Word, TMqttMessageInFlight>.Create([doOwnsValues]);
   FPacketIdNext     := 1;
   FLastContact      := Now;
 end;
 
-destructor TMQTTSessionClass.Destroy;
+destructor TMqttSessionDataClass.Destroy;
 begin
   FSubscriptions.Free;
   FMessageQueue.Free;
@@ -556,14 +583,14 @@ begin
   inherited;
 end;
 
-procedure TMQTTSessionClass.MessageQueue(const AMessage: TMQTTMessageRec);
+procedure TMqttSessionDataClass.MessageQueue(const AMessage: TMqttMessageRec);
 begin
   // only queue messages with QoS > 0 for persistent sessions
   if not FCleanSession and (AMessage.QoS > qostAT_MOST_ONCE) then
     FMessageQueue.Add(AMessage);
 end;
 
-function  TMQTTSessionClass.MessageDequeue: TMQTTMessageRec;
+function  TMqttSessionDataClass.MessageDequeue: TMqttMessageRec;
 begin
   if FMessageQueue.Count > 0 then begin
     Result := FMessageQueue[0];
@@ -572,7 +599,7 @@ begin
     raise Exception.Create('No messages in queue');
 end;
 
-function  TMQTTSessionClass.SubscriptionExists(const ATopicFilter: string): boolean;
+function  TMqttSessionDataClass.SubscriptionExists(const ATopicFilter: string): boolean;
 var
   i: integer;
 begin
@@ -582,10 +609,10 @@ begin
   Result := false;
 end;
 
-function  TMQTTSessionClass.SubscriptionAdd(const ATopicFilter: string; AQoS: TMQTTQoSType): boolean;
+function  TMqttSessionDataClass.SubscriptionAdd(const ATopicFilter: string; AQoS: TMqttQoSType): boolean;
 var
   i: integer;
-  sub: TMQTTSubscribeTopicRec;
+  sub: TMqttSubscribeTopicRec;
 begin
   Result := false;
 
@@ -606,7 +633,7 @@ begin
   Result := true;
 end;
 
-procedure TMQTTSessionClass.SubscriptionRemove(const ATopicFilter: string);
+procedure TMqttSessionDataClass.SubscriptionRemove(const ATopicFilter: string);
 var
   i: integer;
 begin
@@ -615,7 +642,7 @@ begin
       FSubscriptions.Delete(i);
 end;
 
-function  TMQTTSessionClass.PacketIdGenerate: word;
+function  TMqttSessionDataClass.PacketIdGenerate: word;
 begin
   Result := FPacketIdNext;
   Inc(FPacketIdNext);
@@ -623,47 +650,47 @@ begin
     Inc(FPacketIdNext);
 end;
 
-procedure TMQTTSessionClass.LastContactUpdate;
+procedure TMqttSessionDataClass.LastContactUpdate;
 begin
   FLastContact := Now;
 end;
 {$ENDREGION}
 
-{$REGION 'TMQTTPacketClass'}
-constructor TMQTTPacketClass.Create;
+{$REGION 'TMqttPacketClass'}
+constructor TMqttPacketClass.Create;
 begin
   FStream := TMemoryStream.Create;
 end;
 
-destructor TMQTTPacketClass.Destroy;
+destructor TMqttPacketClass.Destroy;
 begin
   FStream.Free;
 
   inherited;
 end;
 
-function  TMQTTPacketClass.DumpGet: string;
+function  TMqttPacketClass.DumpGet: string;
 begin
   Result := '<not implemented>';
 end;
 
-procedure TMQTTPacketClass.StreamFromBytes(ABytes: TBytes);
+procedure TMqttPacketClass.StreamFromBytes(ABytes: TBytes);
 begin
   Stream.WriteBuffer(ABytes[0], Length(ABytes));
   Stream.Position := 0;
 end;
 
-function  TMQTTPacketClass.ByteRead: byte;
+function  TMqttPacketClass.ByteRead: byte;
 begin
   FStream.Read(Result, SizeOf(Byte));
 end;
 
-procedure TMQTTPacketClass.ByteWrite(AByte: byte);
+procedure TMqttPacketClass.ByteWrite(AByte: byte);
 begin
   FStream.Write(AByte, SizeOf(Byte));
 end;
 
-function  TMQTTPacketClass.BytesRead(ALength: integer): TBytes;
+function  TMqttPacketClass.BytesRead(ALength: integer): TBytes;
 begin
   // dynamically allocates the result buffer
   SetLength(Result, ALength);
@@ -671,26 +698,26 @@ begin
     FStream.Read(Result[0], ALength);
 end;
 
-procedure TMQTTPacketClass.BytesWrite(const ABytes: TBytes);
+procedure TMqttPacketClass.BytesWrite(const ABytes: TBytes);
 begin
   // efficiently writes byte arrays without copying
   if Length(ABytes) > 0 then
     FStream.Write(ABytes[0], Length(ABytes));
 end;
 
-function  TMQTTPacketClass.WordRead: word;
+function  TMqttPacketClass.WordRead: word;
 begin
   FStream.Read(Result, SizeOf(Word));
   Result := Swap(Result); // *** MQTT uses big-endian (network byte order) ***
 end;
 
-procedure TMQTTPacketClass.WordWrite(AWord: word);
+procedure TMqttPacketClass.WordWrite(AWord: word);
 begin
   AWord := Swap(AWord); // *** convert to big-endian ***
   FStream.Write(AWord, SizeOf(Word));
 end;
 
-function  TMQTTPacketClass.StringRead: string; // *** DUPLICATE in StrUTF8FromStreamRead ***
+function  TMqttPacketClass.StringRead: string; // *** DUPLICATE in StrUTF8FromStreamRead ***
 var
   len: word;
   bytes: TBytes;
@@ -709,7 +736,7 @@ begin
     Result := '';
 end;
 
-function  TMQTTPacketClass.StringReadLen(ALength: integer): string;
+function  TMqttPacketClass.StringReadLen(ALength: integer): string;
 var
   bytes: TBytes;
 begin
@@ -722,7 +749,7 @@ begin
   end;
 end;
 
-procedure TMQTTPacketClass.StringWrite(const AString: string);
+procedure TMqttPacketClass.StringWrite(const AString: string);
 var
   len: word;
   bytes: TBytes;
@@ -733,7 +760,7 @@ begin
   BytesWrite(bytes);
 end;
 
-function  TMQTTPacketClass.RemainingLengthRead: integer;
+function  TMqttPacketClass.RemainingLengthRead: integer;
 var
   digit: byte;
   multiplier, bytesread: integer;
@@ -753,7 +780,7 @@ begin
   until (digit and 128) = 0;
 end;
 
-procedure TMQTTPacketClass.RemainingLengthWrite(ALength: integer);
+procedure TMqttPacketClass.RemainingLengthWrite(ALength: integer);
 var
   digit: byte;
 begin
@@ -779,16 +806,16 @@ begin
   until ALength = 0;
 end;
 
-function  TMQTTPacketClass.MessageRead: TMQTTMessageRec;
+function  TMqttPacketClass.MessageRead: TMqttMessageRec;
 var
   fixedheader: byte;
   remaininglength: integer;
-  packettype: TMQTTPacketType;
+  packettype: TMqttPacketType;
   qosbyte: byte;
 begin
   FStream.Position := 0;
   fixedheader := ByteRead;
-  packettype := TMQTTPacketType((FixedHeader and $F0) shr 4);
+  packettype := TMqttPacketType((FixedHeader and $F0) shr 4);
 
   case packettype of
     ptPUBLISH: begin
@@ -800,7 +827,7 @@ begin
 
       // qos
       qosbyte := (FixedHeader and $06) shr 1;
-      Result.QoS := TMQTTQOSType(qosbyte);
+      Result.QoS := TMqttQOSType(qosbyte);
 
       // qos
       if Result.QoS > qostAT_MOST_ONCE then
@@ -819,7 +846,7 @@ begin
   end;
 end;
 
-procedure TMQTTPacketClass.MessageWrite(const AMessage: TMQTTMessageRec);
+procedure TMqttPacketClass.MessageWrite(const AMessage: TMqttMessageRec);
 var
   fixedheader: byte;
   remaininglength: integer;
@@ -859,46 +886,46 @@ begin
     FStream.Write(AMessage.ApplicationMessage[0], Length(AMessage.ApplicationMessage));
 end;
 
-function  TMQTTPacketClass.LenGet: integer;
+function  TMqttPacketClass.LenGet: integer;
 begin
   Result := FStream.Size;
 end;
 
-function  TMQTTPacketClass.AsAsciiGet: string;
+function  TMqttPacketClass.AsAsciiGet: string;
 begin
   Result := AsciiFromStream(FStream);
 end;
 
-function  TMQTTPacketClass.AsHexGet: string;
+function  TMqttPacketClass.AsHexGet: string;
 begin
   Result := HexFromStream(FStream);
 end;
 
-function  TMQTTPacketClass.AsCharGet: string;
+function  TMqttPacketClass.AsCharGet: string;
 begin
   Result := CharFromStream(FStream);
 end;
 {$ENDREGION}
 
-{$REGION 'TMQTTConnectFlags'}
-procedure TMQTTConnectFlags.FromByte(AByte: byte);
+{$REGION 'TMqttConnectFlags'}
+procedure TMqttConnectFlags.FromByte(AByte: byte);
 begin
   CleanSession :=              (AByte and $02) <>  0;
   WillFlag     :=              (AByte and $04) <>  0;
-  WillQoS      := TMQTTQoSType((AByte and $18) shr 3);
+  WillQoS      := TMqttQoSType((AByte and $18) shr 3);
   WillRetain   :=              (AByte and $20) <>  0;
   PasswordFlag :=              (AByte and $40) <>  0;
   UsernameFlag :=              (AByte and $80) <>  0;
 end;
 
-function TMQTTConnectFlags.ToByte: byte;
+function TMqttConnectFlags.ToByte: byte;
 begin
   Result := 0;
 end;
 {$ENDREGION}
 
-{$REGION 'TMQTTConnectPacket'}
-function  TMQTTConnectPacketRec.DumpGet: string;
+{$REGION 'TMqttConnectPacket'}
+function  TMqttConnectPacketRec.DumpGet: string;
 begin
   Result        := Format('Packet Type:         %d', [Byte(PacketType)])
   + sLineBreak   + Format('Remaining Length:    %d', [RemainingLength])
@@ -925,7 +952,7 @@ begin
     + sLineBreak + Format('Password:            %s', [Password]);
 end;
 
-procedure TMQTTConnectPacketRec.LoadFromData(const AData: TBytes);
+procedure TMqttConnectPacketRec.LoadFromData(const AData: TBytes);
 var
   stream: TMemoryStream;
   flags: byte;
@@ -944,7 +971,7 @@ begin
 
     ConnectFlags.CleanSession :=              (flags and $02) <>  0;
     ConnectFlags.WillFlag     :=              (flags and $04) <>  0;
-    ConnectFlags.WillQoS      := TMQTTQoSType((flags and $18) shr 3);
+    ConnectFlags.WillQoS      := TMqttQoSType((flags and $18) shr 3);
     ConnectFlags.WillRetain   :=              (flags and $20) <>  0;
     ConnectFlags.PasswordFlag :=              (flags and $40) <>  0;
     ConnectFlags.UsernameFlag :=              (flags and $80) <>  0;
@@ -970,30 +997,30 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION 'TMQTTPingreqPacketRec'}
-function TMQTTPingreqPacketRec.DumpGet: string;
+{$REGION 'TMqttPingreqPacketRec'}
+function TMqttPingreqPacketRec.DumpGet: string;
 begin
   Result        := Format('Packet Type:         %d', [Byte(PacketType)])
   + sLineBreak   + Format('Remaining Length:    %d', [RemainingLength]);
 end;
 {$ENDREGION}
 
-{$REGION 'TMQTTPublishFlags'}
-procedure TMQTTPublishFlags.FromByte(AByte: byte);
+{$REGION 'TMqttPublishFlags'}
+procedure TMqttPublishFlags.FromByte(AByte: byte);
 begin
   DupFlag      :=              (AByte and $08) <>  0;
-  QoSLevel     := TMQTTQoSType((AByte and $06) shr 1);
+  QoSLevel     := TMqttQoSType((AByte and $06) shr 1);
   Retain       :=              (AByte and $01) <>  0;
 end;
 
-function TMQTTPublishFlags.ToByte: byte;
+function TMqttPublishFlags.ToByte: byte;
 begin
   Result := 0; // 0000 xxxx
 end;
 {$ENDREGION}
 
-{$REGION 'TMQTTPublishPacketRec'}
-function TMQTTPublishPacketRec.DumpGet: string;
+{$REGION 'TMqttPublishPacketRec'}
+function TMqttPublishPacketRec.DumpGet: string;
 begin
   Result        := Format('Packet Type:         %d', [Byte(PacketType)])
   + sLineBreak   + Format('Remaining Length:    %d', [RemainingLength])
@@ -1006,32 +1033,32 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION 'TMQTTSubscribePacketRec'}
-function TMQTTSubscribePacketRec.DumpGet: string;
+{$REGION 'TMqttSubscribePacketRec'}
+function TMqttSubscribePacketRec.DumpGet: string;
 begin
   Result        := Format('Packet Type:         %d', [Byte(PacketType)])
   + sLineBreak   + Format('Remaining Length:    %d', [RemainingLength]);
 end;
 {$ENDREGION}
 
-{$REGION 'TMQTTUnsubscribePacketRec'}
-function TMQTTUnsubscribePacketRec.DumpGet: string;
+{$REGION 'TMqttUnsubscribePacketRec'}
+function TMqttUnsubscribePacketRec.DumpGet: string;
 begin
   Result        := Format('Packet Type:         %d', [Byte(PacketType)])
   + sLineBreak   + Format('Remaining Length:    %d', [RemainingLength]);
 end;
 {$ENDREGION}
 
-{$REGION 'TMQTTDisconnectPacketRec'}
-function TMQTTDisconnectPacketRec.DumpGet: string;
+{$REGION 'TMqttDisconnectPacketRec'}
+function TMqttDisconnectPacketRec.DumpGet: string;
 begin
   Result        := Format('Packet Type:         %d', [Byte(PacketType)])
   + sLineBreak   + Format('Remaining Length:    %d', [RemainingLength]);
 end;
 {$ENDREGION}
 
-{$REGION 'TMQTTStreamDecoder'}
-//procedure TMQTTStreamDecoder.DataAppend(const ABytes: TBytes);
+{$REGION 'TMqttStreamDecoder'}
+//procedure TMqttStreamDecoder.DataAppend(const ABytes: TBytes);
 //var
 //  newlen: integer;
 //begin
@@ -1042,7 +1069,7 @@ end;
 //  FOffset := 0;
 //end;
 
-//procedure TMQTTStreamDecoder.BufferCompact;
+//procedure TMqttStreamDecoder.BufferCompact;
 //var
 //  validlen: integer;
 //begin
@@ -1053,7 +1080,7 @@ end;
 //  FOffset := 0;
 //end;
 
-//procedure TMQTTStreamDecoder.DataAppend(const ABytes: TBytes);
+//procedure TMqttStreamDecoder.DataAppend(const ABytes: TBytes);
 //var
 //  taillen, oldlen, newlen: integer;
 //begin
@@ -1072,7 +1099,7 @@ end;
 //  FOffset := 0;
 //end;
 
-procedure TMQTTStreamDecoder.DataAppend(const ABytes: TBytes);
+procedure TMqttStreamDecoder.DataAppend(const ABytes: TBytes);
 var
   startlen: integer;
 begin
@@ -1081,7 +1108,7 @@ begin
   Move(ABytes[0], FBuffer[startlen], Length(ABytes));
 end;
 
-function TMQTTStreamDecoder.PacketTryExtract(out APacket: TBytes): boolean;
+function TMqttStreamDecoder.PacketTryExtract(out APacket: TBytes): boolean;
 var
   i, remlen, multiplier, lenlen, totallen: integer;
   encbyte: byte;
@@ -1132,6 +1159,101 @@ begin
 //      Exit;
 //    end;
 //  end;
+end;
+{$ENDREGION}
+
+{$REGION 'TMqttLogWorker'}
+constructor TMqttLogWorker.Create(AConn: TADOConnection);
+begin
+  inherited Create(true);   // do NOT run immediately, it must be started manually
+  FreeOnTerminate := false; // must be free manually after termination
+
+  // init
+  FDataList := TThreadList<TTCPSessionDataClass>.Create;
+  FConn := AConn;
+end;
+
+destructor TMqttLogWorker.Destroy;
+begin
+  // terminate
+  Terminate; // set Terminated := true so ensure exit from while loop and any pending logs are flushed
+  WaitFor;
+
+  // list
+  FDataList.Free;
+
+  inherited;
+end;
+
+procedure TMqttLogWorker.Enqueue(const ATCPSessionDataClass: TTCPSessionDataClass);
+begin
+  FDataList.Add(ATCPSessionDataClass);
+end;
+
+procedure TMqttLogWorker.FlushToDb;
+var
+  datalist: TList<TTCPSessionDataClass>;
+  data: TTCPSessionDataClass;
+  query: TADOQuery;
+  i: integer;
+begin
+  datalist := FDataList.LockList;
+  try
+    if datalist.Count = 0 then
+      Exit;
+
+    query := TADOQuery.Create(nil);
+    try
+      query.Connection := FConn;
+    //query.SQL.Text := 'insert into DbaMqtt.dbo.TblTcp (FldIp, FldUId, FldEvent, FldDateTime) values (:PIp, :PUId, :PEvent, :PDateTime)';
+      for i := 0 to datalist.Count - 1 do begin
+        data := datalist[i];
+
+//        query.Parameters[0].DataType := TDataType.ftString;
+//        query.Parameters[0].Value := data.Ip;
+//
+//        query.Parameters[2].DataType := TDataType.ftDateTime;
+//        query.Parameters[2].Value := data.DateTime;
+//
+//        query.Parameters[0].DataType := TDataType.ftGuid;
+//        query.Parameters[1].Value := data.UId;
+//
+//        query.Parameters[3].DataType := TDataType.ftString;
+//        query.Parameters[3].Value := data.Event;
+
+
+        query.SQL.Text := Format('insert into DbaMqtt.dbo.TblTcp (FldIp, FldUId, FldEvent, FldDateTime) values (''%s'', ''%s'', ''%s'', ''%s'')', [
+          data.Ip
+        , data.UId
+        , data.Event
+        , DateTimeToStr(data.DateTime)
+        ]);
+
+//        data.Free;
+
+        query.ExecSQL;
+      end;
+    finally
+      query.Free;
+      datalist.Clear;
+    end;
+  finally
+    FDataList.UnlockList;
+  end;
+end;
+
+procedure TMqttLogWorker.Execute;
+begin
+  inherited;
+
+  // continous flush during running
+  while not Terminated do begin // *** must be stopped manually somewhere ***
+    Sleep(250);
+    FlushToDb;
+  end;
+
+  // final flush after termination
+  FlushToDb;
 end;
 {$ENDREGION}
 
@@ -1223,7 +1345,7 @@ begin
   LogResponse(AResponse);
 end;
 
-function  TMQTTClass.StrDebugable(const AStr: string; IvHex: boolean): string;
+function  TMqttClass.StrDebugable(const AStr: string; IvHex: boolean): string;
 var
   i: integer;
   b: byte;
@@ -1248,7 +1370,7 @@ begin
   Delete(Result, 1, 1);
 end;
 
-function  TMQTTClass.StrDebugable(const AIdBytes: TIdBytes; IvHex: boolean): string;
+function  TMqttClass.StrDebugable(const AIdBytes: TIdBytes; IvHex: boolean): string;
 var
   i: integer;
   b: byte;
@@ -1271,7 +1393,7 @@ begin
   Delete(Result, 1, 1);
 end;
 
-function  TMQTTClass.StrPrintable(const AStr: string): string;
+function  TMqttClass.StrPrintable(const AStr: string): string;
 var
   i, len: integer;
   c: char;
@@ -1329,7 +1451,7 @@ begin
   Inc(AIndex, len);
 end;
 
-function  TMQTTClass.StrRead(AContext: TIdContext): string;
+function  TMqttClass.StrRead(AContext: TIdContext): string;
 var
   rbu: TIdBytes; // lengthbytes
   stz: word; // strlen
@@ -1401,32 +1523,28 @@ begin
     Move(AIdBytes[ACount], AIdBytes[0], Remaining);
   SetLength(AIdBytes, Remaining);
 end;
-*)
-{$ENDREGION}
 
-{$REGION 'Zzz'}
-{
-  procedure BytesSplitAtNullChar(const fullpacket: TIdBytes; var AIdBytesVec: TBytesVec);
-  var
-    i: int64;
-    bts: TIdBytes;
-  begin
-    SetLength(AIdBytesVec, 0);
-    SetLength(bts, 0);
-    for i := Low(fullpacket) to High(fullpacket) do begin
-      if (fullpacket[i] <> $0) and (i <= High(fullpacket)) then begin
-        SetLength(bts, Length(bts) + 1);
-        bts[High(bts)] := fullpacket[i];
-      end else begin
-        SetLength(bts, Length(bts) + 1);
-        bts[High(bts)] := $0;
-        SetLength(AIdBytesVec, Length(AIdBytesVec) + 1);
-        AIdBytesVec[High(AIdBytesVec)] := bts;
-        SetLength(bts, 0);
-      end;
+procedure BytesSplitAtNullChar(const fullpacket: TIdBytes; var AIdBytesVec: TBytesVec);
+var
+  i: int64;
+  bts: TIdBytes;
+begin
+  SetLength(AIdBytesVec, 0);
+  SetLength(bts, 0);
+  for i := Low(fullpacket) to High(fullpacket) do begin
+    if (fullpacket[i] <> $0) and (i <= High(fullpacket)) then begin
+      SetLength(bts, Length(bts) + 1);
+      bts[High(bts)] := fullpacket[i];
+    end else begin
+      SetLength(bts, Length(bts) + 1);
+      bts[High(bts)] := $0;
+      SetLength(AIdBytesVec, Length(AIdBytesVec) + 1);
+      AIdBytesVec[High(AIdBytesVec)] := bts;
+      SetLength(bts, 0);
     end;
   end;
-}
+end;
+*)
 {$ENDREGION}
 
 end.

@@ -11,7 +11,7 @@ type
     FNotificationCenter: TNotificationCenter;
   public
     procedure NotificationSet(const IvTitle, IvMessage: string);
-    procedure NotificationFireDateSet(const IvName, IvTitle, IvMessage: string; IvTime: TDateTime);
+    procedure NotificationFireDateTimeSet(const IvName, IvTitle, IvMessage: string; IvDateTime: TDateTime);
     procedure NotificationCancel(const IvNotificationName: string);
     procedure NotificationCancelAll();
     constructor Create();
@@ -52,7 +52,7 @@ begin
   end;
 end;
 
-procedure TWksNotification.NotificationFireDateSet(const IvName, IvTitle, IvMessage: string; IvTime: TDateTime);
+procedure TWksNotification.NotificationFireDateTimeSet(const IvName, IvTitle, IvMessage: string; IvDateTime: TDateTime);
 var
   ntf: TNotification;
 begin
@@ -65,7 +65,7 @@ begin
       ntf.Title       := IvTitle;
       ntf.AlertBody   := IvMessage;
       ntf.EnableSound := true;
-      ntf.FireDate    := IvTime;
+      ntf.FireDate    := IvDateTime;
       FNotificationCenter.PresentNotification(ntf);
     finally
       ntf.Free;

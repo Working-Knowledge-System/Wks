@@ -1,0 +1,66 @@
+--[REGION 'HEADER']
+-- -----------------------------------------------------------------------------
+-- title      :  Wks Databases Backup
+-- description:  create .bak files for all Dba* databases in the local sql server stored in :
+--               C:\Program Files\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQL\Backup
+-- 
+-- author     :  giarussi
+-- created    :  10/27/2022 02:50:50 PM
+-- copyright  :  (c) Wks 2022
+-- licence    :  BDS
+-- -----------------------------------------------------------------------------
+--[ENDREGION]
+
+-- declare
+declare @kp varchar(256); set @kp = 'C:\$Bak\Dba'                                 -- backupdir (without \Year\Week) -- '\\azfs6a\H_ENG_YMS\$Bak\Dba\2017\50'
+--declare @dt varchar(20) ; set @dt = convert(varchar, getdate(), 112)            -- date
+--declare @dy varchar(20) ; set @dy = convert(varchar, datepart(yyyy, getdate())) -- year
+--declare @dw varchar(20) ; set @dw = convert(varchar, datepart(ww, getdate()))   -- week
+declare @de int                                                                   -- bakdir exists
+declare @dn varchar(50)                                                           -- databasename
+declare @fk varchar(256)                                                          -- filenameforbackup
+
+-- calc
+--set @dw = replicate('0', 2-len(@dw)) + @dw
+--set @kp = @kp + '\' + @dy + '\' + @dw
+print 'backupdirwithyearandweek ' + @kp
+
+-- ensuredir
+exec master.dbo.xp_fileexist @kp, @de output
+if @de = 0 begin
+  print 'create dir ' + @kp
+  exec master.dbo.xp_create_subdir @kp
+end
+
+-- cursor
+declare c cursor for
+select name
+from master.dbo.sysdatabases
+where
+    (name     like 'Dba%')
+and (name not like 'DbaZzz%')
+and (name not like 'DbaFoundry%')
+and (name not in  ('DbaXxx', 'DbaPlace'))
+order by 1
+open c
+
+-- walk
+fetch next from c into @dn
+while @@fetch_status = 0 begin
+  set @fk = @kp + '\' + @dn /*+ '_' + @dt*/ + '.bak'
+  print(@fk)
+  
+  backup database @dn to disk = @fk
+
+  -- next
+  fetch next from c into @dn
+end
+
+-- dispose
+close c
+deallocate c
+
+-- end
+select 'Wks databases backup done' as FldResult
+
+

@@ -42,9 +42,9 @@ uses
 {$REGION 'Tests'}
 procedure TMqttTestFixture.RemainingLengthWriteTest(ALength: cardinal; ALengthExpected: byte);
 var
-  packet: TMQTTPacketClass;
+  packet: TMqttPacketClass;
 begin
-  Packet := TMQTTPacketClass.Create;
+  Packet := TMqttPacketClass.Create;
   try
     packet.RemainingLengthWrite(ALength);
     Assert.AreEqual<integer>(ALengthExpected, packet.Stream.Size);

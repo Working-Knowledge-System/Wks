@@ -6,11 +6,11 @@ interface
 uses
     System.Classes
   , System.SysUtils
-  , WksMqttTypesUnit
+  , System.StrUtils
   ;
 {$ENDREGION}
 
-{$REGION 'Routines'}
+{$REGION 'Utils'}
 function  VarLenFieldLength(AString: string): integer; // 2bytes + stringlength
 function  StrFromStreamRead(AStream: TStream): string; // read UTF8 encoded string
 function  BytesFromHex(const AHex: string): TBytes;
@@ -19,11 +19,18 @@ function  HexFromStream(AStream: TStream): string;     //  C0  7F  20  00 ...
 function  HexFromBytes(ABytes: TBytes): string;
 function  CharFromStream(AStream: TStream): string;    //   À   ~   _   .
 function  DumpFromStream(AStream: TStream): string;    // *** da rivedere ***
+function  IpFormat(AIp: string): string;
 {$ENDREGION}
 
 implementation
 
-{$REGION 'Routines'}
+{$REGION 'Use'}
+uses
+    WksMqttTypesUnit
+  ;
+{$ENDREGION}
+
+{$REGION 'Utils'}
 function  VarLenFieldLength(AString: string): integer;
 begin
   if AString.IsEmpty then
@@ -224,7 +231,8 @@ begin
         if (i mod BYTES_PER_LINE = 0) then
           LineStr := '';
 
-        if Char(b) in PRINTABLE_ASCII then
+      //if Char(b) in PRINTABLE_ASCII then
+        if CharInSet(Char(b), PRINTABLE_ASCII) then
           LineStr := LineStr + Char(b)
         // show unprintable as dots
         else
@@ -241,6 +249,14 @@ begin
   finally
     AStream.Position := oldpos;
   end;
+end;
+
+function  IpFormat(AIp: string): string;
+var
+  v: TArray<string>;
+begin
+  v := SplitString(AIp, '.');
+  Result := Format('%3s.%3s.%3s.%3s', [v[0], v[1], v[2], v[3]]);
 end;
 {$ENDREGION}
 
