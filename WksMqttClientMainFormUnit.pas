@@ -19,16 +19,30 @@ uses
   , Vcl.Imaging.pngimage
   , Vcl.ExtCtrls
   , Vcl.ComCtrls
+  , System.SyncObjs//, IdTCPClient, IdGlobal, IdException
   , JvExExtCtrls
   , JvNetscapeSplitter
+  , SynEdit
+  , SynEditHighlighter
+  , SynHighlighterGeneral
   , WksMqttBaseMainFormtUnit
   , WksMqttClientUnit
-  , WksMqttTypesUnit, SynEdit, SynEditHighlighter, SynHighlighterGeneral
+  , WksMqttTypesUnit
   ;
 {$ENDREGION}
 
 {$REGION 'Type'}
 type
+  TMqttClientWorkerThread = class(TThread)
+  private
+    FIndex: Integer;
+    FBarrier: TLightweightEvent;
+  protected
+    procedure Execute; override;
+  public
+    constructor Create(AIndex: integer; ABarrier: TLightweightEvent);
+  end;
+
   TMainForm = class(TBaseForm)
     PublishRequestTabSheet: TTabSheet;
     PublishPacketSendButton: TButton;
@@ -59,8 +73,8 @@ type
     ConnectPasswordEdit: TEdit;
     ServerJoinButton: TButton;
     ServerDisjoinButton: TButton;
-    ConnectClientIdentifierLabel: TLabel;
-    ConnectClientIdentifierEdit: TEdit;
+    ConnectObjectIdLabel: TLabel;
+    ConnectObjectIdEdit: TEdit;
     MqttTabSheet: TTabSheet;
     MqttProtocolNameLabel: TLabel;
     MqttProtocolLevelLabel: TLabel;
@@ -68,16 +82,12 @@ type
     DisconnectPacketSendButton: TButton;
     MqttProtocolLevelComboBox: TComboBox;
     ConnectCleanSessionCheckBox: TCheckBox;
-    ConnectQosLabel: TLabel;
+    ConnectWillQosLabel: TLabel;
     ConnectQosComboBox: TComboBox;
     PublishQosLabel: TLabel;
     PublishQosComboBox: TComboBox;
     PublishDupFlagCheckBox: TCheckBox;
     PublishRetainCheckBox: TCheckBox;
-    PingreqCountComboBox: TComboBox;
-    PingreqCountLabel: TLabel;
-    Label1: TLabel;
-    PingreqPauseMsComboBox: TComboBox;
     PublishCountLabel: TLabel;
     PublishPauseMsLabel: TLabel;
     PublishCountComboBox: TComboBox;
@@ -87,6 +97,14 @@ type
     UnsubscribePacketSendButton: TButton;
     SubscribeTopicFilterListMemo: TMemo;
     SubscribeTopicFilterListLabel: TLabel;
+    ConnectObjectKindComboBox: TComboBox;
+    ConnectObjectKindLabel: TLabel;
+    TestTabSheet: TTabSheet;
+    TestCountLabel: TLabel;
+    TestPauseMsLabel: TLabel;
+    TestCountComboBox: TComboBox;
+    TestPauseMsComboBox: TComboBox;
+    TestStartButton: TButton;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ServerDisjoinButtonClick(Sender: TObject);
@@ -98,9 +116,10 @@ type
     procedure DisconnectPacketSendButtonClick(Sender: TObject);
     procedure SubscribePacketSendButtonClick(Sender: TObject);
     procedure UnsubscribePacketSendButtonClick(Sender: TObject);
+    procedure TestStartButtonClick(Sender: TObject);
   private
     { Private declarations }
-    FMqttClient: TMQTTClientClass;
+    FMqttClient: TMqttClientClass;
   public
     { Public declarations }
   end;
@@ -134,7 +153,8 @@ begin
   MqttProtocolLevelComboBox.ItemIndex      := FIni.ReadInteger('Mqtt'     , 'ProtocolLevel'    , 4 {3.1.1}                                );
   ServerHostEdit.Text                      := FIni.ReadString ('Server'   , 'Host'             , 'www.wks.cloud'                          );
   ServerPortEdit.Text                      := FIni.ReadString ('Server'   , 'Port'             , '1883'                                   );
-  ConnectClientIdentifierEdit.Text         := FIni.ReadString ('Connect'  , 'ClientIdentifier' , 'client001'                              );
+  ConnectObjectKindComboBox.ItemIndex      := FIni.ReadInteger('Connect'  , 'ObjectKind'       , 4 {Equipment}                            ); // \__ ClientIdentifier = Equipment.101
+  ConnectObjectIdEdit.Text                 := FIni.ReadString ('Connect'  , 'ClientId'         , '101'                                    ); // /
   ConnectQosComboBox.ItemIndex             := FIni.ReadInteger('Connect'  , 'Qos'              , 0                                        );
   ConnectWillTopicEdit.Text                := FIni.ReadString ('Connect'  , 'WillTopic'        , 'wks/mqtt/clients/$ClientIdentifier$/wlt');
   ConnectWillMessageEdit.Text              := FIni.ReadString ('Connect'  , 'WillMessage'      , 'I have done here folks!'                );
@@ -144,8 +164,6 @@ begin
   ConnectCredentialsActiveCheckBox.Checked := FIni.ReadBool   ('Connect'  , 'CredentialsActive', true                                     );
   ConnectKeepAliveSecondsEdit.Text         := FIni.ReadString ('Connect'  , 'KeepAliveSeconds' , '60'                                     );
   ConnectCleanSessionCheckBox.Checked      := FIni.ReadBool   ('Connect'  , 'CleanSession'     , true                                     );
-  PingreqCountComboBox.ItemIndex           := FIni.ReadInteger('Pingreq'  , 'Count'            , 0                                        );
-  PingreqPauseMsComboBox.ItemIndex         := FIni.ReadInteger('Pingreq'  , 'PauseMs'          , 2                                        );
   PublishTopicEdit.Text                    := FIni.ReadString ('Publish'  , 'Topic'            , 'wks/mqtt/test/helloworld'               );
   PublishMessageEdit.Text                  := FIni.ReadString ('Publish'  , 'Message '         , 'hello MQTT!'                            );
   PublishQosComboBox.ItemIndex             := FIni.ReadInteger('Publish'  , 'Qos'              , 0                                        );
@@ -153,8 +171,11 @@ begin
   PublishPauseMsComboBox.ItemIndex         := FIni.ReadInteger('Publish'  , 'PauseMs'          , 2                                        );
   SubscribeTopicFilterListMemo.Text        := FIni.ReadString ('Subscribe', 'TopicFilterList'  , 'wks/mqtt/system/*,0'                    ).Replace('|', sLineBreak);
 
+  TestCountComboBox.ItemIndex              := FIni.ReadInteger('Server'   , 'TestCount'        , 0                                        );
+  TestPauseMsComboBox.ItemIndex            := FIni.ReadInteger('Server'   , 'TestPauseMs'      , 2                                        );
+
   // client
-  FMqttClient := TMQTTClientClass.Create(LogSynEdit.Lines, LogVerboseCheckBox, LogRawAsciiCheckBox, LogRawHexCheckBox, LogRawCharCheckBox);
+  FMqttClient := TMqttClientClass.Create(LogSynEdit.Lines, LogVerboseCheckBox, LogRawAsciiCheckBox, LogRawHexCheckBox, LogRawCharCheckBox);
   Log('client created');
 end;
 
@@ -165,7 +186,8 @@ begin
   FIni.WriteInteger('Mqtt'     , 'ProtocolLevel'    , MqttProtocolLevelComboBox.ItemIndex     );
   FIni.WriteString ('Server'   , 'Host'             , ServerHostEdit.Text                     );
   FIni.WriteString ('Server'   , 'Port'             , ServerPortEdit.Text                     );
-  FIni.WriteString ('Connect'  , 'ClientIdentifier' , ConnectClientIdentifierEdit.Text        );
+  FIni.WriteInteger('Connect'  , 'ObjectKind'       , ConnectObjectKindComboBox.ItemIndex     );
+  FIni.WriteString ('Connect'  , 'ClientId'         , ConnectObjectIdEdit.Text                );
   FIni.WriteInteger('Connect'  , 'Qos'              , ConnectQosComboBox.ItemIndex            );
   FIni.WriteString ('Connect'  , 'WillTopic'        , ConnectWillTopicEdit.Text               );
   FIni.WriteString ('Connect'  , 'WillMessage'      , ConnectWillMessageEdit.Text             );
@@ -175,14 +197,15 @@ begin
   FIni.WriteBool   ('Connect'  , 'CredentialsActive', ConnectCredentialsActiveCheckBox.Checked);
   FIni.WriteString ('Connect'  , 'KeepAliveSeconds ', ConnectKeepAliveSecondsEdit.Text        );
   FIni.WriteBool   ('Connect'  , 'CleanSession'     , ConnectCleanSessionCheckBox.Checked     );
-  FIni.WriteInteger('Pingreq'  , 'Count'            , PingreqCountComboBox.ItemIndex          );
-  FIni.WriteInteger('Pingreq'  , 'PauseMs'          , PingreqPauseMsComboBox.ItemIndex        );
   FIni.WriteString ('Publish'  , 'Topic'            , PublishTopicEdit.Text                   );
   FIni.WriteString ('Publish'  , 'Message'          , PublishMessageEdit.Text                 );
   FIni.WriteInteger('Publish'  , 'Qos'              , PublishQosComboBox.ItemIndex            );
   FIni.WriteInteger('Publish'  , 'Count'            , PublishCountComboBox.ItemIndex          );
   FIni.WriteInteger('Publish'  , 'PauseMs'          , PublishPauseMsComboBox.ItemIndex        );
   FIni.WriteString ('Subscribe', 'TopicFilterList'  , string(SubscribeTopicFilterListMemo.Text).Replace(sLineBreak, '|'));
+
+  FIni.WriteInteger('Server'   , 'TestCount'        , TestCountComboBox.ItemIndex             );
+  FIni.WriteInteger('Server'   , 'TestPauseMs'      , TestPauseMsComboBox.ItemIndex           );
 
   // disjoin from tcpserver
   if FMQTTClient.IsJoined then
@@ -239,7 +262,10 @@ procedure TMainForm.ConnectPacketSendButtonClick(Sender: TObject);
 begin
   inherited;
 
-  FMqttClient.ConnectPacketSend(MqttProtocolLevelComboBox.ItemIndex, ConnectQosComboBox.ItemIndex, ConnectClientIdentifierEdit.Text, ConnectWillTopicEdit.Text, ConnectWillMessageEdit.Text, ConnectUsernameEdit.Text, ConnectPasswordEdit.Text, ConnectCleanSessionCheckBox.Checked, StrToIntDef(ConnectKeepAliveSecondsEdit.Text, 60));
+  FMqttClient.ObjectKind := ConnectObjectKindComboBox.Text;
+  FMqttClient.ObjectId   := string(ConnectObjectIdEdit.Text).ToInteger;
+
+  FMqttClient.ConnectPacketSend(MqttProtocolLevelComboBox.ItemIndex, ConnectQosComboBox.ItemIndex, FMqttClient.ClientIdentifier, ConnectWillTopicEdit.Text, ConnectWillMessageEdit.Text, ConnectUsernameEdit.Text, ConnectPasswordEdit.Text, ConnectCleanSessionCheckBox.Checked, StrToIntDef(ConnectKeepAliveSecondsEdit.Text, 60));
 end;
 
 procedure TMainForm.DisconnectPacketSendButtonClick(Sender: TObject);
@@ -252,22 +278,10 @@ end;
 
 {$REGION 'PingReqPacketSend'}
 procedure TMainForm.PingRequestPacketSendButtonClick(Sender: TObject);
-var
-  i, count, pause: integer;
 begin
   inherited;
 
-  count := StrToIntDef(PingreqCountComboBox.Text  , 1);
-  pause := StrToIntDef(PingreqPauseMsComboBox.Text, 0);
-
-  if count > 10 then
-    if not (MessageDlg(Format('Send %d PINGREQ to the broker?', [count]), mtCustom, [mbYes, mbNo], 0) = mrYes) then
-      Exit;
-
-  for i := 1 to count do begin
-    FMqttClient.PingReqPacketSend;
-    Sleep(pause);
-  end;
+  FMqttClient.PingReqPacketSend;
 end;
 {$ENDREGION}
 
@@ -290,7 +304,7 @@ begin
     msg := PublishMessageEdit.Text;
     if msg.Contains('$Counter$') then
       msg := StringReplace(msg, '$Counter$', Format('%5d', [i]), [treplaceFlag.rfReplaceAll]);
-    FMqttClient.PublishPacketSend(FMqttClient.NextPacketId, PublishTopicEdit.Text, msg, TMQTTQosType(PublishQosComboBox.ItemIndex), PublishDupFlagCheckBox.Checked, PublishRetainCheckBox.Checked);
+    FMqttClient.PublishPacketSend(FMqttClient.NextPacketId, PublishTopicEdit.Text, msg, TMqttQosType(PublishQosComboBox.ItemIndex), PublishDupFlagCheckBox.Checked, PublishRetainCheckBox.Checked);
     Sleep(pause);
   end;
 end;
@@ -302,7 +316,7 @@ var
   row: string;
   i, count: integer;
   rowsvec, tokenvec: TArray<string>;
-  subscribevec: TMQTTSubscribeTopicRecVec;
+  subscribevec: TMqttSubscribeTopicRecVec;
 begin
   inherited;
 
@@ -315,7 +329,7 @@ begin
       row := row + ',0';
     tokenvec := SplitString(row, ',');
     subscribevec[i].TopicFilter  := tokenvec[0];
-    subscribevec[i].RequestedQoS := TMQTTQoSType(StrToIntDef(tokenvec[1], 0));
+    subscribevec[i].RequestedQoS := TMqttQoSType(StrToIntDef(tokenvec[1], 0));
   end;
 
   FMqttClient.SubscribePacketSend(FMqttClient.NextPacketId, subscribevec);
@@ -327,7 +341,7 @@ procedure TMainForm.UnsubscribePacketSendButtonClick(Sender: TObject);
 var
   i, count: integer;
   row: string;
-  unsubscribevec: TMQTTUnsubscribeTopicRecVec;
+  unsubscribevec: TMqttUnsubscribeTopicRecVec;
 begin
   inherited;
 
@@ -340,6 +354,116 @@ begin
   end;
 
   FMqttClient.UnsubscribePacketSend(FMqttClient.NextPacketId, unsubscribevec);
+end;
+{$ENDREGION}
+
+{$REGION 'TMqttClientWorkerThread'}
+constructor TMqttClientWorkerThread.Create(AIndex: integer; ABarrier: TLightweightEvent);
+begin
+  inherited Create(false);  // run immediately
+  FreeOnTerminate := false; // must be free manually after termination
+
+  FIndex := AIndex;
+  FBarrier := ABarrier;
+end;
+
+procedure TMqttClientWorkerThread.Execute;
+var
+  mqttclient: TMqttClientClass;
+  host: string;
+  prt{, i}: integer;
+begin
+  inherited;
+
+  mqttclient := TMqttClientClass.Create(MainForm.LogSynEdit.Lines, MainForm.LogVerboseCheckBox, MainForm.LogRawAsciiCheckBox, MainForm.LogRawHexCheckBox, MainForm.LogRawCharCheckBox);
+  try
+    // init
+    host := 'www.wks.cloud';
+    prt := 1883;
+
+    // tcp join
+    mqttclient.ClientIdentifier; // := Format('MqttClientTest_%d', [FIndex]);
+    mqttclient.Join(host, prt);
+
+    // mqtt connect
+    // ...
+
+    // pingreq packet(s) send
+    if true then
+    //for i := 1 to 10 begin
+      mqttclient.PingReqPacketSend;
+      //Sleep(pause);
+    //end;
+
+    // sync point for concurrent disconnect
+    FBarrier.WaitFor;
+
+    // simulate short work
+    Sleep(1000);
+
+    // mqtt disconnect
+    // ...
+
+    // tcp disjoin
+    mqttclient.Disjoin;
+  except
+    on e: Exception do
+      Writeln(Format('[worker %d] Error: %s', [FIndex, e.Message]));
+  end;
+  mqttclient.Free;
+end;
+{$ENDREGION}
+
+{$REGION 'Test'}
+procedure TMainForm.TestStartButtonClick(Sender: TObject);
+var
+  i, count, pause: integer;
+  barrier: TLightweightEvent;
+  workers: array of TMqttClientWorkerThread;
+begin
+  inherited;
+
+  // init
+  count := StrToIntDef(TestCountComboBox.Text  , 1);
+  pause := StrToIntDef(TestPauseMsComboBox.Text, 0);
+
+  // exit
+  if count > 1 then
+    if not (MessageDlg(Format('Repeat %d tests with parallel workers threads?', [count]), mtCustom, [mbYes, mbNo], 0) = mrYes) then
+      Exit;
+
+  // equalizer
+  barrier := TLightweightEvent.Create;
+
+  // tests
+  Log('Starting %d test clients workers for jon/disjoin...', [count]);
+  try
+    // create
+    for i := 0 to count - 1 do begin
+      Log('Create a MQTT Client worker thread %d', [i]);
+      SetLength(workers, Length(workers) + 1);
+      workers[i] := TMqttClientWorkerThread.Create(i, barrier);
+    //workers[i].FreeOnTerminate := false;
+    end;
+
+    // Let them all connect before releasing
+    Sleep(500); // give all threads time to reach barrier
+
+    // release all at once
+    barrier.SetEvent;
+
+    // wait for all to finish
+    Sleep(3000);
+
+    // free
+    for i := 0 to count - 1 do begin
+      workers[i].WaitFor;
+      workers[i].Free;
+    end;
+  finally
+    barrier.Free;
+  end;
+  Log('All %d test clients workers finished', [count]);
 end;
 {$ENDREGION}
 

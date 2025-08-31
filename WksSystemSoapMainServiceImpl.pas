@@ -643,24 +643,25 @@ var
 begin
   // sql
   sql         := '-- reset'
-  + sLineBreak + 'delete from DbaDatabase.dbo.TblServer'
-  + sLineBreak + 'delete from DbaDatabase.dbo.TblDatabase'
-  + sLineBreak + 'delete from DbaDatabase.dbo.TblTable'
-  + sLineBreak + 'delete from DbaDatabase.dbo.TblField'
-//+ sLineBreak + 'delete from DbaDatabase.dbo.TblIndex'
+  + sLineBreak + 'delete from DbaDatabase.dbo.TblServer   where FldSystem = ''Wks'''
+  + sLineBreak + 'delete from DbaDatabase.dbo.TblDatabase where FldSystem = ''Wks'''
+  + sLineBreak + 'delete from DbaDatabase.dbo.TblTable    where FldSystem = ''Wks'''
+  + sLineBreak + 'delete from DbaDatabase.dbo.TblField    where FldSystem = ''Wks'''
+//+ sLineBreak + 'delete from DbaDatabase.dbo.TblIndex    where FldSystem = ''Wks'''
   + sLineBreak + ''
   + sLineBreak + '-- server insert'
   + sLineBreak + 'insert into DbaDatabase.dbo.TblServer'
   + sLineBreak + 'select'
-  + sLineBreak + '    ''Wks''    as FldSystem'
-  + sLineBreak + '  , ''WKS''    as FldServer'
-  + sLineBreak + '  , ''Active'' as FldState'
-  + sLineBreak + '  , null       as FldKind'
-  + sLineBreak + '  , null       as FldLocation'
-  + sLineBreak + '  , null       as FldSaUsername'
-  + sLineBreak + '  , null       as FldSaPassword'
-  + sLineBreak + '  , null       as FldDescription'
-  + sLineBreak + '  , null       as FldNote'
+  + sLineBreak + '    ''Wks''     as FldSystem'
+  + sLineBreak + '  , ''WKS''     as FldServer'
+  + sLineBreak + '  , ''Active''  as FldState'
+  + sLineBreak + '  , ''MsSqlDb'' as FldKind'
+  + sLineBreak + '  , null        as FldPort'
+  + sLineBreak + '  , null        as FldLocation'
+  + sLineBreak + '  , null        as FldSaUsername'
+  + sLineBreak + '  , null        as FldSaPassword'
+  + sLineBreak + '  , null        as FldDescription'
+  + sLineBreak + '  , null        as FldNote'
   + sLineBreak + ''
   + sLineBreak + '-- databases insert'
   + sLineBreak + 'insert into DbaDatabase.dbo.TblDatabase'
@@ -695,6 +696,8 @@ begin
   + sLineBreak + '    FldDatabase'
   + sLineBreak + 'from'
   + sLineBreak + '    DbaDatabase.dbo.TblDatabase'
+  + sLineBreak + 'where'
+  + sLineBreak + '    FldSystem = ''Wks'''
   + sLineBreak + 'order by'
   + sLineBreak + '    FldDatabase'
   + sLineBreak + ''
@@ -717,9 +720,14 @@ begin
   + sLineBreak + '  + ''   , null                 as FldKind'''
   + sLineBreak + '  + ''   , null                 as FldRows'''
   + sLineBreak + '  + ''   , null                 as FldDescription'''
+  + sLineBreak + '  + ''   , null                 as FldDescription2'''
   + sLineBreak + '  + ''   , null                 as FldPrimaryKey'''
   + sLineBreak + '  + ''   , null                 as FldForeignKey'''
   + sLineBreak + '  + ''   , null                 as FldNote'''
+  + sLineBreak + '  + ''   , null                 as FldSizeMb'''
+  + sLineBreak + '  + ''   , null                 as FldRecordOldest'''
+  + sLineBreak + '  + ''   , null                 as FldRecordYoungest'''
+  + sLineBreak + '  + ''   , null                 as FldFieldCount'''
   + sLineBreak + '  + '' from'''
   + sLineBreak + '  + ''     information_schema.tables'''
   + sLineBreak + '  + '' order by'''
@@ -801,7 +809,7 @@ begin
   sbu.Add('\**********************************************************************************/'          );
 
   // dbaloop
-  TDbaRec.DsFromSql('select * from DbaDatabase.dbo.TblDatabase order by FldDatabase', u);
+  TDbaRec.DsFromSql('select * from DbaDatabase.dbo.TblDatabase where FldSystem = ''Wks'' order by FldDatabase', u);
   try
     while not u.Eof do begin
       // zip
@@ -826,7 +834,7 @@ begin
       sbu.Add('GO');
 
       // tablesloop
-      TDbaRec.DsFromSql(Format('select * from DbaDatabase.dbo.TblTable where FldDatabase = ''%s'' order by FldTable', [dba]), v);
+      TDbaRec.DsFromSql(Format('select * from DbaDatabase.dbo.TblTable where FldSystem = ''Wks'' and FldDatabase = ''%s'' order by FldTable', [dba]), v);
       try
         while not v.Eof do begin
           // zip
@@ -841,7 +849,7 @@ begin
 
           // fieldsloop
           com := ' ';
-          TDbaRec.DsFromSql(Format('select * from DbaDatabase.dbo.TblField where FldDatabase = ''%s'' and FldTable = ''%s'' order by FldOrder', [dba, tbl]), w);
+          TDbaRec.DsFromSql(Format('select * from DbaDatabase.dbo.TblField where FldSystem = ''Wks'' and FldDatabase = ''%s'' and FldTable = ''%s'' order by FldOrder', [dba, tbl]), w);
           try
             while not w.Eof do begin
               // zip

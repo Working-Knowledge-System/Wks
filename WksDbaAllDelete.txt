@@ -1,0 +1,56 @@
+--[REGION 'HEADER']
+-- ----------------------------------------------------------------------------- *** WARNING ***
+-- title      :  Wks Databases Backup
+-- description:  delete all Dba* databases in the local sql server instance
+-- 
+-- author     :  giarussi
+-- created    :  10/27/2022 02:50:50 PM
+-- copyright  :  (c) Wks 2022
+-- licence    :  BDS
+-- -----------------------------------------------------------------------------
+--[ENDREGION]
+
+-- var
+declare @t1 table(FldFileBak varchar(max)) -- dbs
+declare @db varchar(1024)                  -- dbaname
+declare @cm nvarchar(max)                  -- command
+
+-- dbs
+insert into @t1
+select
+   [name]
+from
+   [master].[sys].[databases]
+where
+    [name] not in ('master', 'model', 'msdb', 'tempdb', 'DbaPlace')
+and [name] like 'Dba%'
+--select * from @t1
+
+-- cursor
+declare @c cursor   
+set @c = cursor for select FldFileBak from @t1 order by 1
+open @c
+fetch next from @c into @db
+while @@fetch_status = 0 begin
+	-- command
+	set @cm = '
+USE [master]
+ALTER DATABASE [' + @db + '] SET SINGLE_USER WITH ROLLBACK IMMEDIATE
+DROP  DATABASE [' + @db + ']
+--GO
+'
+	-- go
+	print @cm
+    exec(@cm)
+    --execute sp_executesql @cm
+
+	-- next
+    fetch next from @c into @db
+end
+
+-- dispose
+close c
+deallocate c
+
+-- end
+select 'Wks databases delete done' as FldResult

@@ -23,11 +23,15 @@ uses
 type
   TMqttClientClass = class(TMqttClass)
   private
-    // fields
+    // mqttfields
     FTCPClient: TIdTCPClient;
     FKeepAlivePingTimer: TTimer;
     FPacketIdCounter: word;
     FIsConnected: boolean; // set to true if has received the the CONNACK packet
+
+    // wksfields
+    FObjectKind: string;
+    FObjectId: integer;
 
     // tcpipclient events
 //    FOnTcpClientJoined: TNotifyEvent;
@@ -52,26 +56,30 @@ type
 
     // utils
     function  NextPacketIdGet: word;
-    function IsJoinedGet: boolean;
+    function  IsJoinedGet: boolean;
+    function  ClientIdentifierGet: string;
   public
     constructor Create(ALogStrings: TStrings; ALogVerbose, ALogRawAscii, ALogRawHex, ALogRawChar: TCheckBox); override;
     destructor Destroy; override;
     procedure Join(AHost: string; APort: integer);
     procedure Disjoin;
     procedure ConnectPacketSend(IvProtocolLevel, IvQos: byte; AClientIdentifier, AWillTopic, AWillMessage, AUsername, APassword: string; IvCleanSession: boolean = true; AKeepAliveSeconds: word = 60);
-    procedure PublishPacketSend(APacketIdentifier: word; ATopicName, AApplicationMessage: string; AQosLevel: TMQTTQoSType = qostAT_MOST_ONCE; ADupFlag: boolean = False; ARetain: boolean = false);
-    procedure SubscribePacketSend(APacketIdentifier: word; ASubscribeTopicRecVec: TMQTTSubscribeTopicRecVec);
-    procedure UnsubscribePacketSend(APacketIdentifier: word; AUnsubscribeTopicRecVec: TMQTTUnsubscribeTopicRecVec);
+    procedure PublishPacketSend(APacketIdentifier: word; ATopicName, AApplicationMessage: string; AQosLevel: TMqttQoSType = qostAT_MOST_ONCE; ADupFlag: boolean = False; ARetain: boolean = false);
+    procedure SubscribePacketSend(APacketIdentifier: word; ASubscribeTopicRecVec: TMqttSubscribeTopicRecVec);
+    procedure UnsubscribePacketSend(APacketIdentifier: word; AUnsubscribeTopicRecVec: TMqttUnsubscribeTopicRecVec);
     procedure PingReqPacketSend;
     procedure DisconnectPacketSend;
     procedure KeepAlivePingTimerReset;
 
-//    property OnBrokerConnected   : TNotifyEvent   read FOnBrokerConnected    write FOnBrokerConnected;
-//    property OnBrokerDisconnected: TNotifyEvent   read FOnBrokerDisconnected write FOnBrokerDisconnected;
-    property OnBrokerMessage: TOnMQTTMessage read FOnBrokerMessage write FOnBrokerMessage;
+//  property OnBrokerConnected   : TNotifyEvent   read FOnBrokerConnected    write FOnBrokerConnected;
+//  property OnBrokerDisconnected: TNotifyEvent   read FOnBrokerDisconnected write FOnBrokerDisconnected;
+    property OnBrokerMessage     : TOnMQTTMessage read FOnBrokerMessage      write FOnBrokerMessage;
 
-    property NextPacketId: word read NextPacketIdGet;
-    property IsJoined{TcpClientJoined}: boolean read IsJoinedGet;         // tcpclient is connected to tcpserver
+    property ObjectKind          : string         read FObjectKind           write FObjectKind;
+    property ObjectId            : integer        read FObjectId             write FObjectId;
+    property ClientIdentifier    : string         read ClientIdentifierGet;
+    property NextPacketId        : word           read NextPacketIdGet;
+    property IsJoined{TcpClientJoined}: boolean   read IsJoinedGet;       // tcpclient is connected to tcpserver
     property IsConnected{MqttClientConnected}: boolean read FIsConnected; // mqttclient is connected to mqttbroker
   end;
 {$ENDREGION}
@@ -160,6 +168,11 @@ begin
     on e: Exception do
       Log('client disjoining failed: %s', [e.Message.Replace(sLineBreak, ' ')]);
   end;
+end;
+
+function  TMqttClientClass.ClientIdentifierGet: string;
+begin
+  Result := Format('%s.%d', [FObjectKind, FObjectId]);
 end;
 
 procedure TMqttClientClass.ConnectPacketSend(IvProtocolLevel, IvQos: byte; AClientIdentifier, AWillTopic, AWillMessage, AUsername, APassword: string; IvCleanSession: boolean; AKeepAliveSeconds: word);
@@ -261,7 +274,7 @@ procedure TMqttClientClass.ConnectPacketSend(IvProtocolLevel, IvQos: byte; AClie
 
   {$REGION 'var'}
 var
-  packet: TMQTTPacketClass;
+  packet: TMqttPacketClass;
   remainlen: cardinal;
   connectflags: byte;
   willflag: boolean;
@@ -271,7 +284,7 @@ begin
   if LogVerbose.Checked then Log('CONNECT packet send...');
 
   {$REGION 'packet'}
-  packet := TMQTTPacketClass.Create;
+  packet := TMqttPacketClass.Create;
   try
 
     {$REGION 'remaininglenght'}
@@ -409,7 +422,7 @@ procedure TMqttClientClass.DisconnectPacketSend;
 
   {$REGION 'var'}
 var
-  packet: TMQTTPacketClass;
+  packet: TMqttPacketClass;
   remainlen: cardinal;
   {$ENDREGION}
 
@@ -417,7 +430,7 @@ begin
   if LogVerbose.Checked then Log('DISCONNECT packet send...');
 
   {$REGION 'packet'}
-  packet := TMQTTPacketClass.Create;
+  packet := TMqttPacketClass.Create;
   try
 
     {$REGION 'remaininglenght'}
@@ -483,7 +496,7 @@ procedure TMqttClientClass.PingReqPacketSend;
 
   {$REGION 'var'}
 var
-  packet: TMQTTPacketClass;
+  packet: TMqttPacketClass;
   remainlen: cardinal;
   {$ENDREGION}
 
@@ -491,7 +504,7 @@ begin
   if LogVerbose.Checked then Log('PINGREQ packet send...');
 
   {$REGION 'packet'}
-  packet := TMQTTPacketClass.Create;
+  packet := TMqttPacketClass.Create;
   try
 
     {$REGION 'remaininglenght'}
@@ -530,7 +543,7 @@ begin
 
 end;
 
-procedure TMqttClientClass.PublishPacketSend(APacketIdentifier: word; ATopicName, AApplicationMessage: string; AQosLevel: TMQTTQoSType; ADupFlag: boolean; ARetain: boolean);
+procedure TMqttClientClass.PublishPacketSend(APacketIdentifier: word; ATopicName, AApplicationMessage: string; AQosLevel: TMqttQoSType; ADupFlag: boolean; ARetain: boolean);
 
   {$REGION 'protocoll'}
 {
@@ -661,17 +674,17 @@ procedure TMqttClientClass.PublishPacketSend(APacketIdentifier: word; ATopicName
 
   {$REGION 'var'}
 var
-  packet: TMQTTPacketClass;
+  packet: TMqttPacketClass;
   ctrlbyte, ctrlflags: byte;
   remainlen: integer;
-  msg: TMQTTMessageRec;
+  msg: TMqttMessageRec;
   {$ENDREGION}
 
 begin
   if LogVerbose.Checked then Log('PUBLISH packet send...');
 
   {$REGION 'packet'}
-  packet := TMQTTPacketClass.Create;
+  packet := TMqttPacketClass.Create;
   try
 
     {$REGION 'remaininglenght'}
@@ -722,7 +735,7 @@ begin
 
   {$REGION 'zzz'}
   {
-  packet := TMQTTPacketClass.Create;
+  packet := TMqttPacketClass.Create;
   try
     // Writing a message
     msg.TopicName          := ATopicName;
@@ -744,7 +757,7 @@ begin
 
 end;
 
-procedure TMqttClientClass.SubscribePacketSend(APacketIdentifier: word; ASubscribeTopicRecVec: TMQTTSubscribeTopicRecVec);
+procedure TMqttClientClass.SubscribePacketSend(APacketIdentifier: word; ASubscribeTopicRecVec: TMqttSubscribeTopicRecVec);
 
   {$REGION 'protocoll'}
 {
@@ -767,7 +780,7 @@ procedure TMqttClientClass.SubscribePacketSend(APacketIdentifier: word; ASubscri
 
   {$REGION 'var'}
 var
-  packet: TMQTTPacketClass;
+  packet: TMqttPacketClass;
   remainlen: integer;
   ctrlbyte: byte;
   i: integer;
@@ -777,7 +790,7 @@ begin
   if LogVerbose.Checked then Log('SUBSCRIBE packet send...');
 
   {$REGION 'packet'}
-  packet := TMQTTPacketClass.Create;
+  packet := TMqttPacketClass.Create;
   try
 
     {$REGION 'remaininglenght'}
@@ -823,7 +836,7 @@ begin
 
 end;
 
-procedure TMqttClientClass.UnsubscribePacketSend(APacketIdentifier: word; AUnsubscribeTopicRecVec: TMQTTUnsubscribeTopicRecVec);
+procedure TMqttClientClass.UnsubscribePacketSend(APacketIdentifier: word; AUnsubscribeTopicRecVec: TMqttUnsubscribeTopicRecVec);
 
   {$REGION 'protocoll'}
 {
@@ -846,7 +859,7 @@ procedure TMqttClientClass.UnsubscribePacketSend(APacketIdentifier: word; AUnsub
 
   {$REGION 'var'}
 var
-  packet: TMQTTPacketClass;
+  packet: TMqttPacketClass;
   remainlen: cardinal;
   ctrlbyte: byte;
   i: integer;
@@ -856,7 +869,7 @@ begin
   if LogVerbose.Checked then Log('UNSUBSCRIBE packet send...');
 
   {$REGION 'packet'}
-  packet := TMQTTPacketClass.Create;
+  packet := TMqttPacketClass.Create;
   try
 
     {$REGION 'remaininglenght'}
@@ -914,21 +927,21 @@ end;
 
 procedure TMqttClientClass.OnServerDataReceivedHandler;
 var
-  decoder: TMQTTStreamDecoder;
-  packet: TMQTTPacketClass;
+  decoder: TMqttStreamDecoder;
+  packet: TMqttPacketClass;
   io: TIdIOHandler;
   ip: string;
   bytes: TIdBytes;
   packetbytes: TBytes;
   ctrlbyte: byte;
-  packettype: TMQTTPacketType;
+  packettype: TMqttPacketType;
 
 //  size{, packetnumber}: cardinal;
-//  appmessage: TMQTTMessageRec;
+//  appmessage: TMqttMessageRec;
 //  fixedheader: byte;
 begin
-  decoder := TMQTTStreamDecoder.Create;
-  packet := TMQTTPacketClass.Create;
+  decoder := TMqttStreamDecoder.Create;
+  packet := TMqttPacketClass.Create;
   try
     while FTCPClient.Connected do begin
       // zip
@@ -977,7 +990,7 @@ begin
           packet.Stream.Position := 0;
 
           // type
-          packettype := TMQTTPacketType((ctrlbyte and $F0) shr 4);
+          packettype := TMqttPacketType((ctrlbyte and $F0) shr 4);
 
           // process the various packets types
           case packettype of

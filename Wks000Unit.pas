@@ -13094,6 +13094,13 @@ if IvDir = hvHorizontal then begin
       if fld.IsNull then
         sbu.Add('<td><span class="w3-theme-text-muted">null</span></td>')
 
+      else if fld.FieldName = 'FldNo' then
+        sbu.Add('<td><span id="Co' + fld.AsString + '">' + fld.AsString + '</span></td>') // add handle for hook <a href=#CoNo></a> for example with No = P1, P2, ...
+
+      else if TStrRec.StrIsLike(fld.FieldName, 'Fld*Color') then
+      //sbu.Add('<span class="badge" style="background-color: ' + fld.AsString + '">&#9679</span>')
+        sbu.Add('<td><div title="' + fld.AsString + '" style="display: inline-block; width: 1em; aspect-ratio: 1 / 1; vertical-align: middle; background-color: ' + fld.AsString + ';"></div></td>')
+
       else if fld.FieldName = 'FldState' then begin
         flv := fld.AsString;
         sbu.Add('<td style="padding:6px 8px"><span class="w3-tag w3-round-xxlarge w3-%s" style="padding-top: 1.0px;padding-bottom: 1.5px;color: white;">%s</span></td>', [TStaRec.ColorW3FromState(flv), flv]{, not flv.IsEmpty})

@@ -22,6 +22,13 @@ uses
   , SynEditTypes
   , SynEditHighlighter
   , SynHighlighterGeneral
+  , JvExExtCtrls
+  , JvNetscapeSplitter
+  , VirtualTrees
+  , Data.DB
+  , Data.Win.ADODB
+  , Vcl.Grids
+  , Vcl.DBGrids
   ;
 {$ENDREGION}
 
@@ -44,6 +51,9 @@ type
     LogRawAsciiCheckBox: TCheckBox;
     LogSynEdit: TSynEdit;
     SynMqttSyn: TSynGeneralSyn;
+    RightPanel: TPanel;
+    RightJvNetscapeSplitter: TJvNetscapeSplitter;
+    RightPageControl: TPageControl;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure LogClearButtonClick(Sender: TObject);
@@ -76,6 +86,9 @@ implementation
 {$REGION 'Form'}
 procedure TBaseForm.FormCreate(Sender: TObject);
 begin
+  // init
+  ReportMemoryLeaksOnShutdown := true;
+
   // gui
   Caption := 'WKS MQTT Base';
   TopPageControl.ActivePageIndex := 0;

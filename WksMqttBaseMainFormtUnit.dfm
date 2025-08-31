@@ -14,6 +14,19 @@ object BaseForm: TBaseForm
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   TextHeight = 15
+  object RightJvNetscapeSplitter: TJvNetscapeSplitter
+    Left = 590
+    Top = 204
+    Height = 397
+    Align = alRight
+    MinSize = 1
+    Maximized = False
+    Minimized = False
+    ButtonCursor = crDefault
+    ExplicitLeft = 792
+    ExplicitTop = 352
+    ExplicitHeight = 100
+  end
   object TopPanel: TPanel
     Left = 0
     Top = 0
@@ -192,7 +205,7 @@ object BaseForm: TBaseForm
   object MainPanel: TPanel
     Left = 0
     Top = 204
-    Width = 849
+    Width = 537
     Height = 397
     Align = alLeft
     BevelOuter = bvNone
@@ -203,7 +216,7 @@ object BaseForm: TBaseForm
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 843
+      Width = 531
       Height = 391
       ActivePage = LogTabSheet
       Align = alClient
@@ -213,7 +226,7 @@ object BaseForm: TBaseForm
         object LogTopPanel: TPanel
           Left = 0
           Top = 0
-          Width = 835
+          Width = 523
           Height = 33
           Align = alTop
           BevelOuter = bvNone
@@ -265,7 +278,7 @@ object BaseForm: TBaseForm
         object LogSynEdit: TSynEdit
           Left = 0
           Top = 33
-          Width = 835
+          Width = 523
           Height = 328
           Align = alClient
           Font.Charset = DEFAULT_CHARSET
@@ -326,6 +339,26 @@ object BaseForm: TBaseForm
       end
     end
   end
+  object RightPanel: TPanel
+    Left = 600
+    Top = 204
+    Width = 408
+    Height = 397
+    Align = alRight
+    BevelOuter = bvNone
+    Caption = 'RightPanel'
+    ShowCaption = False
+    TabOrder = 2
+    object RightPageControl: TPageControl
+      AlignWithMargins = True
+      Left = 3
+      Top = 3
+      Width = 402
+      Height = 391
+      Align = alClient
+      TabOrder = 0
+    end
+  end
   object SynMqttSyn: TSynGeneralSyn
     DetectPreprocessor = False
     KeyAttri.Foreground = clBrown
@@ -344,7 +377,7 @@ object BaseForm: TBaseForm
       'SUBSCRIBE'
       'UNSUBACK'
       'UNSUBSCRIBE')
-    Left = 920
-    Top = 240
+    Left = 96
+    Top = 336
   end
 end

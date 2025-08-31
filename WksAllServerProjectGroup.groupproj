@@ -42,6 +42,9 @@
         <Projects Include="WksFormSoapProject.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="WksHeartbeatIsapiProject.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="WksImageIsapiProject.dproj">
             <Dependencies/>
         </Projects>
@@ -194,6 +197,15 @@
     <Target Name="WksFormSoapProject:Make">
         <MSBuild Projects="WksFormSoapProject.dproj" Targets="Make"/>
     </Target>
+    <Target Name="WksHeartbeatIsapiProject">
+        <MSBuild Projects="WksHeartbeatIsapiProject.dproj"/>
+    </Target>
+    <Target Name="WksHeartbeatIsapiProject:Clean">
+        <MSBuild Projects="WksHeartbeatIsapiProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksHeartbeatIsapiProject:Make">
+        <MSBuild Projects="WksHeartbeatIsapiProject.dproj" Targets="Make"/>
+    </Target>
     <Target Name="WksImageIsapiProject">
         <MSBuild Projects="WksImageIsapiProject.dproj"/>
     </Target>
@@ -276,13 +288,13 @@
         <MSBuild Projects="WksWordSoapProject.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="WksXxxIsapiProject;WksXxxSoapProject;WksPersonSoapProject;WksOrganizationSoapProject;WksMemberSoapProject;WksAccountSoapProject;WksAgentSoapProject;WksCodeSoapProject;WksCodeIsapiProject;WksDbaIsapiProject;WksDocumentSoapProject;WksFileSoapProject;WksFormSoapProject;WksImageIsapiProject;WksInvoiceSoapProject;WksIotIsapiProject;WksPageIsapiProject;WksPageSoapProject;WksReportSoapProject;WksSystemSoapProject;WksTaskSoapProject;WksWordSoapProject"/>
+        <CallTarget Targets="WksXxxIsapiProject;WksXxxSoapProject;WksPersonSoapProject;WksOrganizationSoapProject;WksMemberSoapProject;WksAccountSoapProject;WksAgentSoapProject;WksCodeSoapProject;WksCodeIsapiProject;WksDbaIsapiProject;WksDocumentSoapProject;WksFileSoapProject;WksFormSoapProject;WksHeartbeatIsapiProject;WksImageIsapiProject;WksInvoiceSoapProject;WksIotIsapiProject;WksPageIsapiProject;WksPageSoapProject;WksReportSoapProject;WksSystemSoapProject;WksTaskSoapProject;WksWordSoapProject"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="WksXxxIsapiProject:Clean;WksXxxSoapProject:Clean;WksPersonSoapProject:Clean;WksOrganizationSoapProject:Clean;WksMemberSoapProject:Clean;WksAccountSoapProject:Clean;WksAgentSoapProject:Clean;WksCodeSoapProject:Clean;WksCodeIsapiProject:Clean;WksDbaIsapiProject:Clean;WksDocumentSoapProject:Clean;WksFileSoapProject:Clean;WksFormSoapProject:Clean;WksImageIsapiProject:Clean;WksInvoiceSoapProject:Clean;WksIotIsapiProject:Clean;WksPageIsapiProject:Clean;WksPageSoapProject:Clean;WksReportSoapProject:Clean;WksSystemSoapProject:Clean;WksTaskSoapProject:Clean;WksWordSoapProject:Clean"/>
+        <CallTarget Targets="WksXxxIsapiProject:Clean;WksXxxSoapProject:Clean;WksPersonSoapProject:Clean;WksOrganizationSoapProject:Clean;WksMemberSoapProject:Clean;WksAccountSoapProject:Clean;WksAgentSoapProject:Clean;WksCodeSoapProject:Clean;WksCodeIsapiProject:Clean;WksDbaIsapiProject:Clean;WksDocumentSoapProject:Clean;WksFileSoapProject:Clean;WksFormSoapProject:Clean;WksHeartbeatIsapiProject:Clean;WksImageIsapiProject:Clean;WksInvoiceSoapProject:Clean;WksIotIsapiProject:Clean;WksPageIsapiProject:Clean;WksPageSoapProject:Clean;WksReportSoapProject:Clean;WksSystemSoapProject:Clean;WksTaskSoapProject:Clean;WksWordSoapProject:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="WksXxxIsapiProject:Make;WksXxxSoapProject:Make;WksPersonSoapProject:Make;WksOrganizationSoapProject:Make;WksMemberSoapProject:Make;WksAccountSoapProject:Make;WksAgentSoapProject:Make;WksCodeSoapProject:Make;WksCodeIsapiProject:Make;WksDbaIsapiProject:Make;WksDocumentSoapProject:Make;WksFileSoapProject:Make;WksFormSoapProject:Make;WksImageIsapiProject:Make;WksInvoiceSoapProject:Make;WksIotIsapiProject:Make;WksPageIsapiProject:Make;WksPageSoapProject:Make;WksReportSoapProject:Make;WksSystemSoapProject:Make;WksTaskSoapProject:Make;WksWordSoapProject:Make"/>
+        <CallTarget Targets="WksXxxIsapiProject:Make;WksXxxSoapProject:Make;WksPersonSoapProject:Make;WksOrganizationSoapProject:Make;WksMemberSoapProject:Make;WksAccountSoapProject:Make;WksAgentSoapProject:Make;WksCodeSoapProject:Make;WksCodeIsapiProject:Make;WksDbaIsapiProject:Make;WksDocumentSoapProject:Make;WksFileSoapProject:Make;WksFormSoapProject:Make;WksHeartbeatIsapiProject:Make;WksImageIsapiProject:Make;WksInvoiceSoapProject:Make;WksIotIsapiProject:Make;WksPageIsapiProject:Make;WksPageSoapProject:Make;WksReportSoapProject:Make;WksSystemSoapProject:Make;WksTaskSoapProject:Make;WksWordSoapProject:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
