@@ -145,7 +145,7 @@ end;
 procedure TMemberMainForm.MemberEmailGenerateLabelClick(Sender: TObject);
 var
   org: TOrgRec;
-  pat, eat, fbk: string;  // path, emailat@abc.com
+  pat, eat, fbk: string;  // path, puppadrillo@wks.cloud
   vec: {$IF COMPILERVERSION < 32.0} TStringDynArray {$ELSE} TArray<string> {$ENDIF};
 begin
   inherited;

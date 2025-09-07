@@ -4,7 +4,7 @@
 -- description:  create .bak files for all Dba* databases in the local sql server stored in :
 --               C:\Program Files\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQL\Backup
 -- 
--- author     :  giarussi
+-- author     :  puppadrillo
 -- created    :  10/27/2022 02:50:50 PM
 -- copyright  :  (c) Wks 2022
 -- licence    :  BDS

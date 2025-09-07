@@ -583,8 +583,8 @@ begin
 
   // logintab
   OrganizationEdit.Text      := gini.StrGet('Login/Organization', ''                   ); // Wks
-  UsernameEdit.Text          := gini.StrGet('Login/Username'    , ''                   ); // giarussi
-  PasswordEdit.Text          := gini.CryGet('Login/Password'    , ''                   ); // secrett
+  UsernameEdit.Text          := gini.StrGet('Login/Username'    , ''                   ); // puppadrillo
+  PasswordEdit.Text          := gini.CryGet('Login/Password'    , ''                   ); // secret
 
   // servertab
   ServerWwwDevEdit.Text      := gini.StrGet('Server/WwwDev'     , 'localhost'          );
@@ -879,9 +879,9 @@ begin
       {$REGION 'sessionrio'}
       Log('Building a new session...', fmInfo);
       Randomize();
-      gwse.Init('Win', TRndRec.RndInt(100000, 199999), 0, TNetRec.IpLan, TNetRec.Domain, TNetRec.Host, TNetRec.OsLogin, TBynRec.BinaryTag, TBynRec.Ver, gaps.Www, gorg.Obj.&Object, UsernameEdit.Text, fbk);
+      gses.Init('Win', TRndRec.RndInt(100000, 199999), 0, TNetRec.IpLan, TNetRec.Domain, TNetRec.Host, TNetRec.OsLogin, TBynRec.BinaryTag, TBynRec.Ver, gaps.Www, gorg.Obj.&Object, UsernameEdit.Text, fbk);
       Log('Saving the new session to server...', fmInfo);
-      if not gwse.InsertRio(fbk) then begin
+      if not gses.InsertRio(fbk) then begin
         Log('Session problem: unable to save the new session to the server, %s', [sLineBreak + fbk], fmDanger);
         ControlsShow(true);
         Exit;
@@ -957,7 +957,7 @@ begin
       {$ENDREGION}
 
       {$REGION 'enter'}
-      Log('Entering session %d...', [gwse.SessionId], fmSuccess);
+      Log('Entering session %d...', [gses.SessionId], fmSuccess);
       Sleep(LONG_PAUSE_MS);
       ModalResult := mrOk;    // ---> [ close form and ENTER ]
       {$ENDREGION}

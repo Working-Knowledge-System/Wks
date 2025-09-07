@@ -1,6 +1,6 @@
 object MainWebModule: TMainWebModule
-  OnCreate = MainWebModuleCreate
-  OnDestroy = MainWebModuleDestroy
+  OnCreate = WebModuleCreate
+  OnDestroy = WebModuleDestroy
   Actions = <
     item
       Default = True
@@ -38,9 +38,9 @@ object MainWebModule: TMainWebModule
       PathInfo = '/Js'
       OnAction = MainWebModuleJsWebActionAction
     end>
-  BeforeDispatch = MainWebModuleBeforeDispatch
-  AfterDispatch = MainWebModuleAfterDispatch
-  OnException = MainWebModuleException
+  BeforeDispatch = WebModuleBeforeDispatch
+  AfterDispatch = WebModuleAfterDispatch
+  OnException = WebModuleException
   Height = 230
   Width = 415
 end

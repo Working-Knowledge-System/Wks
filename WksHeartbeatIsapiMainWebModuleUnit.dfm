@@ -4,7 +4,7 @@ object MainWebModule: TMainWebModule
       Default = True
       Name = 'DefaultHandler'
       PathInfo = '/'
-      OnAction = WebModule1DefaultHandlerAction
+      OnAction = MainWebModuleDefaultHandlerAction
     end>
   Height = 230
   Width = 415

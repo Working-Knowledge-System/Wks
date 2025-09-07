@@ -2,6 +2,47 @@ unit WksImageIsapiMainWebModuleUnit;
 
 interface
 
+{$REGION 'Help'}
+{                                request
+                                    |
+                                    V
+  -----------------------------------------------------------------------------------
+ |                           BeforeDispatch                                          |
+ |  - here the event can enable or disable the actionitems suitable to the response  |
+ |  - can begin filling out the response object                                      |
+ |  - can provide any other necessary preprocessing objects                          |
+ |  If the event finishes filling out the response object,                           |
+ |  it should change the Handled parameter to True so the dispatcher                 |
+ |  will not send the request on to any of the actionitems                           |
+ |  If the BeforeDispatch event handler sends the response message,                  |
+ |  the dispatcher will not pass the request on to any of the action items,          |
+ |  even if the Handled parameter is left as False                                   |
+ |  If the BeforeDispatch event handler sets the Handled parameter to True but does  |
+ |  not send the response, the Web dispatcher will generate an AfterDispatch event   |
+  -----------------------------------------------------------------------------------
+ |                             Dispatcher                                            |
+ |  the dispatcher tries to match the HTTP request                                   |
+ |  PathInfo with any PathInfo of the action items                                   |
+ |                                                                                   |
+ |                       /  webaction1/PathInfo1                                     |
+ |  request/PathInfo--->|   webaction1/PathInfo2                                     |
+ |                       \  webaction1/PathInfo...                                   |
+ |                                                                                   |
+ |  here the dispatcher/actionitem process the request and fill out the response obj |
+  -----------------------------------------------------------------------------------
+ |                            AfterDispatch                                          |
+ |  It is used to perform any necessary cleanup or logging                           |
+  -----------------------------------------------------------------------------------
+ |                             BeforeSend (non trovo nulla!)                         |
+ |  The OnBeforeSend event occurs just before sending a response back to the client  |
+ |  It is used to modify or add headers to a response                                |
+  -----------------------------------------------------------------------------------
+                                    |
+                                    V
+                                 response
+}
+{$ENDREGION}
+
 {$REGION 'Use'}
 uses
     System.SysUtils
@@ -21,10 +62,14 @@ type
     procedure WebModuleAfterDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
     procedure MainWebModuleDefaultHandlerAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
     procedure MainWebModuleInfoWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
+    procedure MainWebModuleOrganizationWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
     procedure MainWebModuleImageWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
     procedure MainWebModulePersonWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
+    procedure MainWebModuleUserWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
+    procedure MainWebModuleMemberWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
   private
     { Private declarations }
+  //FIni: TIniCls;
   //FTic: TTicRec;
   //FWrq: TWrqRec;
     FWmoRec: TWmoRec;
@@ -58,15 +103,27 @@ procedure TMainWebModule.WebModuleCreate(Sender: TObject);
 begin
 
   {$REGION 'Commands'}
-  SetLength(FWmoRec.CmdRecVec, 3);
+  SetLength(FWmoRec.CmdRecVec, 7);
   FWmoRec.CmdRecVec[0].Cmd         := '/';
   FWmoRec.CmdRecVec[0].Description := 'Default handler';
   
   FWmoRec.CmdRecVec[1].Cmd         := '/Info';
   FWmoRec.CmdRecVec[1].Description := 'Describe module''s info and capabilities (this page)';
-  
-  FWmoRec.CmdRecVec[2].Cmd         := '/Image';
-  FWmoRec.CmdRecVec[2].Description := 'Serve an image';
+
+  FWmoRec.CmdRecVec[2].Cmd         := '/Object';
+  FWmoRec.CmdRecVec[2].Description := 'Serve Object''s image stored in the Image field';
+
+  FWmoRec.CmdRecVec[3].Cmd         := '/Person';
+  FWmoRec.CmdRecVec[3].Description := 'Serve Person''s images stored in ...';
+
+  FWmoRec.CmdRecVec[4].Cmd         := '/User';
+  FWmoRec.CmdRecVec[4].Description := 'Serve User''s images stored in ...';
+
+  FWmoRec.CmdRecVec[5].Cmd         := '/Member';
+  FWmoRec.CmdRecVec[5].Description := 'Serve Member''s images stored in ...';
+
+  FWmoRec.CmdRecVec[6].Cmd         := '/Organization';
+  FWmoRec.CmdRecVec[6].Description := 'Serve Organization''s images stored in ...';
   {$ENDREGION}
 
   {$REGION 'Objects'}
@@ -75,7 +132,7 @@ begin
   {$ENDREGION}
 
   {$REGION 'Events'}
-//FWmoRec.OnWebModuleCreate;
+  FWmoRec.OnWebModuleCreate;
   {$ENDREGION}
 
 end;
@@ -88,7 +145,7 @@ begin
   {$ENDREGION}
 
   {$REGION 'Events'}
-//FWmoRec.OnWebModuleDestroy;
+  FWmoRec.OnWebModuleDestroy;
   {$ENDREGION}
 
 end;
@@ -101,8 +158,9 @@ end;
 
 procedure TMainWebModule.WebModuleBeforeDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
-  Inc(FWmoRec.Run);
-//TWmoRec.BeforeDispatch(Request, Response, FWrq, FTic);
+//Inc(FWmoRec.Run);                                      // comment if useless
+//FWmoRec.BeforeDispatch(Request, Response, FWrq, FTic); // comment to skip session/request flow
+  gwrq.WebRequestOrig := Request; // cagnolina           // uncomment if revious is commented
 
   {$REGION 'CustomHeader'}
   // handle here specific CustomHeader for all webactions or at beginning of each specific webaction
@@ -115,14 +173,14 @@ begin
   {$REGION 'ActionAvailabilityLogic'}
 //TMainWebModule(Sender).Actions.Items[0].Enabled := false; // /      DefaultHandler
 //TMainWebModule(Sender).Actions.Items[1].Enabled := false; // /Info  InfoWebAction
-//TMainWebModule(Sender).Actions.Items[2].Enabled := false; // /Xxx   Xxx main handler
+//TMainWebModule(Sender).Actions.Items[2].Enabled := false; // /Image Image main handler
   {$ENDREGION}
 
 end;
 
 procedure TMainWebModule.WebModuleAfterDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
-//TWmoRec.AfterDispatch(Request, Response, FWrq, FTic);
+//FWmoRec.AfterDispatch(Request, Response, FWrq, FTic); // comment to skip session/request flow
 end;
   {$ENDREGION}
 
@@ -130,53 +188,82 @@ end;
 
     {$REGION 'Standard'}
 procedure TMainWebModule.MainWebModuleDefaultHandlerAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
+var
+  fbk: string;
 begin
+  // init gorg, since this module skip the session/request flow
+  if not gorg.InitByWww(Request.Host, fbk) then begin
+    Response.Content := fbk;
+    Exit;
+  end;
+
+  // init theme for the same reason
+  if not gthe.InitDba(gorg.ObjectId, fbk) then begin
+    Response.Content := fbk;
+    Exit;
+  end;
+
+  // response
   TWrsRec.ResponseSet(Response, THtmRec.PageDefault);
+
+  // also replace last thing for the same reason
+  Response.Content := StringReplace(Response.Content, '$RvElapsedMs$', '0', [rfReplaceAll]);
 end;
 
 procedure TMainWebModule.MainWebModuleInfoWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
+var
+  vec: TArray<string>;
+  i: integer;
 begin
- {TWrsRec.ResponseSet(Response, TJteRec.ServerInfo('Serves a dynamic web pages', 'Web Broker Isapi', [
-    '/'
-  , '/Info'
-  , '/View'
-  , '/Init', '/Theme', '/Test'
-  , '/Login', '/LoginTry', '/Logout'
-  , '/AccountCreate', '/AccountRecover', '/AccountDelete'
-  ]), TCtyRec.CTY_APP_JSON);}
+  SetLength(vec, Length(FWmoRec.CmdRecVec));
+  for i := 0 to High(FWmoRec.CmdRecVec) do
+    vec[i] := FWmoRec.CmdRecVec[i].Cmd;
+
+  TWrsRec.ResponseSet(Response, TJteRec.ServerInfo('Serves dynamic web Image''s', 'Web Broker Isapi', vec), TCtyRec.CTY_APP_JSON);
 end;
     {$ENDREGION}
 
     {$REGION 'Image'}
-procedure TMainWebModule.MainWebModuleImageWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
+procedure TMainWebModule.MainWebModuleImageWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 var
-  mem: TStream;
-  dst: TDataSet;
-  fld: TField; // blobfield
+  bol: boolean;
   oty: string;
   oid: integer;
   sql: string;
-  bol: boolean;
+  dst: TDataSet;
+  fld: TField; // blobfield
+  mem: TMemoryStream;
+  blob: TStream;
 begin
   // usage: /WksImageIsapiProject.dll/Image?CoObjType=Page&CoObjId=415'
 
   // objecttype
   oty := Request.QueryFields.Values['CoObjType'];
-  if oty.IsEmpty then
+  if oty.IsEmpty then begin
+    Response.Content := 'CoObjType is missed';
+    Response.StatusCode := 400; // badrequest
+    Handled := true;
     Exit;
+  end;
 
   // objectid
   oid := StrTOIntDef(Request.QueryFields.Values['CoObjId'], 0);
-  if oid <= 0 then
+  if oid <= 0 then begin
+    Response.Content := 'CoObjId is missed';
+    Response.StatusCode := 400; // badrequest
+    Handled := true;
     Exit;
-
-  // query
-  sql := Format('select FldImage from Dba%s.dbo.TblObject where FldId = %d', [oty, oid]);
+  end;
 
   // dst
+  sql := Format('select FldImage from Dba%s.dbo.TblObject where FldId = %d', [oty, oid]);
   bol := TDbaRec.DsFromSql(sql, dst);
-  if not bol then
+  if not bol then begin
+    Response.Content := 'Image not found';
+    Response.StatusCode := 404; // notfound
+    Handled := true;
     Exit;
+  end;
 
   // field
   fld := dst.FieldByName('FldImage');
@@ -185,20 +272,34 @@ begin
   mem := TMemoryStream.Create;
 //try
     // fieldread
-    mem := dst.CreateBlobStream(fld, bmRead{Write}); // if s.Size = 0 then ...
+    blob := dst.CreateBlobStream(fld, bmRead{Write}); // if s.Size = 0 then ...
+
+    // mem use e (to avoid hint)
+    try
+      mem.CopyFrom(blob, blob.Size);
+    finally
+      blob.Free;
+    end;
+
+    // response
     bol := mem.Size > 0;
-    if not bol then
+    if not bol then begin // *** here potentially create a syntetic image, may be random ***
+      Response.Content := 'Image is empty';
+      Response.StatusCode := 404; // notfound
+      Handled := true;
       Exit;
+    end;
 
     // test
-  //mem.LoadFromFile('C:\$Img\M\Mongodb\MongoDb_200x200.png');
+  //mem.LoadFromFile('C:\$Org\W\Wks\WksLogo.png');
 
     // contentstreamset
     mem.Position := 0;
     Response.ContentStream := mem;
 
-    // mimeset
+    // codes
     Response.ContentType := 'image/png';
+    Response.StatusCode := 200; // ok
 
     // send
     //Response.SendResponse; // not really needed, va' dopo l'except, alla fine
@@ -209,29 +310,37 @@ end;
     {$ENDREGION}
 
     {$REGION 'Person'}
-procedure TMainWebModule.MainWebModulePersonWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
+procedure TMainWebModule.MainWebModulePersonWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 var
-  mem: TStream;
+  bol: boolean;
+  oid: integer;
+  sql: string;
   dst: TDataSet;
   fld: TField; // blobfield
-  oid: integer; //oty: string;
-  sql: string;
-  bol: boolean;
+  mem: TMemoryStream;
+  blob: TStream;
 begin
   // usage: /WksImageIsapiProject.dll/Person?CoObjId=102'
+  // note:  /WksImageIsapiProject.dll/Image?CoObjType=Person&CoObjId=102'  will get the image in the TblObject
 
   // objectid
   oid := StrTOIntDef(Request.QueryFields.Values['CoObjId'], 0);
-  if oid <= 0 then
+  if oid <= 0 then begin
+    Response.Content := 'CoObjId is missed';
+    Response.StatusCode := 400; // badrequest
+    Handled := true;
     Exit;
-
-  // query
-  sql := Format('select FldPicture from DbaPerson.dbo.TblPerson where FldObjectId = %d', [oid]);
+  end;
 
   // dst
+  sql := Format('select FldPicture from DbaPerson.dbo.TblPerson where FldObjectId = %d', [oid]);
   bol := TDbaRec.DsFromSql(sql, dst);
-  if not bol then
+  if not bol then begin
+    Response.Content := 'Image not found';
+    Response.StatusCode := 404; // notfound
+    Handled := true;
     Exit;
+  end;
 
   // field
   fld := dst.FieldByName('FldPicture');
@@ -240,24 +349,56 @@ begin
   mem := TMemoryStream.Create;
 
   // fieldread
-  mem := dst.CreateBlobStream(fld, bmRead);
+  blob := dst.CreateBlobStream(fld, bmRead{Write}); // if s.Size = 0 then ...
+
+  // mem use (to avoid hint)
+  try
+    mem.CopyFrom(blob, blob.Size);
+  finally
+    blob.Free;
+  end;
+
+  // response
   bol := mem.Size > 0;
-  if not bol then
+  if not bol then begin // *** here potentially create a syntetic image, may be random ***
+    Response.Content := 'Image is empty';
+    Response.StatusCode := 404; // notfound
+    Handled := true;
     Exit;
+  end;
 
   // contentstreamset
   mem.Position := 0;
   Response.ContentStream := mem;
 
-  // mimeset
+  // codes
   Response.ContentType := 'image/png';
+  Response.StatusCode := 200; // ok
 end;
     {$ENDREGION}
 
     {$REGION 'User'}
+procedure TMainWebModule.MainWebModuleUserWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+begin
+  Response.Content := 'Not Implemented';
+  Response.StatusCode := 501; // notimplemented
+end;
     {$ENDREGION}
 
     {$REGION 'Member'}
+procedure TMainWebModule.MainWebModuleMemberWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+begin
+  Response.Content := 'Not Implemented';
+  Response.StatusCode := 501; // notimplemented
+end;
+    {$ENDREGION}
+
+    {$REGION 'Organization'}
+procedure TMainWebModule.MainWebModuleOrganizationWebActionAction( Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+begin
+  Response.Content := 'Not Implemented';
+  Response.StatusCode := 501; // notimplemented
+end;
     {$ENDREGION}
 
   {$ENDREGION}

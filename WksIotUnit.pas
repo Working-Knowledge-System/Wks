@@ -46,7 +46,7 @@ type
     Id          : integer  ; //
     PId         : integer  ; //
     Organization: string   ; // \___organization        Localhost
-    Owner       : string   ; // /                       giarussi
+    Owner       : string   ; // /                       puppadrillo
     Datalog     : string   ; // \
     Uom{Csv}    : string   ; //  |  ***REMOVE***        C,%,...
     Value{Csv}  : string   ; //  |--measure(s)          123.45,41.5,...

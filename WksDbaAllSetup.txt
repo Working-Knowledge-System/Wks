@@ -15,12 +15,12 @@ DATABASE
 
 - for the database collect and write down the following information:
    
-  info               placeholder                examples            your-choice
-  -----------------------------------------------------------------------------
-  Db Host:           <db-host-name>             OLIMPO              ?
-  Db Instance:       <db-sqlserver-instance>    OLIMPO\SQLEXPRESS   ?
-  Db Owner:          <db-owner>                 billgates           ?
-  Db Password:       <db-owner-password>        secret              ?
+  info               placeholder                examples                your-choice
+  ---------------------------------------------------------------------------------
+  Db Host:           <db-host-name>             OLIMPO                  ?
+  Db Instance:       <db-sqlserver-instance>    OLIMPO\SQLEXPRESS       ?
+  Db Owner:          <db-owner>                 billgates               ?
+  Db Password:       <db-owner-password>        secret                  ?
 
 
 
@@ -33,12 +33,12 @@ SYSTEM ROOT ORGANIZATION and OWNER
   
 - So for wks initialization carefully decide the following:  
 
-  info               placeholder                examples            your-choice
-  --------------------------------------------------------------------------------
-  Organization: (1)  <orga-owner>               MICROSOFT           ?
-  Website:      (2)  <orga-website>             www.microsoft.com   ?
-  Owner:        (3)  <member-owner>             billgates           ?
-  Password:     (4)  <member-owner-password>    secret              ?
+  info               placeholder                examples                your-choice
+  ---------------------------------------------------------------------------------
+  Organization: (1)  <orga-owner>               MICROSOFT               ?
+  Website:      (2)  <orga-website>             www.microsoft.com       ?
+  Owner:        (3)  <member-owner>             billgates               ?
+  Password:     (4)  <member-owner-password>    secret                  ?
 
 
 
@@ -48,22 +48,22 @@ ROOT ORGANIZATION
 - for the root-organization decide the POP3 account info to send emails.
   this account will be used by the system to send syste-level emails:
    
-  info               placeholder                examples            your-choice
+  info               placeholder                examples                your-choice
   ---------------------------------------------------------------------------------
-  POP3:              <pop3>                     pop3.microsoft.com  ?
-  Port:              <pop3-port>                ???                 ?
-  Usernane:          <pop3-username>            billgates           ?
-  Password:     (3)  <pop3-password>            secret              ?
+  POP3:              <pop3>                     pop3.microsoft.com      ?
+  Port:              <pop3-port>                ???                     ?
+  Usernane:          <pop3-username>            billgates               ?
+  Password:     (3)  <pop3-password>            secret                  ?
 
 - also for the root-organization decide the SMTP accounts info to receive emails
   this account will be used by the system for receiving emails and automatically process them:
   :
-  info               placeholder                examples            your-choice
+  info               placeholder                examples                your-choice
   ---------------------------------------------------------------------------------
-  SMTP:              <smtp>                     smtp.microsoft.com  ?
-  Port:              <smtp-port>                ???                 ?
-  Usernane:          <smtp-username>            billgates           ?
-  Password:     (3)  <smtp-password>            secret              ?
+  SMTP:              <smtp>                     smtp.microsoft.com      ?
+  Port:              <smtp-port>                ???                     ?
+  Usernane:          <smtp-username>            billgates               ?
+  Password:     (3)  <smtp-password>            secret                  ?
 
 
 
@@ -73,10 +73,10 @@ ROOT MEMBER OWNER
 - for the root-member decide these info
   these info will be used by the system to communicate with the member-owner
 
-  info               placeholder                examples            your-choice
-  --------------------------------------------------------------------------------
-  Email              <owner-email>              giarussi@yahoo.com  ?
-  Phone:             <owner-phone>              348 5904744         ?
+  info               placeholder                examples                your-choice
+  ---------------------------------------------------------------------------------
+  Email              <owner-email>              puppadrillo@wks.cloud   ?
+  Phone:             <owner-phone>              +39 351 3320036         ?
 
 
 

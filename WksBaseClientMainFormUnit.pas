@@ -1268,7 +1268,7 @@ var
 begin
 
   {$REGION 'LOGIN SESSION & GLOBAL OBJECTS'}
-  suc := TLoginForm.Execute(fbk); // *** business objects (gpxy, gorg, gthe, gwse, gper, gusr, gmbr, ..., gcli, gsys) are initialized during this phase ***
+  suc := TLoginForm.Execute(fbk); // *** business objects (gpxy, gorg, gthe, gses, gper, gusr, gmbr, ..., gcli, gsys) are initialized during this phase ***
   if not suc then
     Application.Terminate;
   {$ENDREGION}
@@ -1327,7 +1327,7 @@ begin
 
   // option (common)
   OptionCryptoKeyEdit.Text                         := gini.CryGet( 'Common/OptionCryptoKey'                  , '12345'                    );
-  OptionPersistRootFolderEdit.Text                 := gini.StrGet( 'Common/OptionPersistRootFolder'          , 'C:\$\Persist'             );
+  OptionPersistRootFolderEdit.Text                 := gini.StrGet( 'Common/OptionPersistRootFolder'          , 'C:\$Persist'             );
   OptionTempFolderEdit.Text                        := gini.StrGet( 'Common/OptionTempFolder'                 , 'C:\$Tmp'                  );
   OptionWeekWorkOneStartJvDateTimePicker.DateTime  := gini.FloGet( 'Common/OptionWeekWorkOneStart'           , IncHour(Date(), 19)        ); OptionWeekWorkOneStartJvDateTimePickerChange(nil);
 
@@ -1410,7 +1410,7 @@ begin
   {$ENDREGION}
 
   {$REGION 'Session'}
-//UserAvatarImage.Hint         := Format('winsession:%s', [gwse.Info]);
+//UserAvatarImage.Hint         := Format('winsession:%s', [gses.Info]);
   {$ENDREGION}
 
   {$REGION 'Member'}
@@ -1645,11 +1645,11 @@ begin
   {$ENDREGION}
 
   {$REGION 'sessionclose'}
-  if gwse.SessionId > 0 then begin
-    gwse.DateTimeEnd := Now;
-    if gwse.CloseRio(fbk) then begin
+  if gses.SessionId > 0 then begin
+    gses.DateTimeEnd := Now;
+    if gses.CloseRio(fbk) then begin
       LogFrame.LogShow;
-      LogFrame.Log('winsession %d closed at %s', [gwse.SessionId, DateTimeToStr(gwse.DateTimeEnd)]);
+      LogFrame.Log('winsession %d closed at %s', [gses.SessionId, DateTimeToStr(gses.DateTimeEnd)]);
       Application.ProcessMessages;
       Sleep(MEDIUM_PAUSE_MS);
     end else
