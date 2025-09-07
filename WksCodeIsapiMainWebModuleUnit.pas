@@ -3,7 +3,47 @@ unit WksCodeIsapiMainWebModuleUnit;
 interface
 
 {$REGION 'Help'}
-{
+{                                request
+                                    |
+                                    V
+  -----------------------------------------------------------------------------------
+ |                           BeforeDispatch                                          |
+ |  - here the event can enable or disable the actionitems suitable to the response  |
+ |  - can begin filling out the response object                                      |
+ |  - can provide any other necessary preprocessing objects                          |
+ |  If the event finishes filling out the response object,                           |
+ |  it should change the Handled parameter to True so the dispatcher                 |
+ |  will not send the request on to any of the actionitems                           |
+ |  If the BeforeDispatch event handler sends the response message,                  |
+ |  the dispatcher will not pass the request on to any of the action items,          |
+ |  even if the Handled parameter is left as False                                   |
+ |  If the BeforeDispatch event handler sets the Handled parameter to True but does  |
+ |  not send the response, the Web dispatcher will generate an AfterDispatch event   |
+  -----------------------------------------------------------------------------------
+ |                             Dispatcher                                            |
+ |  the dispatcher tries to match the HTTP request                                   |
+ |  PathInfo with any PathInfo of the action items                                   |
+ |                                                                                   |
+ |                       /  webaction1/PathInfo1                                     |
+ |  request/PathInfo--->|   webaction1/PathInfo2                                     |
+ |                       \  webaction1/PathInfo...                                   |
+ |                                                                                   |
+ |  here the dispatcher/actionitem process the request and fill out the response obj |
+  -----------------------------------------------------------------------------------
+ |                            AfterDispatch                                          |
+ |  It is used to perform any necessary cleanup or logging                           |
+  -----------------------------------------------------------------------------------
+ |                             BeforeSend (non trovo nulla!)                         |
+ |  The OnBeforeSend event occurs just before sending a response back to the client  |
+ |  It is used to modify or add headers to a response                                |
+  -----------------------------------------------------------------------------------
+                                    |
+                                    V
+                                 response
+
+  Code module
+  ============
+  
   supply CODE (css, csv, html, js, sql, ...) as a single block suitable for web application
   execute volatile (temporary) code
 }
@@ -11,8 +51,8 @@ interface
 
 {$REGION 'Use'}
 uses
-    System.Classes
-  , System.SysUtils
+    System.SysUtils
+  , System.Classes
   , Web.HTTPApp
   , Wks000Unit
   ;
@@ -24,11 +64,11 @@ type
   EInsufficientInfo = class(Exception);
 
   TMainWebModule = class(TWebModule)
-    procedure MainWebModuleCreate(Sender: TObject);
-    procedure MainWebModuleDestroy(Sender: TObject);
-    procedure MainWebModuleException(Sender: TObject; E: Exception; var Handled: boolean);
-    procedure MainWebModuleBeforeDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
-    procedure MainWebModuleAfterDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
+    procedure WebModuleCreate(Sender: TObject);
+    procedure WebModuleDestroy(Sender: TObject);
+    procedure WebModuleException(Sender: TObject; E: Exception; var Handled: boolean);
+    procedure WebModuleBeforeDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
+    procedure WebModuleAfterDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
     procedure MainWebModuleDefaultHandlerAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
     procedure MainWebModuleInfoWebActionAction(Sender: TObject;  Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
     procedure MainWebModuleCodeWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
@@ -38,6 +78,7 @@ type
     procedure MainWebModuleJsWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
   private
     { Private declarations }
+  //FIni: TIniCls;
   //FTic: TTicRec;
   //FWrq: TWrqRec;
     FWmoRec: TWmoRec;
@@ -80,23 +121,35 @@ uses
 {$REGION 'TMainWebModule'}
 
   {$REGION 'Events'}
-procedure TMainWebModule.MainWebModuleCreate(Sender: TObject);
+procedure TMainWebModule.WebModuleCreate(Sender: TObject);
 begin
 
   {$REGION 'Commands'}
-  SetLength(FWmoRec.CmdRecVec, 3);
+  SetLength(FWmoRec.CmdRecVec, 7);
   FWmoRec.CmdRecVec[0].Cmd         := '/';
   FWmoRec.CmdRecVec[0].Description := 'Default handler';
   
   FWmoRec.CmdRecVec[1].Cmd         := '/Info';
   FWmoRec.CmdRecVec[1].Description := 'Describe module''s info and capabilities (this page)';
-  
-  FWmoRec.CmdRecVec[2].Cmd         := '/Xxx';
-  FWmoRec.CmdRecVec[2].Description := 'Serve a code';
+
+  FWmoRec.CmdRecVec[2].Cmd         := '/Code';
+  FWmoRec.CmdRecVec[2].Description := 'Serve a block of code or the result of the code execution';
+
+  FWmoRec.CmdRecVec[3].Cmd         := '/Library';
+  FWmoRec.CmdRecVec[3].Description := 'Serve an entire library, for example a js or css library, assembling sub-objects';
+
+  FWmoRec.CmdRecVec[4].Cmd         := '/Volatile';
+  FWmoRec.CmdRecVec[4].Description := 'Serve temporary code written for a specific event and has a short time to live';
+
+  FWmoRec.CmdRecVec[5].Cmd         := '/Css';
+  FWmoRec.CmdRecVec[5].Description := 'Serve a css code, obsolete';
+
+  FWmoRec.CmdRecVec[6].Cmd         := '/Js';
+  FWmoRec.CmdRecVec[6].Description := 'Serve a js code, obsolete';
   {$ENDREGION}
 
   {$REGION 'Objects'}
-  FWmoRec.Run := 0;
+//FWmoRec.Run := 0;
 //FIni := TIniCls.Create;
   {$ENDREGION}
 
@@ -106,7 +159,7 @@ begin
 
 end;
 
-procedure TMainWebModule.MainWebModuleDestroy(Sender: TObject);
+procedure TMainWebModule.WebModuleDestroy(Sender: TObject);
 begin
 
   {$REGION 'Objects'}
@@ -119,16 +172,17 @@ begin
 
 end;
 
-procedure TMainWebModule.MainWebModuleException(Sender: TObject; E: Exception; var Handled: boolean);
+procedure TMainWebModule.WebModuleException(Sender: TObject; E: Exception; var Handled: boolean);
 begin
   FWmoRec.OnWebModuleException(Response, E);
   Handled := true;
 end;
 
-procedure TMainWebModule.MainWebModuleBeforeDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
+procedure TMainWebModule.WebModuleBeforeDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
-  Inc(FWmoRec.Run);
-//TWmoRec.BeforeDispatch(Request, Response, FWrq, FTic);
+//Inc(FWmoRec.Run);                                      // comment if useless
+//FWmoRec.BeforeDispatch(Request, Response, FWrq, FTic); // comment to skip session/request flow
+  gwrq.WebRequestOrig := Request; // cagnolina
 
   {$REGION 'CustomHeader'}
   // handle here specific CustomHeader for all webactions or at beginning of each specific webaction
@@ -146,9 +200,9 @@ begin
 
 end;
 
-procedure TMainWebModule.MainWebModuleAfterDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
+procedure TMainWebModule.WebModuleAfterDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
-//TWmoRec.AfterDispatch(Request, Response, FWrq, FTic);
+//FWmoRec.AfterDispatch(Request, Response, FWrq, FTic); // comment to skip session/request flow
 end;
   {$ENDREGION}
 
@@ -161,11 +215,15 @@ begin
 end;
 
 procedure TMainWebModule.MainWebModuleInfoWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
+var
+  vec: TArray<string>;
+  i: integer;
 begin
-  TWrsRec.ResponseSet(Response, TJteRec.ServerInfo('Server that supply code (css, html, js, json, text, xml, ...) upon a request', 'Web Broker Isapi', [
-    '/', '/Info'
-  , '/Code', '/Library', '/Volatile', '/Css', '/Js'
-  ]), TCtyRec.CTY_APP_JSON);
+  SetLength(vec, Length(FWmoRec.CmdRecVec));
+  for i := 0 to High(FWmoRec.CmdRecVec) do
+    vec[i] := FWmoRec.CmdRecVec[i].Cmd;
+
+  TWrsRec.ResponseSet(Response, TJteRec.ServerInfo('Serves dynamic web Code''s', 'Web Broker Isapi', vec), TCtyRec.CTY_APP_JSON);
 end;
     {$ENDREGION}
 
@@ -176,7 +234,7 @@ var
   oid, aff, i: integer;
   cod: TCodRec;
   dst: TDataset;
-//sts: TStringStream;
+  sts: TStringStream;
 
   function html_repater(): string;
   var
@@ -285,32 +343,32 @@ begin
   end;
 
 //  res := sse_event;
-//
-//  // response (send an initial SSE event)
-//  sts := TStringStream.Create; // no need to free it
-//  sts.WriteString(res);
-//  sts.Position := 0;
-//  TWrsRec.ResponseCustomHeaderAdd(Response, ['Cache-Control', 'no-cache', 'Connection', 'keep-alive']);
-//  TWrsRec.ResponseSet(Response, sts, mim, THttRec.HTTP_STATUS_200_OK);
-//  Response.SendResponse;
 
-  // Set the SSE headers
-  Response.ContentType := 'text/event-stream';
-  Response.CustomHeaders.Values['Cache-Control'] := 'no-cache';
-  Response.CustomHeaders.Values['Connection'] := 'keep-alive';
-
-  // Send an initial SSE event
-  Response.Content := 'data: ' + FormatDateTime('yyyy-mm-dd hh:nn:ss', Now) + sLineBreak + sLineBreak;
+  // response (send an initial SSE event)
+  sts := TStringStream.Create; // no need to free it
+  sts.WriteString(res);
+  sts.Position := 0;
+  TWrsRec.ResponseCustomHeaderAdd(Response, ['Cache-Control', 'no-cache', 'Connection', 'keep-alive']);
+  TWrsRec.ResponseSet(Response, sts, mim, THttRec.HTTP_STATUS_200_OK);
   Response.SendResponse;
 
-  // Continue sending SSE events
-  while not Request.RemoteAddr.IsEmpty do begin
-    Sleep(1000); // Delay for 1 second
-    Response.Content := 'data: ' + FormatDateTime('yyyy-mm-dd hh:nn:ss', Now) + sLineBreak + sLineBreak;
-    Response.SendResponse;
-  end;
+  // set the SSE headers
+//  Response.ContentType := 'text/event-stream';
+//  Response.CustomHeaders.Values['Cache-Control'] := 'no-cache';
+//  Response.CustomHeaders.Values['Connection'] := 'keep-alive';
 
-  Handled := True;
+  // send an initial SSE event
+//  Response.Content := 'data: ' + FormatDateTime('yyyy-mm-dd hh:nn:ss', Now) + sLineBreak + sLineBreak;
+//  Response.SendResponse;
+
+  // continue sending SSE events
+//  while not Request.RemoteAddr.IsEmpty do begin
+//    Sleep(1000); // delay for 1 second
+//    Response.Content := 'data: ' + FormatDateTime('yyyy-mm-dd hh:nn:ss', Now) + sLineBreak + sLineBreak;
+//    Response.SendResponse;
+//  end;
+
+//  Handled := true;
 end;
 
 procedure TMainWebModule.MainWebModuleLibraryWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);

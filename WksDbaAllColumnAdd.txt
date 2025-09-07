@@ -3,7 +3,7 @@
 -- title      :  Wks Databases Column Add
 -- description:  add a new column in all Dba*.dbo.Tbl* tables in the local sql server instance
 -- 
--- author     :  giarussi
+-- author     :  puppadrillo
 -- created    :  10/01/2023 23:00:00
 -- copyright  :  (c) Wks 2023
 -- licence    :  BDS

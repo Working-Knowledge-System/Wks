@@ -1577,8 +1577,8 @@ var
   // client
   cip: string;            // clientip
   cid: string;            // clientid
-  cun: string;            // username/client giarussi
-  cuu: string;            // usernumber      353992
+  cun: string;            // username/client puppadrillo
+  cuu: string;            // usernumber      123456
   pei: string;            // personid
   usi: string;            // userid
   mei: string;            // memberid
@@ -1688,7 +1688,7 @@ try
       {$REGION 'SET'}
       if cmd.StartsWith('SET') then begin
         try
-          // CLI SET {"what": "CLIENTINFO", "username": "GIARUSSI", "layoutWidth": 1024 "layoutHeight": 768} request to set client's info
+          // CLI SET {"what": "CLIENTINFO", "username": "PUPPADRILLO", "layoutWidth": 1024 "layoutHeight": 768} request to set client's info
           if wha = 'CLIENTINFO' then begin                           // server reply also with username... *** move to a separate cmd ***
           //cun := jva.GetValue<string>('username');
             clw := jva.GetValue<integer>('layoutWidth');

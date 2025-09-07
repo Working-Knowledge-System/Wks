@@ -667,83 +667,83 @@ GO
 
 
 CREATE TABLE [DbaClient].[dbo].[TblRequest](                                         *** this table tack user's web-hits ***
-    [FldDateTime]                               [datetime]                      NULL -- {request-datetime                       }
-  , [FldClientAddr]                             [varchar](32)                   NULL -- {10.176.85.121                          }
-  , [FldClientHost]                             [varchar](32)                   NULL -- {www.wks.cloud      (THE-ONLY-SURE-INFO)}
-  , [FldClientAccept]                           [varchar](256)                  NULL -- {text/html,application/xml              }
-  , [FldClientAcceptEncoding]                   [varchar](256)                  NULL -- {gzip, deflate                          }
-  , [FldClientAcceptLanguage]                   [varchar](256)                  NULL -- {en-US,en                               }
-  , [FldClientApp]                              [varchar](2048)                 NULL -- {Mozilla/5.0 Windows NT... useragent    }
-  , [FldClientAppVersion]                       [varchar](16)                   NULL -- {5.0 / 1.0.0.1                          }
-  , [FldClientDoNotTrack]                       [varchar](16)                   NULL -- {1                                      }
-  , [FldClientTimezoneOffset]                   [int]                           NULL -- {?                                      }
-  , [FldClientLanguage]                         [varchar](16)                   NULL -- {?                                      }
-  , [FldClientPlatform]                         [varchar](32)                   NULL -- {?                                      }
-  , [FldClientOs]                               [varchar](32)                   NULL -- {?                                      }
-  , [FldClientCpuCores]                         [varchar](32)                   NULL -- {?                                      }
-  , [FldClientScreen]                           [varchar](32)                   NULL -- {?                                      }
-  , [FldClientAudio]                            [varchar](64)                   NULL -- {?                                      }
-  , [FldClientVideo]                            [varchar](64)                   NULL -- {?                                      }
-  , [FldClientLocalStorage]                     [varchar](16)                   NULL -- {?                                      }
-  , [FldClientSessionStorage]                   [varchar](16)                   NULL -- {?                                      }
-  , [FldClientIndexedDb]                        [varchar](16)                   NULL -- {?                                      }
-  , [FldClientFingerprint]                      [varchar](32)                   NULL -- {?                                      }
-  , [FldUserOrganization]                       [varchar](32)                   NULL -- {Wks (fromurl/db)                       }
-  , [FldUserDomain]                             [varchar](32)                   NULL -- {?                                      }
-  , [FldUserComputer]                           [varchar](32)                   NULL -- {phobos                                 }
-  , [FldUsername]                               [varchar](16)                   NULL -- {giarussi | 353992                      }
-  , [FldSession]                                [varchar](32)                   NULL -- {?                                      }
-  , [FldOtp]                                    [varchar](32)                   NULL -- {?                                      }
-  , [FldHttpOrigin]                             [varchar](64)                   NULL -- {                                       }
-  , [FldHttpProtocol]                           [varchar](16)                   NULL -- {HTTP/1.1                               }
-  , [FldHttpMethod]                             [varchar](16)                   NULL -- {GET, POST                              }
-  , [FldRequestId]                              [varchar](16)                   NULL -- {095EBA6CEcb.ConnId                     }
-  , [FldConnection]                             [varchar](16)                   NULL -- {keep-alive                             }
-  , [FldHost]                                   [varchar](128)                  NULL -- {aiwymsapp.ai.lfoundry.com              }
-  , [FldUrl]                                    [varchar](2048)                 NULL -- {/WksIsapiProject.dll *partial or empty*}
-  , [FldPathInfo]                               [varchar](256)                  NULL -- {/Info                                  }
-  , [FldQuery]                                  [varchar](max)                  NULL -- {?CoId=381&CoXxx=2                      }
-  , [FldServerAddr]                             [varchar](32)                   NULL -- {10.176.39.2                            }
-  , [FldServerHost]                             [varchar](32)                   NULL -- {localhost | www.abc.com                }
-  , [FldServerPort]                             [int]                           NULL -- {80                                     }
-  , [FldServerPortSecure]                       [int]                           NULL -- {80                                     }
-  , [FldServerSoftware]                         [varchar](32)                   NULL -- {Microsoft-IIS/10.0                     }
-  , [FldScriptName]                             [varchar](32)                   NULL -- {/WksIsapiProject.dll                   }
-  , [FldScriptVer]                              [varchar](16)                   NULL -- {1.0.0.123                              }
-  , [FldTimingMs]                               [int]                           NULL -- {-1                                     }
---, [FldClientIp]                               [varchar](32)                   NULL -- {10.176.85.121                          }
---, [FldClientPort]                             [int]                           NULL -- {62682                                  }
+    [FldDateTime]                               [datetime]                      NULL -- {request-datetime                         }
+  , [FldClientAddr]                             [varchar](32)                   NULL -- {10.176.85.121                            }
+  , [FldClientHost]                             [varchar](32)                   NULL -- {www.wks.cloud      (THE-ONLY-SURE-INFO)  }
+  , [FldClientAccept]                           [varchar](256)                  NULL -- {text/html,application/xml                }
+  , [FldClientAcceptEncoding]                   [varchar](256)                  NULL -- {gzip, deflate                            }
+  , [FldClientAcceptLanguage]                   [varchar](256)                  NULL -- {en-US,en                                 }
+  , [FldClientApp]                              [varchar](2048)                 NULL -- {Mozilla/5.0 Windows NT... useragent      }
+  , [FldClientAppVersion]                       [varchar](16)                   NULL -- {5.0 / 1.0.0.1                            }
+  , [FldClientDoNotTrack]                       [varchar](16)                   NULL -- {1                                        }
+  , [FldClientTimezoneOffset]                   [int]                           NULL -- {?                                        }
+  , [FldClientLanguage]                         [varchar](16)                   NULL -- {?                                        }
+  , [FldClientPlatform]                         [varchar](32)                   NULL -- {?                                        }
+  , [FldClientOs]                               [varchar](32)                   NULL -- {?                                        }
+  , [FldClientCpuCores]                         [varchar](32)                   NULL -- {?                                        }
+  , [FldClientScreen]                           [varchar](32)                   NULL -- {?                                        }
+  , [FldClientAudio]                            [varchar](64)                   NULL -- {?                                        }
+  , [FldClientVideo]                            [varchar](64)                   NULL -- {?                                        }
+  , [FldClientLocalStorage]                     [varchar](16)                   NULL -- {?                                        }
+  , [FldClientSessionStorage]                   [varchar](16)                   NULL -- {?                                        }
+  , [FldClientIndexedDb]                        [varchar](16)                   NULL -- {?                                        }
+  , [FldClientFingerprint]                      [varchar](32)                   NULL -- {?                                        }
+  , [FldUserOrganization]                       [varchar](32)                   NULL -- {Wks (fromurl/db)                         }
+  , [FldUserDomain]                             [varchar](32)                   NULL -- {?                                        }
+  , [FldUserComputer]                           [varchar](32)                   NULL -- {phobos                                   }
+  , [FldUsername]                               [varchar](16)                   NULL -- {puppadrillo | 123456                     }
+  , [FldSession]                                [varchar](32)                   NULL -- {?                                        }
+  , [FldOtp]                                    [varchar](32)                   NULL -- {?                                        }
+  , [FldHttpOrigin]                             [varchar](64)                   NULL -- {                                         }
+  , [FldHttpProtocol]                           [varchar](16)                   NULL -- {HTTP/1.1                                 }
+  , [FldHttpMethod]                             [varchar](16)                   NULL -- {GET, POST                                }
+  , [FldRequestId]                              [varchar](16)                   NULL -- {095EBA6CEcb.ConnId                       }
+  , [FldConnection]                             [varchar](16)                   NULL -- {keep-alive                               }
+  , [FldHost]                                   [varchar](128)                  NULL -- {wksapp.foundry.com                       }
+  , [FldUrl]                                    [varchar](2048)                 NULL -- {/WksIsapiProject.dll *partial or empty*  }
+  , [FldPathInfo]                               [varchar](256)                  NULL -- {/Info                                    }
+  , [FldQuery]                                  [varchar](max)                  NULL -- {?CoId=381&CoXxx=2                        }
+  , [FldServerAddr]                             [varchar](32)                   NULL -- {100.100.100.100                          }
+  , [FldServerHost]                             [varchar](32)                   NULL -- {localhost | www.wks.cloud                }
+  , [FldServerPort]                             [int]                           NULL -- {80                                       }
+  , [FldServerPortSecure]                       [int]                           NULL -- {80                                       }
+  , [FldServerSoftware]                         [varchar](32)                   NULL -- {Microsoft-IIS/10.0                       }
+  , [FldScriptName]                             [varchar](32)                   NULL -- {/WksIsapiProject.dll                     }
+  , [FldScriptVer]                              [varchar](16)                   NULL -- {1.0.0.123                                }
+  , [FldTimingMs]                               [int]                           NULL -- {-1                                       }
+--, [FldClientIp]                               [varchar](32)                   NULL -- {100.100.100.100                          }
+--, [FldClientPort]                             [int]                           NULL -- {62682                                    }
 --, [FldUserPassword]                           [varchar](32)                   NULL --
---, [FldUserLogon]                              [varchar](16)                   NULL -- {?                                      }
---, [FldUserRemote]                             [varchar](16)                   NULL -- {?                                      }
---, [FldUserRemoteUnmapped]                     [varchar](16)                   NULL -- {/                                      }
---, [FldInternalPathInfo]                       [varchar](256                   NULL -- {/Info                                  }
---, [FldRawPathInfo]                            [varchar](256)                  NULL -- {/Info                                  }
---, [FldPathTranslated]                         [varchar](256)                  NULL -- {X:\$\X\Win32\Debug\Info                }
---, [FldReferer]                                [varchar](16)                   NULL -- {http://abc.com/WksIsapi.dll/Run?CoId=12}
---, [FldTitle]                                  [varchar](128)                  NULL -- {*empty*                                }
---, [FldCookie]                                 [varchar](2048)                 NULL -- {CoOtp=933073; CoDomain=LOCALHOST;      }
---, [FldTotalBytes]                             [varchar](16)                   NULL -- {0                                      }
---, [FldExpires]                                [date]                          NULL -- {?                                      }
---, [FldMimeType]                               [varchar](16)                   NULL -- {?                                      }
---, [FldContentEncoding]                        [varchar](16)                   NULL -- {*empty*                                }
---, [FldContentType]                            [varchar](16)                   NULL -- {*empty* | application/x-www-form...    }
---, [FldContentLength]                          [varchar](16)                   NULL -- {0                                      }
---, [FldRawContent]                             [varchar](16)                   NULL -- {*arrrayofbytes*                        }
---, [FldContentVersion]                         [varchar](16)                   NULL -- {*empty*                                }
---, [FldContent]                                [varchar](16)                   NULL -- {*keys-values in form*                  }
---, [FldFrom]                                   [varchar](128)                  NULL -- {*empty* / might conteins User          }
---, [FldDate]                                   [date]                          NULL -- {1899-12-29                             }
---, [FldServerName]                             [varchar](16)                   NULL -- {localhost                              }
---, [FldServerProtocol]                         [varchar](16)                   NULL -- {HTTP/1.1                               }
---, [FldWebsiteInstance]                        [varchar](16)                   NULL -- {1                                      }
---, [FldWebsitePath]                            [varchar](16)                   NULL -- {/LM/W3SVC/1/ROOT                       }
---, [FldScriptGateway]                          [varchar](16)                   NULL -- {CGI/1.1                                }
---, [FldScriptPath]                             [varchar](16)                   NULL -- {X:\$\X\Win32\Debug                     }
---, [FldAuthorization]                          [varchar](16)                   NULL -- {*empty*                                }
---, [FldCacheControl]                           [varchar](16)                   NULL -- {*empty* or no-cache                    }
---, [FldIfModifiedSince]                        [date]                          NULL -- {1899-12-29                             }
---, [FldDerivedFrom]                            [varchar](16)                   NULL -- {*empty*                                }
+--, [FldUserLogon]                              [varchar](16)                   NULL -- {?                                        }
+--, [FldUserRemote]                             [varchar](16)                   NULL -- {?                                        }
+--, [FldUserRemoteUnmapped]                     [varchar](16)                   NULL -- {/                                        }
+--, [FldInternalPathInfo]                       [varchar](256                   NULL -- {/Info                                    }
+--, [FldRawPathInfo]                            [varchar](256)                  NULL -- {/Info                                    }
+--, [FldPathTranslated]                         [varchar](256)                  NULL -- {X:\$\X\Win32\Debug\Info                  }
+--, [FldReferer]                                [varchar](16)                   NULL -- {http://wks.cloud/WksIsapi.dll/Run?CoId=12}
+--, [FldTitle]                                  [varchar](128)                  NULL -- {*empty*                                  }
+--, [FldCookie]                                 [varchar](2048)                 NULL -- {CoOtp=933073; CoDomain=LOCALHOST;        }
+--, [FldTotalBytes]                             [varchar](16)                   NULL -- {0                                        }
+--, [FldExpires]                                [date]                          NULL -- {?                                        }
+--, [FldMimeType]                               [varchar](16)                   NULL -- {?                                        }
+--, [FldContentEncoding]                        [varchar](16)                   NULL -- {*empty*                                  }
+--, [FldContentType]                            [varchar](16)                   NULL -- {*empty* | application/x-www-form...      }
+--, [FldContentLength]                          [varchar](16)                   NULL -- {0                                        }
+--, [FldRawContent]                             [varchar](16)                   NULL -- {*arrrayofbytes*                          }
+--, [FldContentVersion]                         [varchar](16)                   NULL -- {*empty*                                  }
+--, [FldContent]                                [varchar](16)                   NULL -- {*keys-values in form*                    }
+--, [FldFrom]                                   [varchar](128)                  NULL -- {*empty* / might conteins User            }
+--, [FldDate]                                   [date]                          NULL -- {1899-12-29                               }
+--, [FldServerName]                             [varchar](16)                   NULL -- {localhost                                }
+--, [FldServerProtocol]                         [varchar](16)                   NULL -- {HTTP/1.1                                 }
+--, [FldWebsiteInstance]                        [varchar](16)                   NULL -- {1                                        }
+--, [FldWebsitePath]                            [varchar](16)                   NULL -- {/LM/W3SVC/1/ROOT                         }
+--, [FldScriptGateway]                          [varchar](16)                   NULL -- {CGI/1.1                                  }
+--, [FldScriptPath]                             [varchar](16)                   NULL -- {X:\$\X\Win32\Debug                       }
+--, [FldAuthorization]                          [varchar](16)                   NULL -- {*empty*                                  }
+--, [FldCacheControl]                           [varchar](16)                   NULL -- {*empty* or no-cache                      }
+--, [FldIfModifiedSince]                        [date]                          NULL -- {1899-12-29                               }
+--, [FldDerivedFrom]                            [varchar](16)                   NULL -- {*empty*                                  }
 ) ON [PRIMARY]
 GO
 

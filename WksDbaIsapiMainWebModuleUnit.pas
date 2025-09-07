@@ -3,8 +3,52 @@ unit WksDbaIsapiMainWebModuleUnit;
 interface
 
 {$REGION 'Help'}
-{
-  save single value into databases tables
+{                                request
+                                    |
+                                    V
+  -----------------------------------------------------------------------------------
+ |                           BeforeDispatch                                          |
+ |  - here the event can enable or disable the actionitems suitable to the response  |
+ |  - can begin filling out the response object                                      |
+ |  - can provide any other necessary preprocessing objects                          |
+ |  If the event finishes filling out the response object,                           |
+ |  it should change the Handled parameter to True so the dispatcher                 |
+ |  will not send the request on to any of the actionitems                           |
+ |  If the BeforeDispatch event handler sends the response message,                  |
+ |  the dispatcher will not pass the request on to any of the action items,          |
+ |  even if the Handled parameter is left as False                                   |
+ |  If the BeforeDispatch event handler sets the Handled parameter to True but does  |
+ |  not send the response, the Web dispatcher will generate an AfterDispatch event   |
+  -----------------------------------------------------------------------------------
+ |                             Dispatcher                                            |
+ |  the dispatcher tries to match the HTTP request                                   |
+ |  PathInfo with any PathInfo of the action items                                   |
+ |                                                                                   |
+ |                       /  webaction1/PathInfo1                                     |
+ |  request/PathInfo--->|   webaction1/PathInfo2                                     |
+ |                       \  webaction1/PathInfo...                                   |
+ |                                                                                   |
+ |  here the dispatcher/actionitem process the request and fill out the response obj |
+  -----------------------------------------------------------------------------------
+ |                            AfterDispatch                                          |
+ |  It is used to perform any necessary cleanup or logging                           |
+  -----------------------------------------------------------------------------------
+ |                             BeforeSend (non trovo nulla!)                         |
+ |  The OnBeforeSend event occurs just before sending a response back to the client  |
+ |  It is used to modify or add headers to a response                                |
+  -----------------------------------------------------------------------------------
+                                    |
+                                    V
+                                 response
+
+  Bba module
+  ==========
+  
+  here we can implement all dbrelated functionalities like
+  selecting inserting, updating, deleting
+  also make something to replicate a system, cloning a remote already working system (may be the head)
+  here locally in a underconstruction new system
+  for nuw it just updates a single field with a single value
 }
 {$ENDREGION}
 
@@ -33,6 +77,7 @@ type
     procedure MainWebModuleDeleteWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
   private
     { Private declarations }
+  //FIni: TIniCls;
   //FTic: TTicRec;
   //FWrq: TWrqRec;
     FWmoRec: TWmoRec;
@@ -67,15 +112,18 @@ procedure TMainWebModule.WebModuleCreate(Sender: TObject);
 begin
 
   {$REGION 'Commands'}
-  SetLength(FWmoRec.CmdRecVec, 3);
+  SetLength(FWmoRec.CmdRecVec, 4);
   FWmoRec.CmdRecVec[0].Cmd         := '/';
   FWmoRec.CmdRecVec[0].Description := 'Default handler';
   
   FWmoRec.CmdRecVec[1].Cmd         := '/Info';
   FWmoRec.CmdRecVec[1].Description := 'Describe module''s info and capabilities (this page)';
+
+  FWmoRec.CmdRecVec[2].Cmd         := '/Dba';
+  FWmoRec.CmdRecVec[2].Description := 'Dba main handler doing noting for now';
   
-  FWmoRec.CmdRecVec[2].Cmd         := '/Update';
-  FWmoRec.CmdRecVec[2].Description := 'Update a field in a record';
+  FWmoRec.CmdRecVec[3].Cmd         := '/Update';
+  FWmoRec.CmdRecVec[3].Description := 'Update a field in a record';
   {$ENDREGION}
 
   {$REGION 'Objects'}
@@ -110,8 +158,9 @@ end;
 
 procedure TMainWebModule.WebModuleBeforeDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
-  Inc(FWmoRec.Run);
-//TWmoRec.BeforeDispatch(Request, Response, FWrq, FTic);
+//Inc(FWmoRec.Run);                                      // comment if useless
+//FWmoRec.BeforeDispatch(Request, Response, FWrq, FTic); // comment to skip session/request flow
+  gwrq.WebRequestOrig := Request; // cagnolina           // uncomment if revious is commented
 
   {$REGION 'CustomHeader'}
   // handle here specific CustomHeader for all webactions or at beginning of each specific webaction
@@ -131,7 +180,7 @@ end;
 
 procedure TMainWebModule.WebModuleAfterDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
-//TWmoRec.AfterDispatch(Request, Response, FWrq, FTic);
+//FWmoRec.AfterDispatch(Request, Response, FWrq, FTic); // comment to skip session/request flow
 end;
   {$ENDREGION}
 
@@ -144,12 +193,15 @@ begin
 end;
 
 procedure TMainWebModule.MainWebModuleInfoWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
+var
+  vec: TArray<string>;
+  i: integer;
 begin
-  TWrsRec.ResponseSet(Response, TJteRec.ServerInfo('Server that change ONE thing in the database', 'Web Broker Isapi', [
-    '/'
-  , '/Info'
-  , '/Select', '/Insert', '/Update', '/Delete'
-  ]), TCtyRec.CTY_APP_JSON);
+  SetLength(vec, Length(FWmoRec.CmdRecVec));
+  for i := 0 to High(FWmoRec.CmdRecVec) do
+    vec[i] := FWmoRec.CmdRecVec[i].Cmd;
+
+  TWrsRec.ResponseSet(Response, TJteRec.ServerInfo('Server that change ONE thing in the database', 'Web Broker Isapi', vec), TCtyRec.CTY_APP_JSON);
 end;
     {$ENDREGION}
 
@@ -229,15 +281,15 @@ begin
   // keyfieldmalformed
   // ...
 
-  // notloggedin
-  end else if usr.Equals('unknown') then begin
+  // usersessionNOTvalid, notloggedin
+  end else if usr.Equals('unknown') {*** change to gses.IsValid(fbk) ***} then begin
     oks := 'false';
     sta := 'FAIL';
     fbk := 'User not logged in';
     msg := 'Unable to update record (Please log in to make changes)';
     sco := 200; // 400 Bad Request
 
-  // loggedin
+  // usersessionVALID, loggedin
   end else begin
     // update
     sql := Format('update %s set %s = %s where %s', [tbl, fls, TSqlRec.Val(flv), whe]);

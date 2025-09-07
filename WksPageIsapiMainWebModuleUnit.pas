@@ -74,6 +74,7 @@ type
     procedure MainWebModuleAccountDeleteWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
   private
     { Private declarations }
+  //FIni: TIniCls;
     FTic: TTicRec;
     FWrq: TWrqRec;
     FWmoRec: TWmoRec;
@@ -112,9 +113,9 @@ begin
   
   FWmoRec.CmdRecVec[1].Cmd         := '/Info';
   FWmoRec.CmdRecVec[1].Description := 'Describe module''s info and capabilities (this page)';
-  
+
   FWmoRec.CmdRecVec[2].Cmd         := '/Page';
-  FWmoRec.CmdRecVec[2].Description := 'Server a page';
+  FWmoRec.CmdRecVec[2].Description := 'Page main handler to server web pages';
   {$ENDREGION}
 
   {$REGION 'Objects'}
@@ -149,8 +150,9 @@ end;
 
 procedure TMainWebModule.WebModuleBeforeDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
-  Inc(FWmoRec.Run);
-  FWmoRec.BeforeDispatch(Request, Response, FWrq, FTic);
+  Inc(FWmoRec.Run);                                      // comment if useless
+  FWmoRec.BeforeDispatch(Request, Response, FWrq, FTic); // comment to skip session/request flow
+//gwrq.WebRequestOrig := Request; // cagnolina           // uncomment if revious is commented
 
   {$REGION 'CustomHeader'}
   // handle here specific CustomHeader for all webactions or at beginning of each specific webaction
@@ -170,13 +172,13 @@ end;
 
 procedure TMainWebModule.WebModuleAfterDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
-  FWmoRec.AfterDispatch(Request, Response, FWrq, FTic);
+  FWmoRec.AfterDispatch(Request, Response, FWrq, FTic); // comment to skip session/request flow
 end;
   {$ENDREGION}
 
   {$REGION 'Actions'}
 
-    {$REGION 'Page'}
+    {$REGION 'Standard'}
 procedure TMainWebModule.MainWebModuleDefaultHandlerAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 var
   pid: integer;
@@ -195,15 +197,15 @@ begin
 end;
 
 procedure TMainWebModule.MainWebModuleInfoWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
+var
+  vec: TArray<string>;
+  i: integer;
 begin
-  TWrsRec.ResponseSet(Response, TJteRec.ServerInfo('Serves dynamic web pages', 'Web Broker Isapi', [
-    '/'
-  , '/Info'
-  , '/View'
-  , '/Init', '/Theme', '/Test'
-  , '/Login', '/LoginTry', '/Logout'
-  , '/AccountCreate', '/AccountRecover', '/AccountDelete'
-  ]), TCtyRec.CTY_APP_JSON);
+  SetLength(vec, Length(FWmoRec.CmdRecVec));
+  for i := 0 to High(FWmoRec.CmdRecVec) do
+    vec[i] := FWmoRec.CmdRecVec[i].Cmd;
+
+  TWrsRec.ResponseSet(Response, TJteRec.ServerInfo('Serves dynamic web Page''s', 'Web Broker Isapi', vec), TCtyRec.CTY_APP_JSON);
 end;
 
 procedure TMainWebModule.MainWebModuleViewWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
@@ -369,8 +371,8 @@ begin
   // if success, then the already generated session (during FWmoRec.BeforeDispatch) will be recorded into DbaUser.dbo.TblUser
   // also create the member assigning rights/levels accesses to it
 
-  // loggedinalready
-  if          gwse.IsValid(fbk){LoggedIn} then begin
+  // usersessionvalid (loggedinalready)
+  if          gses.IsValid(fbk) then begin
     Response.Content := THtmRec.PageWarning('Already logged in', 'You have already a valid active session.');
     Exit;
 
@@ -393,7 +395,7 @@ begin
   // authenticationfail
   if not gusr.IsAuthenticated(usr, pas, fbk) then begin
     // gobaluservarupdate
-  //gusr.LoggedIn := false; // *** unreliable ***
+  //gusr.LoggedIn := false; // *** unreliable --> use gses.IsValid(fbk) ***
 
     Response.Content := THtmRec.PageWarning('Invalid Credentials', 'The username and/or password you have entered are not valid.');
     Exit;
@@ -401,12 +403,12 @@ begin
   // authenticationok
   end else begin
     // gobaluservarupdate
-  //gusr.LoggedIn := true; // *** unreliable ***
+  //gusr.LoggedIn := true; // *** unreliable --> use gses.IsValid(fbk) ***
 
-    // websessionupdateondba
-    gwse.Organization := gorg.Obj.&Object;
-    gwse.Username := usr;
-    gwse.Update(fbk);
+    // sessionupdateondba
+    gses.Organization := gorg.Obj.&Object;
+    gses.Username := usr;
+    gses.Update(fbk);
 
     // writeonclient-browser
     rem := gwrq.FieldContentGet('CoRememberMe', 'false');
@@ -440,7 +442,7 @@ var
 begin
 
   // session
-  gwse.Close(fbk);
+  gses.Close(fbk);
 
   // removefromclientbrowser (if user just Quit then leave the cookies) note: these cookies are deleted if the server-session expire
   TWrsRec.FieldCookieDelete(Response, 'CoDateTime');

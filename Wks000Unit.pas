@@ -93,16 +93,12 @@ interface
   Groups
   ------
   [O] = Object         = Obj (ex Xxx)
-  [B] = usinessobjects = Person, User, Organization, Theme, Member
+  [B] = usinessobjects = Person, User, Session, Organization, Theme, Member (a person, with an account enter a system and become a user with a valid session then join an organization becoming a member)
 
-
-  Objects        Bmp
-  -----------------------------
-  Object         Image
-  Person         Picture
-  User           Avatar
-  Organization   Logo, LogoLong
-  Member         Avatar
+  Obj                   Object     >    Person     >    User      >     Session    >    Organization >  Member
+  ----------------------------------------------------------------------------------------------------------------------
+  graphic object        Image           Picture         Avatar          -               Logo/LogoLong   Badge
+   
 
   array of const
   -----------------------------
@@ -151,8 +147,9 @@ uses
 //, IdSSLOpenSSL                  // hmac ?
   , IdHMACSHA1                    // indyhmac
   , ujachLogMgr                   // jachlog
-  , ujachLogToDisk                //
-  , ujachLogToSysLogIndyUDP       //
+//, ujachLogAuto                  // jachlog autoconfigure
+  , ujachLogToDisk                // jachlog
+  , ujachLogToSysLogIndyUDP       // jachlog
   , SynEdit                       // synedit
   , SynEditTypes                  // synedit types
 //, SynEditMiscProcs              // synedit misc
@@ -176,19 +173,34 @@ uses
   , SynHighlighterYAML            //
   , SynEditMiscClasses            // gutter gbsNone
   , VirtualTrees                  // virtualstringtree
-  , ArrayHelper                   // TArray<T> and TArrayRecord<T> helper
+//, VirtualTrees.Types            // tvtimagekind *** per versione di VT non turbopack ***
+//, VirtualTrees.BaseTree         // timageindex  *** per versione di VT non turbopack ***
+  , Profiler                      // tprofiler delphiarea
   , Agg2D                         // aggengine
   , AggBasics                     // aggutils
 //, AggColor                      // aggcolors
   , AggPixelFormat                // aggblendmode ...
 //, AggWin32Bmp                   // tpixelmap
-  , Profiler                      // tprofiler delphiarea
+  , ArrayHelper                   // TArray<T> and TArrayRecord<T> helper
   , WksSynHighlighterRUnit        // wks synedit highlighter for R lang
   ;
 {$ENDREGION}
 
+{$REGION 'Enum'}
+type
+//TTriStateEnum     = (tsTrue, stFalse, tsUnknown);
+  TWebFrameworkEnum = (wfNone, wfW3Css, wfPicoCss);
+  TCaseEnum         = (cAsIs, cLower, cUpper, cCapital, cCapitalAll);
+  TFbkModeEnum      = (fmNone, fmInfo, fmSuccess, fmWarning, fmDanger, fmError); // bg: transparent, blue, green, orange, red, black
+  TImgTormEnum      = (itNone, itBottom, itTop, itTopBottom);
+  TProcessKindEnum  = (pkUnknown, pk32Bit, pk64Bit);
+  THvDirEnum        = (hvHorizontal, hvVertical);
+{$ENDREGION}
+
 {$REGION 'Const'}
 const
+
+  // *** INVERT SOME ***
 
   {$REGION 'Strings'}
   OK_STR                  = 'Ok';
@@ -210,11 +222,16 @@ const
 //CHAR_CONTENT_CHANGED    = '•'; // dot
   {$ENDREGION}
 
+  {$REGION 'Font'}
+  FONT_FAMILY_REGULAR     = 'Roboto';              // Arial      , Tahoma  , Roboto     , Calibri
+  FONT_FAMILY_MONOSPACE   = 'Roboto Mono';         // Courier New, Consolas, Roboto Mono, Source Code Pro, Inconsolata, IBM Plex Mono, Times New Roman, Arial, Tahoma, Verdana, Courier New, Lucida Console
+  {$ENDREGION}
+
   {$REGION 'Pauses'}
-  LOG_PAUSE_MS           =  100;                  // inter log sleep pause
-  SHORT_PAUSE_MS         = 1000;                  // sleep pause after a success (ie succesful login)
-  MEDIUM_PAUSE_MS        = 2000;                  //
-  LONG_PAUSE_MS          = 3000;                  // sleep pause after a failure (ie unsuccessful login attempt)
+  LOG_PAUSE_MS            =  100;                  // inter log sleep pause
+  SHORT_PAUSE_MS          = 1000;                  // sleep pause after a success (ie succesful login)
+  MEDIUM_PAUSE_MS         = 2000;                  //
+  LONG_PAUSE_MS           = 3000;                  // sleep pause after a failure (ie unsuccessful login attempt)
   {$ENDREGION}
 
   {$REGION 'Dba'}
@@ -225,8 +242,10 @@ const
   DBA_PROVIDER            = 'SQLOLEDB.1'  ; // Microsoft OLE DB Provider for SQL Server
   DBA_CONNECTION_STR      = 'Provider='+DBA_PROVIDER+';Data Source=AIWYMSTEST\SQLEXPRESS;User ID=sa;Password=secret;Persist Security Info=True';
   {$ELSE}
-  DBA_PROVIDER            = 'MSOLEDBSQL.1'; // Microsoft OLE DB Driver for SQL Server
+//DBA_PROVIDER            = 'SQLOLEDB.1';   // classic OLE DB driver
+  DBA_PROVIDER            = 'MSOLEDBSQL.1'; // new OLE DB Driver (need to be installed)
   DBA_CONNECTION_STR      = 'Provider='+DBA_PROVIDER+';Data Source=LOCALHOST;User ID=sa;Password=secret@123;Persist Security Info=True';
+//DBA_CONNECTION_STR      = 'Provider='+DBA_PROVIDER+';Data Source=DED14QWDB0010;Initial Catalog=DbaPage;Integrated Security=SSPI;Persist Security Info=True;User ID=TE602810TEADM';
   {$ENDIF}
   DBA_CMD_TIMEOUT_SEC     = 600;
   DATASET_MAXRECORDS      = 10000; // ultimatetopmax
@@ -334,9 +353,13 @@ const
   {$ENDREGION}
 
   {$REGION 'Obj'}
-  OBJ_ROOT_ID      = 1;
-  OBJ_ROOT_ZZZ_ID  = 2;
-  OBJ_ROOT_TEMP_ID = 3;
+  OBJ_ROOT_ID                 = 1;
+  OBJ_ROOT_ZZZ_ID             = 2;
+  OBJ_ROOT_TEMP_ID            = 3;
+  {$ENDREGION}
+
+  {$REGION 'DEFAULTS'}
+  DEF_WEB_FRAMEWORK           = wfW3Css;
   {$ENDREGION}
 
   {$REGION 'Vector'}
@@ -344,17 +367,6 @@ const
   MY_ARRAY     : TArray<string> = ['First','Second','Third']; // *** WARNING if not present errors happens later ***
   {$ENDREGION}
 
-{$ENDREGION}
-
-{$REGION 'Enum'}
-type
-//TTriStateEnum     = (tsTrue, stFalse, tsUnknown);
-  TWebFrameworkEnum = (wfNone, wfW3, wfBs);
-  TCaseEnum         = (cAsIs, cLower, cUpper, cCapital, cCapitalAll);
-  TFbkModeEnum      = (fmNone, fmInfo, fmSuccess, fmWarning, fmDanger, fmError); // bg: transparent, blue, green, orange, red, black
-  TImgTormEnum      = (itNone, itBottom, itTop, itTopBottom);
-  TProcessKindEnum  = (pkUnknown, pk32Bit, pk64Bit);
-  THvDirEnum        = (hvHorizontal, hvVertical);
 {$ENDREGION}
 
 {$REGION 'Helper'}
@@ -669,14 +681,13 @@ type
     {$REGION 'Const'}
   const
     AGG_Y_UP           = false;
-
     AGG_TEXT_UP        = not AGG_Y_UP;
     AGG_TEXT_HEIGHT    = 10.0;
-    AGG_TEXT_COLOR     = '000000ff'; // RGBA
-    AGG_TEXT_FONT      = 'Tahoma';   // 'Arial', 'Times New Roman', 'Courier New', 'Verdana', 'Tahoma', 'Lucida Console', 'Galleria', 'Briquet'  filename containing the font face to be used
-    AGG_TEXT_ALIGNMENT = 'cc';       // center-center
-    AGG_TEXT_HINTS     = true;       // sembra influenzi leggermente lo spessore del testo
-    AGG_TEXT_ROUND_OFF = true;       // rounds to integers the text x y origin
+    AGG_TEXT_COLOR     = '000000ff';            // RGBA
+    AGG_TEXT_FONT      = FONT_FAMILY_MONOSPACE; // filename containing the font face to be used
+    AGG_TEXT_ALIGNMENT = 'cc';                  // center-center
+    AGG_TEXT_HINTS     = true;                  // sembra influenzi leggermente lo spessore del testo
+    AGG_TEXT_ROUND_OFF = true;                  // rounds to integers the text x y origin
     {$ENDREGION}
 
   public
@@ -718,8 +729,8 @@ type
     Environment: string; // clientconectto Dev, Test, Prod    |-- drives one of the above, may drive also db env?
   public
     function  Info: string;
-    function  Www: string;   // *** add IvUrlAbsolute also in ObjUrl *** //        www.abc.com (noport, noprotocol)
-    function  Url: string;                                               // http://www.abc.com
+    function  Www: string;   // *** add IvUrlAbsolute also in ObjUrl *** //        www.wks.cloud (noport, noprotocol)
+    function  Url: string;                                               // http://www.wks.cloud
     function  FileIsapiUrl: string;
     function  FileIsapiDownloadUrl(IvObjectId: integer; IvUId, IvObj: string{; IvHoursOfValidity: double}): string;
   end;
@@ -1556,6 +1567,8 @@ type
     // audio
 
     // font
+    CTY_FONT_WOFF       = 'application/font-woff';
+    CTY_FONT_WOFF2      = 'font/woff2';
 
     // example
 
@@ -1862,7 +1875,7 @@ type
   //+ sLineBreak +   '<link  href="[RvWebSiteIncludeUrl()]/bootstrap-table/1.11.1/dist/bootstrap-table.min.css" rel="stylesheet" type="text/css" />'
   //+ sLineBreak +   '<script src="[RvWebSiteIncludeUrl()]/bootstrap-table/1.11.1/dist/bootstrap-table.min.js" type="text/javascript" ></script>'
     + sLineBreak + '</head>'
-    + sLineBreak + '<body style="font-family:Calibri; background-color: #[RvPaletteBackground()]">' //  link="blue" vlink="purple"
+    + sLineBreak + '<body style="font-family:' + FONT_FAMILY_MONOSPACE + '; background-color: #[RvPaletteBackground()]">' // link="blue" vlink="purple"
     + sLineBreak +   '<p align="center" style="text-align:center;">'
     + sLineBreak +     '<a href="[RvOrganizationWww()]">'
     + sLineBreak +       '<img src="cid:OrganizationLogoImageCId" height="48" border="0" title="[RvOrganizationWww()]" />'
@@ -1875,7 +1888,7 @@ type
     + sLineBreak +   '<p align="center" style="text-align:center">'
     + sLineBreak +     '<table border="0" cellspacing="0" cellpadding="0" style="width:400px;border-collapse:collapse;margin-left:auto;margin-right:auto;">'
     + sLineBreak +       '<tr>'
-    + sLineBreak +         '<td valign="top" style="font-family:Calibri;">'
+    + sLineBreak +         '<td valign="top" style="font-family:' + FONT_FAMILY_MONOSPACE + ';">'
     + sLineBreak +           '$Content$'
     + sLineBreak +         '</td>'
     + sLineBreak +       '</tr>'
@@ -2222,7 +2235,6 @@ type
 
     // detail
     ObjectId                : integer;
-  //Page                    : string ; *** removed ***
     Menu                    : string ;
     Popup                   : string ;
     Icon                    : string ;
@@ -2318,6 +2330,7 @@ type
     class function  List(IvItemVec: TArray<string>; IvMode: TListModeEnum = lmUnordered): string; static;
     class function  TableFromDs(IvDs: TDataset; IvHtmlDefault: string = ''; IvClass: string = ''; IvStyle: string = ''; IvEditable: boolean = false; IvEditJson: string = ''; IvDir: THvDirEnum = hvHorizontal; IvDsRecordCountOff: boolean = false; IvDsHeaderOff: boolean = false): string; static;
     class function  TableFromSql(IvSql: string; IvHtmlDefault: string = ''; IvClass: string = ''; IvStyle: string = ''; IvEditable: boolean = false; IvEditJson: string = ''; IvDir: THvDirEnum = hvHorizontal; IvDsRecordCountOff: boolean = false; IvDsHeaderOff: boolean = false): string; static;
+    class function TableFromSql2(IvSql: string; IvHtmlDefault: string = ''; IvClass: string = ''; IvStyle: string = ''; IvEditable: boolean = false; IvEditJson: string = ''; IvDir: THvDirEnum = hvHorizontal; IvDsRecordCountOff: boolean = false; IvDsHeaderOff: boolean = false): string; static;
     class function  RepeatFromDs(IvDs: TDataSet; IvHtmlBody: string; IvHtmlHeader: string = ''; IvHtmlFooter: string = ''; IvHtmlDefault: string = ''): string; static;
     class function  RepeatFromSql(IvSql: string; IvHtmlBody: string; IvHtmlHeader: string = ''; IvHtmlFooter: string = ''; IvHtmlDefault: string = ''): string; static;
     class function  Report(IvId: integer; IvHtmlDefaultIfAnyDsIsEmpty: string = ''): string; static;
@@ -2326,7 +2339,7 @@ type
     class function  TopNav(IvId, IvPId: integer; IvUrlAbsolute: boolean = false): string; static;
     class function  Page(IvPage: TPagRec; IvUrlAbsolute: boolean = false): string; overload; static;
     class function  Page(IvId: integer; IvTitleShow: boolean = true; IvImageShow: boolean = true; IvSubTitleShow: boolean = true; IvTopNavOff: boolean = false; IvSystemInfoOff: boolean = false; IvUrlAbsolute: boolean = false): string; overload; static;
-    class function  Page(IvTitle, IvSubTitle, IvContent: string; IvContentKind: string = ''; IvTitleShow: boolean = true; IvImageShow: boolean = true; IvSubTitleShow: boolean = true; IvTopNavOff: boolean = false; IvSystemInfoOff: boolean = false; IvUrlAbsolute: boolean = false): string; overload; static;
+    class function  Page(IvTitle, IvSubTitle, IvContent: string; IvContentKind: string = ''; IvTitleShow: boolean = true; IvImageShow: boolean = false; IvSubTitleShow: boolean = true; IvTopNavOff: boolean = false; IvSystemInfoOff: boolean = false; IvUrlAbsolute: boolean = false): string; overload; static;
     class function  PageSimple: string; static;
     class function  PageDefault: string; static;
     class function  PageFeedback(IvFbk: TFbkRec): string; static;
@@ -3274,13 +3287,13 @@ type
     , (Itm: 'Block quote'       ; Exa: '>\n> blockquote\n>\n>'         ; Rex: '((?:^(?:>|<br>>) ?.*?$\n)+)'            ; Reo: [roMultiLine, roSingleLine]; New: '<br><blockquote>%s</blockquote>'    )
     , (Itm: 'List (unordered)'  ; Exa: '- item\n- item>'               ; Rex: '((?:^(?:[ \t]*[-\*•]) +.*?$\n)+)'       ; Reo: [roMultiLine, roSingleLine]; New: '<ul>%s</ul>'                        ) // CHAR_CONTENT_CHANGED (dot)
     // notable
-    , (Itm: 'Url'               ; Exa: 'http://www.abc.com'            ; Rex: '(^| )((http:|https:)\S+)( |$)' {|www\.} ; Reo: [roMultiLine] ; New: '%s<a href="%s" target="_blank">%s</a>%s'         ) // warning: canreintroduceitself
-    , (Itm: 'Email'             ; Exa: 'abc@example.com'               ; Rex: '(^| )([-\w\.]+@[-\w]+\.[-\w]{2,4})( |$)'; Reo: [roMultiLine] ; New: '%s<a href="mailto:%s">%s</a>%s'                  ) // warning: canreintroduceitself
+    , (Itm: 'Url'               ; Exa: 'http://www.wks.cloud'          ; Rex: '(^| )((http:|https:)\S+)( |$)' {|www\.} ; Reo: [roMultiLine] ; New: '%s<a href="%s" target="_blank">%s</a>%s'         ) // warning: canreintroduceitself
+    , (Itm: 'Email'             ; Exa: 'email@wks.cloud'               ; Rex: '(^| )([-\w\.]+@[-\w]+\.[-\w]{2,4})( |$)'; Reo: [roMultiLine] ; New: '%s<a href="mailto:%s">%s</a>%s'                  ) // warning: canreintroduceitself
     // special
-    , (Itm: 'Link (classic)'    ; Exa: '[Go](www.go.it "Title")'       ; Rex: '(\[.*\])(\(.*\))'                       ; Reo: [roMultiLine] ; New: '<a href="%s" title="%s">%s</a>'                  ) // %s can have   http://abc.com/def   or   /def
+    , (Itm: 'Link (classic)'    ; Exa: '[Go](www.go.it "Title")'       ; Rex: '(\[.*\])(\(.*\))'                       ; Reo: [roMultiLine] ; New: '<a href="%s" title="%s">%s</a>'                  ) // %s can have   http://wks.cloud/def   or   /def
   //, (Itm: 'Link'              ; Exa: '(www.go.it|Go|Title|*)'        ; Rex: '\(([^)]+?\|)+(.+?)\)'                   ; Reo: [roMultiLine] ; New: '<a href="%s" title="%s" target="%s">%s</a>'      )
     , (Itm: 'Link'              ; Exa: '(www.go.it|Go|Title|*)'        ; Rex: '\((http|www|\/)(.+?)\)'                 ; Reo: [roMultiLine] ; New: '<a href="%s" title="%s" target="%s">%s</a>'      )
-    , (Itm: 'Image (classic)'   ; Exa: '![Img](www.go.it/x.png)'       ; Rex: '!(\[.*\])(\(.*\))'                      ; Reo: [roMultiLine] ; New: '<img src="%s" alt="%s">'                         ) // %s can have   http://abc.com/def   or   /def
+    , (Itm: 'Image (classic)'   ; Exa: '![Img](www.go.it/x.png)'       ; Rex: '!(\[.*\])(\(.*\))'                      ; Reo: [roMultiLine] ; New: '<img src="%s" alt="%s">'                         ) // %s can have   http://wks.cloud/def   or   /def
   //, (Itm: 'Image'             ; Exa: '[/img/a.png|alt|w|h|card|torn]'; Rex: '\[(.+?\|)+(.+?)\]'                      ; Reo: [roMultiLine] ; New: '<img src="%s" alt="%s">'                         )
     , (Itm: 'Image'             ; Exa: '[/img/a.png|alt|w|h|card|torn]'; Rex: '\[(http|www|\/)(.+?)\]'                 ; Reo: [roMultiLine] ; New: '<img src="%s" alt="%s">'                         )
     // fenced
@@ -3358,7 +3371,7 @@ type
   TMjrRec = record // memberjobrole --> enum?
   const
     ROLE_SYSTEM                = 'System'       ; // 9
-    ROLE_ARCHITECT             = 'Architect    '; // 8
+    ROLE_ARCHITECT             = 'Architect'    ; // 8
     ROLE_ADMINISTRATOR         = 'Administrator'; // 7
     ROLE_EXECUTIVE             = 'Executive'    ; // 6
     ROLE_HEAD                  = 'Head'         ; // 5
@@ -3460,8 +3473,8 @@ type
     Password: string;                                                     // secret
     Email   : string;                                                     // wks@wks.cloud
   public
-    class function  Info   : string; static;                              // giarussi@zbook.domain
-    class function  Info2  : string; static;                              // OsUser: giarussi@zbook.domain   Lan: 127.0.0.0   Wan: 127.0.0.0
+    class function  Info   : string; static;                              // puppadrillo@zbook.domain
+    class function  Info2  : string; static;                              // OsUser: puppadrillo@zbook.domain   Lan: 127.0.0.0   Wan: 127.0.0.0
     class function  Domain : string; static;                              // WKS
     class function  Host   : string; static;                              // PHOBOS (computername)
     class function  OsLogin: string; static;                              // puppadrillo
@@ -3515,7 +3528,7 @@ type
 
     // detail
     ObjectId       : integer; // FldObjectId
-    Www            : string;  // www.abc.com
+    Www            : string;  // www.wks.cloud
     Phone          : string;
     Email          : string;
     About          : string;
@@ -3534,7 +3547,7 @@ type
     function  InitByWww(IvWww: string; var IvFbk: string): boolean;                                                      // use "www.organization.com" to select the organization (in isapi servers it is a convenient way to get the organame = sitename)
     function  TreeDir(IvOrganization: string = ''): string;                                                              // Root/Organization/W
     function  TreePath(IvOrganization: string = ''): string;                                                             // Root/Organization/W/Wks
-    function  HttpWww: string;                                                                                           // http(s)://www.abc.com
+    function  HttpWww: string;                                                                                           // http(s)://www.wks.cloud
     function  HomePath: string;                                                                                          // C:\$Org\W\Wks
     function  LogoFile{Spec}: string;                                                                                    // C:\$Org\W\Wks\WksLogo.png
     function  LogoLongFile{Spec}: string;                                                                                // C:\$Org\W\Wks\WksLogoLong.png
@@ -4153,6 +4166,35 @@ type
     procedure SaveToFile(IvFile: string);                                                                                        //
   end;
 
+  TSesRec = record // [B] session (same object for web/win clients, it exists if user is logged in or not, a session may contains several requests)
+    DateTimeBegin  : TDateTime;
+    DateTimeEnd    : TDateTime; // for browser it might not exist since the user rarely will explicitly logoff from a website
+    Kind           : string;    // Web|Win|Android|Apple
+    SessionId      : cardinal;  //
+    FingerprintId  : cardinal;  // clientpcfingherprint   via js for browser and not implemented for winclients (may exceed integer range ence string!
+    IpLan          : string;    // clientaddr             possible for browser and winclients
+    Domain         : string;    // clientdomain           impossible with recent browsers, possible for winclients
+    Computer       : string;    // clientcomputer         idem
+    OsLogin        : string;    // clientoslogin          idem
+    Client         : string;    // clientapp              browsername or winclientname
+    Version        : string;    // clientversion          useless for browser ok for winclients
+    Server         : string;    // serverhost             browser or winclient contact this server(web)
+    Organization   : string;    // loginorganization      supplied during login in browser or winclients
+    Username       : string;    // loginusername          idem
+  public
+    function  Info: string;
+    function  Exists(IvDateTimeBegin: TDateTime; IvIpLan: string; IvSessionId: integer; var IvFbk: string): boolean;
+    function  IsValid(var IvFbk: string): boolean; // user is authenticated and is loggedin
+    procedure Reset;
+    function  Init(IvKind: string; IvSessionId, IvFingerprintId: cardinal; IvIpLan, IvDomain, IvComputer, IvOsLogin, IvClient, IvVersion, IvServer, IvOrganization, IvUsername: string; var IvFbk: string): boolean;
+    function  Insert(var IvFbk: string): boolean;
+    function  InsertRio(var IvFbk: string): boolean;
+    function  Select(var IvFbk: string): boolean;
+    function  Update(var IvFbk: string): boolean; // set FldOrganization and FldUsername
+    function  Close(var IvFbk: string): boolean;  // set FldDateTimeEnd
+    function  CloseRio(var IvFbk: string): boolean;
+  end;
+
   {$REGION 'TSmtRe*'}
   TSmtRem = class(TRemotable)
   private
@@ -4190,7 +4232,7 @@ type
   TSopRec = record // soap
   const
     SOAP_FIX_VALUE                         = '<Value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xsd:string"></Value>';
-    SOAP_URL                               = 'http://%s';                                                    // %s=website:port (localhost, www.abc.com)
+    SOAP_URL                               = 'http://%s';                                                    // %s=website:port (localhost, www.wks.cloud)
     SOAP_DLL_URL                           =          '/Wks%sSoapProject.dll';                               // %1=Xxx
     SOAP_WSDL_PUBLISH_URL                  =                               '/soap/IWSDLPublish';             // ?
     SOAP_DATAMODULE_URL                    =                               '/soap/I%sSoap%sDataModule';      // %1=Xxx, %2=Main (IvObj, ivservice=Main as a default)
@@ -4385,46 +4427,6 @@ type
     class function ExePath(IvName: string): string; static;
   end;
 
-  TTxtRec = record // text
-  public                                                                                            // count all kinds of charcters in a memo
-    class function  TxtCharsFrequency(IvText: TStrings; var IvDigits{, IvNumbers}, IvLetters, IvLowers, IvUppers, IvPucts, IvSeps, IvSymbols, IvWhites: integer; var IvFbk: string): boolean; static;
-    class function  TxtWordCount(IvText: TStrings; IvWord: string): integer; static;
-    class function  TxtWordFirst(IvText: TStrings): string; static;
-    class function  TxtWordDensity(IvText: TStrings; IvWord: string): single; static;
-    class function  TxtWordsCount(IvText: TStrings): integer; static;                                             // returns how many words are in the given text
-    class function  TxtWordsVector(IvText: TStrings; var IvStringVector: TStringVector): integer; static;         // returns all words in a vector
-    class function  TxtWordsDistinctVector(IvText: TStrings; var IvStringVector: TStringVector): integer; static; // returns all distinct words in a vector
-    class function  TxtWordsFrequencyVector(IvText: TStrings; var IvKvv: TKvaRecVec): integer; static;            // returns all distinct words + frequencies in a vector
-  end;
-
-  TWseRec = record // session (it exists if user is logged in or not, a session contains several requests)
-    DateTimeBegin  : TDateTime;
-    DateTimeEnd    : TDateTime; // for browser websessions it might not exixst since the user rarely will explicitly logoff a website
-    Kind           : string;    // Web|Win|Android|Apple
-    SessionId      : cardinal;  //
-    FingerprintId  : cardinal;  // clientpcfingherprint   via js for browser and not implemented for winclients (may exceed integer range ence string!
-    IpLan          : string;    // clientaddr             possible for browser and winclients
-    Domain         : string;    // clientdomain           impossible with recent browsers, possible for winclients
-    Computer       : string;    // clientcomputer         idem
-    OsLogin        : string;    // clientoslogin          idem
-    Client         : string;    // clientapp              browsername or winclientname
-    Version        : string;    // clientversion          useless for browser ok for winclients
-    Server         : string;    // serverhost             browser or winclient contact this server(web)
-    Organization   : string;    // loginorganization      supplied during login in browser or winclients
-    Username       : string;    // loginusername          idem
-  public
-    function  Info: string;
-    function  Exists(IvDateTimeBegin: TDateTime; IvSessionId: integer; var IvFbk: string): boolean;
-    function  IsValid(var IvFbk: string): boolean; // userisloggedin because it is authenticated
-    function  Init(IvKind: string; IvSessionId, IvFingerprintId: cardinal; IvIpLan, IvDomain, IvComputer, IvOsLogin, IvClient, IvVersion, IvServer, IvOrganization, IvUsername: string; var IvFbk: string): boolean;
-    function  Insert(var IvFbk: string): boolean;
-    function  InsertRio(var IvFbk: string): boolean;
-    function  Select(var IvFbk: string): boolean;
-    function  Update(var IvFbk: string): boolean; // set FldUsername
-    function  Close(var IvFbk: string): boolean;  // set FldDateTimeEnd
-    function  CloseRio(var IvFbk: string): boolean;
-  end;
-
   TSygRec = record // syneditglobalsearch (should be saved to the ini/registry)
     SearchText     : string ;
     SearchHistory  : string ;
@@ -4505,15 +4507,15 @@ type
     AUTHOR                 = 'puppadrillo';
     ACRONYM                = 'WKS';
     NAME                   = 'Working Knowledge System';
-    DESCRIPTION            = 'Cloud integrated knowledge management system';
-  //COPYRIGHT              = '© 2010-present Wks';
+    DESCRIPTION            = 'Cloud integrated and unified knowledge management system';
+  //COPYRIGHT              = '© 2010-present WKS';
     SLOGAN                 = 'Programmed for progress';
     WWW                    = 'www.wks.cloud';
-    PHONE                  = '348/5904744';
+    PHONE                  = '+39 351 3320036';
     EMAIL                  = 'info@wks.cloud';
     // admins
-    ADMIN_EMAIL_CSV        = 'giarussi@yahoo.com';
-    ADMIN_PHONE_CSV        = '+39 348 5904744';
+    ADMIN_EMAIL_CSV        = 'puppadrillo@wks.cloud';
+    ADMIN_PHONE_CSV        = '+39 351 3320036';
     // paths
     HOME_PATH              = 'C:\$\X\Win32\Debug';
     INC_PATH               = 'C:\$Inc';
@@ -4522,6 +4524,7 @@ type
     LOGO_LONG_URL          = '/Organization/W/Wks/WksLogoLong.png';                                    // use LogoLongGraphic
     ICON_URL               = '/Organization/W/Wks/WksIcon.ico';
     // options
+    CSS_FRAMEWORK          = {read from db or }DEF_WEB_FRAMEWORK;
     URL_CHECK              = true;
     // files
   //FILE_VEC: array [0..2] of string = ('C:\$Inc\wks\wks.js' , 'C:\$Inc\wks\wks.css' , 'C:\$\X\Win32\Debug\Default.htm');
@@ -4574,10 +4577,11 @@ end;
   const
     // theme
     THEME_DEF               = 'black'              ; // guithemename
+    STATE_DEF               = 'Active'             ; // state
     GRADE_DEF               = 'w3-theme'           ; // see: TW3fRec w3-theme-<color>.css
     FONT_FAMILY_DEF         = 'Verdana'            ; // Verdana, sans-serif
     FONT_WEIGHT_DEF         = '500'                ; // 500..900
-    SIZE_CLASS_DEF          = ''                   ; //
+    SIZE_CLASS_DEF          = 'w3-large'           ; // navsize: w3-tiny, w3-small, w3-medium, w3-large, w3-xlarge, w3-xxlarge, w3-xxxlarge, w3-jumbo
     PADDING_CLASS_DEF       = 'w3-padding-x-large' ; //
     BORDERED_CLASS_DEF      = ''                   ; //
     HIGHLIGHTJS_THEME_DEF   = 'agate'              ; // highlightjsthemename
@@ -4602,6 +4606,7 @@ end;
     // identity
     ObjectId          : integer;
     Theme             : string;
+    State             : string;
     Grade             : string;
     // webframwork
   //Framework         : TWebFrameworkEnum;
@@ -4640,6 +4645,7 @@ end;
   private
     FObjectId          : integer;
     FTheme             : string;
+    FState             : string;
     FGrade             : string;
     FFontFamily        : string;
     FFontWeight        : string;
@@ -4657,8 +4663,9 @@ end;
     FSuccessColor      : string;
   published
     property ObjectId          : integer       read FObjectId           write FObjectId          ;
-    property Grade             : string        read FGrade              write FGrade             ;
     property Theme             : string        read FTheme              write FTheme             ;
+    property State             : string        read FState              write FState             ;
+    property Grade             : string        read FGrade              write FGrade             ;
     property FontFamily        : string        read FFontFamily         write FFontFamily        ;
     property FontWeight        : string        read FFontWeight         write FFontWeight        ;
     property SizeClass         : string        read FSizeClass          write FSizeClass         ;
@@ -4681,6 +4688,18 @@ end;
   public
     procedure Init;
     function  ElapsedMs: cardinal;
+  end;
+
+  TTxtRec = record // text
+  public                                                                                            // count all kinds of charcters in a memo
+    class function  TxtCharsFrequency(IvText: TStrings; var IvDigits{, IvNumbers}, IvLetters, IvLowers, IvUppers, IvPucts, IvSeps, IvSymbols, IvWhites: integer; var IvFbk: string): boolean; static;
+    class function  TxtWordCount(IvText: TStrings; IvWord: string): integer; static;
+    class function  TxtWordFirst(IvText: TStrings): string; static;
+    class function  TxtWordDensity(IvText: TStrings; IvWord: string): single; static;
+    class function  TxtWordsCount(IvText: TStrings): integer; static;                                             // returns how many words are in the given text
+    class function  TxtWordsVector(IvText: TStrings; var IvStringVector: TStringVector): integer; static;         // returns all words in a vector
+    class function  TxtWordsDistinctVector(IvText: TStrings; var IvStringVector: TStringVector): integer; static; // returns all distinct words in a vector
+    class function  TxtWordsFrequencyVector(IvText: TStrings; var IvKvv: TKvaRecVec): integer; static;            // returns all distinct words + frequencies in a vector
   end;
 
   TUomRec = record
@@ -4751,7 +4770,7 @@ end;
     Password     : string  ;
     AvatarGraphic: TGraphic;
     State        : string  ; // *** can be set only by a user with Admin role ***
-  //LoggedIn     : boolean ; // normalfalse, set to true after a successful authentication (if given username and password correspond with those into the database)
+  //LoggedIn     : boolean ; // false by default, set to true only after a successful authentication *** not reliable, dismissed ***
   public
     function  Info: string;                                                         // fcbiarussi@wks
     procedure Free;
@@ -4764,8 +4783,7 @@ end;
     function  IsActiveRio(IvUsername: string; var IvFbk: string): boolean;
     function  IsAuthenticated(IvUsername, IvPassword: string; var IvFbk: string): boolean;
     function  IsAuthenticatedRio(IvUsername, IvPassword: string; var IvFbk: string): boolean;
-  //function  HasValidSession(IvUsername: string; var IvFbk: string): boolean;      // user was successfully authenticated in the web or windows client
-    function  IsLoggedIn: boolean;                                                  // = HasValidSession() = gwse.IsValid(fbk)
+  //function  IsLoggedIn: boolean;                                                  // = gses.IsValid(fbk)  *** duplicate function, dismissed ***
     function  HomePath: string;                                                     // C:\$Per\I\IarussiFedericoCarloBrian
     function  AvatarFile: string;                                                   // C:\$Per\I\IarussiFedericoCarloBrian\IarussiFedericoCarloBrian_Avatar.png | fcbiarussi_Avatar.png
     function  HomeUrl(IvUrlAbsolute: boolean = false): string;                      // /Person/I/IarussiFedericoCarloBrian
@@ -4943,7 +4961,7 @@ end;
   TWrqRec = record // webrequest
     WebRequestOrig: TWebRequest; // original web request
     FingerprintId : cardinal   ; // remove
-    SessionId     : cardinal   ; // remove, already in TWseRec
+    SessionId     : cardinal   ; // remove, already in TSesRec
     RequestId     : cardinal   ; // remove
     PageId        : integer    ; // remove
     DateTime      : TDateTime  ; // onclient
@@ -5068,14 +5086,14 @@ var
 
   // globalrecordscontextweb(isapi)
   gwsi: TWsiRec;                   // website    (www and url copied from TWrqRec)
-  gwse: TWseRec;                   // websession (can be from browser or from a winclient and is the container of several webrequests)
   gwrq: TWrqRec;                   // webrequest (*** CAGNOLINA ***)
 
   // globalrecordsbusinessobjects
   gper: TPerRec;                   // personstuff        [B] *** WARNING, contains Image, PictureGraphic that need to be free ***
   gusr: TUsrRec;                   // userstuff          [B] *** WARNING, contains AvatarGraphic that need to be free ***
+  gses: TSesRec;                   // session            [B]     user-session can be from browser or from a winclient and is the container of several web/win requests
   gorg: TOrgRec;                   // organization stuff [B] *** WARNING, contains Image, LogoGraphic, LogoLongGraphic that need to be free ***
-  gthe: TTheRec;                   // theme              [B]
+  gthe: TTheRec;                   // theme              [B]     font and colors for the organization brand
   gmbr: TMbrRec;                   // memberstuff        [B] *** WARNING, contains Image, BadgeGraphic that need to be free ***
 {$ENDREGION}
 
@@ -5131,7 +5149,7 @@ uses
 //, superdate                     // javatodelphidatetime
 //, MarkdownProcessor             // md, not used
 //, GraphicEx                     // used to determine a graphicclass from a stream, but not used anymore *** DANGER using it results in a not working TDBImage ***
-  , ImagingTypes                  // timagedata, vampire
+  , ImagingTypes                  // vampire, timagedata
   , Imaging                       // vampyre
   , DTDBTreeView                  // dtdbtree
   , WksSearchFormUnit             // searchform
@@ -8851,7 +8869,7 @@ begin
     if iop.StartsWith('/') then
       Delete(iop, 1, 1);
 
-    // split (dot [.] is not usable in cases like: Root/Organization/W/W3/W3.js)
+    // split (dot [.] is not usable in cases like: Root/Organization/W/w3/4.0/w3.js)
   //vec := SplitString(iop, '/');
     vec := iop.Split(['/']);
 
@@ -10317,7 +10335,7 @@ begin
 
     // torecipients (just one for now)
     if IvToCsv <> '' then
-      msg.Recipients.EMailAddresses := IvToCsv; // xxx@abc.com,yyy@abc.com
+      msg.Recipients.EMailAddresses := IvToCsv; // email@wks.cloud,email2@wks.cloud
 
     // ccrecipients
     if IvCcCsv <> '' then
@@ -10468,7 +10486,7 @@ begin
   {Result :=} EmailFromUsername(IvFbk, IvCcCsv, CcCsv);
 
   // bc
-  Result := EmailFromUsername(IvFbk, IvBcCsv, BcCsv);
+  {Result := }EmailFromUsername(IvFbk, IvBcCsv, BcCsv);
 
   // sbj
   Subject      := IvSubject;
@@ -10506,7 +10524,7 @@ end;
 
 function  TEmlRec.SendToOrgAdmin(var IvFbk: string; const IvIntent, IvSubject, IvTitle, IvContent: string; IvOrganizationLogoShow, IvSystemLogoShow, IvSaveToDba: boolean): boolean;
 begin
-  Result := Send(IvFbk, IvIntent , TSysRec.EMAIL, {gorg.EmailAdminCsv}'giarussi@yahoo.com' {*** temporary ***}, '', '', IvSubject, IvTitle, IvContent, IvOrganizationLogoShow, IvSystemLogoShow, IvSaveToDba);
+  Result := Send(IvFbk, IvIntent , TSysRec.EMAIL, {gorg.EmailAdminCsv}'puppadrillo@wks.cloud' {*** temporary ***}, '', '', IvSubject, IvTitle, IvContent, IvOrganizationLogoShow, IvSystemLogoShow, IvSaveToDba);
 end;
 
 function  TEmlRec.SendI(var IvFbk: string; const IvToCsv, IvCcCsv, IvBcCsv, IvSubject, IvTitle, IvContent: string; IvOrganizationLogoShow, IvSystemLogoShow, IvSaveToDba: boolean): boolean;
@@ -11747,15 +11765,15 @@ begin
 
   // +useratorgainfo
   if not gusr.Info.IsEmpty then
-    cap := cap + Format(' - %s', [gusr.Info]);                                // WKS Python Editor - osusername@ospcname.osdomain - giarussi@WKS
+    cap := cap + Format(' - %s', [gusr.Info]);                                // WKS Python Editor - osusername@ospcname.osdomain - puppadrillo@WKS
 
   // +appserverinfo
   if not gaps.Info.IsEmpty then
-    cap := cap + Format(' - %s', [gaps.Info]);                                // WKS Python Editor - osusername@ospcname.osdomain - giarussi@WKS - server www.wks.cloud
+    cap := cap + Format(' - %s', [gaps.Info]);                                // WKS Python Editor - osusername@ospcname.osdomain - puppadrillo@WKS - server www.wks.cloud
 
   // +sessioninfo
-  if not gwse.Info.IsEmpty then
-    cap := cap + Format(' - %s', [gwse.Info]);                                // WKS Python Editor - osusername@ospcname.osdomain - giarussi@WKS - server www.wks.cloud - winsession 123456
+  if not gses.Info.IsEmpty then
+    cap := cap + Format(' - %s', [gses.Info]);                                // WKS Python Editor - osusername@ospcname.osdomain - puppadrillo@WKS - server www.wks.cloud - winsession 123456
 
   // form
   IvForm.Caption := cap;
@@ -12334,14 +12352,16 @@ end;
 
 class function  THtmRec.Img(IvSrc, IvAlt: string; IvW, IvH: integer; IvIsCard: boolean; IvTorn: TImgTormEnum{, IvClass, IvStyle: string}): string;
 var
-  a, w, h, c: string;
+  a, w, h, c, clk: string;
 begin
-  if not IvAlt.IsEmpty then a := Format(' alt="%s"'     , [IvAlt]);
-  if IvW > 0           then w := Format(' width="%dpx"' , [IvW  ]);
-  if IvH > 0           then h := Format(' height="%dpx"', [IvH  ]);
+  if not IvAlt.IsEmpty then a := Format(' alt="%s"'           , [IvAlt]);
+  if IvW > 0           then w := Format('style="width:%dpx;"' , [IvW  ]); // ' width="%d"'  no px, not ideal
+  if IvH > 0           then h := Format('style="height:%dpx;"', [IvH  ]); // ' height="%d"' no px, not ideal
   if IvIsCard          then c := ' w3-card-4';
 
-  Result := Format('<img class="w3-image%s" onclick="wksImageModalViewerShow(this);" src="%s"%s%s%s>', [c, IvSrc, a, w, h]);
+  if not True then clk := ' onclick="wksImageModalViewerShow(this);"' else clk := '';
+
+  Result := Format('<img class="w3-image%s"%s src="%s"%s%s%s>', [c, clk, IvSrc, a, w, h]);
 
        if IvTorn = itBottom    then Result := Format('<div class="w3-shadow"><div class="w3-torn-bot">%s</div></div>'    , [Result])
   else if IvTorn = itTopBottom then Result := Format('<div class="w3-shadow"><div class="w3-torn-top-bot">%s</div></div>', [Result])
@@ -13349,6 +13369,55 @@ begin
   end;
 end;
 
+class function THtmRec.TableFromSql2(IvSql, IvHtmlDefault, IvClass, IvStyle: string; IvEditable: boolean; IvEditJson: string; IvDir: THvDirEnum; IvDsRecordCountOff, IvDsHeaderOff: boolean): string;
+var
+  qry: TADOQuery;
+  sql: string;
+  aff, i: integer;
+  dst: TADODataSet;
+begin
+  qry := TADOQuery.Create(nil);
+  dst := TADODataSet.Create(nil);
+  try
+    // init
+    qry.ConnectionString := TDbaRec.DBA_CONN_STR;
+    sql := grva.Rva(IvSql);
+    qry.SQL.Text := sql;
+
+    // executes then move to the first recordset
+    qry.Open;
+
+    // dstfirst
+    dst.Recordset := qry.Recordset;
+
+    // rstloop
+    i := 0;
+    Result := '';
+    repeat
+      Inc(i);
+
+      // dstscan
+    //while not dst.eof do begin
+      //for i := 0 to dst.Fields.Count - 1 do
+          //FieldValue := dst.Fields[I].Value; // or dst.Fields['Field'].Value
+      //dst.MoveNext;
+    //end;
+
+      // dsttotable
+      Result := Result
+              + '<br><br><br>'
+            //+ Format('<div>Resutlset #%d</div>', [i])
+              + TableFromDs(dst, IvHtmlDefault, IvClass, IvStyle, IvEditable, IvEditJson, IvDir, IvDsRecordCountOff, IvDsHeaderOff);
+
+      // dstnext
+      dst.Recordset := qry.NextRecordset(aff);
+    until not Assigned(dst.Recordset);
+  finally
+    dst.Free;
+    qry.Free;
+  end;
+end;
+
 class function  THtmRec.RepeatFromDs(IvDs: TDataSet; IvHtmlBody, IvHtmlHeader, IvHtmlFooter, IvHtmlDefault: string): string;
 var
   i, rid, rto: integer;  // rowid, rowtotal
@@ -13733,10 +13802,17 @@ begin
       sql := params_replace(dve[j].Select, pve);
 
       // table
-      dsh := TableFromSql(sql, dve[j].FeedbackIfEmpty, dve[j].Classs, dve[j].Style, dve[j].Editable, dve[j].Json, ddi, rer.DsRecordCountOff, rer.DsHeaderOff);
+      dsh := TableFromSql2(sql, dve[j].FeedbackIfEmpty, dve[j].Classs, dve[j].Style, dve[j].Editable, dve[j].Json, ddi, rer.DsRecordCountOff, rer.DsHeaderOff);
+
+      // oppure
+      // ritornare un vettore di ds da
+      // ok := TDbaRec.DsFromSqlMulty(IvSql, dstvec, fbk, false); <-- da fare, probabilmente buono anche in altre occasioni
+      // luppare dstvec
+      // for i := low(dstvec) to high(dstvec) do
+      // dsh := dsh + '<br><br><br>' + TableFromDs(dstvec[i]);
 
       // sqlfbkifadmin
-      if {gwse.IsValid(fbk) and} gmbr.IsAdmin and (not rer.DsRecordCountOff) then begin
+      if {*** call is local to the server ***} {and gses.IsValid(fbk) and} gmbr.IsAdmin and (not rer.DsRecordCountOff) then begin
       con := TNamRec.Co('Sql%dModal', [j]);
       dsh := dsh
       + sLineBreak + ModalBtn('Sql', con, Code(sql, 'sql'), H(2, Format('Sql %d', [j])), BtnStd('Close', 0, con), fmInfo);
@@ -13792,7 +13868,7 @@ begin
   rah := rsb.Text;
 
   // profilerfbkifadmin
-  if {gwse.IsValid(fbk) and} gmbr.IsAdmin and (not rer.DsRecordCountOff) then begin
+  if {*** call is local to the server ***} {and gses.IsValid(fbk) and} gmbr.IsAdmin and (not rer.DsRecordCountOff) then begin
   con := TNamRec.Co('ProfilerModal');
   rah := rah
   + sLineBreak + ModalBtn('Profiler', con, Code(gpro.OutputTextTimers(tiAll)), H(2, 'Profiler results'), BtnStd('Close', 0, con), fmInfo);
@@ -13940,15 +14016,15 @@ var
   {$REGION 'macro'}
   function  LogoSizePx: string;
   begin                                                          // font-size (px)
-         if gthe.SizeClass = 'w3-tiny'     then Result := '31'   // 10 *** DA RIVEDERE ***
-    else if gthe.SizeClass = 'w3-small'    then Result := '30'   // 12     ok
-    else if gthe.SizeClass = 'w3-medium'   then Result := '38.5' // 15 *** DA RIVEDERE ***
-    else if gthe.SizeClass = 'w3-large'    then Result := '43'   // 18 *** DA RIVEDERE ***
-    else if gthe.SizeClass = 'w3-xlarge'   then Result := '52'   // 24 *** DA RIVEDERE ***
-    else if gthe.SizeClass = 'w3-xxlarge'  then Result := '70'   // 36 *** DA RIVEDERE ***
-    else if gthe.SizeClass = 'w3-xxxlarge' then Result := '88'   // 48 *** DA RIVEDERE ***
-    else if gthe.SizeClass = 'w3-jumbo'    then Result := '112'  // 64 *** DA RIVEDERE ***
-    else                                        Result := '35';  // 12     ok plain nav-bar, with empty gthe.SizeClass
+         if gthe.SizeClass = 'w3-tiny'     then Result := '27'   // 10
+    else if gthe.SizeClass = 'w3-small'    then Result := '30'   // 12
+    else if gthe.SizeClass = 'w3-medium'   then Result := '35'   // 15 default
+    else if gthe.SizeClass = 'w3-large'    then Result := '39'   // 18
+    else if gthe.SizeClass = 'w3-xlarge'   then Result := '48'   // 24
+    else if gthe.SizeClass = 'w3-xxlarge'  then Result := '64'   // 36
+    else if gthe.SizeClass = 'w3-xxxlarge' then Result := '84'   // 48
+    else if gthe.SizeClass = 'w3-jumbo'    then Result := '105'  // 64
+    else                                        Result := '35';  // 12
   end;
 
   function  ItemAdd(IvKind{Link|Button|(Caption)}, IvHref, IvCaption, IvTitle: string; IvClass: string = 'w3-bar-item'; IvStyle: string = ''; IvImg: string = ''): string;
@@ -13986,7 +14062,7 @@ var
   var
     aun: boolean; // authenticationneeded
     hss, bit, fle, sel, cap, tit: string; // hideonsmallornot, baritem, floatleft, selected, caption
-    cnt, cn2: integer;
+    jgm, cnt, cn2: integer; // jobgrademin
   begin
     hss := giif.Str(IvHideOnSmallScreen, ' w3-hide-small', '');
     bit := giif.Str(IvHideOnSmallScreen, '', ' w3-bar-item');
@@ -13994,9 +14070,15 @@ var
 
     dst.First;
     while not dst.Eof do begin
-      // skip
+      // skip for not user's valid session (user is not logged in, authentication has not been performed)
       aun := dst.FieldByName('FldAuthenticationNeeded').AsBoolean;
-      if aun and not gwse.IsValid(fbk) then begin
+      if aun and not gses.IsValid(fbk) then begin
+        dst.Next;
+        Continue
+      end;
+      // skip for member's js not equal or above  jgminimum
+      jgm := dst.FieldByName('FldJobGradeMin').AsInteger;
+      if gmbr.JobGrade < jgm then begin
         dst.Next;
         Continue
       end;
@@ -14023,9 +14105,26 @@ var
   sbu.Add(    ItemAdd('B', url, cap+' <i class="fa fa-caret-down"></i>', tit, hss+sel+bit+' '+gthe.PaddingClass{, 'float:left;'}));
   sbu.Add(    '<div class="w3-dropdown-content w3-bar-block w3-card-4">');
           while not ds2.Eof do begin
+            // skip for not user's valid session (user is not logged in, authentication has not been performed)
+            aun := ds2.FieldByName('FldAuthenticationNeeded').AsBoolean;
+            if aun and not gses.IsValid(fbk) then begin
+              ds2.Next;
+              Continue
+            end;
+            // skip for member's js not equal or above  jgminimum
+            jgm := ds2.FieldByName('FldJobGradeMin').AsInteger;
+            if gmbr.JobGrade < jgm then begin
+              ds2.Next;
+              Continue
+            end;
+
+            // zip
             cn2 := ds2.FieldByName('FldChildCount').AsInteger;
             ur2 := Format('/%s?CoId=%d', [TBynRec.BinaryNameExt, ds2.FieldByName('FldId').AsInteger]); // /Page
-            cap := ds2.FieldByName('FldTitle').AsString; if cap.IsEmpty then cap := TStrRec.StrExpand(ds2.FieldByName('FldObject').AsString);
+            cap := ds2.FieldByName('FldTitle').AsString;
+            if cap.IsEmpty then
+              cap := TStrRec.StrExpand(ds2.FieldByName('FldObject').AsString);
+            tit := dst.FieldByName('FldTitle').AsString;
 
             // nochilds
             if cn2 = 0 then begin
@@ -14087,8 +14186,11 @@ var
 begin
 
   {$REGION 'zip'}
-  ish := IvId = gorg.HomePageId;
-  idi := giif.Int(ish, IvId, IvPId);
+  if IvId = -1 then
+    ish := true
+  else
+    ish := IvId = gorg.HomePageId;
+  idi := giif.Int(ish, gorg.HomePageId, IvPId);
   bgd := TColRec.TColIsDark(TColRec.FromHexStr(TW3fRec.W3ColorFromTheme(gthe.Theme))); // TColRec.FromHexStr(gthe.Theme)
   lgo := gorg.LogoUrl(IvUrlAbsolute, bgd);
   {$ENDREGION}
@@ -14119,7 +14221,7 @@ begin
   sbu.Add(  '<div class="w3-dropdown-hover">'                                                                                                                                   ); // orga
 //sbu.Add(    ItemAdd('B', 'wks.fbkNotImpl()', gorg.Obj.&Object, gorg.Obj.&Object, 'w3-padding-xsmall', '', lgo)                                                                ); // logo -> presentation, contacts, etc
   sbu.Add(    ItemAdd('B', ''                , gorg.Obj.&Object, gorg.Obj.&Object, 'w3-padding-xsmall', '', lgo)                                                                ); // logo -> presentation, contacts, etc
-if gorg.Obj.&Object.Equals('Wks') and gwse.IsValid(fbk) then begin
+if gorg.Obj.&Object.Equals('Wks') and gses.IsValid(fbk) then begin
   sbu.Add(    '<div class="w3-dropdown-content w3-bar-block w3-card-4">'                                                                                                        );
 //sbu.Add(      ItemAdd('B', '/WksPageIsapiProject.dll/Info'                , 'Info'    , 'Info'                 )                                                              ); // info
 //sbu.Add(      ItemAdd('B', '/WksPageIsapiProject.dll/OrganizationContacts', 'Contacts', 'Organization Contacts')                                                              ); // contacts
@@ -14138,10 +14240,10 @@ end;
       {$ENDREGION}
 
       {$REGION 'user/member'}
-    if not {gusr.LoggedIn}gwse.IsValid(fbk) then
-  sbu.Add(  ItemAdd('B', '/WksPageIsapiProject.dll/Login', '<i class="fa fa-user"></i>', 'Login', 'w3-right')                                                                   )
+    if not gses.IsValid(fbk) then
+  sbu.Add(  ItemAdd('B', '/WksPageIsapiProject.dll/Login', '<i class="fa fa-user"></i>', 'Login', 'w3-right')                                                                   )  // not logged user/member
     else begin
-  sbu.Add(  '<div class="w3-dropdown-hover w3-right">'                                                                                                                          ); // user/member
+  sbu.Add(  '<div class="w3-dropdown-hover w3-right">'                                                                                                                          ); // logged user/member
   sbu.Add(    ItemAdd('B', 'wks.fbkNotImpl()', gusr.Username, gusr.Username, 'w3-padding-xsmall', '', gusr.AvatarUrl)                                                           );
   sbu.Add(    '<div class="w3-dropdown-content w3-bar-block w3-card-4" style="right:0px">'                                                                                      );
   sbu.Add(      ItemAdd('B', '/WksPageIsapiProject.dll/Logout'      , 'Logout'  , 'Logout'  )                                                                                   );
@@ -14191,12 +14293,18 @@ end;
 
     {$ENDREGION}
 
+  if chz > 0 then begin
+
     {$REGION 'itemsonlargescreen'}
   sbu.Add(  '<!-- itemsonlargescreen -->');
   ItemsAdd(true);
     {$ENDREGION}
 
+  end;
+
   sbu.Add('</div>');
+
+  if chz > 0 then begin
 
     {$REGION 'itemsonsmallscreen'}
   sbu.Add(  '<!-- itemsonsmallscreen -->');
@@ -14205,6 +14313,7 @@ end;
   sbu.Add(  '</div>');
     {$ENDREGION}
 
+  end;
     {$ENDREGION}
 
   Result := sbu.Text;
@@ -14392,45 +14501,43 @@ begin
   sbu.Add('<meta name="keywords" content="wks, spc, mes">'                                                                   ); // keywords
   sbu.Add('<meta name="viewport" content="width=device-width, initial-scale=1.0">'                                           ); // viewport
   sbu.Add('<meta http-equiv="Cache-control" content="no-cache no-store">'                                                    ); // cache
-//  sbu.Add('<meta name="color-scheme" content="dark light">'                                                                  ); // pico theme
+//sbu.Add('<meta name="color-scheme" content="dark light">'                                                                  ); // pico theme
+
+  sbu.Add('<!-- icon -->'                                                                                                    ); // icon
+//sbu.Add('<link rel="shortcut icon" type="image/x-icon" href="%s%s" />'                                , [www, gorg.IconUrl]); // i
+  sbu.Add('<link rel="icon" type="image/x-icon" href="%s%s">'                                           , [www, gorg.IconUrl]); // ii
 
   sbu.Add('<!-- css -->'                                                                                                     ); // css
-  sbu.Add('<link rel="icon" type="image/x-icon" href="%s%s">'                                           , [www, gorg.IconUrl]); // icon
-//sbu.Add('<link rel="shortcut icon" type="image/x-icon" href="%s%s" />'                                , [www, gorg.IconUrl]); // icon
-  sbu.Add('<link rel="stylesheet" href="%s/Include/font-awesome/4.7.0/css/font-awesome.css">'                         , [www]); // fonts fa
-//sbu.Add('<link rel="stylesheet" href="%s/Include/font-awesome/4.7.0/css/font-awesome-readable.css">'                , [www]); // fonts fa
-  sbu.Add('<link rel="stylesheet" href="%s://fonts.googleapis.com/css?family=%s">'         , [gwrq.Protocol, gthe.FontFamily]); // fonts google
-  sbu.Add('<link rel="stylesheet" href="%s/Include/highlight.js/11.7.0/styles/%s.min.css">'         , [www, gthe.HighlightJs]); // highlightjs theme
+  sbu.Add('<link rel="stylesheet" href="%s/Include/F/font-awesome/4.7.0/css/font-awesome.css">'                       , [www]); // fonts fa
+//sbu.Add('<link rel="stylesheet" href="%s/Include/F/font-awesome/4.7.0/css/font-awesome.min.css">'                   , [www]); // fonts fa
+//sbu.Add('<link rel="stylesheet" href="%s://fonts.googleapis.com/css?family=%s">'         , [gwrq.Protocol, gthe.FontFamily]); // fonts google (not good for intranets)
+  sbu.Add('<link rel="stylesheet" href="%s/Include/H/highlight.js/11.7.0/styles/%s.min.css">'       , [www, gthe.HighlightJs]); // highlightjs theme
 
   sbu.Add('<!-- js -->'                                                                                                      ); // js
 //sbu.Add('<!--script src="https://unpkg.com/htmx.org"></script-->'                                                          ); // htmx
-  sbu.Add('<script src="%s/Include/jquery/3.7.0/jquery-3.7.0.js"></script>'                                           , [www]); // jquery
-  sbu.Add('<script src="%s/Include/canvasjs/1.9.6/canvasjs.min.js"></script>'                                         , [www]); // graph (nowatermark)
-  sbu.Add('<script src="%s/Include/highlight.js/11.7.0/highlight.min.js"></script>'                                   , [www]); // highlight
+  sbu.Add('<script src="%s/Include/J/jquery/3.7.0/jquery-3.7.0.js"></script>'                                         , [www]); // jquery
+  sbu.Add('<script src="%s/Include/C/canvasjs/1.9.6/canvasjs.min.js"></script>'                                       , [www]); // graph (nowatermark)
+  sbu.Add('<script src="%s/Include/H/highlight.js/11.7.0/highlight.min.js"></script>'                                 , [www]); // highlight
   sbu.Add('<script>hljs.highlightAll();</script>'                                                                            ); // highlight
 
-//case gthe.Framework of                                                                                                        // frameworks
-//wfW3 : begin
-  sbu.Add('<!-- w3 -->'                                                                                                      ); // w3
-  sbu.Add('<link rel="stylesheet" href="%s/Include/w3/w3.css">'                                                       , [www]); // w3css (https://www.w3schools.com/w3css/4/w3.css write cookies!)
-  sbu.Add('<link rel="stylesheet" href="%s/Include/w3/w3-theme-%s.css">'                                  , [www, gthe.Theme]); // w3csstheme
-  sbu.Add('<script src="%s/Include/w3/w3.js"></script>'                                                               , [www]); // w3js
-  sbu.Add('<script src="%s/Include/w3/w3color.js"></script>'                                                          , [www]); // w3colorjs
-//end;
-//wfPico : begin
-//  sbu.Add('<link rel="stylesheet" href="/Include/pico/2.0.6/css/pico.pumpkin.css">'                                          ); // pico theme
-//  sbu.Add('<link rel="stylesheet" href="/Include/pico/2.0.6/css/pico.colors.css">'                                           ); // pico ???
-//end;
-//wfBs : begin
-//sbu.Add('<!-- bootstrap -->'                                                                                               ); // bootstrap
-//sbu.Add('<link rel="stylesheet" href="%s/Include/bootstrap/5.3.0/css/bootstrap.css">'                               , [www]); // bscss
-//sbu.Add('<script src="%s/Include/bootstrap/5.3.0/js/bootstrap.js"></script>'                                        , [www]); // bsjs
-//end;
-//end;
+case TSysRec.CSS_FRAMEWORK of                                                                                                   // webframeworks
+  wfW3Css : begin
+  sbu.Add('<!-- w3css -->'                                                                                                   ); // w3
+  sbu.Add('<link rel="stylesheet" href="%s/Include/W/w3/4.0/w3.css">'                                                 , [www]); // w3css (https://www.w3schools.com/w3css/4/w3.css write cookies!)
+  sbu.Add('<link rel="stylesheet" href="%s/Include/W/w3/4.0/w3-theme-%s.css">'                            , [www, gthe.Theme]); // w3csstheme
+  sbu.Add('<script src="%s/Include/W/w3/4.0/w3.js"></script>'                                                         , [www]); // w3js
+  sbu.Add('<script src="%s/Include/W/w3/4.0/w3color.js"></script>'                                                    , [www]); // w3colorjs
+  end;
+  wfPicoCss : begin
+  sbu.Add('<!-- picocss -->'                                                                                                 ); // pico
+  sbu.Add('<link rel="stylesheet" href="/Include/pico/2.0.6/css/pico.pumpkin.css">'                                          ); // pico theme
+  sbu.Add('<link rel="stylesheet" href="/Include/pico/2.0.6/css/pico.colors.css">'                                           ); // pico colors
+  end;
+end;
 
   sbu.Add('<!-- wks -->'                                                                                                     ); // wks
-//sbu.Add('<link rel="stylesheet" href="%s/Include/wks/wks.css">'                                                     , [www]); // wkscss *** prefer to use extensions in w3-theme*.css ***
-  sbu.Add('<script src="%s/Include/wks/wks.js"></script>'                                                             , [www]); // wksjs
+  sbu.Add('<link rel="stylesheet" href="%s/Include/W/wks/wks.css">'                                                   , [www]); // wkscss (global stuff like fonts etc.)
+  sbu.Add('<script src="%s/Include/W/wks/wks.js"></script>'                                                           , [www]); // wksjs  (global... import the *ms.js)
 
   // pluginsbefore
   sbu.Add('<!--[RvPluginsBefore]-->'); // this tag will be replaced at the very end (webmodule.afterdispatch) with all plugins scripts needed by the builded page
@@ -14440,17 +14547,17 @@ if not IvPage.Head.Trim.IsEmpty then begin
   sbu.Add(IvPage.Head.Trim                                                                                                   );
 end;
 
-  sbu.Add('<!-- css -->'                                                                                                     ); // pagecss default
-  sbu.Add('<style>'                                                                                                          );
-  sbu.Add('html, body {'                                                                                                     );
-  sbu.Add('  font-family: %s, sans-serif !important'                                                      , [gthe.FontFamily]);
-  sbu.Add('}'                                                                                                                );
-  sbu.Add('h1,h2,h3,h4,h5,h6 {'                                                                                              );
+//  sbu.Add('<!-- css -->'                                                                                                     ); // pagecss default
+//  sbu.Add('<style>'                                                                                                          );
+//  sbu.Add('html, body {'                                                                                                     );
+//  sbu.Add('  font-family: %s, sans-serif, monospace !important'                                           , [gthe.FontFamily]); // FONT_FAMILY_MONOSPACE
+//  sbu.Add('}'                                                                                                                );
+//  sbu.Add('h1,h2,h3,h4,h5,h6 {'                                                                                              );
 //sbu.Add('  font-family: %s, sans-serif;'                                                                , [gthe.FontFamily]);
-  sbu.Add('  font-weight: %s;'                                                                            , [gthe.FontWeight]);
-  sbu.Add('  margin: 10px 0;'                                                                                                );
-  sbu.Add('}'                                                                                                                );
-  sbu.Add('</style>'                                                                                                         );
+//  sbu.Add('  font-weight: %s;'                                                                            , [gthe.FontWeight]);
+//  sbu.Add('  margin: 10px 0;'                                                                                                );
+//  sbu.Add('}'                                                                                                                );
+//  sbu.Add('</style>'                                                                                                         );
 
 if not IvPage.Css.Trim.IsEmpty then begin
   sbu.Add('<!-- csscustom -->'                                                                                               ); // pagecss custom
@@ -14474,7 +14581,7 @@ end;
   {$ENDREGION}
 
   {$REGION 'body'}
-  sbu.Add('<body tabindex="0">'                                                                                                      ); // oncontextmenu="return false;"
+  sbu.Add('<body tabindex="0">'                                                                                              ); // oncontextmenu="return false;"
 
     {$REGION 'offcanvas'}
 //if not true then begin                                                                                                        // offcanvas
@@ -14607,7 +14714,7 @@ if not IvPage.SystemInfoOff then begin
   sbu.Add('<footer class="w3-container w3-center">'                                                                                  );
   sbu.Add(  '<p class="w3-small w3-text-gray">'                                                                                      ); // sysinfo
   sbu.Add(  'Wks %s application server (%s) - %s', [gctx.WksModule.ToUpper, TAaaRec.ProcessKindAsText, DateTimetoStr(Now())], true, 0);
-  sbu.Add(  ' - orga %d - client %d - session %d - request %d', [gorg.ObjectId, gwrq.FingerprintId, gwrq.SessionId{gwse.SessionId}, gwrq.RequestId], true, 0);
+  sbu.Add(  ' - orga %d - client %d - session %d - request %d', [gorg.ObjectId, gwrq.FingerprintId, gwrq.SessionId{gses.SessionId}, gwrq.RequestId], true, 0);
   sbu.Add(  ' - elapsed time $RvElapsedMs$ ms'                                                                                       );
   sbu.Add(  '</p>'                                                                                                                   );
   sbu.Add(  '<p class="w3-small w3-text-gray">'                                                                                      ); // poweredby
@@ -14715,7 +14822,7 @@ end;
 
 class function  THtmRec.Page(IvId: integer; IvTitleShow, IvImageShow, IvSubTitleShow, IvTopNavOff, IvSystemInfoOff: boolean; IvUrlAbsolute: boolean): string;
 var
-  ish, isw, pas: boolean; // ishelp, iswebsite, pass
+  ish, isw, pas: boolean; // ishelp, iswebsitehome, pass
   pag: TPagRec;
   pai, fbk: string; // page with or without id
 begin
@@ -14742,8 +14849,8 @@ begin
   else if not (pag.Obj.State.Equals('Active') or pag.Obj.State.Equals('Hidden')) then
     Result := PageInfo('Not Active', Format('The requested %s is not active', [pai]))
 
-  // notloggedin (notauthenticateduser, notvalidsession)
-  else if pag.AuthenticationNeededHirerarchical and not {gusr.LoggedIn}gwse.IsValid(fbk) then
+  // notvalidsession (usernotauthenticated, usernotloggedin)
+  else if pag.AuthenticationNeededHirerarchical and not gses.IsValid(fbk) then
     Result := PageInfo('Login required.', Format('The requested %s require a logged-in user.<p>Please <a href="/WksPageIsapiProject.dll/Login" title="Login">Login</a><p>Or create a <a href="/WksPageIsapiProject.dll/AccountCreate" title="New Account">New Account</a>', [pai]))
 
   // notmemberjobgrademin
@@ -14772,6 +14879,7 @@ var
   pag: TPagRec;
 begin
   pag.Reset(true);
+//pag.Obj.Id          := IvId;
   pag.Obj.ContentKind := IvContentKind;
   pag.Obj.Title       := IvTitle;
   pag.Obj.SubTitle    := IvSubTitle;
@@ -14803,11 +14911,21 @@ end;
 class function  THtmRec.PageDefault: string;
 var
   sbu: TSbuRec;
+  wmo: string; // webmodule
 begin
-  sbu.Add('<!-- default -->');
-  sbu.Add('<b><p class="w3-big">Wks %s Application Server</p></b>', [gctx.WksModule.ToUpper]);
+  wmo := gctx.WksModule.ToUpper;
 
-  Result := Page('Default', '', sbu.Text);
+  sbu.Add('<!-- %s module default page -->', [wmo]);
+  sbu.Add('<br>');
+  sbu.Add('<p>This page is the default page of <b>Wks %s Application Server</b> ISAPI module.<p>', [wmo]);
+  sbu.Add('<p>Here is the list of available path-info API end-points:</p>');
+  sbu.Add('<br>');
+  sbu.Add('<p><i>Not implemented</i></p>');
+  sbu.Add('<br>');
+  sbu.Add('<br>');
+  // ... add here additional info, like the list of paths info
+
+  Result := Page(Format('%s module default page', [wmo]), 'Automatic default page showing module''s paths info and capabilities', sbu.Text);
 end;
 
 class function  THtmRec.PageFeedback(IvFbk: TFbkRec): string;
@@ -15130,7 +15248,7 @@ const
         + sLineBreak
         + sLineBreak + '[Common]'
         + sLineBreak + 'OptionCryptoKey='
-        + sLineBreak + 'OptionPersistRootFolder=C:\$\Persist'
+        + sLineBreak + 'OptionPersistRootFolder=C:\$Persist'
         + sLineBreak + 'OptionTempFolder=' + TEMP_PATH
         + sLineBreak + 'OptionWeekWorkOneStart=44924.7916666667'
         ;
@@ -18266,11 +18384,11 @@ begin
       Email        := dst.FieldByName('FldEmail'       ).AsString;
       About        := dst.FieldByName('FldAbout'       ).AsString;
       Slogan       := dst.FieldByName('FldSlogan'      ).AsString;
-      TGraRec.FromBlobField(LogoGraphic    , TBlobField(dst.FieldByName('FldLogo'    ))); //LogoGraphic := TPngImage.Create; //LogoGraphic.LoadFromFile('C:\$Org\W\Wks\WksLogo.png');
+      TGraRec.FromBlobField(LogoGraphic    , TBlobField(dst.FieldByName('FldLogo'    ))); //LogoGraphic := TPngImage.Create; //LogoGraphic.LoadFromFile('C:\$Org\W\Wks\WksLogo.png'); ==(1)==
       TGraRec.FromBlobField(LogoLongGraphic, TBlobField(dst.FieldByName('FldLogoLong')));
 
       // derived
-      sql := Format('select FldId from DbaPage.dbo.TblObject where FldObject = ''%s''', [Obj.&Object]);
+      sql := Format('select FldId from DbaPage.dbo.TblObject where FldObject = ''%s''', [Obj.&Object]); // select FldId from DbaPage.dbo.TblObject a inner join DbaPage.dbo.TblPage b on (b.FldObjectId = a.FldId) where a.FldObject = ''%s''
       HomePageId := TDbaRec.Scalar(sql, 0);
 
       IvFbk := Format('OrgRec loaded from database with %s data', [IvOrganization]);
@@ -18314,7 +18432,7 @@ begin
       Phone           := rem.Phone;
       Email           := rem.Email;
       Slogan          := rem.Slogan;
-    //LogoGraphic     := TPngImage.Create; LogoGraphic.LoadFromFile('C:\$Org\W\Wks\WksLogo.png');
+    //LogoGraphic     := TPngImage.Create; LogoGraphic.LoadFromFile('C:\$Org\W\Wks\WksLogo.png'); ==(1)==
     //LogoLongGraphic := TPngImage.Create; LogoLongGraphic.LoadFromFile('C:\$Org\W\Wks\WksLogoLong.png');
       TGraRec.FromByteArray(LogoGraphic    , rem.LogoBytes    );
       TGraRec.FromByteArray(LogoLongGraphic, rem.LogoLongBytes);
@@ -18487,7 +18605,6 @@ begin
 
   // detail
   ObjectId                 := 0    ;
-//Page                     := ''   ; *** removed ***
   Menu                     := ''   ;
   Popup                    := ''   ;
   Icon                     := ''   ;
@@ -18501,9 +18618,11 @@ begin
   ContainerOn              := true ;
   ContentFixed             := true ;
   Centered                 := true ;
-  ImageShow                := true ;
-  TitleShow                := false;
+  TitleShow                := true ;
+  ImageShow                := false;
   SubtitleShow             := false;
+  TopNavOff                := false;
+  SystemInfoOff            := false;
   TopSpace                 :=  0   ;
   BottomSpace              :=  0   ;
   LeftSpace                :=  0   ;
@@ -18537,7 +18656,6 @@ begin
       Reset
     else begin
       ObjectId                 := dst.FieldByName('FldObjectId'            ).AsInteger;
-    //Page                     := dst.FieldByName('FldPage'                ).AsString ; *** removed ***
       Menu                     := dst.FieldByName('FldMenu'                ).AsString ;
       Popup                    := dst.FieldByName('FldPopup'               ).AsString ;
       Icon                     := dst.FieldByName('FldIcon'                ).AsString ;
@@ -18721,7 +18839,7 @@ var
 //cod: TCodRec; // coderecord
 begin
   Result := TStrRec.StrReplace(IvThreePath, '\', '/');
-  Result := TStrRec.StrReplace(Result     , '.', '/'); // *** warning, breaks paths like Root/Organization/W/W3/W3.js ***
+  Result := TStrRec.StrReplace(Result     , '.', '/'); // *** warning, breaks paths like Root/Organization/W/w3/4.0/w3.js ***
 
   for coi in TCodRec.Vector do
     if Result.EndsWith('/' + coi.Kind, true) then begin
@@ -19132,10 +19250,10 @@ begin
   mes := TMemoryStream.Create;
   htt := TIdHTTP.Create(nil);
   try
-//    h.ProxyParams.ProxyServer   := '10.176.64.206';
+//    h.ProxyParams.ProxyServer   := '100.100.100.100';
 //    h.ProxyParams.ProxyPort     := 8080;
-//    h.ProxyParams.ProxyUsername := 'giarussi';
-//    h.ProxyParams.ProxyPassword := 'Dd00Ee11Ff';
+//    h.ProxyParams.ProxyUsername := 'puppadrillo';
+//    h.ProxyParams.ProxyPassword := 'secret';
     htt.get(IvUrl, mes);
     mes.Seek(0, soFromBeginning);
     if          ext = '.gif' then begin
@@ -20131,7 +20249,7 @@ var
   icb: ICompiledBinding;
   sre: TValue;
 begin
-  rex := TRegEx.Create(PATTERN, [roIgnoreCase, roMultiLine, roSingleLine]);
+  rex := TRegEx.Create(PATTERN, [roIgnoreCase]); // , roMultiLine, roSingleLine
   mat := rex.Match(s);
   while mat.Success do begin
     if (mat.Groups.Count = 4) then begin
@@ -20378,12 +20496,12 @@ var
     ;
   end;
 
-  function  MacroWse: string;
+  function  MacroSession: string;
   begin
     Result := '?';
-         if fun.Equals('WseDateTimeBegin') then Result := DateTimeToStr(gwse.DateTimeBegin) // [RvWseDateTimeBegin()]
-    else if fun.Equals('WseKind')          then Result := gwse.Kind                   // [RvWseKind()]
-    else if fun.Equals('WseSessionId')     then Result := gwse.SessionId.ToString     // [RvWseSessionId()]
+         if fun.Equals('SessionDateTimeBegin') then Result := DateTimeToStr(gses.DateTimeBegin) // [RvSessionDateTimeBegin()]
+    else if fun.Equals('SessionKind')          then Result := gses.Kind                         // [RvSessionKind()]
+    else if fun.Equals('SessionId')            then Result := gses.SessionId.ToString           // [RvSessionId()]
     ;
   end;
 
@@ -20391,7 +20509,7 @@ var
   begin
     Result := '?';
          if fun.Equals('WrqFingerprintId') then Result := gwrq.FingerprintId.ToString
-  //else if fun.Equals('WrqSessionId')     then Result := gwrq.SessionId.ToString // remove, already in TWseRec
+  //else if fun.Equals('WrqSessionId')     then Result := gwrq.SessionId.ToString // remove, already in TSesRec
     else if fun.Equals('WrqRequestId')     then Result := gwrq.RequestId.ToString
     else if fun.Equals('WrqPageId')        then Result := gwrq.PageId.ToString
     else if fun.Equals('WrqField')         then Result := gwrq.FieldGet       (a[0], a[1])  // [RvWreField(field-coname | default)]
@@ -20443,6 +20561,8 @@ var
   end;
 
   function  MacroUser: string;
+  var
+    fbk: string;
   begin
     Result := '?';
          if fun.Equals('UserId')            then Result := gusr.PersonId.ToString
@@ -20454,7 +20574,7 @@ var
     else if fun.Equals('UserHomeUrl')       then Result := gusr.HomeUrl
     else if fun.Equals('UserAvatarUrl')     then Result := gusr.AvatarUrl
     else if fun.Equals('UserAvatarImg')     then Result := gusr.AvatarImg(TIntRec.IntFromAny(a[0], 96), TBolRec.BolFromAny(a[1])) // <img ...>
-    else if fun.Equals('UserLoggedIn')      then Result := TStrRec.StrFromBool(gusr.IsLoggedIn)
+    else if fun.Equals('UserLoggedIn')      then Result := TStrRec.StrFromBool(gses.IsValid(fbk))
     ;
   end;
 
@@ -20513,6 +20633,7 @@ var
     Result := '?';
          if fun.Equals('OrganizationId')          then Result := gthe.ObjectId.ToString
     else if fun.Equals('Theme')                   then Result := gthe.Theme
+    else if fun.Equals('State')                   then Result := gthe.State
     else if fun.Equals('Grade')                   then Result := gthe.Grade
     else if fun.Equals('ThemeFontFamily')         then Result := gthe.FontFamily
     else if fun.Equals('ThemeFontWeight')         then Result := gthe.FontWeight
@@ -20608,7 +20729,7 @@ begin
   else if f[0].Equals('Sql')     then Result := MacroSql
   else if f[0].Equals('W3')      then Result := MacroW3
   else if f[0].Equals('Website') then Result := MacroWebsite
-  else if f[0].Equals('Wse')     then Result := MacroWse
+  else if f[0].Equals('Ses')     then Result := MacroSession //now is simply session, no distinction between win clients and web clients
   else if f[0].Equals('Wrq')     then Result := MacroWrq
   {$ENDREGION}
 
@@ -21028,6 +21149,229 @@ begin
   finally
     stl.Free;
   end;
+end;
+  {$ENDREGION}
+
+  {$REGION 'TSesRec'}
+function  TSesRec.Info: string;
+begin
+  Result := '';
+  if SessionId > 0 then
+    Result := Format('session %d (%s)', [SessionId, Kind]);
+end;
+
+function  TSesRec.Exists(IvDateTimeBegin: TDateTime; IvIpLan: string; IvSessionId: integer; var IvFbk: string): boolean;
+var
+  sql: string;
+begin
+  sql :=         'select 1 from DbaClient.dbo.TblSession'
+  + sLineBreak + 'where'
+  + sLineBreak + '    FldDateTimeBegin       = ' + TSqlRec.Val(IvDateTimeBegin)
+  + sLineBreak + 'and FldSessionId           = ' + TSqlRec.Val(IvSessionId)
+  + sLineBreak + 'and FldIpLan               = ' + TSqlRec.Val(IvIpLan);
+  Result := TDbaRec.Scalar(sql, 0) = 1;
+  IvFbk := ifthen(Result, 'Session exists', 'Session does nor exists');
+end;
+
+function  TSesRec.IsValid(var IvFbk: string): boolean;
+var
+  sql: string;
+begin
+  sql :=         'select 1 from DbaClient.dbo.TblSession'
+  + sLineBreak + 'where'
+  + sLineBreak + '    FldDateTimeBegin       = ' + TSqlRec.Val(DateTimeBegin)
+  + sLineBreak + 'and FldDateTimeEnd        is null'
+  + sLineBreak + 'and FldIpLan               = ' + TSqlRec.Val(IpLan)
+  + sLineBreak + 'and FldSessionId           = ' + TSqlRec.Val(SessionId    )
+  + sLineBreak + 'and FldOrganization        = ' + TSqlRec.Val(Organization )
+  + sLineBreak + 'and FldUsername            = ' + TSqlRec.Val(Username     );
+  Result := TDbaRec.Scalar(sql, 0) = 1;
+  IvFbk := ifthen(Result, 'Session is valid', 'Session is not valid');
+end;
+
+procedure TSesRec.Reset;
+begin
+  DateTimeBegin := TDatRec.ZERO_DAT;
+  DateTimeEnd   := TDatRec.ZERO_DAT;
+  Kind          := '';
+  SessionId     := 0;
+  FingerprintId := 0;
+  IpLan         := '';
+  Domain        := '';
+  Computer      := '';
+  OsLogin       := '';
+  Client        := '';
+  Version       := '';
+  Server        := '';
+  Organization  := '';
+  Username      := '';
+end;
+
+function  TSesRec.Init(IvKind: string; IvSessionId, IvFingerprintId: cardinal; IvIpLan, IvDomain, IvComputer, IvOsLogin, IvClient, IvVersion, IvServer, IvOrganization, IvUsername: string; var IvFbk: string): boolean;
+begin
+  DateTimeBegin := Now();            // FldDateTimeBegin
+  DateTimeEnd   := TDatRec.ZERO_DAT; // FldDateTimeEnd
+  Kind          := IvKind;           // FldKind
+  SessionId     := IvSessionId;      // FldSessionId              TRndRec.RndInt(100000, 199999)
+  FingerprintId := IvFingerprintId;  // FldFingerprintId
+  IpLan         := IvIpLan;          // FldIpLan
+  Domain        := IvDomain;         // FldDomain
+  Computer      := IvComputer;       // FldComputer
+  OsLogin       := IvOsLogin;        // FldOsLogin
+  Client        := IvClient;         // FldClient
+  Version       := IvVersion;        // FldVersion
+  Server        := IvServer;         // FldServer
+  Organization  := IvOrganization;   // FldOrganization
+  Username      := IvUsername;       // FldUsername
+
+  IvFbk := 'SesRec initialized';
+  Result := true;
+end;
+
+function  TSesRec.Insert(var IvFbk: string): boolean;
+var
+  aff: integer;
+  sql: string;
+begin
+  sql :=         'insert into DbaClient.dbo.TblSession'
+  + sLineBreak + 'select'
+  + sLineBreak + '    FldDateTimeBegin = ' + TSqlRec.Val(DateTimeBegin)
+  + sLineBreak + '  , FldDateTimeEnd   = ' + TSqlRec.Val(DateTimeEnd  ) // *** should be null, notnull after session close ***
+  + sLineBreak + '  , FldKind          = ' + TSqlRec.Val(Kind         )
+  + sLineBreak + '  , FldSessionId     = ' + TSqlRec.Val(SessionId    )
+  + sLineBreak + '  , FldFingerprintId = ' + TSqlRec.Val(FingerprintId)
+  + sLineBreak + '  , FldIpLan         = ' + TSqlRec.Val(IpLan        )
+  + sLineBreak + '  , FldDomain        = ' + TSqlRec.Val(Domain       )
+  + sLineBreak + '  , FldComputer      = ' + TSqlRec.Val(Computer     )
+  + sLineBreak + '  , FldOsLogin       = ' + TSqlRec.Val(OsLogin      )
+  + sLineBreak + '  , FldClient        = ' + TSqlRec.Val(Client       )
+  + sLineBreak + '  , FldVersion       = ' + TSqlRec.Val(Version      )
+  + sLineBreak + '  , FldServer        = ' + TSqlRec.Val(Server       )
+  + sLineBreak + '  , FldOrganization  = ' + TSqlRec.Val(Organization )
+  + sLineBreak + '  , FldUsername      = ' + TSqlRec.Val(Username     ); // *** sould be null, notnull after user login ***
+  Result := TDbaRec.CmdExec(sql, aff, IvFbk);
+  if not Result then
+    glog.Log(IvFbk);
+end;
+
+function  TSesRec.InsertRio(var IvFbk: string): boolean;
+begin
+  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemSessionInsertSoap(DateTimeBegin, Kind, SessionId, FingerprintId, IpLan, Domain, Computer, OsLogin, Client, Version, Server, Organization, Username, IvFbk);
+end;
+
+function  TSesRec.Select(var IvFbk: string): boolean;
+var
+  sql: string;
+  dst: TDataset;
+begin
+  sql :=         'select'
+  + sLineBreak + '    FldDateTimeBegin'
+  + sLineBreak + '  , FldDateTimeEnd  '
+  + sLineBreak + '  , FldKind         '
+  + sLineBreak + '  , FldSessionId    '
+  + sLineBreak + '  , FldFingerprintId'
+  + sLineBreak + '  , FldIpLan        '
+  + sLineBreak + '  , FldDomain       '
+  + sLineBreak + '  , FldComputer     '
+  + sLineBreak + '  , FldOsLogin      '
+  + sLineBreak + '  , FldClient       '
+  + sLineBreak + '  , FldVersion      '
+  + sLineBreak + '  , FldServer       '
+  + sLineBreak + '  , FldOrganization '
+  + sLineBreak + '  , FldUsername     '
+  + sLineBreak + 'from'
+  + sLineBreak + '    DbaClient.dbo.TblSession'
+  + sLineBreak + 'where'
+//+ sLineBreak + '    FldDateTimeBegin = ' + TSqlRec.Val(DateTimeBegin)
+//+ sLineBreak + 'and FldDateTimeEnd  is null'
+  + sLineBreak + '    FldIpLan         = ' + TSqlRec.Val(IpLan)
+  + sLineBreak + 'and FldSessionId     = ' + TSqlRec.Val(SessionId    )
+  + sLineBreak + 'and FldFingerprintId = ' + TSqlRec.Val(FingerprintId);
+//+ sLineBreak + 'and FldOrganization  = ' + TSqlRec.Val(Organization )
+//+ sLineBreak + 'and FldUsername      = ' + TSqlRec.Val(Username     );
+
+  Result := TDbaRec.DsFromSql(sql, dst);
+  if Result then begin
+    DateTimeBegin := dst.FieldByName('FldDateTimeBegin').AsDateTime;
+    DateTimeEnd   := dst.FieldByName('FldDateTimeEnd'  ).AsDateTime;
+    Kind          := dst.FieldByName('FldKind'         ).AsString  ;
+    SessionId     := dst.FieldByName('FldSessionId'    ).AsLongWord;
+    FingerprintId := dst.FieldByName('FldFingerprintId').AsLongWord;
+    IpLan         := dst.FieldByName('FldIpLan'        ).AsString  ;
+    Domain        := dst.FieldByName('FldDomain'       ).AsString  ;
+    Computer      := dst.FieldByName('FldComputer'     ).AsString  ;
+    OsLogin       := dst.FieldByName('FldOsLogin'      ).AsString  ;
+    Client        := dst.FieldByName('FldClient'       ).AsString  ;
+    Version       := dst.FieldByName('FldVersion'      ).AsString  ;
+    Server        := dst.FieldByName('FldServer'       ).AsString  ;
+    Organization  := dst.FieldByName('FldOrganization' ).AsString  ;
+    Username      := dst.FieldByName('FldUsername'     ).AsString  ;
+  end;
+end;
+
+function  TSesRec.Update(var IvFbk: string): boolean;
+var
+  aff: integer;
+  sql: string;
+begin
+  sql :=         'update DbaClient.dbo.TblSession'
+  + sLineBreak + 'set'
+  + sLineBreak + '    FldOrganization  = ' + TSqlRec.Val(Organization ) // *** now should be a valid organization ***
+  + sLineBreak + '  , FldUsername      = ' + TSqlRec.Val(Username     ) // *** now should be a valid username ***
+  + sLineBreak + 'where'
+  + sLineBreak + '    FldDateTimeBegin = ' + TSqlRec.Val(DateTimeBegin)
+//+ sLineBreak + 'and FldDateTimeEnd  is ' + TSqlRec.Val(DateTimeEnd  )
+  + sLineBreak + 'and FldKind          = ' + TSqlRec.Val(Kind         )
+  + sLineBreak + 'and FldSessionId     = ' + TSqlRec.Val(SessionId    )
+  + sLineBreak + 'and FldFingerprintId = ' + TSqlRec.Val(FingerprintId)
+  + sLineBreak + 'and FldIpLan         = ' + TSqlRec.Val(IpLan        )
+  + sLineBreak + 'and FldDomain        = ' + TSqlRec.Val(Domain       )
+  + sLineBreak + 'and FldComputer      = ' + TSqlRec.Val(Computer     )
+  + sLineBreak + 'and FldOsLogin       = ' + TSqlRec.Val(OsLogin      )
+  + sLineBreak + 'and FldClient        = ' + TSqlRec.Val(Client       )
+  + sLineBreak + 'and FldVersion       = ' + TSqlRec.Val(Version      )
+  + sLineBreak + 'and FldServer        = ' + TSqlRec.Val(Server       );
+//+ sLineBreak + 'and FldOrganization  = ' + TSqlRec.Val(Organization )
+//+ sLineBreak + 'and FldUsername      = ' + TSqlRec.Val(Username     )
+  Result := TDbaRec.CmdExec(sql, aff, IvFbk);
+  if not Result then
+    glog.Log(IvFbk);
+end;
+
+function  TSesRec.Close(var IvFbk: string): boolean;
+var
+  aff: integer;
+  sql: string;
+begin
+  sql :=         'update DbaClient.dbo.TblSession'
+  + sLineBreak + 'set'
+  + sLineBreak + '    FldDateTimeEnd   = ' + TSqlRec.Val({DateTimeEnd}Now)
+  + sLineBreak + 'where'
+  + sLineBreak + '    FldDateTimeBegin = ' + TSqlRec.Val(DateTimeBegin) // *** now should be a valid date ***
+//+ sLineBreak + 'and FldDateTimeEnd  is ' + TSqlRec.Val(DateTimeEnd  )
+  + sLineBreak + 'and FldKind          = ' + TSqlRec.Val(Kind         )
+  + sLineBreak + 'and FldSessionId     = ' + TSqlRec.Val(SessionId    )
+  + sLineBreak + 'and FldFingerprintId = ' + TSqlRec.Val(FingerprintId)
+  + sLineBreak + 'and FldIpLan         = ' + TSqlRec.Val(IpLan        )
+  + sLineBreak + 'and FldDomain        = ' + TSqlRec.Val(Domain       )
+  + sLineBreak + 'and FldComputer      = ' + TSqlRec.Val(Computer     )
+  + sLineBreak + 'and FldOsLogin       = ' + TSqlRec.Val(OsLogin      )
+  + sLineBreak + 'and FldClient        = ' + TSqlRec.Val(Client       )
+  + sLineBreak + 'and FldVersion       = ' + TSqlRec.Val(Version      )
+  + sLineBreak + 'and FldServer        = ' + TSqlRec.Val(Server       )
+  + sLineBreak + 'and FldOrganization  = ' + TSqlRec.Val(Organization )
+  + sLineBreak + 'and FldUsername      = ' + TSqlRec.Val(Username     );
+  Result := TDbaRec.CmdExec(sql, aff, IvFbk);
+  if not Result then
+    glog.Log(IvFbk);
+
+  // reset
+  gses.Reset;
+end;
+
+function  TSesRec.CloseRio(var IvFbk: string): boolean;
+begin
+  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemSessionCloseSoap(DateTimeBegin, DateTimeEnd, Kind, SessionId, FingerprintId, IpLan, Domain, Computer, OsLogin, Client, Version, Server, Organization, Username, IvFbk);
 end;
   {$ENDREGION}
 
@@ -23328,38 +23672,38 @@ begin
 
   // Default.htm
   sbu.Clr;
-  sbu.Add('<!DOCTYPE html>'                                                    , true , 0);
-  sbu.Add('<html lang="en">'                                                             );
-  sbu.Add('<head>'                                                                       );
-  sbu.Add('  <title>%s Default Page</title>'                         , [gorg.Obj.&Object]); // TSysRec.ACRONYM // gorg.Organization
-  sbu.Add('  <meta charset="utf-8">'                                                     );
-  sbu.Add('  <meta http-equiv="refresh" content="0; url=/WksPageIsapiProject.dll/">'     );
-  sbu.Add('  <meta name="author" content="%s" />'                      , [TSysRec.AUTHOR]);
-  sbu.Add('  <meta name="description" content="%s" />'                   , [TSysRec.NAME]); // gorg.Name
-  sbu.Add('  <link rel="icon" type="image/x-icon" href="%s" />'      , [TSysRec.ICON_URL]); // gorg.LogoIconUrl   option: rel="shortcut icon"
+  sbu.Add('<!DOCTYPE html>'                                                     , true , 0);
+  sbu.Add('<html lang="en">'                                                              );
+  sbu.Add('<head>'                                                                        );
+  sbu.Add('  <title>%s Default Page</title>'                          , [gorg.Obj.&Object]); // TSysRec.ACRONYM // gorg.Organization
+  sbu.Add('  <meta charset="utf-8">'                                                      );
+  sbu.Add('  <meta http-equiv="refresh" content="0; url=/WksPageIsapiProject.dll/">'      );
+  sbu.Add('  <meta name="author" content="%s" />'                       , [TSysRec.AUTHOR]);
+  sbu.Add('  <meta name="description" content="%s" />'                    , [TSysRec.NAME]); // gorg.Name
+  sbu.Add('  <link rel="icon" type="image/x-icon" href="%s" />'       , [TSysRec.ICON_URL]); // gorg.LogoIconUrl   option: rel="shortcut icon"
   if IvUseSpin then begin
-  sbu.Add('  <link rel="stylesheet" href="/Include/w3/w3-theme-%s.css" />'     , ['grey']); // gthe.Theme
-  sbu.Add('  <link rel="stylesheet" href="/Include/w3/w3.css" />'                        );
-  sbu.Add('  <script src="/Include/wks/wks.js"></script>'                                );
+  sbu.Add('  <link rel="stylesheet" href="/Include/W/w3/4.0/w3-theme-%s.css" />', ['grey']); // gthe.Theme
+  sbu.Add('  <link rel="stylesheet" href="/Include/W/w3/4.0/w3.css" />'                   );
+  sbu.Add('  <script src="/Include/W/wks/wks.js"></script>'                               );
   end;
-  sbu.Add('</head>'                                                                      );
-  sbu.Add('<body>'                                                                       ); // oncontextmenu="return false";
+  sbu.Add('</head>'                                                                       );
+  sbu.Add('<body>'                                                                        ); // oncontextmenu="return false";
   if IvUseSpin then begin
-  sbu.Add('  <div class="w3-waitloader-spin"></div>'                                     );
-  sbu.Add('  <div class="w3-waitloader-number"</div>'                                    );
-  sbu.Add('  <script>'                                                                   );
-  sbu.Add('  var waitloadernumber = document.querySelector(".w3-waitloader-number");'    );
-  sbu.Add('  var count = 0;'                                                             );
-  sbu.Add('  setInterval('                                                               );
-  sbu.Add('    () => {'                                                                  );
-  sbu.Add('      count++;'                                                               );
-  sbu.Add('      if (count > 0) waitloadernumber.textContent = count;'                   );
-  sbu.Add('    }'                                                                        );
-  sbu.Add('  , 1000);'                                                                   );
-  sbu.Add('  </script>'                                                                  );
+  sbu.Add('  <div class="w3-waitloader-spin"></div>'                                      );
+  sbu.Add('  <div class="w3-waitloader-number"</div>'                                     );
+  sbu.Add('  <script>'                                                                    );
+  sbu.Add('  var waitloadernumber = document.querySelector(".w3-waitloader-number");'     );
+  sbu.Add('  var count = 0;'                                                              );
+  sbu.Add('  setInterval('                                                                );
+  sbu.Add('    () => {'                                                                   );
+  sbu.Add('      count++;'                                                                );
+  sbu.Add('      if (count > 0) waitloadernumber.textContent = count;'                    );
+  sbu.Add('    }'                                                                         );
+  sbu.Add('  , 1000);'                                                                    );
+  sbu.Add('  </script>'                                                                   );
   end;
-  sbu.Add('</body>'                                                                      );
-  sbu.Add('</html>'                                                                      );
+  sbu.Add('</body>'                                                                       );
+  sbu.Add('</html>'                                                                       );
   sbu.SaveToFile(TSysRec.HOME_PATH + '\Default.htm');
 end;
 
@@ -23391,17 +23735,37 @@ begin
 end;
 
 class function  TSysRec.LogoGraphic: TGraphic;
+var
+  picture: TPicture;
 begin
-  if not Assigned(Result) then
-    Result := TGraphic.Create;
-  Result.LoadFromFile(LogoFile);
+  picture := TPicture.Create;
+  try
+    // loads the right subclass (TPngImage, TJPEGImage, ...) depending on the file
+    picture.LoadFromFile(LogoFile);
+
+    // extract the actual graphic (TPngImage, TBitmap, ...)
+    Result := Picture.Graphic.ClassType.Create as TGraphic;
+    Result.Assign(picture.Graphic);
+  finally
+    picture.Free;
+  end;
 end;
 
 class function  TSysRec.LogoLongGraphic: TGraphic;
+var
+  picture: TPicture;
 begin
-  if not Assigned(Result) then
-    Result := TGraphic.Create;
-  Result.LoadFromFile(LogoLongFile);
+  picture := TPicture.Create;
+  try
+    // loads the right subclass (TPngImage, TJPEGImage, ...) depending on the file
+    picture.LoadFromFile(LogoLongFile);
+
+    // extract the actual graphic (TPngImage, TBitmap, ...)
+    Result := Picture.Graphic.ClassType.Create as TGraphic;
+    Result.Assign(picture.Graphic);
+  finally
+    picture.Free;
+  end;
 end;
 
 class function  TSysRec.LogoLongImg(IvHeight: integer; IvUrlAbsolute: boolean): string;
@@ -23486,6 +23850,7 @@ procedure TTheRec.Reset;
 begin
   ObjectId           := 0                      ;
   Theme              := THEME_DEF              ;
+  State              := STATE_DEF              ;
   Grade              := GRADE_DEF              ;
   FontFamily         := FONT_FAMILY_DEF        ;
   FontWeight         := FONT_WEIGHT_DEF        ;
@@ -23509,7 +23874,7 @@ var
   sql: string;
   dst: TDataset;
 begin
-  sql := Format('select top(1) * from DbaOrganization.dbo.TblTheme where FldObjectId = %d', [IvOrganizationId]);
+  sql := Format('select top(1) * from DbaOrganization.dbo.TblTheme where FldObjectId = %d and FldState = ''Active''', [IvOrganizationId]);
   TDbaRec.DsFromSql(sql, dst);
   try
     // insertnew
@@ -23518,6 +23883,7 @@ begin
       + sLineBreak + 'select'
       + sLineBreak + '    FldObjectId = '           + TSqlRec.Val(IvOrganizationId       )
       + sLineBreak + '  , FldTheme = '              + TSqlRec.Val(THEME_DEF              )
+      + sLineBreak + '  , FldState = '              + TSqlRec.Val(STATE_DEF              )
       + sLineBreak + '  , FldGrade = '              + TSqlRec.Val(GRADE_DEF              )
       + sLineBreak + '  , FldFontFamily = '         + TSqlRec.Val(FONT_FAMILY_DEF        )
       + sLineBreak + '  , FldFontWeight = '         + TSqlRec.Val(FONT_WEIGHT_DEF        )
@@ -23541,6 +23907,7 @@ begin
     end else begin
       ObjectId           :=          dst.FieldByName('FldObjectId'          ).AsInteger;
       Theme              := giif.NxD(dst.FieldByName('FldTheme'             ).AsString, THEME_DEF              );
+      State              := giif.NxD(dst.FieldByName('FldState'             ).AsString, STATE_DEF              );
       Grade              := giif.NxD(dst.FieldByName('FldGrade'             ).AsString, GRADE_DEF              );
       FontFamily         := giif.NxD(dst.FieldByName('FldFontFamily'        ).AsString, FONT_FAMILY_DEF        );
       FontWeight         := giif.NxD(dst.FieldByName('FldFontWeight'        ).AsString, FONT_WEIGHT_DEF        );
@@ -23578,6 +23945,7 @@ begin
     if Result then begin
                                                                 ObjectId           := rem.ObjectId          ;
                                                                 Theme              := rem.Theme             ;
+                                                                State              := rem.State             ;
                                                                 Grade              := rem.Grade             ;
                                                                 FontFamily         := rem.FontFamily        ;
                                                                 FontWeight         := rem.FontWeight        ;
@@ -24063,17 +24431,12 @@ begin
   Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemUserIsAuthenticatedSoap(IvUsername, IvPassword, IvFbk);
 end;
 
-//function TUsrRec.HasValidSession(IvUsername: string; var IvFbk: string): boolean;
+//function TUsrRec.IsLoggedIn: boolean;
+//var
+//  fbk: string;
 //begin
-//  Result := gwse.IsValid(IvFbk);
+//  Result := gses.IsValid(fbk); // *** shortcut - eliminate! ***
 //end;
-
-function TUsrRec.IsLoggedIn: boolean;
-var
-  fbk: string;
-begin
-  Result := gwse.IsValid(fbk);
-end;
 
 function  TUsrRec.HomePath: string;
 begin
@@ -25343,17 +25706,17 @@ begin
   stl := TStringList.Create;
   try
     // w3.js
-    stl.Text := TDbaRec.ObjFieldGet('Code', 'FldContent', 'Root/Organization/W/W3/w3.js', '');
+    stl.Text := TDbaRec.ObjFieldGet('Code', 'FldContent', 'Root/Organization/W/w3/4.0/w3.js', '');
     fna := TSysRec.INC_PATH + '\w3\w3.js';
     stl.SaveToFile(fna);
 
     // w3color.js
-    stl.Text := TDbaRec.ObjFieldGet('Code', 'FldContent', 'Root/Organization/W/W3/w3color.js', '');
+    stl.Text := TDbaRec.ObjFieldGet('Code', 'FldContent', 'Root/Organization/W/w3/4.0/w3color.js', '');
     fna := TSysRec.INC_PATH + '\w3\w3color.js';
     stl.SaveToFile(fna);
 
     // w3.css
-    stl.Text := TDbaRec.ObjFieldGet('Code', 'FldContent', 'Root/Organization/W/W3/w3.css', '');
+    stl.Text := TDbaRec.ObjFieldGet('Code', 'FldContent', 'Root/Organization/W/w3/4.0/w3.css', '');
     fna := TSysRec.INC_PATH + '\w3\w3.css';
     stl.SaveToFile(fna);
 
@@ -25821,11 +26184,17 @@ end;
 {class} procedure TWmoRec.OnWebModuleCreate;
 begin
 //glog.Log('WebModuleCreate');
+
+  // may be load TSysRec ...
+  // ...
 end;
 
 {class} procedure TWmoRec.OnWebModuleDestroy;
 begin
 //glog.Log('WebModuleDestroy');
+
+  // may be free TSysRec images if any ...
+  // ...
 end;
 
 {class} procedure TWmoRec.OnWebModuleException(IvWebResponse: TWebResponse; IvE: Exception);
@@ -25837,9 +26206,11 @@ begin
 end;
 
 {class} procedure TWmoRec.BeforeDispatch(IvWebRequest: TWebRequest; IvWebResponse: TWebResponse; var IvWrq: TWrqRec; var IvTic: TTicRec);
+
+  {$REGION 'var'}
 var
   fid, sid: cardinal;
-  ref, red{, dab}, fbk: string; // referer, redirect, datetimebegin
+  ipl, ref, red{, dab}, fbk: string; // iplan, referer, redirect, datetimebegin
 
   {function host_mistakes_fix(host: string): string;
   begin
@@ -25850,13 +26221,15 @@ var
     if not Result.StartsWith('www.') then
       Result := Format('www.%s', [Result]);
   end;}
+  {$ENDREGION}
+
 begin
 
   {$REGION 'Help'}
   {
-    HERE THE WEB APPLICATION SHOULD KNOW ALL ABOUT THE REQUEST SO IT CAN LOAD ALL THE BUSINESS RECORDS:
-    - system, params, switches
-    - user, authentication, session
+    HERE THE WEB APPLICATION WILL KNOW ALL ABOUT THE REQUEST SO IT CAN LOAD ALL THE BUSINESS RECORDS:
+    - system, params, switches (may be these can be loaded at webmodule creation)
+    - person, user, authentication, session, request
     - organization, palette, theme
     - member, email, role, level, structure, authorization
 
@@ -25884,11 +26257,18 @@ begin
   // fixearly *** impossible ***
 //IvWebRequest.Host := host_mistakes_fix(IvWebRequest.Host);
 
+  // skip for modules like WksImageIsapi
+//if not assigned(IvWebRequest) then
+  //Exit;
+
   // request i
   IvWrq.WebRequestOrig := IvWebRequest;
 
+  // iplan
+  ipl := IvWebRequest.RemoteAddr;
+
   // redirect
-  ref := IvWebRequest.Referer; // Referer 'http://www.abc.com/Default.htm?CoRedirect=http://www.abc.com/WksPageIsapiProject.dll/View?CoId=167&CoDocumentId=129
+  ref := IvWebRequest.Referer; // Referer 'http://www.wks.cloud/Default.htm?CoRedirect=http://www.wks.cloud/WksPageIsapiProject.dll/View?CoId=167&CoDocumentId=129
   if TStrRec.StrHas(ref, 'CoRedirect=') then begin
     red := TStrRec.StrRightOf('CoRedirect=', ref, false);
     IvWebResponse.Content := TWrsRec.SendRedirectJsStr(red);
@@ -25911,25 +26291,27 @@ begin
 
   // session
 //dab := IvWrq.FieldCookieGet('CoDateTime', 0.0);
-  sid := IvWrq.FieldCookieGet('CoSessionId', 0);
-  if sid <= 0 then begin // clienthasnotsessionid --> createnewonethenstoreitindbaandclient
+  sid := IvWrq.FieldCookieGet('CoSessionId', 0); // at the very beginning this is hot present in the client, later is present so skip the init/insert process
+  if sid <= 0 then begin                         // clienthasnotsessionid --> create new one then store it in dba and client
     Randomize();
     sid := TRndRec.RndInt(10000, 99999);
-    gwse.Init('Web', sid, fid, IvWebRequest.RemoteAddr, 'Unknown', 'Unknown', 'Unknown', IvWebRequest.UserAgent, 'SeeUserAgent', IvWebRequest.Host, gwse.Organization, gwse.Username, fbk);
+    gses.Init('Web', sid, fid, ipl, 'Unknown', 'Unknown', 'Unknown', IvWebRequest.UserAgent, 'SeeUserAgent', IvWebRequest.Host, gses.Organization, gses.Username, fbk);
     // savetodba
-    gwse.Insert(fbk);
+    gses.Insert(fbk);
     // savetoclient
     TWrsRec.FieldCookieSet(IvWebResponse, 'CoSessionId', sid);
   end else begin
-    gwse.SessionId     := sid;
-    gwse.FingerprintId := fid;
-    gwse.Select(fbk);
+    gses.SessionId     := sid;
+    gses.FingerprintId := fid;
+    gses.IpLan         := ipl;
+    gses.Username      := ''; // this will be resolved like ... where FldUser = null , not elegant!
+    gses.Select(fbk);
   end;
 
   // request ii                                                                                                 // HTTPHEADER___________________EXAMPLE_____________________________________NOTE__________________________
 //IvWrq.WebRequestOrig := IvWebRequest;                                                                         //                              whole original webrequest
-  IvWrq.FingerprintId  := gwse.FingerprintId;                                                                   //                              3681292525                                  IvWebRequest.CookieFields.Values['CoFingerprintId']
-  IvWrq.SessionId      := gwse.SessionId;                                                                       //
+  IvWrq.FingerprintId  := gses.FingerprintId;                                                                   //                              3681292525                                  IvWebRequest.CookieFields.Values['CoFingerprintId']
+  IvWrq.SessionId      := gses.SessionId;                                                                       //
   IvWrq.RequestId      := (IvWebRequest as TISAPIRequest).Ecb^.ConnId;                                          // Ecb.ConnId                   095EBA6C
   IvWrq.PageId         := StrToIntDef(IvWebRequest.QueryFields.Values['CoId'], 0);                              //                              123
   IvWrq.DateTime       := TDatRec.DatFromIso(IvWebRequest.CookieFields.Values['CoDateTime'], Now);              //                              2019-01-31 12:12:14.377
@@ -25946,9 +26328,9 @@ begin
     IvWrq.Host := TSysRec.WWW;
 
   // system
-  // hardcodedin TSysRec
+  // hardcodedin TSysRec ... *** but load from db in module.create ! ***
 
-  // organization
+  // organization *** MOVE BEFORE session ***
   if not gorg.InitByWww(IvWrq.Host, fbk) then begin
     IvWrq.Error := fbk;
     Exit;
@@ -25964,16 +26346,16 @@ begin
   gthe.InitDba(gorg.ObjectId, fbk);
 
   // user
-  if not gwse.Username.IsEmpty then
-    gusr.InitDba(gwse.Username, fbk);
+  if not gses.Username.IsEmpty then
+    gusr.InitDba(gses.Username, fbk);
 
   // person
-  if not gwse.Username.IsEmpty then
-    gper.InitDba(gwse.Username, fbk);
+  if not gses.Username.IsEmpty then
+    gper.InitDba(gses.Username, fbk);
 
   // member
-  if not gwse.Username.IsEmpty then
-    gmbr.InitDba(gwse.Organization, gwse.Username, fbk);
+  if not gses.Username.IsEmpty then
+    gmbr.InitDba(gses.Organization, gses.Username, fbk);
 
   // page
   if IvWrq.PageId <= 0 then // *** IMPORTANT ***
@@ -26168,203 +26550,6 @@ begin
          else Result[i]:= CONSON[Random(Length(CONSON)) + 1];
     b := not b;
    end;
-end;
-  {$ENDREGION}
-
-  {$REGION 'TWseRec'}
-function  TWseRec.Info: string; // websession
-begin
-  Result := '';
-  if SessionId > 0 then
-    Result := Format('session %d (%s)', [SessionId, Kind]);
-end;
-
-function  TWseRec.Exists(IvDateTimeBegin: TDateTime; IvSessionId: integer; var IvFbk: string): boolean;
-var
-  sql: string;
-begin
-  sql :=         'select 1 from DbaClient.dbo.TblSession'
-  + sLineBreak + 'where'
-  + sLineBreak + '    FldDateTimeBegin       = ' + TSqlRec.Val(IvDateTimeBegin)
-  + sLineBreak + 'and FldSessionId           = ' + TSqlRec.Val(IvSessionId);
-  Result := TDbaRec.Scalar(sql, 0) = 1;
-  IvFbk := ifthen(Result, 'Session exists', 'Session does nor exists');
-end;
-
-function  TWseRec.IsValid(var IvFbk: string): boolean;
-var
-  sql: string;
-begin
-  sql :=         'select 1 from DbaClient.dbo.TblSession'
-  + sLineBreak + 'where'
-  + sLineBreak + '    FldDateTimeBegin       = ' + TSqlRec.Val(DateTimeBegin)
-  + sLineBreak + 'and FldDateTimeEnd        is null'
-  + sLineBreak + 'and FldSessionId           = ' + TSqlRec.Val(SessionId    )
-  + sLineBreak + 'and FldOrganization        = ' + TSqlRec.Val(Organization )
-  + sLineBreak + 'and FldUsername            = ' + TSqlRec.Val(Username     );
-  Result := TDbaRec.Scalar(sql, 0) = 1;
-  IvFbk := ifthen(Result, 'Session is valid', 'Session is not valid');
-end;
-
-function  TWseRec.Init(IvKind: string; IvSessionId, IvFingerprintId: cardinal; IvIpLan, IvDomain, IvComputer, IvOsLogin, IvClient, IvVersion, IvServer, IvOrganization, IvUsername: string; var IvFbk: string): boolean;
-begin
-  Randomize();
-
-  DateTimeBegin := Now();            // FldDateTimeBegin
-  DateTimeEnd   := TDatRec.ZERO_DAT; // FldDateTimeEnd
-  Kind          := IvKind;           // FldKind
-  SessionId     := IvSessionId;      // FldSessionId              TRndRec.RndInt(100000, 199999)
-  FingerprintId := IvFingerprintId;  // FldFingerprintId
-  IpLan         := IvIpLan;          // FldIpLan
-  Domain        := IvDomain;         // FldDomain
-  Computer      := IvComputer;       // FldComputer
-  OsLogin       := IvOsLogin;        // FldOsLogin
-  Client        := IvClient;         // FldClient
-  Version       := IvVersion;        // FldVersion
-  Server        := IvServer;         // FldServer
-  Organization  := IvOrganization;   // FldOrganization
-  Username      := IvUsername;       // FldUsername
-
-  IvFbk := 'WseRec initialized';
-  Result := true;
-end;
-
-function  TWseRec.Insert(var IvFbk: string): boolean;
-var
-  aff: integer;
-  sql: string;
-begin
-  sql :=         'insert into DbaClient.dbo.TblSession'
-  + sLineBreak + 'select'
-  + sLineBreak + '    FldDateTimeBegin = ' + TSqlRec.Val(DateTimeBegin)
-  + sLineBreak + '  , FldDateTimeEnd   = ' + TSqlRec.Val(DateTimeEnd  ) // *** should be null, notnull after session close ***
-  + sLineBreak + '  , FldKind          = ' + TSqlRec.Val(Kind         )
-  + sLineBreak + '  , FldSessionId     = ' + TSqlRec.Val(SessionId    )
-  + sLineBreak + '  , FldFingerprintId = ' + TSqlRec.Val(FingerprintId)
-  + sLineBreak + '  , FldIpLan         = ' + TSqlRec.Val(IpLan        )
-  + sLineBreak + '  , FldDomain        = ' + TSqlRec.Val(Domain       )
-  + sLineBreak + '  , FldComputer      = ' + TSqlRec.Val(Computer     )
-  + sLineBreak + '  , FldOsLogin       = ' + TSqlRec.Val(OsLogin      )
-  + sLineBreak + '  , FldClient        = ' + TSqlRec.Val(Client       )
-  + sLineBreak + '  , FldVersion       = ' + TSqlRec.Val(Version      )
-  + sLineBreak + '  , FldServer        = ' + TSqlRec.Val(Server       )
-  + sLineBreak + '  , FldOrganization  = ' + TSqlRec.Val(Organization )
-  + sLineBreak + '  , FldUsername      = ' + TSqlRec.Val(Username     ); // *** sould be null, notnull after user login ***
-  Result := TDbaRec.CmdExec(sql, aff, IvFbk);
-  if not Result then
-    glog.Log(IvFbk);
-end;
-
-function  TWseRec.InsertRio(var IvFbk: string): boolean;
-begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemSessionInsertSoap(DateTimeBegin, Kind, SessionId, FingerprintId, IpLan, Domain, Computer, OsLogin, Client, Version, Server, Organization, Username, IvFbk);
-end;
-
-function  TWseRec.Select(var IvFbk: string): boolean;
-var
-  sql: string;
-  dst: TDataset;
-begin
-  sql :=         'select'
-  + sLineBreak + '    FldDateTimeBegin'
-  + sLineBreak + '  , FldDateTimeEnd  '
-  + sLineBreak + '  , FldKind         '
-  + sLineBreak + '  , FldSessionId    '
-  + sLineBreak + '  , FldFingerprintId'
-  + sLineBreak + '  , FldIpLan        '
-  + sLineBreak + '  , FldDomain       '
-  + sLineBreak + '  , FldComputer     '
-  + sLineBreak + '  , FldOsLogin      '
-  + sLineBreak + '  , FldClient       '
-  + sLineBreak + '  , FldVersion      '
-  + sLineBreak + '  , FldServer       '
-  + sLineBreak + '  , FldOrganization '
-  + sLineBreak + '  , FldUsername     '
-  + sLineBreak + 'from'
-  + sLineBreak + '    DbaClient.dbo.TblSession'
-  + sLineBreak + 'where'
-//+ sLineBreak + '    FldDateTimeBegin = ' + TSqlRec.Val(DateTimeBegin)
-  + sLineBreak + '    FldSessionId     = ' + TSqlRec.Val(SessionId    )
-  + sLineBreak + 'and FldFingerprintId = ' + TSqlRec.Val(FingerprintId);
-  Result := TDbaRec.DsFromSql(sql, dst);
-  if Result then begin
-    DateTimeBegin := dst.FieldByName('FldDateTimeBegin').AsDateTime;
-    DateTimeEnd   := dst.FieldByName('FldDateTimeEnd'  ).AsDateTime;
-    Kind          := dst.FieldByName('FldKind'         ).AsString  ;
-    SessionId     := dst.FieldByName('FldSessionId'    ).AsLongWord;
-    FingerprintId := dst.FieldByName('FldFingerprintId').AsLongWord;
-    IpLan         := dst.FieldByName('FldIpLan'        ).AsString  ;
-    Domain        := dst.FieldByName('FldDomain'       ).AsString  ;
-    Computer      := dst.FieldByName('FldComputer'     ).AsString  ;
-    OsLogin       := dst.FieldByName('FldOsLogin'      ).AsString  ;
-    Client        := dst.FieldByName('FldClient'       ).AsString  ;
-    Version       := dst.FieldByName('FldVersion'      ).AsString  ;
-    Server        := dst.FieldByName('FldServer'       ).AsString  ;
-    Organization  := dst.FieldByName('FldOrganization' ).AsString  ;
-    Username      := dst.FieldByName('FldUsername'     ).AsString  ;
-  end;
-end;
-
-function  TWseRec.Update(var IvFbk: string): boolean;
-var
-  aff: integer;
-  sql: string;
-begin
-  sql :=         'update DbaClient.dbo.TblSession'
-  + sLineBreak + 'set'
-  + sLineBreak + '    FldOrganization  = ' + TSqlRec.Val(Organization ) // *** now should be a valid organization ***
-  + sLineBreak + '  , FldUsername      = ' + TSqlRec.Val(Username     ) // *** now should be a valid username ***
-  + sLineBreak + 'where'
-  + sLineBreak + '    FldDateTimeBegin = ' + TSqlRec.Val(DateTimeBegin)
-//+ sLineBreak + 'and FldDateTimeEnd  is ' + TSqlRec.Val(DateTimeEnd  )
-  + sLineBreak + 'and FldKind          = ' + TSqlRec.Val(Kind         )
-  + sLineBreak + 'and FldSessionId     = ' + TSqlRec.Val(SessionId    )
-  + sLineBreak + 'and FldFingerprintId = ' + TSqlRec.Val(FingerprintId)
-  + sLineBreak + 'and FldIpLan         = ' + TSqlRec.Val(IpLan        )
-  + sLineBreak + 'and FldDomain        = ' + TSqlRec.Val(Domain       )
-  + sLineBreak + 'and FldComputer      = ' + TSqlRec.Val(Computer     )
-  + sLineBreak + 'and FldOsLogin       = ' + TSqlRec.Val(OsLogin      )
-  + sLineBreak + 'and FldClient        = ' + TSqlRec.Val(Client       )
-  + sLineBreak + 'and FldVersion       = ' + TSqlRec.Val(Version      )
-  + sLineBreak + 'and FldServer        = ' + TSqlRec.Val(Server       );
-  Result := TDbaRec.CmdExec(sql, aff, IvFbk);
-  if not Result then
-    glog.Log(IvFbk);
-end;
-
-function  TWseRec.Close(var IvFbk: string): boolean;
-var
-  aff: integer;
-  sql: string;
-begin
-  sql :=         'update DbaClient.dbo.TblSession'
-  + sLineBreak + 'set'
-  + sLineBreak + '    FldDateTimeEnd   = ' + TSqlRec.Val({DateTimeEnd}Now)
-  + sLineBreak + 'where'
-  + sLineBreak + '    FldDateTimeBegin = ' + TSqlRec.Val(DateTimeBegin) // *** now should be a valid date ***
-  + sLineBreak + 'and FldSessionId     = ' + TSqlRec.Val(SessionId    )
-  + sLineBreak + 'and FldFingerprintId = ' + TSqlRec.Val(FingerprintId)
-  + sLineBreak + 'and FldDomain        = ' + TSqlRec.Val(Domain       )
-  + sLineBreak + 'and FldComputer      = ' + TSqlRec.Val(Computer     )
-  + sLineBreak + 'and FldOsLogin       = ' + TSqlRec.Val(OsLogin      )
-  + sLineBreak + 'and FldIpLan         = ' + TSqlRec.Val(IpLan        )
-  + sLineBreak + 'and FldClient        = ' + TSqlRec.Val(Client       )
-  + sLineBreak + 'and FldVersion       = ' + TSqlRec.Val(Version      )
-  + sLineBreak + 'and FldServer        = ' + TSqlRec.Val(Server       )
-  + sLineBreak + 'and FldOrganization  = ' + TSqlRec.Val(Organization )
-  + sLineBreak + 'and FldUsername      = ' + TSqlRec.Val(Username     );
-  Result := TDbaRec.CmdExec(sql, aff, IvFbk);
-  if not Result then
-    glog.Log(IvFbk);
-
-  gwse.DateTimeEnd  := 0.0;
-  gwse.Organization := '';
-  gwse.Username     := '';
-end;
-
-function  TWseRec.CloseRio(var IvFbk: string): boolean;
-begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemSessionCloseSoap(DateTimeBegin, DateTimeEnd, Kind, SessionId, FingerprintId, IpLan, Domain, Computer, OsLogin, Client, Version, Server, Organization, Username, IvFbk);
 end;
   {$ENDREGION}
 

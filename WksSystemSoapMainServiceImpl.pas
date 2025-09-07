@@ -457,44 +457,44 @@ end;
   {$REGION 'Session'}
 function  TSystemSoapMainService.SystemSessionInsertSoap(const IvDateTimeBegin: TDateTime              ; const IvKind: string; const IvSessionId, IvFingerprintId: cardinal; const IvIpLan, IvDomain, IvComputer, IvOsLogin, IvClient, IvVersion, IvServer, IvOrganization, IvUsername: string; var IvFbk: string): boolean;
 var
-  wse: TWseRec;
+  ses: TSesRec;
 begin
-  wse.DateTimeBegin := IvDateTimeBegin ; // FldDateTimeBegin
-  wse.DateTimeEnd   := TDatRec.ZERO_DAT; // FldDateTimeEnd
-  wse.Kind          := IvKind          ; // FldKind
-  wse.SessionId     := IvSessionId     ; // FldSessionId
-  wse.FingerprintId := IvFingerprintId ; // FldFingerprintId
-  wse.IpLan         := IvIpLan         ; // FldIpLan
-  wse.Domain        := IvDomain        ; // FldDomain
-  wse.Computer      := IvComputer      ; // FldComputer
-  wse.OsLogin       := IvOsLogin       ; // FldOsLogin
-  wse.Client        := IvClient        ; // FldClient
-  wse.Version       := IvVersion       ; // FldVersion
-  wse.Server        := IvServer        ; // FldServer
-  wse.Organization  := IvOrganization  ; // FldOrganization
-  wse.Username      := IvUsername      ; // FldUsername
-  Result := wse.Insert(IvFbk);
+  ses.DateTimeBegin := IvDateTimeBegin ; // FldDateTimeBegin
+  ses.DateTimeEnd   := TDatRec.ZERO_DAT; // FldDateTimeEnd
+  ses.Kind          := IvKind          ; // FldKind
+  ses.SessionId     := IvSessionId     ; // FldSessionId
+  ses.FingerprintId := IvFingerprintId ; // FldFingerprintId
+  ses.IpLan         := IvIpLan         ; // FldIpLan
+  ses.Domain        := IvDomain        ; // FldDomain
+  ses.Computer      := IvComputer      ; // FldComputer
+  ses.OsLogin       := IvOsLogin       ; // FldOsLogin
+  ses.Client        := IvClient        ; // FldClient
+  ses.Version       := IvVersion       ; // FldVersion
+  ses.Server        := IvServer        ; // FldServer
+  ses.Organization  := IvOrganization  ; // FldOrganization
+  ses.Username      := IvUsername      ; // FldUsername
+  Result := ses.Insert(IvFbk);
 end;
 
 function  TSystemSoapMainService.SystemSessionCloseSoap(const IvDateTimeBegin, IvDateTimeEnd: TDateTime; const IvKind: string; const IvSessionId, IvFingerprintId: cardinal; const IvIpLan, IvDomain, IvComputer, IvOsLogin, IvClient, IvVersion, IvServer, IvOrganization, IvUsername: string; var IvFbk: string): boolean;
 var
-  wse: TWseRec;
+  ses: TSesRec;
 begin
-  wse.DateTimeBegin := IvDateTimeBegin ; // FldDateTimeBegin
-  wse.DateTimeEnd   := TDatRec.ZERO_DAT; // FldDateTimeEnd
-  wse.Kind          := IvKind          ; // FldKind
-  wse.SessionId     := IvSessionId     ; // FldSessionId
-  wse.FingerprintId := IvFingerprintId ; // FldFingerprintId
-  wse.IpLan         := IvIpLan         ; // FldIpLan
-  wse.Domain        := IvDomain        ; // FldDomain
-  wse.Computer      := IvComputer      ; // FldComputer
-  wse.OsLogin       := IvOsLogin       ; // FldOsLogin
-  wse.Client        := IvClient        ; // FldClient
-  wse.Version       := IvVersion       ; // FldVersion
-  wse.Server        := IvServer        ; // FldServer
-  wse.Organization  := IvOrganization  ; // FldOrganization
-  wse.Username      := IvUsername      ; // FldUsername
-  Result := wse.Close(IvFbk);
+  ses.DateTimeBegin := IvDateTimeBegin ; // FldDateTimeBegin
+  ses.DateTimeEnd   := TDatRec.ZERO_DAT; // FldDateTimeEnd
+  ses.Kind          := IvKind          ; // FldKind
+  ses.SessionId     := IvSessionId     ; // FldSessionId
+  ses.FingerprintId := IvFingerprintId ; // FldFingerprintId
+  ses.IpLan         := IvIpLan         ; // FldIpLan
+  ses.Domain        := IvDomain        ; // FldDomain
+  ses.Computer      := IvComputer      ; // FldComputer
+  ses.OsLogin       := IvOsLogin       ; // FldOsLogin
+  ses.Client        := IvClient        ; // FldClient
+  ses.Version       := IvVersion       ; // FldVersion
+  ses.Server        := IvServer        ; // FldServer
+  ses.Organization  := IvOrganization  ; // FldOrganization
+  ses.Username      := IvUsername      ; // FldUsername
+  Result := ses.Close(IvFbk);
 end;
   {$ENDREGION}
 

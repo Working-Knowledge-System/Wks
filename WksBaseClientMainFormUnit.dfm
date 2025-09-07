@@ -75,6 +75,8 @@ object BaseMainForm: TBaseMainForm
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0
+      ExplicitLeft = -2
+      ExplicitTop = -3
       object TopClientTabSheet: TTabSheet
         Caption = 'Client'
         object ClientToolBar: TToolBar
@@ -3264,7 +3266,7 @@ object BaseMainForm: TBaseMainForm
             Left = 746
             Top = 3
             Width = 187
-            Height = 15
+            Height = 22
             Margins.Right = 8
             Align = alRight
             Caption = 'ObjectContentPrevCharCountLabel'
@@ -3275,6 +3277,7 @@ object BaseMainForm: TBaseMainForm
             Font.Style = []
             ParentFont = False
             Layout = tlCenter
+            ExplicitHeight = 15
           end
         end
       end
@@ -3575,11 +3578,12 @@ object BaseMainForm: TBaseMainForm
             Left = 788
             Top = 3
             Width = 145
-            Height = 15
+            Height = 22
             Margins.Right = 8
             Align = alRight
             Caption = 'ObjectDataCharCountLabel'
             Layout = tlCenter
+            ExplicitHeight = 15
           end
           object ObjectDataValidateSpeedButton: TSpeedButton
             AlignWithMargins = True
@@ -3666,11 +3670,12 @@ object BaseMainForm: TBaseMainForm
             Left = 786
             Top = 3
             Width = 147
-            Height = 15
+            Height = 22
             Margins.Right = 8
             Align = alRight
             Caption = 'ObjectNoteCharCountLabel'
             Layout = tlCenter
+            ExplicitHeight = 15
           end
         end
       end
@@ -3693,7 +3698,7 @@ object BaseMainForm: TBaseMainForm
             Left = 747
             Top = 12
             Width = 187
-            Height = 22
+            Height = 31
             Margins.Top = 12
             Margins.Right = 8
             Align = alRight
@@ -3704,6 +3709,7 @@ object BaseMainForm: TBaseMainForm
             Font.Name = 'Courier New'
             Font.Style = [fsBold]
             ParentFont = False
+            ExplicitHeight = 22
           end
           object FilesRioToolBar: TToolBar
             Left = 0

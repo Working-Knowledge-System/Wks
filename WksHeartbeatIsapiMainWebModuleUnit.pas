@@ -3,11 +3,12 @@ unit WksHeartbeatIsapiMainWebModuleUnit;
 interface
 
 uses
-  System.SysUtils, System.Classes, System.DateUtils, System.IOUtils, System.JSON, Winapi.Windows, Winapi.PsAPI, Web.HTTPApp;
+  System.SysUtils, System.Classes, System.DateUtils
+, System.IOUtils, System.JSON, Winapi.Windows, Winapi.PsAPI, Web.HTTPApp;
 
 type
   TMainWebModule = class(TWebModule)
-    procedure WebModule1DefaultHandlerAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+    procedure MainWebModuleDefaultHandlerAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
   private
     { Private declarations }
   public
@@ -134,12 +135,12 @@ end;
 
 function  DllBuildTimestamp(const IvFileName: string): string;
 var
-  handle: THandle;
+//handle: THandle;
   dosheader: TImageDosHeader;
   ntheaders: TImageNtHeaders;
   filestream: TFileStream;
   timedatestamp: cardinal;
-  utctimestamp: TDateTime;
+//utctimestamp: TDateTime;
   localtimestamp: TDateTime;
 begin
   Result := 'Unknown';
@@ -150,7 +151,7 @@ begin
       FileStream.Position := dosheader._lfanew;
       FileStream.ReadBuffer(ntheaders, SizeOf(ntheaders));
       TimeDateStamp := ntheaders.FileHeader.TimeDateStamp;
-      utctimestamp := UnixToDateTime(TimeDateStamp);
+    //utctimestamp := UnixToDateTime(TimeDateStamp);
       localtimestamp := TTimeZone.Local.ToLocalTime(UnixToDateTime(TimeDateStamp));
       Result := DateTimeToStr(localtimestamp);
     finally
@@ -161,7 +162,7 @@ begin
   end;
 end;
 
-procedure TMainWebModule.WebModule1DefaultHandlerAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+procedure TMainWebModule.MainWebModuleDefaultHandlerAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 var
   jsonresponse: TJSONObject;
   servername: array[0..MAX_COMPUTERNAME_LENGTH + 1] of char;
@@ -174,9 +175,9 @@ begin
 
   jsonresponse := TJSONObject.Create;
   try
-    jsonresponse.AddPair('timestamp'     , DateTimeToStr(Now));
-    jsonresponse.AddPair('system'        , SystemFromDllName(DllPath));
+    jsonresponse.AddPair('timestamp'     , FormatDateTime('yyyy/mm/dd hh:nn:ss.zzz', Now));
     jsonresponse.AddPair('server'        , string(servername));
+    jsonresponse.AddPair('system'        , SystemFromDllName(DllPath));
     jsonresponse.AddPair('dll'           , DllPath);
     jsonresponse.AddPair('version'       , DllVersion(DllPath));
     jsonresponse.AddPair('bitness'       , Bitness);
