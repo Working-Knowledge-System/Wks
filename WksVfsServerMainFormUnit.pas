@@ -854,6 +854,7 @@ begin
   IvSl.Add(IvFirstItem);
   que := TADOQuery.Create(nil);
   que.Connection := IvConn;
+//sql := TRva.Rv(IvSql);
   que.SQL.Text := IvSql;
   que.Open;
   que.First;
@@ -882,6 +883,7 @@ begin
   que := TADOQuery.Create(nil);
   try
     que.Connection := VfsADOConnection;
+  //sql := TRva.Rv(IvSql);
     que.SQL.Text := IvSql;
     que.Open;
     Result := que;
@@ -914,6 +916,7 @@ begin
   que := TADOQuery.Create(nil);
   try
     que.Connection := VfsADOConnection;
+  //sql := TRva.Rv(IvSql);
     que.SQL.Text := IvSql;
     que.Open;
     IvDst := que; // assign without create the dataset, creation is already done!
@@ -2168,6 +2171,7 @@ var
 begin
   mqu := TADOQuery.Create(nil);
   mqu.Connection := VfsADOConnection;
+//sql := TRva.Rv(IvSql);
   mqu.SQL.Text := Format(MARQUEE_SQL, [IvArea9]);
   mqu.Open;
   mqu.First;
@@ -3944,6 +3948,7 @@ var
 begin
   // query
   FDQuery.Disconnect(true);
+//sql := TRva.Rv(IvSql);
   FDQuery.SQL.Text := 'select FldArea3 as area3, FldAreaF9 as areaF9 from DbaOrganization.dbo.TblArea where FldAreaF9 is not null';
   FDQuery.Open;
   FDQuery.BeginBatch; // don't update external references until EndBatch;

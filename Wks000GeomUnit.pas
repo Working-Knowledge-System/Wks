@@ -1951,7 +1951,7 @@ function  XyzMassAdd(IvMp1, IvMp2: TXyzMass): TXyzMass;
 begin
   Result.Mass := IvMp1.Mass + IvMp2.Mass;
   if Result.Mass = 0 then begin
-    //gods.Ods('Mass Point Add: Total system mass degenerate to zero');
+    //glog.Dbg('Mass Point Add: Total system mass degenerate to zero');
     Result.Point.X := 0;
     Result.Point.Y := 0;
     Result.Point.Z := 0;

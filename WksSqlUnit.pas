@@ -61,6 +61,7 @@ begin
   qry := TADOQuery.Create(nil);
   qry.Connection := con;
 //qry.CommandTimeout := IvQueryTimeout;
+//sql := TRva.Rv(IvSql);
   qry.SQL.Text := TFile.ReadAllText(IvFile);
   try
     try

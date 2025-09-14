@@ -78,8 +78,8 @@ type
   private
     { Private declarations }
   //FIni: TIniCls;
-  //FTic: TTicRec;
-  //FWrq: TWrqRec;
+    FTic: TTicRec;
+    FWrq: TWrqRec;
     FWmoRec: TWmoRec;
   public
     { Public declarations }
@@ -205,6 +205,9 @@ const
 var
   WebModuleClass: TComponentClass = TMainWebModule;
 {$ENDREGION}
+
+const
+  MODULE_USE_ON_METHODS = false;
 
 implementation
 
@@ -365,12 +368,13 @@ begin
   {$ENDREGION}
 
   {$REGION 'Objects'}
-  FWmoRec.Run := 0;
+//FWmoRec.Run := 0;
 //FIni := TIniCls.Create;
   {$ENDREGION}
 
   {$REGION 'Events'}
-//FWmoRec.OnWebModuleCreate;
+  if MODULE_USE_ON_METHODS then
+    FWmoRec.OnWebModuleCreate;
   {$ENDREGION}
 
 end;
@@ -383,7 +387,8 @@ begin
   {$ENDREGION}
 
   {$REGION 'Events'}
-//FWmoRec.OnWebModuleDestroy;
+  if MODULE_USE_ON_METHODS then
+    FWmoRec.OnWebModuleDestroy;
   {$ENDREGION}
 
 end;
@@ -395,10 +400,28 @@ begin
 end;
 
 procedure TMainWebModule.WebModuleBeforeDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
+var
+  fbk: string;
 begin
-//Inc(FWmoRec.Run);                                      // comment if useless
-//TWmoRec.BeforeDispatch(Request, Response, FWrq, FTic); // comment to skip session/request flow
-  gwrq.WebRequestOrig := Request; // cagnolina           // uncomment if revious is commented
+//Inc(FWmoRec.Run); // comment if useless
+
+  // bo initialization via standard method
+  if MODULE_USE_ON_METHODS then
+    FWmoRec.BeforeDispatch(Request, Response, FWrq, FTic)
+
+  // bo initialization made locally (repeated in every module)
+  else begin
+    FTic.Init;
+
+    gwrq.WebRequestOrig := Request; // cagnolina
+
+    // organization
+    if not gorg.InitByWww(Request.Host, fbk) then
+      raise Exception.CreateFmt('Unable to initialize TOrgRec by www "%s", it does not exists in the database', [Request.Host]);
+
+    // theme
+    gthe.InitDba(gorg.ObjectId, fbk);
+  end;
 
   {$REGION 'CustomHeader'}
   // handle here specific CustomHeader for all webactions or at beginning of each specific webaction
@@ -411,14 +434,17 @@ begin
   {$REGION 'ActionAvailabilityLogic'}
 //TMainWebModule(Sender).Actions.Items[0].Enabled := false; // /      DefaultHandler
 //TMainWebModule(Sender).Actions.Items[1].Enabled := false; // /Info  InfoWebAction
-//TMainWebModule(Sender).Actions.Items[2].Enabled := false; // /Xxx   Xxx main handler
+//TMainWebModule(Sender).Actions.Items[2].Enabled := false; // /Iot   Iot main handler
   {$ENDREGION}
 
 end;
 
 procedure TMainWebModule.WebModuleAfterDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
-//TWmoRec.AfterDispatch(Request, Response, FWrq, FTic); // comment to skip session/request flow
+  if MODULE_USE_ON_METHODS then
+    FWmoRec.AfterDispatch(Request, Response, FWrq, FTic)
+  else
+    Response.Content := StringReplace(Response.Content, '$RvElapsedMs$', FTic.ElapsedMs.ToString, [rfReplaceAll]);
 end;
   {$ENDREGION}
 
@@ -597,7 +623,7 @@ begin
       if giis.Nx(c) then c := Format(IOT_OK_EMAIL_TEMPLATE, [w, og, ow, dl, uo, vf, ri, DateTimeToStr(Now), no]);
       //                fbk, to                  , cc, bc, sub             , tit                      , content, orgaLogoShow, sysLogoShow, saveToDba
       if not geml.SendS(fbk, r.OkEmail           , '', '', gorg.Obj.&Object, 'DatalogInsert OK INSPEC', c) then
-        gods.Ods(fbk);
+        glog.Log(fbk);
     end;
 
     // ctrl violation alerts
@@ -605,7 +631,7 @@ begin
       c := r.CtrlViolationText;
       if giis.Nx(c) then c := Format(IOT_OOC_EMAIL_TEMPLATE, [w, og, ow, dl, uo, vf, ri, DateTimeToStr(Now), no]);
       if not geml.SendW(fbk, r.CtrlViolationEmail, '', '', gorg.Obj.&Object, 'DatalogInsert Warning OOC', c) then
-        gods.Ods(fbk);
+        glog.Log(fbk);
     end;
 
     // spec violation alerts
@@ -613,7 +639,7 @@ begin
       c := r.SpecViolationText;
       if giis.Nx(c) then c := Format(IOT_OOS_EMAIL_TEMPLATE, [w, og, ow, dl, uo, vf, ri, DateTimeToStr(Now), no]);
       if not geml.SendD(fbk, r.SpecViolationEmail, '', '', gorg.Obj.&Object, ' DatalogInsert DANGER OOS', c) then
-        gods.Ods(fbk);
+        glog.Log(fbk);
     end;
     {$ENDREGION}
 
@@ -649,7 +675,7 @@ begin
   end else begin
     Response.StatusCode := THttRec.HTTP_STATUS_200_OK;
     Response.Content := 'OK';
-    gods.Ods('OK');
+    glog.Log('IOT.MainWebModuleDatalogDeleteWebActionAction', 'OK');
   end;
   {$ENDREGION}
 

@@ -41,7 +41,7 @@ interface
                                     V
                                  response
 
-  Bba module
+  Dba module
   ==========
   
   here we can implement all dbrelated functionalities like
@@ -78,8 +78,8 @@ type
   private
     { Private declarations }
   //FIni: TIniCls;
-  //FTic: TTicRec;
-  //FWrq: TWrqRec;
+    FTic: TTicRec;
+    FWrq: TWrqRec;
     FWmoRec: TWmoRec;
   public
     { Public declarations }
@@ -90,6 +90,9 @@ type
 var
   WebModuleClass: TComponentClass = TMainWebModule;
 {$ENDREGION}
+
+const
+  MODULE_USE_ON_METHODS = true;
 
 implementation
 
@@ -115,24 +118,28 @@ begin
   SetLength(FWmoRec.CmdRecVec, 4);
   FWmoRec.CmdRecVec[0].Cmd         := '/';
   FWmoRec.CmdRecVec[0].Description := 'Default handler';
-  
+
   FWmoRec.CmdRecVec[1].Cmd         := '/Info';
   FWmoRec.CmdRecVec[1].Description := 'Describe module''s info and capabilities (this page)';
 
   FWmoRec.CmdRecVec[2].Cmd         := '/Dba';
   FWmoRec.CmdRecVec[2].Description := 'Dba main handler doing noting for now';
-  
+
   FWmoRec.CmdRecVec[3].Cmd         := '/Update';
   FWmoRec.CmdRecVec[3].Description := 'Update a field in a record';
   {$ENDREGION}
 
   {$REGION 'Objects'}
-  FWmoRec.Run := 0;
+//FWmoRec.Run := 0;
 //FIni := TIniCls.Create;
   {$ENDREGION}
 
   {$REGION 'Events'}
-//FWmoRec.OnWebModuleCreate;
+  if MODULE_USE_ON_METHODS then
+    FWmoRec.OnWebModuleCreate
+//else
+  //glog.Log('DBAISAPI.WebModuleCreate')
+  ;
   {$ENDREGION}
 
 end;
@@ -145,22 +152,49 @@ begin
   {$ENDREGION}
 
   {$REGION 'Events'}
-//FWmoRec.OnWebModuleDestroy;
+  if MODULE_USE_ON_METHODS then
+    FWmoRec.OnWebModuleDestroy
+//else
+  //glog.Log('DBAISAPI.WebModuleDestroy')
+  ;
   {$ENDREGION}
 
 end;
 
 procedure TMainWebModule.WebModuleException(Sender: TObject; E: Exception; var Handled: boolean);
 begin
+  glog.Log('DBAISAPI.WebModuleException', E);
+
   FWmoRec.OnWebModuleException(Response, E);
   Handled := true;
 end;
 
 procedure TMainWebModule.WebModuleBeforeDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
+var
+  fbk: string;
 begin
-//Inc(FWmoRec.Run);                                      // comment if useless
-//FWmoRec.BeforeDispatch(Request, Response, FWrq, FTic); // comment to skip session/request flow
-  gwrq.WebRequestOrig := Request; // cagnolina           // uncomment if revious is commented
+//Inc(FWmoRec.Run); // comment if useless
+
+  // bo initialization via standard method
+  if MODULE_USE_ON_METHODS then
+    FWmoRec.BeforeDispatch(Request, Response, FWrq, FTic)
+
+  // bo initialization made locally (repeated in every module)
+  else begin
+  //glog.Log('DBAISAPI.WebModuleBeforeDispatch');
+
+    FTic.Init;
+
+    gwrq.WebRequestOrig := Request; // cagnolina
+
+    // organization
+    if not gorg.InitByWww(Request.Host, fbk) then
+      gwrq.Error := fbk;
+
+    // theme
+    if not gthe.InitDba(gorg.ObjectId, fbk) then
+      gwrq.Error := fbk;
+  end;
 
   {$REGION 'CustomHeader'}
   // handle here specific CustomHeader for all webactions or at beginning of each specific webaction
@@ -173,14 +207,19 @@ begin
   {$REGION 'ActionAvailabilityLogic'}
 //TMainWebModule(Sender).Actions.Items[0].Enabled := false; // /      DefaultHandler
 //TMainWebModule(Sender).Actions.Items[1].Enabled := false; // /Info  InfoWebAction
-//TMainWebModule(Sender).Actions.Items[2].Enabled := false; // /Xxx   Xxx main handler
+//TMainWebModule(Sender).Actions.Items[2].Enabled := false; // /Dba   Dba main handler
   {$ENDREGION}
 
 end;
 
 procedure TMainWebModule.WebModuleAfterDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
-//FWmoRec.AfterDispatch(Request, Response, FWrq, FTic); // comment to skip session/request flow
+  if MODULE_USE_ON_METHODS then
+    FWmoRec.AfterDispatch(Request, Response, FWrq, FTic)
+  else begin
+  //glog.Log('DBAISAPI.WebModuleAfterDispatch');
+    Response.Content := StringReplace(Response.Content, '$RvElapsedMs$', FTic.ElapsedMs.ToString, [rfReplaceAll]);
+  end;
 end;
   {$ENDREGION}
 
@@ -189,7 +228,14 @@ end;
     {$REGION 'Standard'}
 procedure TMainWebModule.MainWebModuleDefaultHandlerAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
-  TWrsRec.ResponseSet(Response, THtmRec.PageDefault);
+//  TWrsRec.ResponseSet(Response, THtmRec.PageDefault);
+  Response.Content :=
+    '<html>'
+  + '<head><title>Web Server Application</title></head>'
+  + '<body>'
+  + Format('Wks Dba Web Application Server - %s - elapsed ms $RvElapsedMs$', [FormatDateTime('yyyy/mm/dd hh:nn:ss.zzz', Now)])
+  + '</body>'
+  + '</html>';
 end;
 
 procedure TMainWebModule.MainWebModuleInfoWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
@@ -221,10 +267,11 @@ procedure TMainWebModule.MainWebModuleUpdateWebActionAction(Sender: TObject; Req
   {$REGION 'var'}
 var
   tic: TTicRec;
-  jso: TJSONObject;                     // jsonobj
-  usr, tbl, fls, flv, whe: string;      // username, table, fldtoset, fldvaluenew, wherestr
-  oks, sta, fbk, msg, sql, jss: string; // okstr, state, jsonstr
-  aff, sco: integer;                    // affected, statuscode
+  jso: TJSONObject;                                        // jsonobj
+  usr, usr2, tbl, tbl2, fls, flv, flv2, whe, whe2: string; // username, table, fldtoset, fldvaluenew, wherestr
+  oks, sta, jss, fbk, msg, sql: string;                    // okstr, state, jsonstr
+  aff, sco: integer;                                       // affected, statuscode
+  ndt: TDateTime; ndt2: string;                            // nowdatatime
 
   procedure audit;
   begin
@@ -232,7 +279,7 @@ var
     fls := Copy(fls, 1, 64);
     sql := 'insert into DbaSystem.dbo.TblAudit '
          + 'select'
-         + '  ' + TSqlRec.Val(Now)            // FldDateTime
+         + '  ' + TSqlRec.Val(ndt)            // FldDateTime
          + ', ' + TSqlRec.Val(usr)            // FldUsername
          + ', ' + TSqlRec.Val(tbl)            // FldTable
          + ', ' + TSqlRec.Val(fls)            // FldField
@@ -251,62 +298,108 @@ var
   {$ENDREGION}
 
 begin
+  // init
   tic.Init;
-
-  // data
-  usr := TStrRec.StrCoalesce([gusr.Username], 'unknown');
+  ndt := Now();
+  usr := 'unknown';
   jso := TJSONObject.ParseJSONValue(Request.Content) as TJSONObject;
-  tbl := jso.GetValue<string>('dbaTable'   , '');
+  tbl := jso.GetValue<string>('dbaTable'   , ''); // DbaXxx.dbo.TblXxx
   fls := jso.GetValue<string>('fldToSet'   , '');
   flv := jso.GetValue<string>('fldValueNew', '');
   whe := jso.GetValue<string>('where'      , '');
   jso.Free;
+  sql := '';
 
-  // tablemalformed
-  if not TRegEx.IsMatch(tbl, '^Dba\w+\.dbo\.Tbl\w+$') then begin // Dba*.dbo.Tbl*
-    oks := 'false';
-    sta := 'FAIL';
-    fbk := Format('Malformed name of table to update "%s"', [tbl]);
-    msg := 'Unable to update record (Please check the table name to update)';
-    sco := 200; // 400 Bad Request
-
-  // fieldtosetmalformed
-  end else if not fls.StartsWith('Fld') or fls.Contains(' ') then begin
-    oks := 'false';
-    sta := 'FAIL';
-    fbk := Format('Malformed name of field to set "%s"', [fls]);
-    msg := 'Unable to update record (Please check the field name to set)';
-    sco := 200; // 400 Bad Request
-
-  // keyfieldmalformed
-  // ...
-
-  // usersessionNOTvalid, notloggedin
-  end else if usr.Equals('unknown') {*** change to gses.IsValid(fbk) ***} then begin
+  // usersessionNOTvalid, usernotloggedin
+  if not gses.IsValid(fbk) then begin
     oks := 'false';
     sta := 'FAIL';
     fbk := 'User not logged in';
     msg := 'Unable to update record (Please log in to make changes)';
     sco := 200; // 400 Bad Request
 
-  // usersessionVALID, loggedin
+  // usersessionvalid, userloggedin
   end else begin
-    // update
-    sql := Format('update %s set %s = %s where %s', [tbl, fls, TSqlRec.Val(flv), whe]);
+    // getdata
+    usr := TStrRec.StrCoalesce([{gusr}gses.Username], 'unknown');
 
-    // fail
-    if not TDbaRec.CmdExec(sql, aff, fbk) then begin
+    // tablemalformed
+    if not TRegEx.IsMatch(tbl, '^Dba\w+\.dbo\.Tbl\w+$') then begin // Dba*.dbo.Tbl*
       oks := 'false';
       sta := 'FAIL';
-      msg := 'Unable to update record ('+fbk+')';
+      fbk := Format('Malformed name of table to update "%s"', [tbl]);
+      msg := 'Unable to update record (Please check the table name to update)';
       sco := 200; // 400 Bad Request
 
-    // success
+    // fieldtosetmalformed
+    end else if not fls.StartsWith('Fld') or fls.Contains(' ') then begin
+      oks := 'false';
+      sta := 'FAIL';
+      fbk := Format('Malformed name of field to set "%s"', [fls]);
+      msg := 'Unable to update record (Please check the field name to set)';
+      sco := 200; // 400 Bad Request
+
+    // wheremalformed
+    // ...
+
+    // allvalid
     end else begin
-      oks := 'true';
-      sta := 'SUCCESS';
-      msg := 'Record updated ('+fbk+')';
-      sco := 200;
+      // newvaluefix
+      // ...
+
+      if false then begin
+        // temp
+        ndt2 := TSqlRec.Val(ndt).Replace('''', '``');
+        usr2 := TSqlRec.Val(usr).Replace('''', '``');
+        tbl2 := TRegEx.Split(tbl, '\.')[2]; // TblXxx
+        flv2 := TSqlRec.Val(flv).Replace('''', '``');
+        whe2 := whe.Replace('''', '``'); // whe arrive already formatted like FldXxx = ''aaa''
+
+        // update target field            declare @sql nvarchar(max) = `update DbaSystem.dbo.TblState set FldStatus = ``Accepted-1```
+        sql :=                    Format('declare @sql nvarchar(max) = `update %s set %s = %s`', [tbl, fls, flv2]);
+
+        // update FldWho if exists        if exists (select 1 from information_schema.columns where table_name = `DbaSystem.dbo.TblState` and column_name = `FldWho`) set @sql += `, FldWho = ``giarussi```
+        sql := sql + sLineBreak + Format('if exists (select 1 from information_schema.columns where table_name = `%s` and column_name = `FldWho`) set @sql += `, FldWho = %s`;'  , [tbl2, usr2]);
+
+        // update FldWhen if exists       if exists (select 1 from information_schema.columns where table_name = `DbaSystem.dbo.TblState` and column_name = `FldWhen`) set @sql += `, FldWhen = ``2025-09-14 01:20:50.975```
+        sql := sql + sLineBreak + Format('if exists (select 1 from information_schema.columns where table_name = `%s` and column_name = `FldWhen`) set @sql += `, FldWhen = %s`;', [tbl2, ndt2]);
+
+        // add where clause               set @sql += ` where FldState = ``Accepted```
+        sql := sql + sLineBreak + Format('set @sql += ` where %s`;', [whe2]);
+
+        // execute the dynamic sql
+      //sql := sql + sLineBreak +        'print @sql';
+        sql := sql + sLineBreak +        'exec sp_executesql @sql;';
+
+        sql := sql.Replace('`', '''');
+
+      end else begin
+        // update target field
+        sql := Format('update %s set %s = %s', [tbl, fls, TSqlRec.Val(flv)]);
+
+        if TDbaRec.FldExists(tbl, 'FldWho', fbk) then
+          sql := sql + Format(', FldWho = ''%s''', [usr]);
+
+        if TDbaRec.FldExists(tbl, 'FldWhen', fbk) then
+          sql := sql + Format(', FldWhen = %s', [TSqlRec.Val(ndt)]);
+
+        sql   := sql + Format(' where %s;', [whe]);
+      end;
+
+      // fail
+      if not TDbaRec.CmdExec(sql, aff, fbk) then begin
+        oks := 'false';
+        sta := 'FAIL';
+        msg := 'Unable to update record ('+fbk+')';
+        sco := 200; // 400 Bad Request
+
+      // success
+      end else begin
+        oks := 'true';
+        sta := 'SUCCESS';
+        msg := 'Record updated ('+fbk+')';
+        sco := 200;
+      end;
     end;
   end;
 
