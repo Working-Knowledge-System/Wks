@@ -4311,7 +4311,7 @@ begin
       Result := Init(Organization, Owner, n, IvFbk);
       Result := DbaInsert(IvFbk);
       if not Result then begin
-        gods.Ods(IvFbk);
+        glog.Log(IvFbk);
         Exit;
       end else
         LogFmt('Cv Recipe Id %d does not exist, insert a default one before select it', [Id]);
@@ -4326,7 +4326,7 @@ begin
     q := Format('select * from DbaCv.dbo.TblRecipe where FldId = %d', [Id]);
     Result := x.DsFD(q, d, IvFbk);
     if not Result then begin
-      gods.Ods(IvFbk);
+      glog.Log(IvFbk);
       Exit;
     end;
     {$ENDREGION}
@@ -4459,7 +4459,7 @@ begin
       n := IfNxRnd(Recipe);
       Init(Organization, Owner, n, k);
       DbaInsert(IvFbk);
-      gods.Ods(IvFbk);
+      glog.Log(IvFbk);
       Exit;
     end;
   {$ENDREGION}

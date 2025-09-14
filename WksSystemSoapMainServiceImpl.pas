@@ -372,7 +372,7 @@ begin
   IvThemeRem.ObjectId           := the.ObjectId          ;
   IvThemeRem.Theme              := the.Theme             ;
   IvThemeRem.Grade              := the.Grade             ;
-  IvThemeRem.FontFamily         := the.FontFamily        ; // Verdana, Monserrat, ...
+  IvThemeRem.FontFamily         := the.FontFamily        ; // Inconsolata, Consolas, Verdana, ...
   IvThemeRem.FontWeight         := the.FontWeight        ; // 500..900
   IvThemeRem.SizeClass          := the.SizeClass         ;
   IvThemeRem.PaddingClass       := the.PaddingClass      ;

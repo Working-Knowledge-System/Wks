@@ -231,6 +231,7 @@ begin
     q.Connection := MqttADOConnection;
     try                                                                //, FldEndDateTime , :PEndDateTime
       q.Paramcheck := true;
+    //sql := TRva.Rv(IvSql);
       q.SQL.Text  := 'insert into DbaMqtt.dbo.TblTcp (FldStartDateTime, FldClientIp) values (:PStartDateTime, :PClientIp)'
       + sLineBreak + 'select scope_identity() as FldNewUId';
       q.Parameters.ParseSQL(q.SQL.Text, true);

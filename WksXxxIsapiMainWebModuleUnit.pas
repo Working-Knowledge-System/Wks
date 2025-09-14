@@ -40,6 +40,11 @@ interface
                                     |
                                     V
                                  response
+
+  Xxx module
+  ==========
+  
+  here goes the description of the present module
 }
 {$ENDREGION}
 
@@ -78,6 +83,9 @@ var
   WebModuleClass: TComponentClass = TMainWebModule;
 {$ENDREGION}
 
+const
+  MODULE_USE_ON_METHODS = false;
+
 implementation
 
 {$REGION 'Use'}
@@ -109,12 +117,13 @@ begin
   {$ENDREGION}
 
   {$REGION 'Objects'}
-  FWmoRec.Run := 0;
+//FWmoRec.Run := 0;
 //FIni := TIniCls.Create;
   {$ENDREGION}
 
   {$REGION 'Events'}
-  FWmoRec.OnWebModuleCreate;
+  if MODULE_USE_ON_METHODS then
+    FWmoRec.OnWebModuleCreate;
   {$ENDREGION}
 
 end;
@@ -127,7 +136,8 @@ begin
   {$ENDREGION}
 
   {$REGION 'Events'}
-  FWmoRec.OnWebModuleDestroy;
+  if MODULE_USE_ON_METHODS then
+    FWmoRec.OnWebModuleDestroy;
   {$ENDREGION}
 
 end;
@@ -139,11 +149,28 @@ begin
 end;
 
 procedure TMainWebModule.WebModuleBeforeDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
+var
+  fbk: string;
 begin
-  Inc(FWmoRec.Run);                                      // comment if useless
-  FWmoRec.BeforeDispatch(Request, Response, FWrq, FTic); // comment to skip session/request flow
-//gwrq.WebRequestOrig := Request; // cagnolina           // uncomment if revious is commented
+//Inc(FWmoRec.Run); // comment if useless
 
+  // bo initialization via standard method
+  if MODULE_USE_ON_METHODS then
+    FWmoRec.BeforeDispatch(Request, Response, FWrq, FTic)
+
+  // bo initialization made locally (repeated in every module)
+  else begin
+    FTic.Init;
+
+    gwrq.WebRequestOrig := Request; // cagnolina
+
+    // organization
+    if not gorg.InitByWww(Request.Host, fbk) then
+      raise Exception.CreateFmt('Unable to initialize TOrgRec by www "%s", it does not exists in the database', [Request.Host]);
+
+    // theme
+    gthe.InitDba(gorg.ObjectId, fbk);
+  end;
 
   {$REGION 'CustomHeader'}
   // handle here specific CustomHeader for all webactions or at beginning of each specific webaction
@@ -163,7 +190,10 @@ end;
 
 procedure TMainWebModule.WebModuleAfterDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
-  FWmoRec.AfterDispatch(Request, Response, FWrq, FTic); // comment to skip session/request flow
+  if MODULE_USE_ON_METHODS then
+    FWmoRec.AfterDispatch(Request, Response, FWrq, FTic)
+  else
+    Response.Content := StringReplace(Response.Content, '$RvElapsedMs$', FTic.ElapsedMs.ToString, [rfReplaceAll]);
 end;
   {$ENDREGION}
 

@@ -364,6 +364,7 @@ end;
 procedure TMainWebModule.MainWebModuleLoginTryWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 var
   usr, pas, rem, rid, fbk: string; // username, password, rememberme, redirecttopageid
+  bst: string; bdt: TDateTime;     // begindatetime
 begin
 
   {$REGION 'go'}
@@ -402,12 +403,15 @@ begin
 
   // authenticationok
   end else begin
-    // gobaluservarupdate
-  //gusr.LoggedIn := true; // *** unreliable --> use gses.IsValid(fbk) ***
+    // begindatetime
+    bst := gwrq.FieldCookieGet('CoDateTimeBegin', TDatRec.ZERO_DAT);
+    bdt := TDatRec.DatFromIso(bst, TDatRec.ZERO_DAT);
 
     // sessionupdateondba
+    gses.DateTimeBegin := bdt;
     gses.Organization := gorg.Obj.&Object;
     gses.Username := usr;
+    gses.Kind := 'Web'; // session is from a web browser, not from a win client
     gses.Update(fbk);
 
     // writeonclient-browser

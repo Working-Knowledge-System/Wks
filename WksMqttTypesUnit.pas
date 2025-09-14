@@ -1205,6 +1205,7 @@ begin
     query := TADOQuery.Create(nil);
     try
       query.Connection := FConn;
+    //sql := TRva.Rv(IvSql);
     //query.SQL.Text := 'insert into DbaMqtt.dbo.TblTcp (FldIp, FldUId, FldEvent, FldDateTime) values (:PIp, :PUId, :PEvent, :PDateTime)';
       for i := 0 to datalist.Count - 1 do begin
         data := datalist[i];
@@ -1222,6 +1223,7 @@ begin
 //        query.Parameters[3].Value := data.Event;
 
 
+      //sql := TRva.Rv(IvSql);
         query.SQL.Text := Format('insert into DbaMqtt.dbo.TblTcp (FldIp, FldUId, FldEvent, FldDateTime) values (''%s'', ''%s'', ''%s'', ''%s'')', [
           data.Ip
         , data.UId

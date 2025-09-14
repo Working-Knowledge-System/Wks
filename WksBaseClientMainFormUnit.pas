@@ -1327,7 +1327,7 @@ begin
 
   // option (common)
   OptionCryptoKeyEdit.Text                         := gini.CryGet( 'Common/OptionCryptoKey'                  , '12345'                    );
-  OptionPersistRootFolderEdit.Text                 := gini.StrGet( 'Common/OptionPersistRootFolder'          , 'C:\$Persist'             );
+  OptionPersistRootFolderEdit.Text                 := gini.StrGet( 'Common/OptionPersistRootFolder'          , 'C:\$Persist'              );
   OptionTempFolderEdit.Text                        := gini.StrGet( 'Common/OptionTempFolder'                 , 'C:\$Tmp'                  );
   OptionWeekWorkOneStartJvDateTimePicker.DateTime  := gini.FloGet( 'Common/OptionWeekWorkOneStart'           , IncHour(Date(), 19)        ); OptionWeekWorkOneStartJvDateTimePickerChange(nil);
 

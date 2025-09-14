@@ -147,9 +147,6 @@ begin
   // tab
 //tab := TabCurrent;
 
-  // script
-  sql := Script;
-
   // connection
   ResultADOConnection.Close;
   ResultADOConnection.ConnectionString := DBA_CONNECTION_STR;
@@ -157,6 +154,10 @@ begin
   // try
   Screen.Cursor := crHourGlass;
   try
+    // script
+    sql := Script;
+  //sql := TRva.Rv(IvSql);
+  
     // query
     ResultADOQuery.Close;
     ResultADOQuery.SQL.Text := sql;
