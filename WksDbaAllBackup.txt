@@ -12,7 +12,7 @@
 --[ENDREGION]
 
 -- declare
-declare @kp varchar(256); set @kp = 'C:\$Bak\Dba'                                 -- backupdir (without \Year\Week) -- '\\azfs6a\H_ENG_YMS\$Bak\Dba\2017\50'
+declare @kp varchar(256); set @kp = 'C:\$Bak\Dba'                                 -- backupdir (without \Year\Week)
 --declare @dt varchar(20) ; set @dt = convert(varchar, getdate(), 112)            -- date
 --declare @dy varchar(20) ; set @dy = convert(varchar, datepart(yyyy, getdate())) -- year
 --declare @dw varchar(20) ; set @dw = convert(varchar, datepart(ww, getdate()))   -- week

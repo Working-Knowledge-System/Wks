@@ -237,8 +237,8 @@ begin
   // set
   DataSet.Edit;
 //DataSet.FieldByName('FldObjectId').Value := FId; // automatic
-  DataSet.FieldByName('FldLocalId' ).Value := 1;  // tblmax+1            // \
-  DataSet.FieldByName('FldLocalPId').Value := 0;  // ?                   //  |__ need to be removed/updated
+  DataSet.FieldByName('FldLocalId' ).Value := 1;   // tblmax+1           // \
+  DataSet.FieldByName('FldLocalPId').Value := 0;   // ?                  //  |__ need to be removed/updated
   DataSet.FieldByName('FldValue1'  ).Value := TNamRec.RndInt('Value1');  //  |
   DataSet.FieldByName('FldValue2'  ).Value := TNamRec.RndInt('Value2');  // /
   DataSet.Post;
