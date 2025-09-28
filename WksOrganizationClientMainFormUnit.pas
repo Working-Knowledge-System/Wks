@@ -90,6 +90,10 @@ type
     ThemeColorResetLabel: TLabel;
     ThemeFontWeightDBComboBox: TDBComboBox;
     ThemeFontWeightLabel: TLabel;
+    OrganizationWwwAltLabel: TLabel;
+    OrganizationWwwAltDBEdit: TDBEdit;
+    ThemeStateLabel: TLabel;
+    ThemeStateDBComboBox: TDBComboBox;
     procedure FormCreate(Sender: TObject);
     procedure ActionPostActionExecute(Sender: TObject);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);

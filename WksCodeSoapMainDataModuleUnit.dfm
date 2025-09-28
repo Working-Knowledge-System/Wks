@@ -4,11 +4,11 @@ object CodeMainDataModule: TCodeMainDataModule
   Width = 540
   object CodeADOConnection: TADOConnection
     ConnectionString = 
-      'Provider=SQLOLEDB.1;Password=secret@123;Persist Security Info=Tr' +
-      'ue;User ID=sa;Initial Catalog=DbaCode;Data Source=LOCALHOST'
+      'Provider=MSOLEDBSQL.1;Password=secret@123;Persist Security Info=' +
+      'True;User ID=sa;Initial Catalog=DbaCode;Data Source=LOCALHOST'
     DefaultDatabase = 'DbaCode'
     LoginPrompt = False
-    Provider = 'SQLOLEDB.1'
+    Provider = 'MSOLEDBSQL.1'
     Left = 80
     Top = 40
   end

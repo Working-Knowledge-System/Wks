@@ -153,7 +153,7 @@ begin
   pat := TVstRec.NodePath(ObjectDTClientTree, ObjectDTClientTree.FocusedNode);
   vec := SplitString(pat, '/');
 
-  org.InitDba(vec[3], fbk);
+  org.InitDba(vec[3], gorg.Www, fbk);
   eat := org.Www.Replace('www.', '');
 
   MemberClientDataSet.Edit;
@@ -186,7 +186,7 @@ begin
   bmp := TBitmap.Create;
   try
   //bmp.Assign(MemberBadgeDBImage.Picture.Bitmap);
-    gmbr.BadgeGenerate(bmp, MemberOrganizationDBEdit.Text, MemberSiteDBEdit.Text, MemberMemberDBEdit.Text);
+    gmbr.BadgeGenerate(bmp, MemberOrganizationDBEdit.Text, gorg.Www, MemberSiteDBEdit.Text, MemberMemberDBEdit.Text);
     MemberClientDataSet.Edit;
     MemberBadgeDBImage.Picture.Assign(bmp);
     MemberClientDataSet.Post;
@@ -277,7 +277,7 @@ begin
 //DataSet.FieldByName('FldbjectId'     ).Value := FId; // automatic
 //DataSet.FieldByName('FldNumber'      ).Value := ;
 //DataSet.FieldByName('FldMember'      ).Value := TNamRec.Username();
-//DataSet.FieldByName('FldEmail'       ).Value := 'mariorossi@wks.cloud';
+//DataSet.FieldByName('FldEmail'       ).Value := 'puppadrillo@wks.cloud';
 //DataSet.FieldByName('FldState'       ).Value := ;
 //DataSet.FieldByName('FldOrganization').Value := ;
 //DataSet.FieldByName('FldDepartment'  ).Value := ;

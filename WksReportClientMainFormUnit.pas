@@ -210,6 +210,28 @@ type
     ReportDsHeaderOffDBCheckBox: TDBCheckBox;
     ReportDsRecordCountOffDBCheckBox: TDBCheckBox;
     ReportParamsOffDBCheckBox: TDBCheckBox;
+    ReportDatasetHeaderFooterTabSheet: TTabSheet;
+    ReportDatasetHeaderLabel: TLabel;
+    ReportDatasetHeaderDBSynEdit: TDBSynEdit;
+    ReportDatasetFooterSplitter: TSplitter;
+    ReportDatasetFooterLabel: TLabel;
+    ReportDatasetFooterDBSynEdit: TDBSynEdit;
+    ReportTabSheet: TTabSheet;
+    ReportHeaderLabel: TLabel;
+    ReportHeaderDBSynEdit: TDBSynEdit;
+    ReportFooterLabel: TLabel;
+    ReportFooterSplitter: TSplitter;
+    ReportFooterDBSynEdit: TDBSynEdit;
+    ReportGlobalTabSheet: TTabSheet;
+    ReportGlobalLeftPanel: TPanel;
+    ReportGlobalDTClientTree: TDTClientTree;
+    ReportGlobalDBNavigator: TDBNavigator;
+    ReportGlobalLeftSplitter: TSplitter;
+    ReportGlobalMainPanel: TPanel;
+    ReportGlobalDBGrid: TDBGrid;
+    ReportGlobalDataDBSynEdit: TDBSynEdit;
+    GlobalClientDataSet: TClientDataSet;
+    GlobalDataSource: TDataSource;
     procedure FormCreate(Sender: TObject);
     procedure ActionPostActionExecute(Sender: TObject);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
@@ -259,6 +281,7 @@ begin
   gsyn.Setup(ReportDatasetUpdateDBSynEdit, Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckSql , OptionFoldingLineShowCheckBox.Checked);
   gsyn.Setup(ReportDatasetDeleteDBSynEdit, Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckSql , OptionFoldingLineShowCheckBox.Checked);
   gsyn.Setup(ReportDatasetJsonDBSynEdit  , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckJson, OptionFoldingLineShowCheckBox.Checked);
+  gsyn.Setup(ReportGlobalDataDBSynEdit   , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckSql , OptionFoldingLineShowCheckBox.Checked);
 end;
 {$ENDREGION}
 
@@ -496,22 +519,21 @@ begin
     + sLineBreak + '      {"Id": "AddNew", "Visible": true, "Title": "Add New"}'
     + sLineBreak + '    ]'
     + sLineBreak + '  }'
-    + sLineBreak + ', "EditData": {'
+    + sLineBreak + ', "EditData": {' // was "EditIni": {
   //+ sLineBreak + '    "ReportId": 14'
-    + sLineBreak + '  , "DatasetName": "Person"'
-    + sLineBreak + '  , "InsertIfNotExists": true'
-    + sLineBreak + '  , "EditTable": "DbaAbc.dbo.TblAbc"'
-    + sLineBreak + '  , "EditKeyFieldList": ["FldId"]' // ["FldSurname","FldName","FldBirthDate"] or ["FldSsn"] or ...
-    + sLineBreak + '  , "EditOwnerField": "FldOwner"'
-    + sLineBreak + '  , "EditOneWayField": "FldState"'
-    + sLineBreak + '  , "EditOneWayRange": ["Active", "Inactive"]'
+    + sLineBreak + '  , "DatasetName": "Xxx"'
+    + sLineBreak + '  , "InsertIfNotExists": false'
+    + sLineBreak + '  , "EditTable": "DbaXxx.dbo.TblXxx"'
+    + sLineBreak + '  , "EditKeyFieldList": ["FldObjectId"] -- or ["FldId"] or ["FldSurname","FldName","FldBirthDate"] or ["FldSsn"]'
+    + sLineBreak + '  , "EditOwnerField": ""                -- or "FldOwner"'
+    + sLineBreak + '  , "EditOneWayField": ""               -- or "FldState"'
+    + sLineBreak + '  , "EditOneWayRange": []               -- or ["Active", "Inactive"]'
     + sLineBreak + '  , "EditFieldList": ['
-    + sLineBreak + '      {"Field": "FldId"          , "Ctrl": "Text"}'
-    + sLineBreak + '    , {"Field": "FldPId"         , "Ctrl": "Text"}' // TextInt
-    + sLineBreak + '    , {"Field": "FldAbc"         , "Ctrl": "Text"}'
+    + sLineBreak + '      {"Field": "FldLocalId"     , "Ctrl": "Text"}'
+    + sLineBreak + '    , {"Field": "FldLocalPId"    , "Ctrl": "Text"}' // TextInt
     + sLineBreak + '    , {"Field": "FldValue1"      , "Ctrl": "Text"}'
     + sLineBreak + '    , {"Field": "FldValue2"      , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldPId"         , "Ctrl": "Text"}'
+    // person example
   //+ sLineBreak + '    , {"Field": "FldPerson"      , "Ctrl": "Text"}'
   //+ sLineBreak + '    , {"Field": "FldName"        , "Ctrl": "Select", "OptionCsv": ",Null,"               , "OptionJson": "/WksCodeIsapiProject.dll/Code?CoId=?"}'
   //+ sLineBreak + '    , {"Field": "FldSurname"     , "Ctrl": "Select", "OptionCsv": ",Null,"               , "OptionJson": "/WksCodeIsapiProject.dll/Code?CoId=?"}'
@@ -529,8 +551,10 @@ begin
   //+ sLineBreak + '    , {"Field": "FldCity"        , "Ctrl": "Text"}'
   //+ sLineBreak + '    , {"Field": "FldProvince"    , "Ctrl": "Text"}'
   //+ sLineBreak + '    , {"Field": "FldCountry"     , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldBirthDate"   , "Ctrl": "Date"}                                 '
-  //+ sLineBreak + '    , {"Field": "FldBirthPlace"  , "Ctrl": "Report", "OptionReport": {"ReportId": 15, "ValueField": "FldPlace", "ColumnField": "%FldLocation% - %FldProvince%"}}'
+  //+ sLineBreak + '    , {"Field": "FldBirthDate"   , "Ctrl": "Date"}
+  //+ sLineBreak + '    , {"Field": "FldTime"        , "Ctrl": "Time"}                               '
+  //+ sLineBreak + '    , {"Field": "FldBirthPlace"  , "Ctrl": "Report", "OptionReport": {"ReportId": 15, "ValueField": "FldPlace", "ColumnField": "%FldLocation% - %FldProvince%"}}' or
+  //+ sLineBreak + '    , {"Field": "FldBirthPlace"  , "Ctrl": "Select", "OptionCsv"   : "http://localhost/WksCodeIsapiProject.dll/Code?CoId=21"}
   //+ sLineBreak + '    , {"Field": "FldOfficePhone" , "Ctrl": "Text"}'
   //+ sLineBreak + '    , {"Field": "FldOfficeMobile", "Ctrl": "Text"}'
   //+ sLineBreak + '    , {"Field": "FldOfficeEmail" , "Ctrl": "Text"}'
@@ -539,13 +563,12 @@ begin
   //+ sLineBreak + '    , {"Field": "FldPicture"     , "Ctrl": "Text"}'
   //+ sLineBreak + '    , {"Field": "FldNote"        , "Ctrl": "Text"}'
   //+ sLineBreak + '      {"Field": "FldState"       , "Ctrl": "Select", "OptionCsv": "http://localhost/WksCodeIsapiProject.dll/Code?CoId=18"}
-  //+ sLineBreak + '    , {"Field": "FldTime"        , "Ctrl": "Time"}
-  //+ sLineBreak + '    , {"Field": "FldLocation"    , "Ctrl": "Select", "OptionCsv": "http://localhost/WksCodeIsapiProject.dll/Code?CoId=21"}
-  //+ sLineBreak + '    , {"Field": "FldTeam1"       , "Ctrl": "Select", "OptionCsv": "", "OptionJson": "http://localhost/WksCodeIsapiProject.dll/Code?CoId=23"}
-  //+ sLineBreak + '    , {"Field": "FldTeam2"       , "Ctrl": "Select", "OptionCsv": "", "OptionJson": "http://localhost/WksCodeIsapiProject.dll/Code?CoId=23"}
-  //+ sLineBreak + '    , {"Field": "FldRefereeLevel", "Ctrl": "Select", "OptionCsv": "", "OptionJson": "http://localhost/WksCodeIsapiProject.dll/Code?CoId=24"}
-  //+ sLineBreak + '    , {"Field": "FldReferee1"    , "Ctrl": "Select", "OptionCsv": "", "OptionJson": "http://localhost/WksCodeIsapiProject.dll/Code?CoId=25"}
-  //+ sLineBreak + '    , {"Field": "FldSerie"       , "Ctrl": "Select"                 , "OptionJson": "http://localhost/WksCodeIsapiProject.dll/Code?CoId=26"}
+  //+ sLineBreak + '    , {"Field": "FldDate"        , "Ctrl": "Date"}
+    // fipav example
+  //+ sLineBreak + '    , {"Field": "FldTeam1"       , "Ctrl": "Select", "OptionCsv"   : "", "OptionJson": "http://localhost/WksCodeIsapiProject.dll/Code?CoId=23"}
+  //+ sLineBreak + '    , {"Field": "FldTeam2"       , "Ctrl": "Select", "OptionCsv"   : "", "OptionJson": "http://localhost/WksCodeIsapiProject.dll/Code?CoId=23"}
+  //+ sLineBreak + '    , {"Field": "FldRefereeLevel", "Ctrl": "Select", "OptionCsv"   : "", "OptionJson": "http://localhost/WksCodeIsapiProject.dll/Code?CoId=24"}
+  //+ sLineBreak + '    , {"Field": "FldReferee1"    , "Ctrl": "Select", "OptionCsv"   : "", "OptionJson": "http://localhost/WksCodeIsapiProject.dll/Code?CoId=25"}
   //+ sLineBreak + '    , {"Field": "FldReferee2"    , "Ctrl": "Report", "OptionReport": {"ReportId": 20, "ValueField": "FldLocation", "ColumnFieldCsv": "%FldLocation% - %FldProvince%"}}
     + sLineBreak + '    ]'
   //+ sLineBreak + '  , "EditValueRange": []'

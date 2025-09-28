@@ -4589,7 +4589,7 @@ begin
   + sLineBreak + ' and FldStrategy = ''%s'''
   , [IvDevice, IvFailBin, IvStrategy]
   );
-//  d := FDba.Ds(YmsDbaAiwymsdbAdoConn, q, f); // 31-Agosto-2020
+//  d := FDba.Ds(YmsDbaAiwwksdbAdoConn, q, f);
   try
     if d.IsEmpty then begin
       IvRecipe := '';

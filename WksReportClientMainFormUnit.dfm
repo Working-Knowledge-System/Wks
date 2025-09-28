@@ -16,6 +16,8 @@ inherited ReportMainForm: TReportMainForm
   inherited TopPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited TopPageControl: TPageControl
+      ExplicitLeft = 0
+      ExplicitTop = 0
       inherited TopSearchTabSheet: TTabSheet
         inherited SearchReplaceOutLabel: TLabel
           StyleElements = [seFont, seClient, seBorder]
@@ -134,6 +136,7 @@ inherited ReportMainForm: TReportMainForm
     inherited LeftPageControl: TPageControl
       inherited ObjectTreeTabSheet: TTabSheet
         inherited ObjectNodeInfoLabel: TLabel
+          Width = 292
           StyleElements = [seFont, seClient, seBorder]
         end
         inherited ObjectDBNavigator: TDBNavigator
@@ -365,6 +368,9 @@ inherited ReportMainForm: TReportMainForm
             end
             inherited ObjectImageClearLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageDBImage: TDBImage
+              Height = 0
             end
           end
           inherited ObjectTypeJvScrollMaxBand: TJvScrollMaxBand
@@ -2344,12 +2350,149 @@ inherited ReportMainForm: TReportMainForm
   inherited MainPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited MainPageControl: TPageControl
+      ActivePage = ReportGlobalTabSheet
+      inherited ObjectContentPrevTabSheet: TTabSheet
+        inherited ObjectContentPrevTopPanel: TPanel
+          inherited ObjectContentPrevCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
       inherited ObjectContentTabSheet: TTabSheet
         inherited ObjectContentSplitter: TSplitter
           ExplicitHeight = 536
         end
+        inherited ObjectContentTopPanel: TPanel
+          inherited ObjectContentCharCountLabel: TLabel
+            Height = 22
+          end
+        end
         inherited ObjectContentSplitView: TSplitView
           DoubleBuffered = True
+        end
+      end
+      inherited ObjectDataTabSheet: TTabSheet
+        inherited ObjectDataTopPanel: TPanel
+          inherited ObjectDataCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited ObjectNoteTabSheet: TTabSheet
+        inherited ObjectNoteTopPanel: TPanel
+          inherited ObjectNoteCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited FilesRioTabSheet: TTabSheet
+        inherited FilesRioTopPanel: TPanel
+          inherited FilesRioInfoLabel: TLabel
+            Height = 31
+          end
+        end
+      end
+      object ReportTabSheet: TTabSheet
+        Caption = 'Report'
+        ImageIndex = 7
+        object ReportHeaderLabel: TLabel
+          AlignWithMargins = True
+          Left = 8
+          Top = 3
+          Width = 926
+          Height = 15
+          Margins.Left = 8
+          Margins.Right = 8
+          Align = alTop
+          Caption = 'Header'
+          ExplicitWidth = 38
+        end
+        object ReportFooterLabel: TLabel
+          AlignWithMargins = True
+          Left = 8
+          Top = 289
+          Width = 926
+          Height = 15
+          Margins.Left = 8
+          Margins.Right = 8
+          Align = alBottom
+          Caption = 'Footer'
+          ExplicitWidth = 34
+        end
+        object ReportFooterSplitter: TSplitter
+          AlignWithMargins = True
+          Left = 8
+          Top = 280
+          Width = 926
+          Height = 3
+          Cursor = crVSplit
+          Margins.Left = 8
+          Margins.Right = 8
+          Align = alBottom
+          ExplicitLeft = -3
+          ExplicitTop = 383
+        end
+        object ReportHeaderDBSynEdit: TDBSynEdit
+          AlignWithMargins = True
+          Left = 8
+          Top = 24
+          Width = 926
+          Height = 250
+          Cursor = crIBeam
+          Margins.Left = 8
+          Margins.Right = 8
+          DataField = 'FldHeader'
+          DataSource = ReportDataSource
+          Align = alClient
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -12
+          Font.Name = 'Courier New'
+          Font.Pitch = fpFixed
+          Font.Style = []
+          Font.Quality = fqClearTypeNatural
+          ParentColor = False
+          ParentFont = False
+          TabOrder = 0
+          Gutter.Font.Charset = DEFAULT_CHARSET
+          Gutter.Font.Color = clWindowText
+          Gutter.Font.Height = -11
+          Gutter.Font.Name = 'Courier New'
+          Gutter.Font.Style = []
+          Gutter.Font.Quality = fqClearTypeNatural
+          Gutter.Bands = <>
+          WantTabs = True
+        end
+        object ReportFooterDBSynEdit: TDBSynEdit
+          AlignWithMargins = True
+          Left = 8
+          Top = 310
+          Width = 926
+          Height = 253
+          Cursor = crIBeam
+          Margins.Left = 8
+          Margins.Right = 8
+          DataField = 'FldFooter'
+          DataSource = ReportDataSource
+          Align = alBottom
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -12
+          Font.Name = 'Courier New'
+          Font.Pitch = fpFixed
+          Font.Style = []
+          Font.Quality = fqClearTypeNatural
+          ParentColor = False
+          ParentFont = False
+          TabOrder = 1
+          Gutter.Font.Charset = DEFAULT_CHARSET
+          Gutter.Font.Color = clWindowText
+          Gutter.Font.Height = -11
+          Gutter.Font.Name = 'Courier New'
+          Gutter.Font.Style = []
+          Gutter.Font.Quality = fqClearTypeNatural
+          Gutter.Bands = <>
+          WantTabs = True
         end
       end
       object ReportParamTabSheet: TTabSheet
@@ -2471,21 +2614,23 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 3
-            Width = 574
+            Width = 920
             Height = 15
             Align = alTop
             Caption = 
               'Options Query (option Value and Caption can be different: select' +
               ' Fld1 as FldValue, Fld2 as FldCaption from ...)'
+            ExplicitWidth = 574
           end
           object ReportParamOptionQueryConnStrLabel: TLabel
             AlignWithMargins = True
             Left = 3
             Top = 178
-            Width = 286
+            Width = 920
             Height = 15
             Align = alBottom
             Caption = 'Option Query Connection String (explicit or Source Id)'
+            ExplicitWidth = 286
           end
           object ReportParamOptionQueryDBSynEdit: TDBSynEdit
             AlignWithMargins = True
@@ -2563,12 +2708,13 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 3
-            Width = 534
+            Width = 920
             Height = 15
             Align = alTop
             Caption = 
               'Options Json (option Value and Caption can be different: {"value' +
               '": "caption", "value2": "caption2", ...})'
+            ExplicitWidth = 534
           end
           object ReportParamOptionJsonDBSynEdit: TDBSynEdit
             AlignWithMargins = True
@@ -2635,10 +2781,11 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 3
-            Width = 297
+            Width = 920
             Height = 15
             Align = alTop
             Caption = 'Options Csv (option Value and Caption will be the same)'
+            ExplicitWidth = 297
           end
           object ReportParamOptionCsvDBSynEdit: TDBSynEdit
             AlignWithMargins = True
@@ -3180,6 +3327,250 @@ inherited ReportMainForm: TReportMainForm
               TitleFont.Style = []
             end
           end
+          object ReportDatasetHeaderFooterTabSheet: TTabSheet
+            Caption = 'Header && Footer'
+            ImageIndex = 6
+            object ReportDatasetHeaderLabel: TLabel
+              AlignWithMargins = True
+              Left = 8
+              Top = 3
+              Width = 902
+              Height = 15
+              Margins.Left = 8
+              Margins.Right = 8
+              Align = alTop
+              Caption = 'Header'
+              ExplicitWidth = 38
+            end
+            object ReportDatasetFooterSplitter: TSplitter
+              AlignWithMargins = True
+              Left = 8
+              Top = 231
+              Width = 902
+              Height = 3
+              Cursor = crVSplit
+              Margins.Left = 8
+              Margins.Right = 8
+              Align = alBottom
+              ExplicitTop = 266
+            end
+            object ReportDatasetFooterLabel: TLabel
+              AlignWithMargins = True
+              Left = 8
+              Top = 210
+              Width = 902
+              Height = 15
+              Margins.Left = 8
+              Margins.Right = 8
+              Align = alBottom
+              Caption = 'Footer'
+              ExplicitWidth = 34
+            end
+            object ReportDatasetHeaderDBSynEdit: TDBSynEdit
+              AlignWithMargins = True
+              Left = 8
+              Top = 24
+              Width = 902
+              Height = 180
+              Cursor = crIBeam
+              Margins.Left = 8
+              Margins.Right = 8
+              DataField = 'FldHeader'
+              DataSource = DatasetDataSource
+              Align = alClient
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Courier New'
+              Font.Pitch = fpFixed
+              Font.Style = []
+              Font.Quality = fqClearTypeNatural
+              ParentColor = False
+              ParentFont = False
+              TabOrder = 0
+              Gutter.Font.Charset = DEFAULT_CHARSET
+              Gutter.Font.Color = clWindowText
+              Gutter.Font.Height = -11
+              Gutter.Font.Name = 'Courier New'
+              Gutter.Font.Style = []
+              Gutter.Font.Quality = fqClearTypeNatural
+              Gutter.Bands = <>
+              WantTabs = True
+            end
+            object ReportDatasetFooterDBSynEdit: TDBSynEdit
+              AlignWithMargins = True
+              Left = 8
+              Top = 240
+              Width = 902
+              Height = 181
+              Cursor = crIBeam
+              Margins.Left = 8
+              Margins.Right = 8
+              DataField = 'FldFooter'
+              DataSource = DatasetDataSource
+              Align = alBottom
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Courier New'
+              Font.Pitch = fpFixed
+              Font.Style = []
+              Font.Quality = fqClearTypeNatural
+              ParentColor = False
+              ParentFont = False
+              TabOrder = 1
+              Gutter.Font.Charset = DEFAULT_CHARSET
+              Gutter.Font.Color = clWindowText
+              Gutter.Font.Height = -11
+              Gutter.Font.Name = 'Courier New'
+              Gutter.Font.Style = []
+              Gutter.Font.Quality = fqClearTypeNatural
+              Gutter.Bands = <>
+              WantTabs = True
+            end
+          end
+        end
+      end
+      object ReportGlobalTabSheet: TTabSheet
+        Caption = 'Globals'
+        ImageIndex = 8
+        object ReportGlobalLeftSplitter: TSplitter
+          Left = 260
+          Top = 0
+          Height = 566
+          ExplicitLeft = 296
+          ExplicitTop = 312
+          ExplicitHeight = 100
+        end
+        object ReportGlobalLeftPanel: TPanel
+          Left = 0
+          Top = 0
+          Width = 260
+          Height = 566
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = 'ReportGlobalLeftPanel'
+          ShowCaption = False
+          TabOrder = 0
+          object ReportGlobalDTClientTree: TDTClientTree
+            AlignWithMargins = True
+            Left = 0
+            Top = 31
+            Width = 257
+            Height = 532
+            Margins.Left = 0
+            Align = alClient
+            BorderStyle = bsNone
+            Colors.BorderColor = 15987699
+            Colors.DisabledColor = clGray
+            Colors.DropMarkColor = 15385233
+            Colors.DropTargetColor = 15385233
+            Colors.DropTargetBorderColor = 15385233
+            Colors.FocusedSelectionColor = 15385233
+            Colors.FocusedSelectionBorderColor = 15385233
+            Colors.GridLineColor = 15987699
+            Colors.HeaderHotColor = clBlack
+            Colors.HotColor = clBlack
+            Colors.SelectionRectangleBlendColor = 15385233
+            Colors.SelectionRectangleBorderColor = 15385233
+            Colors.SelectionTextColor = clBlack
+            Colors.TreeLineColor = 9471874
+            Colors.UnfocusedColor = clGray
+            Colors.UnfocusedSelectionColor = clWhite
+            Colors.UnfocusedSelectionBorderColor = clWhite
+            Header.AutoSizeIndex = 0
+            Header.MainColumn = -1
+            NodeDataSize = 4
+            TabOrder = 0
+            TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowRoot, toShowTreeLines, toThemeAware]
+            Touch.InteractiveGestures = [igPan, igPressAndTap]
+            Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+            DataSource = GlobalDataSource
+            DBTreeFields.KeyFieldName = 'FldId'
+            DBTreeFields.ParentFieldName = 'FldPId'
+            DBTreeFields.ListFieldName = 'FldGlobal'
+            DBTreeFields.ParentOfRootValue = '0'
+            DBTreeImages.HasChildrenImageIndex = -1
+            DBTreeImages.HasChildrenSelectedIndex = -1
+            DBTreeImages.NoChildrenImageIndex = -1
+            DBTreeImages.NoChildrenSelectedIndex = -1
+            UseFilter = True
+            Columns = <>
+          end
+          object ReportGlobalDBNavigator: TDBNavigator
+            AlignWithMargins = True
+            Left = 0
+            Top = 3
+            Width = 257
+            Height = 25
+            Margins.Left = 0
+            Margins.Bottom = 0
+            DataSource = GlobalDataSource
+            VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
+            Align = alTop
+            Flat = True
+            TabOrder = 1
+          end
+        end
+        object ReportGlobalMainPanel: TPanel
+          Left = 263
+          Top = 0
+          Width = 679
+          Height = 566
+          Align = alClient
+          BevelOuter = bvNone
+          Caption = 'ReportGlobalMainPanel'
+          ShowCaption = False
+          TabOrder = 1
+          object ReportGlobalDBGrid: TDBGrid
+            AlignWithMargins = True
+            Left = 8
+            Top = 8
+            Width = 663
+            Height = 152
+            Margins.Left = 8
+            Margins.Top = 8
+            Margins.Right = 8
+            Align = alTop
+            DataSource = GlobalDataSource
+            TabOrder = 0
+            TitleFont.Charset = DEFAULT_CHARSET
+            TitleFont.Color = clWindowText
+            TitleFont.Height = -12
+            TitleFont.Name = 'Segoe UI'
+            TitleFont.Style = []
+          end
+          object ReportGlobalDataDBSynEdit: TDBSynEdit
+            AlignWithMargins = True
+            Left = 8
+            Top = 171
+            Width = 663
+            Height = 387
+            Cursor = crIBeam
+            Margins.Left = 8
+            Margins.Top = 8
+            Margins.Right = 8
+            Margins.Bottom = 8
+            DataField = 'FldData'
+            DataSource = GlobalDataSource
+            Align = alClient
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = 'Consolas'
+            Font.Style = []
+            Font.Quality = fqClearTypeNatural
+            ParentColor = False
+            ParentFont = False
+            TabOrder = 1
+            Gutter.Font.Charset = DEFAULT_CHARSET
+            Gutter.Font.Color = clWindowText
+            Gutter.Font.Height = -11
+            Gutter.Font.Name = 'Consolas'
+            Gutter.Font.Style = []
+            Gutter.Font.Quality = fqClearTypeNatural
+            Gutter.Bands = <>
+          end
         end
       end
     end
@@ -3204,6 +3595,9 @@ inherited ReportMainForm: TReportMainForm
     DataSet = ReportClientDataSet
     Left = 208
     Top = 432
+  end
+  inherited MainSoapConnection: TSoapConnection
+    URL = 'http://localhost/WksReportSoapProject.dll/soap'
   end
   object ReportImageList24: TImageList [27]
     ColorDepth = cd32Bit
@@ -3607,5 +4001,18 @@ inherited ReportMainForm: TReportMainForm
     DataSet = SerieClientDataSet
     Left = 208
     Top = 656
+  end
+  object GlobalClientDataSet: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'GlobalDataSetProvider'
+    RemoteServer = MainSoapConnection
+    Left = 72
+    Top = 712
+  end
+  object GlobalDataSource: TDataSource
+    DataSet = GlobalClientDataSet
+    Left = 208
+    Top = 712
   end
 end

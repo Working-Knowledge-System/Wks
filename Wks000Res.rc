@@ -72,6 +72,7 @@
 // icon file have to be 256 color dept or brcc32 will not compile
 // windows automatically use bitmap resource with lower res-id or use Application.Icon.Handle to load a specific icon
 100_WKS_ICON_RC                                ICON            ".\WksIcon.ico"
+//100_WKS_ICON_INV_RC                            ICON            ".\WksIconInv.ico"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -81,15 +82,7 @@
 // WKS_LOGO_24X24_BMP_RC                          BITMAP          ".\WksLogo_24x24.bmp" // 24x24
 // WKS_LOGO_48X48_BMP_RC                          BITMAP          ".\WksLogo_48x48.bmp" // 48x48
 // WKS_LOGO_BMP_RC                                BITMAP          ".\WksLogo.bmp"       // 256x256
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// manifest
-////////////////////////////////////////////////////////////////////////////////
-
-// 1 24 "WksXxxIsapiProject.manifest"
-
+// WKS_LOGO_INV_BMP_RC                            BITMAP          ".\WksLogoInv.bmp"    // 256x256
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -124,3 +117,174 @@
 //     VALUE "Translation", 2057, 1252
 //   }
 // }
+
+
+////////////////////////////////////////////////////////////////////////////////
+// manifest
+////////////////////////////////////////////////////////////////////////////////
+//1 24 "WksXxxIsapiProject.manifest"
+
+
+////////////////////////////////////////////////////////////////////////////////
+// images
+/*
+  // arrow
+  ARROW_RIGHT_IMAGE_RC                           BITMAP          "C:\$\Image\A\Arrow\Arrow_Right_16x16.bmp"
+  ARROW_UP_IMAGE_RC                              BITMAP          "C:\$\Image\A\Arrow\Arrow_Up_16x16.bmp"
+  ARROW_LEFT_IMAGE_RC                            BITMAP          "C:\$\Image\A\Arrow\Arrow_Left_16x16.bmp"
+  ARROW_DOWN_IMAGE_RC                            BITMAP          "C:\$\Image\A\Arrow\Arrow_Down_16x16.bmp"
+
+  // hierarchy
+  HIERARCHY_PARENT_ICON                          BITMAP          "C:\$\Image\P\Parent_16x16.bmp"
+  HIERARCHY_ITEM_ICON                            BITMAP          "C:\$\Image\I\Item\Item_16x16.bmp"
+  HIERARCHY_OBJECT_ICON                          BITMAP          "C:\$\Image\O\Object\Object_16x16.bmp"
+  HIERARCHY_CHILD_ICON                           BITMAP          "C:\$\Image\C\Child_16x16.bmp"
+  HIERARCHY_LEAF_ICON                            BITMAP          "C:\$\Image\L\Leaf_16x16.bmp"
+  HIERARCHY_SIBLING_ICON                         BITMAP          "C:\$\Image\S\Sibling_16x16.bmp"
+
+  // profile (REMOVE, NOW THESE ARE IN word-objlet)
+  PROFILE_ORGANIZATION_ICON                      BITMAP          "C:\$\Image\O\Organization\Organization_16x16.bmp"
+  PROFILE_DEPARTMENT_ICON                        BITMAP          "C:\$\Image\D\Department\Department_16x16.bmp"
+  PROFILE_AREA_ICON                              BITMAP          "C:\$\Image\A\Area\Area_16x16.bmp"
+  PROFILE_TEAM_ICON                              BITMAP          "C:\$\Image\T\Team\Team_16x16.bmp"
+  PROFILE_ACTIVITY_ICON                          BITMAP          "C:\$\Image\A\Activity\Activity_16x16.bmp"
+  PROFILE_MEMBER_ICON                            BITMAP          "C:\$\Image\M\Member\Member16x16.bmp"
+  PROFILE_ACTIVITIES_ICON                        BITMAP          "C:\$\Image\A\Activity\Activities_16x16.bmp"
+  PROFILE_MEMBER_ICON                            BITMAP          "C:\$\Image\M\Member\Members_16x16.bmp"
+
+  // role
+  ROLE_GUEST_LOW_ICON                            BITMAP          "C:\$\Image\R\Role\RoleGuestLow_96x96.bmp"
+  ROLE_GUEST_NORMAL_ICON                         BITMAP          "C:\$\Image\R\Role\RoleGuestNormal_96x96.bmp"
+  ROLE_GUEST_HIGH_ICON                           BITMAP          "C:\$\Image\R\Role\RoleGuestHigh_96x96.bmp"
+  ROLE_MEMBER_LOW_ICON                           BITMAP          "C:\$\Image\R\Role\RoleMemberLow_96x96.bmp"
+  ROLE_MEMBER_NORMAL_ICON                        BITMAP          "C:\$\Image\R\Role\RoleMemberNormal_96x96.bmp"
+  ROLE_MEMBER_HIGH_ICON                          BITMAP          "C:\$\Image\R\Role\RoleMemberHigh_96x96.bmp"
+  ROLE_SUPERVISOR_LOW_ICON                       BITMAP          "C:\$\Image\R\Role\RoleSupervisorLow_96x96.bmp"
+  ROLE_SUPERVISOR_NORMAL_ICON                    BITMAP          "C:\$\Image\R\Role\RoleSupervisorNormal_96x96.bmp"
+  ROLE_SUPERVISOR_HIGH_ICON                      BITMAP          "C:\$\Image\R\Role\RoleSupervisorHigh_96x96.bmp"
+  ROLE_MANAGER_LOW_ICON                          BITMAP          "C:\$\Image\R\Role\RoleManagerLow_96x96.bmp"
+  ROLE_MANAGER_NORMAL_ICON                       BITMAP          "C:\$\Image\R\Role\RoleManagerNormal_96x96.bmp"
+  ROLE_MANAGER_HIGH_ICON                         BITMAP          "C:\$\Image\R\Role\RoleManagerHigh_96x96.bmp"
+  ROLE_ADMINISTRATOR_LOW_ICON                    BITMAP          "C:\$\Image\R\Role\RoleAdministratorLow_96x96.bmp"
+  ROLE_ADMINISTRATOR_NORMAL_ICON                 BITMAP          "C:\$\Image\R\Role\RoleAdministratorNormal_96x96.bmp"
+  ROLE_ADMINISTRATOR_HIGH_ICON                   BITMAP          "C:\$\Image\R\Role\RoleAdministratorHigh_96x96.bmp"
+
+  // action (REMOVE, NOW THESE ARE IN word-objlet)
+  LIST_ACTION_ICON                               BITMAP          "C:\$\Image\L\List\List_16x16.bmp"
+  NEW_ACTION_ICON                                BITMAP          "C:\$\Image\N\New\New_16x16.bmp"
+  CLONE_ACTION_ICON                              BITMAP          "C:\$\Image\C\Clone\Clone2_16x16.bmp"
+  VIEW_ACTION_ICON                               BITMAP          "C:\$\Image\V\View\View_16x16.bmp"
+  EDIT_ACTION_ICON                               BITMAP          "C:\$\Image\E\Edit\Edit_16x16.bmp"
+  DELETE_ACTION_ICON                             BITMAP          "C:\$\Image\D\Delete\Delete_16x16.bmp"
+  PROMOTE_ACTION_ICON                            BITMAP          "C:\$\Image\P\Promote\Promote_16x16.bmp"
+  DEMOTE_ACTION_ICON                             BITMAP          "C:\$\Image\D\Demote\Demote_16x16.bmp"
+  REFRESH_ACTION_ICON                            BITMAP          "C:\$\Image\R\Refresh\Refresh_16x16.bmp"
+  DESIGN_ACTION_ICON                             BITMAP          "C:\$\Image\D\Design\Design_16x16.bmp"
+  CLOSE_ACTION_ICON                              BITMAP          "C:\$\Image\O\Off\Off_16x16.bmp"
+  OPEN_ACTION_ICON                               BITMAP          "C:\$\Image\O\Open\open_document_16_h.bmp"
+  RUN_ACTION_ICON                                BITMAP          "C:\$\Image\R\Run\Run_16x16.bmp"
+  PDF_ACTION_ICON                                BITMAP          "C:\$\Image\P\Pdf\Pdf_16x16.bmp"
+
+  // word-objlet
+  _ICON                                          BITMAP          "C:\$\Image\X\Xxx\Xxx_16x16.bmp"
+  ACTIVITIES_ICON                                BITMAP          "C:\$\Image\A\Activity\Activities_16x16.bmp"
+  ACTIVITY_ICON                                  BITMAP          "C:\$\Image\A\Activity\Activity_16x16.bmp"
+  AGENDA_ICON                                    BITMAP          "C:\$\Image\A\Agenda\Agenda_16x16.bmp"
+  AREA_ICON                                      BITMAP          "C:\$\Image\A\Area\Area_16x16.bmp"
+  AVATAR_ICON                                    BITMAP          "C:\$\Image\A\Avatar\Avatar_16x16.bmp"
+  BROWSER_ICON                                   BITMAP          "C:\$\Image\B\Browser\Browser_16x16.bmp"
+  CALCULATOR_ICON                                BITMAP          "C:\$\Image\C\Calculator\Calculator_16x16.bmp"
+  CATALOG_ICON                                   BITMAP          "C:\$\Image\B\Book\History16x16.bmp"
+  CHAT_ICON                                      BITMAP          "C:\$\Image\C\Chat\Chat_16x16.bmp"
+  CLIENT_ICON                                    BITMAP          "C:\$\Image\C\Client\Client_16x16.bmp"
+  CLONE_ICON                                     BITMAP          "C:\$\Image\C\Clone\Clone2_16x16.bmp"
+  CLOSE_ICON                                     BITMAP          "C:\$\Image\O\Off\Off_16x16.bmp"
+  CODE_ICON                                      BITMAP          "C:\$\Image\C\Code\Code_16x16.bmp"
+  DATA_ICON                                      BITMAP          "C:\$\Image\D\Data\Data_16x16.bmp"
+  DELETE_ICON                                    BITMAP          "C:\$\Image\D\Delete\Delete_16x16.bmp"
+  DEMOTE_ICON                                    BITMAP          "C:\$\Image\D\Demote\Demote_16x16.bmp"
+  DEPARTMENT_ICON                                BITMAP          "C:\$\Image\D\Department\Department_16x16.bmp"
+  DESIGN_ICON                                    BITMAP          "C:\$\Image\D\Design\Design_16x16.bmp"
+  DIRECTORY_ICON                                 BITMAP          "C:\$\Image\S\System\System_16x16.bmp"
+  ECHO_ICON                                      BITMAP          "C:\$\Image\E\Echo\Echo16x16.bmp"
+  EDIT_ICON                                      BITMAP          "C:\$\Image\E\Edit\Edit_16x16.bmp"
+  EMAIL_ICON                                     BITMAP          "C:\$\Image\E\Email\Email_16x16.bmp"
+  FILE_ICON                                      BITMAP          "C:\$\Image\F\File\File_16x16.bmp"
+  FOLDER_ICON                                    BITMAP          "C:\$\Image\F\Folder\FolderOpen_16x16.bmp"
+  FORM_ICON                                      BITMAP          "C:\$\Image\F\Form\Form_16x16.bmp"
+  GRAPH_ICON                                     BITMAP          "C:\$\Image\G\Graph\Graph_16x16.bmp"
+  HELP_ICON                                      BITMAP          "C:\$\Image\H\Help\Help_16x16.bmp"
+  IMAGE_ICON                                     BITMAP          "C:\$\Image\I\Image\Image_16x16.bmp"
+  ITEM_ICON                                      BITMAP          "C:\$\Image\I\Item\Item_16x16.bmp"
+  LIST_ICON                                      BITMAP          "C:\$\Image\L\List\List_16x16.bmp"
+  LOG_ICON                                       BITMAP          "C:\$\Image\L\Log\Log_16x16.bmp"
+  LOT_ICON                                       BITMAP          "C:\$\Image\L\Lot\Lot_16x16.bmp"
+  MAP_ICON                                       BITMAP          "C:\$\Image\M\Map\Map_16x16.bmp"
+  MARQUEE_ICON                                   BITMAP          "C:\$\Image\M\Marquee\Marquee_16x16.bmp"
+  MEMBER_ICON                                    BITMAP          "C:\$\Image\M\Member\Members_16x16.bmp"
+  MEMBER_ICON                                    BITMAP          "C:\$\Image\M\Member\Member_16x16.bmp"
+  MENU_ICON                                      BITMAP          "C:\$\Image\M\Menu\Menu_16x16.bmp"
+  MOTORCYCLE_IMAGE_RC                            BITMAP          "C:\$\Image\M\Motorcycle\Motorcycle.bmp"
+  NEW_ICON                                       BITMAP          "C:\$\Image\N\New\New_16x16.bmp"
+  OBJECT_ICON                                    BITMAP          "C:\$\Image\O\Object\Object_16x16.bmp"
+  OPEN_ICON                                      BITMAP          "C:\$\Image\O\Open\open_document_16_h.bmp"
+  ORGANIZATION_ICON                              BITMAP          "C:\$\Image\O\Organization\Organization_16x16.bmp"
+  PAGE_ICON                                      BITMAP          "C:\$\Image\P\Page\Page_16x16.bmp"
+  PDF_ICON                                       BITMAP          "C:\$\Image\P\Pdf\Pdf_16x16.bmp"
+  PEOPLE_ICON                                    BITMAP          "C:\$\Image\P\Person\Persons16x16.bmp"
+  PERSON_ICON                                    BITMAP          "C:\$\Image\P\Person\Person_16x16.bmp"
+  PLACE_ICON                                     BITMAP          "C:\$\Image\G\Globe\Globe_16x16.bmp"
+  PLAZA_ICON                                     BITMAP          "C:\$\Image\P\Plaza\Plaza2_16x16.bmp"
+  POLICY_ICON                                    BITMAP          "C:\$\Image\P\Policy\Policy_16x16.bmp"
+  PROJECT_ICON                                   BITMAP          "C:\$\Image\P\Project\Project_16x16.bmp"
+  PROMOTE_ICON                                   BITMAP          "C:\$\Image\P\Promote\Promote_16x16.bmp"
+  RATING_ICON                                    BITMAP          "C:\$\Image\R\Rating\Rating_16x16.bmp"
+  REFRESH_ICON                                   BITMAP          "C:\$\Image\R\Refresh\Refresh_16x16.bmp"
+  REPORT_ICON                                    BITMAP          "C:\$\Image\R\Report\Report_16x16.bmp"
+  ROLE_ICON                                      BITMAP          "C:\$\Image\R\Role\Role_16x16.bmp"
+  ROOT_ICON                                      BITMAP          "C:\$\Image\H\Home\Home_16x16.bmp"
+  ROUTE_ICON                                     BITMAP          "C:\$\Image\R\Route\Route_16x16.bmp"
+  RUN_ICON                                       BITMAP          "C:\$\Image\R\Run\Run_16x16.bmp"
+  SECURITY_ICON                                  BITMAP          "C:\$\Image\S\Security\Security_16x16.bmp"
+  STATE_ICON                                     BITMAP          "C:\$\Image\S\State\State_16x16.bmp"
+  TEAM_ICON                                      BITMAP          "C:\$\Image\T\Team\Team_16x16.bmp"
+  TIME_ICON                                      BITMAP          "C:\$\Image\T\Time\Time_16x16.bmp"
+  ZZZ_ICON                                       BITMAP          "C:\$\Image\T\Zzz\Zzz_16x16.bmp" // Trash
+  USER_ICON                                      BITMAP          "C:\$\Image\U\User\User_16x16.bmp"
+  VIEW_ICON                                      BITMAP          "C:\$\Image\V\View\View_16x16.bmp"
+  WAFER_ICON                                     BITMAP          "C:\$\Image\W\Wafer\WaferGood_16x16.bmp"
+  WEBSITE_ICON                                   BITMAP          "C:\$\Image\G\Globe\Globe_16x16.bmp"
+  WORD_ICON                                      BITMAP          "C:\$\Image\W\Word\Word_16x16.bmp"
+  XXX_ICON                                       BITMAP          "C:\$\Image\X\Xxx\Xxx_16x16.bmp"
+  ZZZ_ICON                                       BITMAP          "C:\$\Image\Z\Zzz\Zzz_16x16.bmp"
+
+  // flow
+  ICON_FLOW_IN                                   BITMAP          "C:\$\Image\I\In\In_16x16.bmp"
+  ICON_FLOW_OUT                                  BITMAP          "C:\$\Image\O\Out\Out_16x16.bmp"
+
+  // places
+  CITY_ICON                                      BITMAP          "C:\$\Image\C\City\City_16x16.bmp"
+  CONTINENT_ICON                                 BITMAP          "C:\$\Image\C\Continent\Continent_16x16.bmp"
+  COUNTRY_ICON                                   BITMAP          "C:\$\Image\C\Country\Country_16x16.bmp"
+  NUMBER_ICON                                    BITMAP          "C:\$\Image\N\Number\Number_16x16.bmp"
+  OCEAN_ICON                                     BITMAP          "C:\$\Image\O\Ocean\Ocean_16x16.bmp"
+  PLANET_ICON                                    BITMAP          "C:\$\Image\P\Planet\Planet_16x16.bmp"
+  PROVINCE_ICON                                  BITMAP          "C:\$\Image\P\Province\Province_16x16.bmp"
+  REGION_ICON                                    BITMAP          "C:\$\Image\R\Region\Region_16x16.bmp"
+  SQUARE_ICON                                    BITMAP          "C:\$\Image\S\Square\Square_16x16.bmp"
+  STREET_ICON                                    BITMAP          "C:\$\Image\S\Street\Street_16x16.bmp"
+  SUN_ICON                                       BITMAP          "C:\$\Image\S\Sun\Sun_16x16.bmp"
+
+  // sample
+  ICON_SAMPLE_BMP                                BITMAP          "C:\$\Image\S\Sample\Sample.bmp"
+  ICON_SAMPLE_ICO                                ICON            "C:\$\Image\S\Sample\Sample.ico"
+  ICON_SAMPLE_CUR                                CURSOR          "C:\$\Image\S\Sample\Sample.cur"
+  ICON_SAMPLE_ANI                                ANICURSOR       "C:\$\Image\S\Sample\Sample.ani"
+  ICON_SAMPLE_JPG                                JPEG            "C:\$\Image\S\Sample\Sample.jpg"
+  ICON_SAMPLE_WAV                                WAVE            "C:\$\Image\S\Sample\Sample.wav"
+  ICON_SAMPLE_TXT                                TEXT            "C:\$\Image\S\Sample\Sample.txt"
+
+  // old
+  IMAGE_CHECK_ON                                 GIF             "C:\$\Image\C\Check\CheckOn_16x16.gif"
+  IMAGE_CHECK_OFF                                GIF             "C:\$\Image\C\Check\CheckOff_16x16.gif"
+*/

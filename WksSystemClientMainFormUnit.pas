@@ -101,6 +101,22 @@ type
     Splitter1: TSplitter;
     BinariesServiceToolButton: TToolButton;
     BinariesDBNavigator: TDBNavigator;
+    SystemDatabaseTabSheet: TTabSheet;
+    DatabasePanel: TPanel;
+    DatabaseToolBar: TToolBar;
+    SystemSourceTabSheet: TTabSheet;
+    SystemSourceLeftPanel: TPanel;
+    SystemSourceDTClientTree: TDTClientTree;
+    SystemSourceDBNavigator: TDBNavigator;
+    SystemSourceLeftSplitter: TSplitter;
+    SystemSourceMainPanel: TPanel;
+    SystemSourceConnStrAdoLabel: TLabel;
+    SystemSourceConnStrFdLabel: TLabel;
+    SystemSourceDBGrid: TDBGrid;
+    SystemSourceConnStrAdoDBSynEdit: TDBSynEdit;
+    SystemSourceConnStrFdDBSynEdit: TDBSynEdit;
+    SourceClientDataSet: TClientDataSet;
+    SourceDataSource: TDataSource;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ActionPostActionExecute(Sender: TObject);
@@ -332,7 +348,7 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION 'SystemAction'}
+{$REGION 'Database'}
 procedure TSystemMainForm.SystemDbaDefinitionRebuildActionExecute(Sender: TObject);
 var
 //bol: boolean;
@@ -474,7 +490,7 @@ begin
 
   // logdetails
   {
-  SyslogRichEdit.Lines.Add(r);                              // <14>Nov  8 15:42:35 www.wks.cloud WksWafermarkDualProject[3312]: tick...
+  SyslogRichEdit.Lines.Add(r);                              // <14>Nov  8 15:42:35 www.wks.cloud WksWaferMarkDualProject[3312]: tick...
   SyslogRichEdit.Lines.Add(h);                              // www.wks.cloud
   SyslogRichEdit.Lines.Add(p);                              // 10.176.66.8
   SyslogRichEdit.Lines.Add(DateTimeToStr(t));               // 11/8/2022 3:42:35 PM

@@ -7,7 +7,7 @@ uses
     System.Classes
   , System.SysUtils
   , Vcl.StdCtrls
-  , PythonEngine              // gPythonEngine
+  , PythonEngine              // PythonEngine
   , PythonVersions
   , Vcl.PythonGUIInputOutput
   ;

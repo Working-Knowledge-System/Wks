@@ -15,7 +15,7 @@ object BaseForm: TBaseForm
   OnDestroy = FormDestroy
   TextHeight = 15
   object RightJvNetscapeSplitter: TJvNetscapeSplitter
-    Left = 590
+    Left = 518
     Top = 204
     Height = 397
     Align = alRight
@@ -205,7 +205,7 @@ object BaseForm: TBaseForm
   object MainPanel: TPanel
     Left = 0
     Top = 204
-    Width = 537
+    Width = 473
     Height = 397
     Align = alLeft
     BevelOuter = bvNone
@@ -216,23 +216,25 @@ object BaseForm: TBaseForm
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 531
+      Width = 467
       Height = 391
       ActivePage = LogTabSheet
       Align = alClient
       TabOrder = 0
+      ExplicitWidth = 531
       object LogTabSheet: TTabSheet
         Caption = '  Log'
         object LogTopPanel: TPanel
           Left = 0
           Top = 0
-          Width = 523
+          Width = 459
           Height = 33
           Align = alTop
           BevelOuter = bvNone
           Caption = 'LogTopPanel'
           ShowCaption = False
           TabOrder = 0
+          ExplicitWidth = 523
           object LogClearButton: TButton
             Left = 3
             Top = 4
@@ -278,7 +280,7 @@ object BaseForm: TBaseForm
         object LogSynEdit: TSynEdit
           Left = 0
           Top = 33
-          Width = 523
+          Width = 459
           Height = 328
           Align = alClient
           Font.Charset = DEFAULT_CHARSET
@@ -335,14 +337,15 @@ object BaseForm: TBaseForm
               AnnPos = sbpRight
               FullRow = True
             end>
+          ExplicitWidth = 523
         end
       end
     end
   end
   object RightPanel: TPanel
-    Left = 600
+    Left = 528
     Top = 204
-    Width = 408
+    Width = 480
     Height = 397
     Align = alRight
     BevelOuter = bvNone
@@ -353,10 +356,11 @@ object BaseForm: TBaseForm
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 402
+      Width = 474
       Height = 391
       Align = alClient
       TabOrder = 0
+      ExplicitWidth = 402
     end
   end
   object SynMqttSyn: TSynGeneralSyn

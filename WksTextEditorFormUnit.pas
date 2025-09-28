@@ -286,7 +286,8 @@ implementation
 {$R *.dfm}
 
 uses
-    WksSpellcheckFormUnit
+    VirtualTrees.Types
+  , WksSpellcheckFormUnit
   , WksPythonUnit
   ;
 {$ENDREGION}

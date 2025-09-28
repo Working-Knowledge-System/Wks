@@ -62,6 +62,11 @@ object MainWebModule: TMainWebModule
       Name = 'AccountDeleteWebAction'
       PathInfo = '/AccountDelete'
       OnAction = MainWebModuleAccountDeleteWebActionAction
+    end
+    item
+      Name = 'ReportWebAction'
+      PathInfo = '/Report'
+      OnAction = MainWebModuleReportWebActionAction
     end>
   BeforeDispatch = WebModuleBeforeDispatch
   AfterDispatch = WebModuleAfterDispatch

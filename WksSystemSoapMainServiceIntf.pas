@@ -32,7 +32,7 @@ type
     function  SystemUserIsAuthenticatedSoap (const IvUsername, IvPassword: string; var IvFbk: string): boolean; stdcall;
     function  SystemUserInitSoap            (const IvUsername: string; var IvUserRem: TUsrRem; var IvFbk: string): boolean; stdcall;
     // organization/theme methods
-    function  SystemOrganizationInitSoap    (const IvOrganization: string; var IvOrganizationRem: TOrgRem; var IvFbk: string): boolean; stdcall;
+    function  SystemOrganizationInitSoap    (const IvOrganization, IvWww: string; var IvOrganizationRem: TOrgRem; var IvFbk: string): boolean; stdcall;
     function  SystemThemeInitSoap           (const IvOrganizationId: integer; var IvThemeRem: TTheRem; var IvFbk: string): boolean; stdcall;
     // member methods
     function  SystemMemberInitSoap          (const IvOrganization, IvUsername: string; var IvMemberRem: TMbrRem; IvFbk: string): boolean; stdcall;

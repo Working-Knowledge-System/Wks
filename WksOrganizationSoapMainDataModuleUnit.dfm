@@ -4,12 +4,12 @@ object OrganizationMainDataModule: TOrganizationMainDataModule
   Width = 727
   object OrganizationADOConnection: TADOConnection
     ConnectionString = 
-      'Provider=SQLOLEDB.1;Password=secret@123;Persist Security Info=Tr' +
-      'ue;User ID=sa;Initial Catalog=DbaOrganization;Data Source=LOCALH' +
-      'OST'
+      'Provider=MSOLEDBSQL.1;Password=secret@123;Persist Security Info=' +
+      'True;User ID=sa;Initial Catalog=DbaOrganization;Data Source=LOCA' +
+      'LHOST'
     DefaultDatabase = 'DbaOrganization'
     LoginPrompt = False
-    Provider = 'SQLOLEDB.1'
+    Provider = 'MSOLEDBSQL.1'
     Left = 80
     Top = 40
   end

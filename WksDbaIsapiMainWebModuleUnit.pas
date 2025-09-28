@@ -269,15 +269,22 @@ var
   tic: TTicRec;
   jso: TJSONObject;                                        // jsonobj
   usr, usr2, tbl, tbl2, fls, flv, flv2, whe, whe2: string; // username, table, fldtoset, fldvaluenew, wherestr
-  oks, sta, jss, fbk, msg, sql: string;                    // okstr, state, jsonstr
+  oks, sta, jss, fbk, msg: string;                         // okstr, state, jsonstr
+  sql0, sql1: string;                                      // sql pre-test, sql update
   aff, sco: integer;                                       // affected, statuscode
   ndt: TDateTime; ndt2: string;                            // nowdatatime
+  kes, vas: TJSONArray;                                    // keyfields, keyvalues
+  i, kez, vaz: integer;                                    // idx, keyfieldscount, keyvaluescount
+  {$ENDREGION}
 
+  {$REGION 'macro'}
   procedure audit;
+  var
+    sql2: string;
   begin
     tbl := Copy(tbl, 1, 64);
     fls := Copy(fls, 1, 64);
-    sql := 'insert into DbaSystem.dbo.TblAudit '
+    sql2:= 'insert into DbaSystem.dbo.TblAudit '
          + 'select'
          + '  ' + TSqlRec.Val(ndt)            // FldDateTime
          + ', ' + TSqlRec.Val(usr)            // FldUsername
@@ -285,12 +292,12 @@ var
          + ', ' + TSqlRec.Val(fls)            // FldField
          + ', ' + TSqlRec.Val(flv)            // FldValue
          + ', ' + TSqlRec.Val(whe)            // FldWhere
-         + ', ' + TSqlRec.Val(sql)            // FldQuery
+         + ', ' + TSqlRec.Val(sql1)           // FldQuery
          + ', ' + TSqlRec.Val(sta)            // FldState
          + ', ' + TSqlRec.Val(msg)            // FldMessage
          + ', ' + TSqlRec.Val(tic.ElapsedMs); // FldInMs
 
-    if not TDbaRec.CmdExec(sql, aff, fbk) then
+    if not TDbaRec.CmdExec(sql2, aff, fbk) then
       glog.Log('Unable to insert the event into Audit database (%s)', [fbk])
    {else
       glog.Log('Event has been logged into Audit database')};
@@ -300,107 +307,165 @@ var
 begin
   // init
   tic.Init;
-  ndt := Now();
   usr := 'unknown';
+  sql1 := '';
+  ndt := Now();
+
+  // inputs
   jso := TJSONObject.ParseJSONValue(Request.Content) as TJSONObject;
-  tbl := jso.GetValue<string>('dbaTable'   , ''); // DbaXxx.dbo.TblXxx
-  fls := jso.GetValue<string>('fldToSet'   , '');
-  flv := jso.GetValue<string>('fldValueNew', '');
-  whe := jso.GetValue<string>('where'      , '');
-  jso.Free;
-  sql := '';
+  try
 
-  // usersessionNOTvalid, usernotloggedin
-  if not gses.IsValid(fbk) then begin
-    oks := 'false';
-    sta := 'FAIL';
-    fbk := 'User not logged in';
-    msg := 'Unable to update record (Please log in to make changes)';
-    sco := 200; // 400 Bad Request
+    tbl := jso.GetValue<string>('tblName'    , ''); // DbaXxx.dbo.TblXxx
+    fls := jso.GetValue<string>('fldName'    , '');
+    flv := jso.GetValue<string>('fldValue   ', '');
 
-  // usersessionvalid, userloggedin
-  end else begin
-    // getdata
-    usr := TStrRec.StrCoalesce([{gusr}gses.Username], 'unknown');
+  //kes := jso.GetValue<string>('fldKeys'    , '');
+    kes := jso.GetValue<TJSONArray>('fldKeys');
 
-    // tablemalformed
-    if not TRegEx.IsMatch(tbl, '^Dba\w+\.dbo\.Tbl\w+$') then begin // Dba*.dbo.Tbl*
+  //vas := jso.GetValue<string>('fldValues'  , '');
+    vas := jso.GetValue<TJSONArray>('fldValues');
+
+    // usersessionNOTvalid, usernotloggedin
+    if not gses.IsValid(fbk) then begin
       oks := 'false';
       sta := 'FAIL';
-      fbk := Format('Malformed name of table to update "%s"', [tbl]);
-      msg := 'Unable to update record (Please check the table name to update)';
+      fbk := 'User not logged in';
+      msg := 'Unable to update record (Please log in to make changes)';
       sco := 200; // 400 Bad Request
 
-    // fieldtosetmalformed
-    end else if not fls.StartsWith('Fld') or fls.Contains(' ') then begin
-      oks := 'false';
-      sta := 'FAIL';
-      fbk := Format('Malformed name of field to set "%s"', [fls]);
-      msg := 'Unable to update record (Please check the field name to set)';
-      sco := 200; // 400 Bad Request
-
-    // wheremalformed
-    // ...
-
-    // allvalid
+    // usersessionvalid, userloggedin
     end else begin
-      // newvaluefix
-      // ...
+      // user
+      usr := TStrRec.StrCoalesce([{gusr}gses.Username], 'unknown');
 
-      if false then begin
-        // temp
-        ndt2 := TSqlRec.Val(ndt).Replace('''', '``');
-        usr2 := TSqlRec.Val(usr).Replace('''', '``');
-        tbl2 := TRegEx.Split(tbl, '\.')[2]; // TblXxx
-        flv2 := TSqlRec.Val(flv).Replace('''', '``');
-        whe2 := whe.Replace('''', '``'); // whe arrive already formatted like FldXxx = ''aaa''
-
-        // update target field            declare @sql nvarchar(max) = `update DbaSystem.dbo.TblState set FldStatus = ``Accepted-1```
-        sql :=                    Format('declare @sql nvarchar(max) = `update %s set %s = %s`', [tbl, fls, flv2]);
-
-        // update FldWho if exists        if exists (select 1 from information_schema.columns where table_name = `DbaSystem.dbo.TblState` and column_name = `FldWho`) set @sql += `, FldWho = ``giarussi```
-        sql := sql + sLineBreak + Format('if exists (select 1 from information_schema.columns where table_name = `%s` and column_name = `FldWho`) set @sql += `, FldWho = %s`;'  , [tbl2, usr2]);
-
-        // update FldWhen if exists       if exists (select 1 from information_schema.columns where table_name = `DbaSystem.dbo.TblState` and column_name = `FldWhen`) set @sql += `, FldWhen = ``2025-09-14 01:20:50.975```
-        sql := sql + sLineBreak + Format('if exists (select 1 from information_schema.columns where table_name = `%s` and column_name = `FldWhen`) set @sql += `, FldWhen = %s`;', [tbl2, ndt2]);
-
-        // add where clause               set @sql += ` where FldState = ``Accepted```
-        sql := sql + sLineBreak + Format('set @sql += ` where %s`;', [whe2]);
-
-        // execute the dynamic sql
-      //sql := sql + sLineBreak +        'print @sql';
-        sql := sql + sLineBreak +        'exec sp_executesql @sql;';
-
-        sql := sql.Replace('`', '''');
-
-      end else begin
-        // update target field
-        sql := Format('update %s set %s = %s', [tbl, fls, TSqlRec.Val(flv)]);
-
-        if TDbaRec.FldExists(tbl, 'FldWho', fbk) then
-          sql := sql + Format(', FldWho = ''%s''', [usr]);
-
-        if TDbaRec.FldExists(tbl, 'FldWhen', fbk) then
-          sql := sql + Format(', FldWhen = %s', [TSqlRec.Val(ndt)]);
-
-        sql   := sql + Format(' where %s;', [whe]);
-      end;
-
-      // fail
-      if not TDbaRec.CmdExec(sql, aff, fbk) then begin
+      // tablemalformed
+      if not TRegEx.IsMatch(tbl, '^Dba\w+\.dbo\.Tbl\w+$') then begin // Dba*.dbo.Tbl*
         oks := 'false';
         sta := 'FAIL';
-        msg := 'Unable to update record ('+fbk+')';
+        fbk := Format('Malformed name of table to update "%s"', [tbl]);
+        msg := 'Unable to update record (Please check the table name to update)';
         sco := 200; // 400 Bad Request
 
-      // success
+      // fieldtosetmalformed
+      end else if not fls.StartsWith('Fld') or fls.Contains(' ') then begin
+        oks := 'false';
+        sta := 'FAIL';
+        fbk := Format('Malformed name of field to set "%s"', [fls]);
+        msg := 'Unable to update record (Please check the field name to set)';
+        sco := 200; // 400 Bad Request
+
+      // keyfieldskeyvaluesmalformed
+      end else if not (kes.Count = vas.Count) then begin
+        oks := 'false';
+        sta := 'FAIL';
+        fbk := Format('Malformed keyfields-count %d != %d keyvalues-count', [kes.Count, vas.Count]);
+        msg := 'Unable to update record (Please check the keyfields and keyvalues)';
+        sco := 200; // 400 Bad Request
+
+      // allvalid
       end else begin
-        oks := 'true';
-        sta := 'SUCCESS';
-        msg := 'Record updated ('+fbk+')';
-        sco := 200;
+
+        {$REGION 'where'}
+        whe := '';
+        for i := 0 to kes.Count - 1 do
+          whe := whe + Format(' and %s = %s', [kes[i].GetValue<string>, TSqlRec.Val(vas[i].GetValue<string>)]);
+        Delete(whe, 1, 5);
+        {$ENDREGION}
+
+        {$REGION 'pre-test and update'}
+        // sql pre-test
+        sql0 := Format('select count(*) from %s where %s', [tbl, whe]);
+
+        // pre-test
+        if not TDbaRec.ScalarInt(sql0, aff, 0, fbk) then begin
+          oks := 'false';
+          sta := 'FAIL';
+          msg := 'Unable to update record (pre-test failed - '+fbk+')';
+          sco := 200; // 400 Bad Request
+
+        end else begin
+          // pre-test affected are less than 1
+          if aff < 1 then begin
+            oks := 'false';
+            sta := 'FAIL';
+            msg := 'Unable to update record (pre-test affected records are less than 1 - '+fbk+')';
+            sco := 200; // 400 Bad Request
+
+          // pre-test affected are more than 1
+          end else if aff > 1 then begin
+            oks := 'false';
+            sta := 'FAIL';
+            msg := 'Unable to update record (pre-test affected records are more than 1 - '+fbk+')';
+            sco := 200; // 400 Bad Request
+
+          // ok affected is exactly one
+          end else begin
+
+            {$REGION 'sql1 update i'}
+            if false then begin
+              // temp
+              ndt2 := TSqlRec.Val(ndt).Replace('''', '``');
+              usr2 := TSqlRec.Val(usr).Replace('''', '``');
+              tbl2 := TRegEx.Split(tbl, '\.')[2]; // TblXxx
+              flv2 := TSqlRec.Val(flv).Replace('''', '``');
+              whe2 := whe.Replace('''', '``'); // whe arrive already formatted like FldXxx = ''aaa''
+
+              // update target field              declare @sql nvarchar(max) = `update DbaSystem.dbo.TblState set FldStatus = ``Accepted-1```
+              sql1 :=                     Format('declare @sql nvarchar(max) = `update %s set %s = %s`', [tbl, fls, flv2]);
+
+              // update FldWho if exists          if exists (select 1 from information_schema.columns where table_name = `DbaSystem.dbo.TblState` and column_name = `FldWho`) set @sql += `, FldWho = ``giarussi```
+              sql1 := sql1 + sLineBreak + Format('if exists (select 1 from information_schema.columns where table_name = `%s` and column_name = `FldWho`) set @sql += `, FldWho = %s`;'  , [tbl2, usr2]);
+
+              // update FldWhen if exists         if exists (select 1 from information_schema.columns where table_name = `DbaSystem.dbo.TblState` and column_name = `FldWhen`) set @sql += `, FldWhen = ``2025-09-14 01:20:50.975```
+              sql1 := sql1 + sLineBreak + Format('if exists (select 1 from information_schema.columns where table_name = `%s` and column_name = `FldWhen`) set @sql += `, FldWhen = %s`;', [tbl2, ndt2]);
+
+              // add where clause                 set @sql += ` where FldState = ``Accepted```
+              sql1 := sql1 + sLineBreak + Format('set @sql += ` where %s`;', [whe2]);
+
+              // execute the dynamic sql
+            //sql1 := sql1 + sLineBreak +        'print @sql';
+              sql1 := sql1 + sLineBreak +        'exec sp_executesql @sql;';
+
+              sql1 := sql1.Replace('`', '''');
+            {$ENDREGION}
+
+            {$REGION 'sql1 update ii'}
+            end else begin
+              // update target field
+              sql1 := Format('update %s set %s = %s', [tbl, fls, TSqlRec.Val(flv)]);
+
+              if TDbaRec.FldExists(tbl, 'FldWho', fbk) then
+                sql1 := sql1 + Format(', FldWho = ''%s''', [usr]);
+
+              if TDbaRec.FldExists(tbl, 'FldWhen', fbk) then
+                sql1 := sql1 + Format(', FldWhen = %s', [TSqlRec.Val(ndt)]);
+
+              sql1   := sql1 + Format(' where %s;', [whe]);
+            end;
+            {$ENDREGION}
+
+            // fail
+            if not TDbaRec.CmdExec(sql1, aff, fbk) then begin
+              oks := 'false';
+              sta := 'FAIL';
+              msg := 'Unable to update record ('+fbk+')';
+              sco := 200; // 400 Bad Request
+
+            // success
+            end else begin
+              oks := 'true';
+              sta := 'SUCCESS';
+              msg := 'Record updated ('+fbk+')';
+              sco := 200;
+            end;
+          end;
+        end;
+        {$ENDREGION}
+
       end;
     end;
+  finally
+    jso.Free;
   end;
 
   // audit

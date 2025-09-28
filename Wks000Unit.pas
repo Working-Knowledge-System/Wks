@@ -11,6 +11,7 @@
 //                           https://github.com/wks                           //
 //                           https://www.wks.cloud                            //
 //                              info@wks.cloud                                //
+//                                2007-2025                                   //
 //                                                                            //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
@@ -212,13 +213,26 @@ const
   {$REGION 'Strings'}
   OK_STR                  = 'Ok';
   NO_STR                  = 'No';
+  YES_STR                 = 'Yes';
+  ALL_STR                 = 'All';
+  EMPTY_STR               = '';
+  NULL_STR                = 'NULL';
+//NONE_STR                = 'None';
+  NO_DATA_STR             = 'No Data';
+  UNKNOWN_STR             = 'Unknown';
+  WARNING_STR             = 'WARNING';
+  EXCEPTION_STR           = 'EXCEPTION';
+  NA_STR2                 = 'NA';
   NA_STR                  = 'Not Available';
   NOT_IMPLEMENTED_STR     = 'Not Implemented';
   NOT_AVAILABLE_STR       = 'Not available';
-  UNKNOWN_STR             = 'Unknown';
-  NO_DATA_STR             = 'No Data';
-  WARNING_STR             = 'WARNING';
-  EXCEPTION_STR           = 'EXCEPTION';
+  NOT_FOUND_STR           = 'Not found';
+  NOT_AUTHORIZED_STR      = 'Not authorized';
+  NOT_ASSIGNED_STR        = 'Not assigned';
+//NOT_AN_OPTION_STR       = 'Not an option';
+  {$ENDREGION}
+
+  {$REGION 'Paths'}
   TEMP_PATH               = 'C:\$Tmp';
   {$ENDREGION}
 
@@ -242,13 +256,24 @@ const
   {$ENDREGION}
 
   {$REGION 'Dba'}
-//DBA_PROVIDER            = 'SQLNCLI11.1' ; // Microsoft ...
-//DBA_PROVIDER            = 'SQLOLEDB.1'  ; // Microsoft classic OLE DB Provider for SQL Server
-  DBA_PROVIDER            = 'MSOLEDBSQL.1'; // new OLE DB Driver (need to be installed)
-//DBA_CONNECTION_STR      = 'Provider='+DBA_PROVIDER+';Integrated Security=SSPI;User ID=WINUSER;Data Source=LOCALHOST;Initial Catalog=DbaXxx';                  // windows authentication (integrated security)
-  DBA_CONNECTION_STR      = 'Provider='+DBA_PROVIDER+';Persist Security Info=True;User ID=sa;Data Source=LOCALHOST;Password=secret@123;Initial Catalog=DbaXxx'; // sql server authentication wks
-  DBA_CMD_TIMEOUT_SEC     = 600;
-  DATASET_MAXRECORDS      = 10000; // ultimatetopmax
+//DBA_PROVIDER              = 'SQLNCLI11.1'    ; // Microsoft ...
+//DBA_PROVIDER              = 'SQLOLEDB.1'     ; // Microsoft classic OLE DB Provider for SQL Server
+  DBA_PROVIDER              = 'MSOLEDBSQL.1'   ; // Microsoft new OLE DB Driver (need to be installed)
+//DBA_PROVIDER              = 'OraOLEDB.Oracle'; // Oracle new OLE DB Driver (installed with Oracle Client, not Oracle Instant Client)
+
+  // mssql
+//DBA_CONNECTION_STR        = 'Provider='+DBA_PROVIDER+';Integrated Security=SSPI  ;User ID=WINUSER;Data Source=LOCALHOST;Initial Catalog=DbaXxx';                // windows authentication (integrated security)
+  DBA_CONNECTION_STR        = 'Provider='+DBA_PROVIDER+';Persist Security Info=True;User ID=sa;Data Source=LOCALHOST;Password=secret@123;Initial Catalog=DbaXxx'; // sql server authentication wks
+
+  // oracle
+//  DBA_CONNECTION_STR_FD_ORA = '''
+//DriverID=Ora
+//Database=servername:1521/service
+//User_Name=user
+//Password=pass
+//''';
+  DBA_CMD_TIMEOUT_SEC       = 600;
+  DATASET_MAXRECORDS        = 10000; // ultimatetopmax
   {$ENDREGION}
 
   {$REGION 'Urls'}
@@ -1683,8 +1708,10 @@ type
   public
     // general
     class function  CmdExec  (const IvSql: string;  var IvAffected: integer; var IvFbk: string; IvTimeoutSec: integer = DBA_CMD_TIMEOUT_SEC): boolean; static;
-    class function  Scalar   (const IvSql: string;  var IvValue   : variant; const IvDefault: variant ; var IvFbk: string; IvTimeOutSec: integer = DBA_CMD_TIMEOUT_SEC): boolean; overload; static;
-    class function  Scalar   (const IvSql: string                          ; const IvDefault: variant                    ; IvTimeOutSec: integer = DBA_CMD_TIMEOUT_SEC): variant; overload; static;
+    class function  ScalarVar(const IvSql: string;  var IvValue   : variant; const IvDefault: variant; var IvFbk: string; IvTimeOutSec: integer = DBA_CMD_TIMEOUT_SEC): boolean; overload; static;
+    class function  ScalarInt(const IvSql: string;  var IvValue   : integer; const IvDefault: integer; var IvFbk: string; IvTimeOutSec: integer = DBA_CMD_TIMEOUT_SEC): boolean; overload; static;
+    class function  ScalarStr(const IvSql: string;  var IvValue   : string ; const IvDefault: string ; var IvFbk: string; IvTimeOutSec: integer = DBA_CMD_TIMEOUT_SEC): boolean; overload; static;
+    class function  Scalar   (const IvSql: string                          ; const IvDefault: variant                   ; IvTimeOutSec: integer = DBA_CMD_TIMEOUT_SEC): variant; overload; static;
     // ds
     class function  DsFromSql(const IvSql: string; out IvDs: TDataset; var IvAffected: integer; var IvFbk: string; IvFalseIfDsIsEmpty: boolean = true): boolean; overload; static;
     class function  DsFromSql(const IvSql: string; out IvDs: TDataset                         ; var IvFbk: string; IvFalseIfDsIsEmpty: boolean = true): boolean; overload; static;
@@ -2005,11 +2032,12 @@ type
   end;
 
   TEnvRec = record // environment
-  const
-    ENV_DEV_HOST  = 'WIN-BRTRBSP3L29';
-    ENV_TEST_HOST = '';
-    ENV_PROD_HOST = '';
+//const
+//  ENV_DEV_HOST  = 'WIN-BRTRBSP3L29';
+//  ENV_TEST_HOST = '';
+//  ENV_PROD_HOST = '';
   public
+    class var Environment: string; // DEV, TEST, PROD
     class function  EnvIsDev: boolean; static;
     class function  EnvIsTest: boolean; static;
     class function  EnvIsProd: boolean; static;
@@ -2267,6 +2295,8 @@ type
     BottomSpace             : integer;
     LeftSpace               : integer;
     RightSpace              : integer;
+    &Class                  : string ;
+    Style                   : string ;
     AuthenticationNeeded    : boolean;
 
     // derived
@@ -2283,7 +2313,17 @@ type
 
   THtmRec = record // html
   const
+  //HTM_COMMENT          = '';
+  //HTM_COMMENT_START    = '<!--';
+  //HTM_COMMENT_END      = '-->';
+    HTM_TAG_PAIR_CSV     = '!--,--,!doctype,a,abbr,acronym,address,applet,area,article,aside,audio,b,base,basefont,bdi,bdo,big,blockquote,body,br,button'
+                         + ',canvas,caption,center,cite,code,col,colgroup,datalist,dd,del,details,dfn,dialog,dir,div,dl,dt,em,embed,fieldset,figcaption'
+                         + ',figure,font,footer,form,frame,frameset,h1,h2,h3,h4,h5,h6,head,header,hr,html,i,iframe,img,input,ins,kbd,keygen,label,legend'
+                         + ',li,link,main,map,mark,menu,menuitem,meta,meter,nav,noframes,noscript,object,ol,optgroup,option,output,p,param,pre,progress'
+                         + ',q,rp,rt,ruby,s,samp,script,section,select,small,source,span,strike,strong,style,sub,summary,sup,table,tbody,td,textarea,tfoot'
+                         + ',th,thead,time,title,tr,track,tt,u,ul,var,video,wbr';
     HTM_TAG_SINGLE_CSV   = 'doctype,track,source,param,meta,link,area,input,img,iframe,hr,base,basefont,col,br,wbr';
+    HTM_TAG_CSV          = HTM_TAG_PAIR_CSV + ',' + HTM_TAG_SINGLE_CSV;
     HTM_INPUT_MONO_CSV   = 'color,date,datetime,email,file,hidden,image,month,number,password,range,search,tel,text,textarea,time,url,week'; // <input type="text">
     HTM_INPUT_MULTI_CSV  = 'checkbox,radio,select'; // datalist ?
     HTM_INPUT_BUTTON_CSV = 'button,reset,search,submit';
@@ -2299,12 +2339,16 @@ type
 
     THtmInputOptionRecVector = array of THtmInputOptionRec;
   public
-    class function  Attr(IvAttr, IvValue: string; IvIfTrue: boolean = true): string; static;                                    // attr="value"
-    class function  AttrFromVec(IvAttr: string; IvValueVec: TStringVector): string; static;                                     // returns attr ="va1 va2 ..." from ['va1', 'va2', '...']
-    class function  AttrClassFromVec(IvClassVec: TStringVector): string; static;                                                // returns class="cl1 cl2 ..." from ['cl1', 'cl2', '...']
-    class function  AttrStyleFromVec(IvStyleVec: TStringVector): string; static;                                                // returns style="st1 st2 ..." from ['st1', 'st2', '...']
-    class procedure ValAdd(var IvValuesCurr: string; IvValuesToAdd: string; IvSep: string; IvIfTrue: boolean = true); static;   // presuppone 'cls1 cls2' or 'sty1:aaa;sty2:bbb;'
-    class function  IdName(IvCoName: string = ''): string; static;                                                              // id="Co1234" name="Co1234" transform to a THatRec
+    class function  BsMode(IvMode: char): string; static; // bs color scheme
+    class function  W3Mode(IvMode: char): string; static; // w3 color scheme
+    class function  Attr(IvAttr, IvValue: string; IvIfTrue: boolean = true): string; static;                                      // attr="value"                                             i.e: id="CoAbc"
+    class function  AttrFromVec(IvAttr: string; IvValueVec: TStringVector): string; static;                                       // returns attr ="va1 va2 ..." from ['va1', 'va2', '...']   i.e: class="va1 va2 ..." or style="va1 va2 ..."
+    class function  AttrClassFromVec(IvClassVec: TStringVector): string; static;                                                  // returns class="cl1 cl2 ..." from ['cl1', 'cl2', '...']
+    class function  AttrStyleFromVec(IvStyleVec: TStringVector): string; static;                                                  // returns style="st1;st2;..." from ['st1', 'st2', '...']
+    class procedure AttrValAdd(var IvValuesCurr: string; IvValuesToAdd: string; IvSep: string; IvIfTrue: boolean = true); static; // presuppone 'cls1 cls2' or 'sty1:aaa;sty2:bbb;'
+    class procedure ClassAdd(var IvClassCurr: string; IvClassesToAdd: string; IvIfTrue: boolean = true); static;                  // add one or more classes 'cls1 cls2' -> 'cls1 cls2 clsnew clsnew2'
+    class procedure StyleAdd(var IvStyleCurr: string; IvStylesToAdd : string; IvIfTrue: boolean = true); static;                  // add one or more styles  'sty1 sty2' -> 'sty1;sty2;stynew;stynew2'
+    class function  IdName(IvCoName: string = ''): string; static;                                                                // id="Co1234" name="Co1234" transform to a THatRec
     class function  A(IvHref, IvCaption: string; IvTitle: string = ''; IvTarget: string = ''; IvClass: string = ''; IvStyle: string = ''): string; static;
     class function  H(IvLevel: integer; IvTitle: string; IvClass: string = ''; IvStyle: string = ''): string; static;
     class function  P(IvContent: string; IvDimmed: boolean = false; IvItalic: boolean = false): string; static;
@@ -2314,13 +2358,17 @@ type
     class function  Img(IvSrc: string; IvAlt: string = ''; IvW: integer = 0; IvH: integer = 0; IvIsCard: boolean = false; IvTorn: TImgTormEnum = itNone{, IvClass, IvStyle: string}): string; static;
     class function  Code(IvCode: string; IvLanguage: string = 'plaintext'): string; static;
     class function  Panel(IvFbk: TFbkRec; IvDismisible: boolean = true): string; static;  // *** MERGE WITH THtmRec.Collapse ***
-    class function  Collapse(IvTitle, IvSubtitle, IvBody: string; IvHhLevel: integer = 1; IvCoName: string = ''; IvTitlesCenter: boolean = false; IvPanelOn: boolean = true; IvPanelClosed: boolean = false): string; static;
+    class function  Collapse(IvTitle, IvSubtitle, IvDescription, IvBody: string; IvHhLevel: integer = 1; IvCoName: string = ''; IvAlignement: string = ''; IvPanelOn: boolean = true; IvPanelClosed: boolean = false): string; static;
     class function  Alert (IvTitle, IvText: string; IvClass: string = ''; IvStyle: string = ''): string; static;
     class function  AlertI(IvTitle, IvText: string): string; static;
     class function  AlertS(IvTitle, IvText: string): string; static;
     class function  AlertW(IvTitle, IvText: string): string; static;
     class function  AlertD(IvTitle, IvText: string): string; static;
     class function  AlertE(IvTitle, IvText: string): string; static;
+    class function  Badge(IvText: string; IvMode: char = 'I'): string; static;
+    class function  BadgeI(IvText: string): string; static;
+    class function  BadgeS(IvText: string): string; static;
+    class function  BadgeW(IvText: string): string; static;
     class function  Modal   (IvShow: boolean; IvCoName, IvBody: string; IvHeader: string = ''; IvFooter: string = ''; IvFbkMode: TFbkModeEnum = fmNone; IvCopyButtonOn: boolean = false): string; static;
     class function  ModalBtn(IvBtnCaption   , IvCoName, IvBody: string; IvHeader: string = ''; IvFooter: string = ''; IvFbkMode: TFbkModeEnum = fmNone; IvCopyButtonOn: boolean = false): string; static;
     class function  GridRow(IvValueVec, IvClassVec, IvStyleVec: TArray<string>; IvBorderDbgOn: boolean = false): string; static;
@@ -2328,7 +2376,9 @@ type
     class function  BtnX(IvCoName: string; IvFollowLink: string = ''; IvFbkMode: TFbkModeEnum = fmNone): string; static;        // close just the panel/modal and optionally go to the given link
     class function  BtnOk(IvCoModalName: string): string; static;                                                               // standard buttons Ok that close the passed modalpanel
     class function  BtnStd(IvKind: string; IvRedirectToPageId: integer = 0; IvData: string = ''): string; static;               // standard buttons like Close, Home, Back, ...
-    class function  Elem(IvTag, IvKind, IvCoName: string; IvTitle: string = ''                 ; IvValue: string = ''         ; IvClass: string = ''; IvStyle: string = ''; IvTail: string = ''                                                                               ; IvDisabled: boolean = false                                                     ; IvReadOnly: boolean = false): string; static;
+
+    class function  Elem(IvTag, IvType, IvCoName: string; IvTitle: string = ''                 ; IvValue: string = ''         ; IvClass: string = ''; IvStyle: string = ''; IvTail: string = ''                                                                               ; IvDisabled: boolean = false                                                     ; IvReadOnly: boolean = false): string; static;  // generic html element
+
     class function  Choice  (   IvKind, IvCoName        , IvTitle: string     ; IvOptCaptionVec, IvOptValueVec: TArray<string>; IvClass: string = ''; IvStyle: string = ''; IvTail: string = ''; IvValueVec: TArray<string> = {$IF CompilerVersion < 32.0}nil{$ELSE}[]{$ENDIF}; IvDisabledVec: TArray<string> = {$IF CompilerVersion < 32.0}nil{$ELSE}[]{$ENDIF}; IvReadOnly: boolean = false): string; static;
     class function  Select  (           IvCoName        , IvTitle: string     ; IvOptCaptionVec, IvOptValueVec: TArray<string>; IvClass: string = ''; IvStyle: string = ''; IvTail: string = ''; IvValueVec: TArray<string> = {$IF CompilerVersion < 32.0}nil{$ELSE}[]{$ENDIF}; IvDisabledVec: TArray<string> = {$IF CompilerVersion < 32.0}nil{$ELSE}[]{$ENDIF}; IvReadOnly: boolean = false): string; static;
     class function  Radio   (           IvCoName        , IvTitle: string     ; IvOptCaptionVec, IvOptValueVec: TArray<string>; IvClass: string = ''; IvStyle: string = ''; IvTail: string = ''; IvValueVec: TArray<string> = {$IF CompilerVersion < 32.0}nil{$ELSE}[]{$ENDIF}; IvDisabledVec: TArray<string> = {$IF CompilerVersion < 32.0}nil{$ELSE}[]{$ENDIF}; IvReadOnly: boolean = false): string; static;
@@ -2337,19 +2387,31 @@ type
     class function  Form(                                                                 IvCoName, IvAction, IvMethod, IvBody: string                                                                                                                                                                                                  ; IvClass: string = ''; IvStyle: string = ''; IvEnctype: string = ''; IvValidatorCsv: string = ''): string; overload; static;
     class function  Form(                                                                 IvCoName, IvAction, IvMethod, IvSubmitCaption: string; IvLabelWidth, IvHelpWidth: integer; IvTitleVec, IvKindVec, IvCoNameVec, IvValueVec, IvPlaceholderVec, IvClassVec, IvStyleVec, IvTailVec: TArray<string>; IvRequiredVec: TArray<boolean>; IvClass: string = ''; IvStyle: string = ''; IvEnctype: string = ''; IvValidatorCsv: string = ''): string; overload; static;
     class function  FormModal(IvTitle, IvFaIcon: string; IvCtrlButtonVec: TArray<string>; IvCoName, IvAction, IvMethod, IvSubmitCaption: string; IvLabelWidth, IvHelpWidth: integer; IvTitleVec, IvKindVec, IvCoNameVec, IvValueVec, IvPlaceholderVec, IvClassVec, IvStyleVec, IvTailVec: TArray<string>; IvRequiredVec: TArray<boolean>; IvClass: string = ''; IvStyle: string = ''; IvEnctype: string = ''; IvValidatorCsv: string = ''): string; static;
+
     class function  List(IvItemVec: TArray<string>; IvMode: TListModeEnum = lmUnordered): string; static;
-    class function  TableFromDs(IvDs: TDataset; IvHtmlDefault: string = ''; IvClass: string = ''; IvStyle: string = ''; IvEditable: boolean = false; IvEditJson: string = ''; IvDir: THvDirEnum = hvHorizontal; IvDsRecordCountOff: boolean = false; IvDsHeaderOff: boolean = false): string; static;
-    class function  TableFromSql(IvSql: string; IvHtmlDefault: string = ''; IvClass: string = ''; IvStyle: string = ''; IvEditable: boolean = false; IvEditJson: string = ''; IvDir: THvDirEnum = hvHorizontal; IvDsRecordCountOff: boolean = false; IvDsHeaderOff: boolean = false): string; static;
-    class function  TableFromSql2(IvSql: string; IvHtmlDefault: string = ''; IvClass: string = ''; IvStyle: string = ''; IvEditable: boolean = false; IvEditJson: string = ''; IvDir: THvDirEnum = hvHorizontal; IvDsRecordCountOff: boolean = false; IvDsHeaderOff: boolean = false): string; static;
+
+    class function  Tx  (IvKind, IvContent: string; IvClass: string = ''; IvStyle: string = ''; IvCoName: string = ''; IvTitle: string = ''; IvWidth: string = ''; IvAlign: string = ''; IvColSpan: string = ''; IvNoWrap: boolean = false): string; static; // tablecell th or td
+    class function  Th          (IvContent: string; IvClass: string = ''; IvStyle: string = ''; IvCoName: string = ''; IvTitle: string = ''; IvWidth: string = ''; IvAlign: string = ''; IvColSpan: string = ''; IvNoWrap: boolean = false): string; static; // <th></th>
+    class function  Td          (IvContent: string; IvClass: string = ''; IvStyle: string = ''; IvCoName: string = ''; IvTitle: string = ''; IvWidth: string = ''; IvAlign: string = ''; IvColSpan: string = ''; IvNoWrap: boolean = false): string; static; // <td></td>
+    class function  Tr          (IvContent: string; IvClass: string = ''; IvStyle: string = ''; IvCoName: string = ''): string; static; // <tr></tr>
+    class function  TableCaption(IvContent: string; IvClass: string = ''; IvStyle: string = ''; IvCoName: string = ''): string; static; // <caption></caption>
+    class function  Table       (IvContent: string; IvClass: string = ''; IvStyle: string = ''; IvCoName: string = ''; IvCaption: string = ''; IvResponsive: boolean = false): string; static; // <table></table>
+
+    class function  TableFromDs (IvDs: TDataset; IvHtmlDefault: string = ''; IvCoName: string = ''; IvClass: string = ''; IvStyle: string = ''; IvEditable: boolean = false; IvEditJson: string = ''; IvDir: THvDirEnum = hvHorizontal; IvDsRecordCountOff: boolean = false; IvDsHeaderOff: boolean = false; IvCaption: string = ''): string; static;
+    class function  TableFromSql(IvCtxId: integer; IvSql: string; IvConnStr: string = ''; IvConnLib: string = ''; IvHtmlDefault: string = ''; IvCoName: string = ''; IvClass: string = ''; IvStyle: string = ''; IvEditable: boolean = false; IvEditJson: string = ''; IvDir: THvDirEnum = hvHorizontal; IvDsRecordCountOff: boolean = false; IvDsHeaderOff: boolean = false): string; static;
+
     class function  RepeatFromDs(IvDs: TDataSet; IvHtmlBody: string; IvHtmlHeader: string = ''; IvHtmlFooter: string = ''; IvHtmlDefault: string = ''): string; static;
     class function  RepeatFromSql(IvSql: string; IvHtmlBody: string; IvHtmlHeader: string = ''; IvHtmlFooter: string = ''; IvHtmlDefault: string = ''): string; static;
+
     class function  Report(IvId: integer; IvHtmlDefaultIfAnyDsIsEmpty: string = ''): string; static;
+
     class function  SlidesFromDs(IvDs: TDataSet; IvHtmlSlideBody: string; IvHtmlHeader: string = ''; IvHtmlFooter: string = ''; IvHtmlDefault: string = ''; IvSlideId: integer = 1): string; static; // similar to repeater
     class function  SlidesFromSql(IvSql: string; IvHtmlSlideBody: string; IvHtmlHeader: string = ''; IvHtmlFooter: string = ''; IvHtmlDefault: string = ''; IvSlideId: integer = 1): string; static; // similar to repeater
+
     class function  TopNav(IvId, IvPId: integer; IvUrlAbsolute: boolean = false): string; static;
     class function  Page(IvPage: TPagRec; IvUrlAbsolute: boolean = false): string; overload; static;
     class function  Page(IvId: integer; IvTitleShow: boolean = true; IvImageShow: boolean = true; IvSubTitleShow: boolean = true; IvTopNavOff: boolean = false; IvSystemInfoOff: boolean = false; IvUrlAbsolute: boolean = false): string; overload; static;
-    class function  Page(IvTitle, IvSubTitle, IvContent: string; IvContentKind: string = ''; IvTitleShow: boolean = true; IvImageShow: boolean = false; IvSubTitleShow: boolean = true; IvTopNavOff: boolean = false; IvSystemInfoOff: boolean = false; IvUrlAbsolute: boolean = false): string; overload; static;
+    class function  Page(IvTitle, IvSubTitle, IvContent: string; IvContentKind: string = ''; IvClass: string = ''; IvStyle: string = ''; IvTitleShow: boolean = true; IvImageShow: boolean = false; IvSubTitleShow: boolean = true; IvTopNavOff: boolean = false; IvSystemInfoOff: boolean = false; IvUrlAbsolute: boolean = false): string; overload; static;
     class function  PageSimple: string; static;
     class function  PageDefault: string; static;
     class function  PageFeedback(IvFbk: TFbkRec): string; static;
@@ -3147,7 +3209,7 @@ type
     function  HomeUrl(IvUrlAbsolute: boolean = false): string;                                  // /Member\W\Wks/I/IarussiFedericoCarloBrian
     function  BadgeUrl(IvUrlAbsolute: boolean = false): string;                                 // /Member/W/Wks/I/IarussiFedericoCarloBrian/IarussiFedericoCarloBrian@WksBadge.png
     function  BadgeImg(IvHeight: integer; IvUrlAbsolute: boolean = false): string;              // <img src="{BadgeUrl}" title="{Info}> style="height:{IvHeightp}x">
-    procedure BadgeGenerate(var IvBadge: TBitmap; IvOrganization, IvSite, IvUsername: string);  // bitmap
+    procedure BadgeGenerate(var IvBadge: TBitmap; IvOrganization, IvWww, IvSite, IvUsername: string);  // bitmap
   end;
 
   TMbrRem = class(TRemotable)
@@ -3511,6 +3573,7 @@ type
     // detail
     FObjectId     : integer      ;
     FWww          : string       ;
+    FWwwAlt       : string       ;
     FPhone        : string       ;
     FEmail        : string       ;
     FAbout        : string       ;
@@ -3521,6 +3584,7 @@ type
     property ObjRem       : TObjRem       read FObjRem        write FObjRem       ;
     property ObjectId     : integer       read FObjectId      write FObjectId     ;
     property Www          : string        read FWww           write FWww          ;
+    property WwwAlt       : string        read FWwwAlt        write FWwwAlt       ;
     property Phone        : string        read FPhone         write FPhone        ;
     property Email        : string        read FEmail         write FEmail        ;
     property About        : string        read FAbout         write FAbout        ;
@@ -3536,6 +3600,7 @@ type
     // detail
     ObjectId       : integer; // FldObjectId
     Www            : string;  // www.wks.cloud
+    WwwAlt         : string;  // 10.10.10.1
     Phone          : string;
     Email          : string;
     About          : string;
@@ -3549,8 +3614,8 @@ type
     function  Info: string;                                                                                              // WKS - Working Knowledge System
     procedure Free;                                                                                                      //
     procedure Reset(IvOrganizationOrWwwDefault: string; IvResetObjAlso: boolean = false);                                // *** ELIMINATE DICOTOMY IF POSSIBLE ***
-    function  InitDba(IvOrganization: string; var IvFbk: string): boolean;                                               // use "Organization"
-    function  InitRio(IvOrganization: string; var IvFbk: string): boolean;                                               // use "Organization" to select the organization (in clients we use Organization as a convenient way)
+    function  InitDba(IvOrganization, IvWww: string; var IvFbk: string): boolean;                                        // use "Organization"
+    function  InitRio(IvOrganization, IvWww: string; var IvFbk: string): boolean;                                        // use "Organization" to select the organization (in clients we use Organization as a convenient way)
     function  InitByWww(IvWww: string; var IvFbk: string): boolean;                                                      // use "www.organization.com" to select the organization (in isapi servers it is a convenient way to get the organame = sitename)
     function  TreeDir(IvOrganization: string = ''): string;                                                              // Root/Organization/W
     function  TreePath(IvOrganization: string = ''): string;                                                             // Root/Organization/W/Wks
@@ -3968,7 +4033,7 @@ type
     EditIni        : string ; // FldEditIni
     Json           : string ; // FldJson           // ex EditJson
     Switch         : string ; // FldSwitch         // +D...
-    Classs         : string ; // FldClass
+    &Class         : string ; // FldClass
     Style          : string ; // FldStyle
     TitleOn        : boolean; // FldTitleOn
     PanelOn        : boolean; // FldPanelOn
@@ -4014,7 +4079,7 @@ type
     CodeState                  : string ;  // FldCodeState
     CodeKind                   : string ;  // FldCodeKind
     Alias                      : string ;  // FldAlias
-    Classs                     : string ;  // FldClass
+    &Class                     : string ;  // FldClass
     Style                      : string ;  // FldStyle
     Layout                     : string ;  // FldLayout
     ParamRecVector             : TReportParamRecVector;
@@ -4179,7 +4244,7 @@ type
     Kind           : string;    // Web|Win|Android|Apple
     SessionId      : cardinal;  //
     FingerprintId  : cardinal;  // clientpcfingherprint   via js for browser and not implemented for winclients (may exceed integer range ence string!
-    IpLan          : string;    // clientaddr             possible for browser and winclients
+    IpLan          : string;    // clientremoteaddr       possible for browser, winclients or appear other network elements (load balancers?)
     Domain         : string;    // clientdomain           impossible with recent browsers, possible for winclients
     Computer       : string;    // clientcomputer         idem
     OsLogin        : string;    // clientoslogin          idem
@@ -4401,7 +4466,7 @@ type
     class function  StrDel(IvStr, IvStrOrCharToDelete: string): string; static;                                             //
     class function  StrReplicate(IvStr: string; IvN: integer): string; static;                                              // repear a string n times
   //class function  StrSplitB(IvString: string; IvDelimiters: string = ','): TStringDynArray; static;                       // DUP see TVecRecVecFromStr() returning a TArray<string>
-    class function  StrWordAppend(IvStr, IvWord: string): string; static;                                                   // src + ' ' + word
+    class function  StrWordAppend(IvStr, IvWord: string; IvSeparator: string = ' '): string; static;                        // src + ' ' + word
     class function  StrKeep(IvStr: string; const IvCharToKeepSet: TSysCharSet): string; static;                             //
     class function  StrLettersOnly(IvStr: string): string; static;                                                          // remove any char not in [A..Z][a..z]
     class function  StrCoalesce(IvStrVector: TArray<string>; IvDefault: string = ''): string; static;                       // return the 1st non empty value in vector
@@ -5103,6 +5168,7 @@ var
   gper: TPerRec;                   // personstuff        [B] *** WARNING, contains Image, PictureGraphic that need to be free ***
   gusr: TUsrRec;                   // userstuff          [B] *** WARNING, contains AvatarGraphic that need to be free ***
   gses: TSesRec;                   // session            [B]     user-session can be from browser or from a winclient and is the container of several web/win requests
+  genv: TEnvRec;                   // environment        [B}     DEV, TEST or PROD, determined by the end of the hostname-1st-token (www.wkstest.cloud -> TEST, www.wks.cloud -> PROD)
   gorg: TOrgRec;                   // organization stuff [B] *** WARNING, contains Image, LogoGraphic, LogoLongGraphic that need to be free ***
   gthe: TTheRec;                   // theme              [B]     font and colors for the organization brand
   gmbr: TMbrRec;                   // memberstuff        [B] *** WARNING, contains Image, BadgeGraphic that need to be free ***
@@ -5163,6 +5229,24 @@ uses
   , ImagingTypes                  // vampire, timagedata
   , Imaging                       // vampyre
   , DTDBTreeView                  // dtdbtree
+  , FireDAC.Stan.Intf             // firedac
+  , FireDAC.Stan.Option
+  , FireDAC.Stan.Error
+  , FireDAC.UI.Intf
+  , FireDAC.Phys.Intf
+  , FireDAC.Stan.Def
+  , FireDAC.Stan.Pool
+  , FireDAC.Stan.Async
+  , FireDAC.Phys
+  , FireDAC.VCLUI.Wait
+  , FireDAC.Comp.Client
+//, FireDAC.Phys.Oracle           // only enterprise/architect
+//, FireDAC.Phys.OracleDef        // idem
+  , FireDAC.Stan.Param
+  , FireDAC.DatS
+  , FireDAC.DApt.Intf
+  , FireDAC.DApt
+  , FireDAC.Comp.DataSet
   , WksSearchFormUnit             // searchform
   , WksReplaceFormUnit            // replaceform
   , WksReplaceConfirmFormUnit     // replaceconfirmform
@@ -8386,7 +8470,7 @@ begin
   end;
 end;
 
-class function  TDbaRec.Scalar(const IvSql: string; var IvValue: variant; const IvDefault: variant; var IvFbk: string; IvTimeOutSec: integer): boolean;
+class function  TDbaRec.ScalarVar(const IvSql: string; var IvValue: variant; const IvDefault: variant; var IvFbk: string; IvTimeOutSec: integer): boolean;
 var
   sql, fld: string;
   con: TADOConnection;
@@ -8427,14 +8511,33 @@ begin
   end;
 end;
 
+class function  TDbaRec.ScalarInt(const IvSql: string; var IvValue: integer; const IvDefault: integer; var IvFbk: string; IvTimeOutSec: integer): boolean;
+var
+  vnt, vnt2: variant;
+begin
+  vnt2 := IvDefault;
+  Result := ScalarVar(IvSql, vnt, vnt2, IvFbk, IvTimeOutSec);
+  IvValue := vnt;
+end;
+
+class function  TDbaRec.ScalarStr(const IvSql: string; var IvValue: string; const IvDefault: string; var IvFbk: string; IvTimeOutSec: integer): boolean;
+var
+  vnt, vnt2: variant;
+begin
+  vnt2 := IvDefault;
+  Result := ScalarVar(IvSql, vnt, vnt2, IvFbk, IvTimeOutSec);
+  IvValue := vnt;
+end;
+
 class function  TDbaRec.Scalar(const IvSql: string; const IvDefault: variant; IvTimeOutSec: integer): variant;
 var
-//boo: boolean;
-//vnt: variant;
+  boo: boolean;
+  vnt, vnt2: variant;
   fbk: string;
 begin
-  {boo :=} Scalar(IvSql, Result, IvDefault, fbk, IvTimeOutSec);
-//Result := vnt;
+  vnt2 := IvDefault;
+  boo := ScalarVar(IvSql, vnt, vnt2, fbk, IvTimeOutSec);
+  Result := vnt;
 end;
     {$ENDREGION}
 
@@ -8810,7 +8913,7 @@ var
   sql: string;
 begin
   sql := Format('select top(1) %s from %s where %s', [IvFld, IvTbl, IvWhere]);
-  Result := Scalar(sql, IvValue, IvDefault, IvFbk);
+  Result := ScalarVar(sql, IvValue, IvDefault, IvFbk);
 end;
 
 class function  TDbaRec.FldGetWhereRio(const IvTbl, IvFld: string; IvWhere: string; var IvValue: variant; IvDefault: variant; var IvFbk: string): boolean;
@@ -10706,17 +10809,17 @@ end;
   {$REGION 'TEnvRec'}
 class function TEnvRec.EnvIsDev: boolean;
 begin
-  Result := SameText(ENV_DEV_HOST, TNetRec.Host);
+  Result := SameText(Environment, 'DEV');
 end;
 
 class function TEnvRec.EnvIsTest: boolean;
 begin
-  Result := SameText(ENV_TEST_HOST, TBynRec.BinaryName);
+  Result := SameText(Environment, 'TEST');
 end;
 
 class function TEnvRec.EnvIsProd: boolean;
 begin
-  Result := SameText(ENV_PROD_HOST, TBynRec.BinaryName);
+  Result := SameText(Environment, 'PROD');
 end;
   {$ENDREGION}
 
@@ -12302,6 +12405,34 @@ end;
   {$ENDREGION}
 
   {$REGION 'THtmRec'}
+class function  THtmRec.BsMode(IvMode: char): string;
+begin
+  case IvMode of
+  'I': Result := 'info'   ;
+  'S': Result := 'success';
+  'W': Result := 'warning';
+  'D': Result := 'danger' ;
+  'M': Result := 'muted'  ;
+  'L': Result := 'light'  ;
+  'K': Result := 'dark'   ;
+  else Result := 'primary'; // secondary
+  end;
+end;
+
+class function  THtmRec.W3Mode(IvMode: char): string;
+begin
+  case IvMode of
+  'I': Result := 'green'      ; // info
+  'S': Result := 'blue'       ; // success
+  'W': Result := 'orange'     ; // warning
+  'D': Result := 'deep-orange'; // danger
+  'M': Result := 'grey'       ; // muted
+  'L': Result := 'silver'     ; // light
+  'K': Result := 'dark-grey'  ; // dark
+  else Result := 'light-blue' ; // primary secondary
+  end;
+end;
+
 class function  THtmRec.Attr(IvAttr, IvValue: string; IvIfTrue: boolean): string;
 
   {$REGION 'help'}
@@ -12377,11 +12508,12 @@ begin
   Result := '';
   if TVecRec.VecNx(IvValueVec) then
     Exit;
+
   for i := Low(IvValueVec) to High(IvValueVec) do begin
     x := IvValueVec[i].Trim;
     if x.IsEmpty then
       continue;
-    s := s + ' ' + x;
+    s := s + ' '{; if style ?} + x;
   end;
   s := s.Trim;
   if not s.IsEmpty then
@@ -12398,10 +12530,20 @@ begin
   Result := AttrFromVec('style', IvStyleVec);
 end;
 
-class procedure THtmRec.ValAdd(var IvValuesCurr: string; IvValuesToAdd: string; IvSep: string; IvIfTrue: boolean);
+class procedure THtmRec.AttrValAdd(var IvValuesCurr: string; IvValuesToAdd: string; IvSep: string; IvIfTrue: boolean);
 begin
   if IvIfTrue and not TStrRec.StrHas(IvValuesCurr, IvValuesToAdd) then
     IvValuesCurr := IvValuesCurr + IvSep + IvValuesToAdd;
+end;
+
+class procedure THtmRec.ClassAdd(var IvClassCurr: string; IvClassesToAdd: string; IvIfTrue: boolean);
+begin
+  AttrValAdd(IvClassCurr, IvClassesToAdd, ' ', IvIfTrue);
+end;
+
+class procedure THtmRec.StyleAdd(var IvStyleCurr: string; IvStylesToAdd: string; IvIfTrue: boolean);
+begin
+  AttrValAdd(IvStyleCurr, IvStylesToAdd, ';', IvIfTrue);
 end;
 
 class function  THtmRec.IdName(IvCoName: string): string;
@@ -12502,19 +12644,34 @@ begin
   Result := sbu.Text;
 end;
 
-class function  THtmRec.Collapse(IvTitle, IvSubtitle, IvBody: string; IvHhLevel: integer; IvCoName: string; IvTitlesCenter, IvPanelOn, IvPanelClosed: boolean): string;
+class function  THtmRec.Collapse(IvTitle, IvSubtitle, IvDescription, IvBody: string; IvHhLevel: integer; IvCoName, IvAlignement: string; IvPanelOn, IvPanelClosed: boolean): string;
 var
   sbu: TSbuRec;
   con, cls: string; // coname, class
   hlv: integer; // headerlevel
 begin
   con := giif.NxD(IvCoName, TNamRec.CoNameRnd('Collapse'));
-  cls := giif.Str(IvTitlesCenter, 'class="w3-center"', '');
   hlv := IvHhLevel;
 
-  sbu.Add('<!-- panel%s -->'                                                                                                        , [con]);
-  sbu.Add('<h%d %s style="cursor:pointer;" onclick="w3.toggleShow(''#%s'')">%s</h%d>'                       , [hlv, cls, con, IvTitle, hlv]);
-  sbu.Add('<div class="w3-cursive w3-text-gray w3-small">%s</div><br>', [IvSubtitle]                               , not IvSubtitle.IsEmpty);
+  // alignement
+  if IvAlignement.StartsWith('C') then      // Center
+    cls := 'class="w3-center"'
+  else if IvAlignement.StartsWith('R') then // Right
+    cls := 'class="w3-right-align"'
+  else
+    cls := '';                              // Left
+
+  // titles i
+  sbu.Add('<!-- collapse%s -->'                                                                                                     , [con]);
+//sbu.Add('<br>'                                                                                                                           );
+  sbu.Add('<div style="cursor:pointer;" onclick="w3.toggleShow(''#%s'')">'                                                          , [con]);
+  sbu.Add('<h%d %s>%s</h%d>'                                                                   , [hlv, cls, IvTitle, hlv], giis.Ex(IvTitle));
+  sbu.Add('<p class="w3-text-gray">%s</p>'                                         , [IvSubtitle], {IvSubtitleShow and} giis.Ex(IvSubtitle));
+  sbu.Add('<p class="w3-text-gray w3-cursive w3-small">%s</p>'                                    , [IvDescription], giis.Ex(IvDescription));
+//sbu.Add('<hr>'                                                                            , giis.Ex(IvSubtitle) or giis.Ex(IvDescription));
+  sbu.Add('</div>'                                                                                                                         );
+
+  // body
   sbu.Add('<div id="%s" %s %s>', [con, giif.BTR(IvPanelOn, 'class="w3-card w3-padding"'), giif.BTR(IvPanelClosed, 'style="display:none;"')]);
   sbu.Add(IvBody);
   sbu.Add('</div>');
@@ -12564,6 +12721,26 @@ begin
   if IvTitle.IsEmpty then
     IvTitle := 'Error';
   Result := Alert(IvTitle, IvText, 'w3-gray');
+end;
+
+class function  THtmRec.Badge(IvText: string; IvMode: char): string;
+begin
+  Result := Format('<span%s>%s</span>', [AttrClassFromVec(['w3-badge', 'w3-'+W3Mode(IvMode)]), IvText]);
+end;
+
+class function  THtmRec.BadgeI(IvText: string): string;
+begin
+  Result := Badge(IvText, 'I');
+end;
+
+class function  THtmRec.BadgeW(IvText: string): string;
+begin
+  Result := Badge(IvText, 'W');
+end;
+
+class function  THtmRec.BadgeS(IvText: string): string;
+begin
+  Result := Badge(IvText, 'S');
 end;
 
 class function  THtmRec.Modal(IvShow: boolean; IvCoName, IvBody, IvHeader, IvFooter: string; IvFbkMode: TFbkModeEnum; IvCopyButtonOn: boolean): string;
@@ -12651,24 +12828,31 @@ begin
   Result := sbu.Text;
 end;
 
-class function  THtmRec.Elem(IvTag, IvKind, IvCoName, IvTitle, IvValue, IvClass, IvStyle, IvTail: string; IvDisabled, IvReadOnly: boolean): string;
+class function  THtmRec.Elem(IvTag, IvType, IvCoName, IvTitle, IvValue{, IvContent}, IvClass, IvStyle         , IvTail: string; IvDisabled, IvReadOnly: boolean): string;
+//    function  THtmRec.Elem(IvTag, IvType, IvCoName         , IvValue , IvContent , IvClass, IvStyle, IvTitle, IvTail: string): string;
 const
   ELEMENTS_WITHOUT_VALUE_ATTR = 'textarea';
 var
   tag: string;
 begin
-  // zip
+  // tag
   tag := IvTag.Trim.ToLower;
+
+  // unknown
+//if not TStrRec.StrHas(','+HTM_TAG_PAIR_CSV+',', ','+tag+',') then begin
+//  Result := Format('{%s}%s{/%s}', [tag, IvContent, tag]);
+//  Exit;
+//end;
 
   // open
   Result := '<'
           + tag
-          + Attr('type'  , IvKind)   // if tag=input
           + Attr('nameid', IvCoName)
-          + Attr('title' , IvTitle)
-          + Attr('value' , IvValue, not TStrRec.StrHas(ELEMENTS_WITHOUT_VALUE_ATTR, IvTag) )
           + Attr('class' , IvClass)
           + Attr('style' , IvStyle)
+          + Attr('type'  , IvType)   // if tag=input
+          + Attr('value' , IvValue, not TStrRec.StrHas(ELEMENTS_WITHOUT_VALUE_ATTR, IvTag) )
+          + Attr('title' , IvTitle)
         //+ disabled ?
         //+ readonly ?
           + giif.ExP(IvTail, ' ')    // something like 'attr1="value1" attr2="value2" required onclick="" ...'
@@ -12677,6 +12861,8 @@ begin
   // close
   if not TStrRec.StrHas(','+HTM_TAG_SINGLE_CSV+',', ','+tag+',') then
     Result := Result + IvValue + '</' + tag + '>';
+//else
+  //Result := Result + IvContent;
 end;
 
 class function  THtmRec.Choice(     IvKind, IvCoName, IvTitle: string; IvOptCaptionVec, IvOptValueVec: TArray<string>; IvClass, IvStyle, IvTail: string; IvValueVec, IvDisabledVec: TArray<string>; IvReadOnly: boolean): string;
@@ -12910,7 +13096,7 @@ class function  THtmRec.FormLine(IvKind, IvCoName, IvTitle: string; IvOptCaption
   |                       |   ----------------------------------------------------------------   |                      |
    ---------------------------------------------------------------------------------------------------------------------
 
-  ymsstyle (full width)
+  wksstyle (full width)
    ---------------------------------------------------------------------------------------------------------------------
   |                       |   ---------------------------------------------------------------------------------------   |
   | Label /LabelWidth     |  | inputctrl: Kind / CoName / Title / Value / Class / Style, Tail                        |  |
@@ -12985,11 +13171,11 @@ begin
   // wksstyle
   if false then
     Result := GridRow([lab                                                  , ctr                                 , hlp                                         ] // valvec
-                    , ['w3-col'                                             , 'w3-col'                            , 'w3-text-italic w3-theme-text-dark w3-small'] // classvec
+                    , ['w3-col'                                             , 'w3-col'                            , 'w3-cursive w3-theme-text-dark w3-small'    ] // classvec
                     , [Format('width:%dpx; margin-top:8px;', [IvLabelWidth]), Format('width:%dpx;', [IvHelpWidth]), 'w3-rest; margin-left:8px; margin-top:10px;'] // stylevec
     )
 
-  // ymsstyle
+  // wksstyle
   else if true then
     Result := GridRow([lab              , ctr                            ] // valvec
                     , ['w3-col m4 l3'   , 'w3-col m8 l9 w3-animate-input'] // classvec
@@ -13097,116 +13283,439 @@ begin
   Result := sbu.Text;
 end;
 
-class function  THtmRec.TableFromDs(IvDs: TDataset; IvHtmlDefault, IvClass, IvStyle: string; IvEditable: boolean; IvEditJson: string; IvDir: THvDirEnum; IvDsRecordCountOff, IvDsHeaderOff: boolean): string;
-
-  {$REGION 'var'}
-const
-  USE_LOCAL_SNACKBAR = false;
-
+class function  THtmRec.Tx(IvKind, IvContent, IvClass, IvStyle, IvCoName, IvTitle, IvWidth, IvAlign, IvColSpan: string; IvNoWrap: boolean): string;
 var
-//okc: boolean;         // oktocontinue
-  nam: string;          // name
-  tna: string;          // tablename
-  fna: string;          // fbkname
-  ena: string;          // editorname
-  xna: string;          // textareaname
-  kna: string;          // okbtnname
-  cna: string;          // cancelbtnname
-  tbl: string;          // tabletoedit
-  fld: TField;          // field
-  fkv: TJSONArray ;     // fieldkeyvector (a list with just ONE value for now ["FldAaa"])
-  fln: string;          // fieldname
-  flv: string;          // fieldvalue
-  sbu: TSbuRec;         // txtbuilder
-  jso: TJSONObject;     // editjsoninfo
-  jva: TJSonValue;      // ajsonval
-  fke: string;          // fieldkey (just ONE for now)
-//  cyl: string;          // coluns styling
-//  cyv: TStringDynArray; // colums styling vec
-//  str: string;          // buffer
-  {$ENDREGION}
+  tag, ali, wid, csp, nwr: string; // tag, align, width, colspan, nowrap
+begin
+  // kind
+  if SameText(IvKind, 'th') then
+    tag := 'th'
+  else
+    tag := 'td';
 
-  {$REGION 'macro'}
-  function field_name_process(ivfldname: string): string; // *** FAST OK ***
-  begin
-    Result := ivfldname;
-    if Result.StartsWith('Fld') then               // ok
-      Result := TStrRec.strRemoveFirst(Result, 3);
-    if Result.EndsWith('Md') then                  // ?
-      Result := TStrRec.StrRemoveLast(Result, 2);
-  end;
+  // width
+  if giis.Ex(IvWidth) then
+    wid := Format(' width="%s"', [IvWidth])
+  else
+    wid := '';
 
-(*function field_value_td_process(ivfld: TField): string; // *** VERY SLOW ***
-  begin
-    Result := ivfld.AsString;
+  // alignment                                <td align="left|right|center|justify|char">
+  ali := UpperCase(IvAlign);
+       if (ali = 'LT') or (ali = 'TL') then ali := ' text-align: left;   vertical-align: top;'    // ' align="left"   valign="top"'
+  else if (ali = 'LM') or (ali = 'ML') then ali := ' text-align: left;   vertical-align: middle;' // ' align="left"   valign="middle"'
+  else if (ali = 'LB') or (ali = 'BL') then ali := ' text-align: left;   vertical-align: bottom;' // ' align="left"   valign="bottom"'
+  else if (ali = 'CT') or (ali = 'TC') then ali := ' text-align: center; vertical-align: top;'    // ' align="center" valign="top"'
+  else if (ali = 'CM') or (ali = 'MC') then ali := ' text-align: center; vertical-align: middle;' // ' align="center" valign="middle"'
+  else if (ali = 'CB') or (ali = 'BC') then ali := ' text-align: center; vertical-align: bottom;' // ' align="center" valign="bottom"'
+  else if (ali = 'RT') or (ali = 'TR') then ali := ' text-align: right;  vertical-align: top;'    // ' align="right"  valign="top"'
+  else if (ali = 'RM') or (ali = 'MR') then ali := ' text-align: right;  vertical-align: middle;' // ' align="right"  valign="middle"'
+  else if (ali = 'RB') or (ali = 'BR') then ali := ' text-align: right;  vertical-align: bottom;' // ' align="right"  valign="bottom"'
+  else                                      ali := '';
 
-    if ivfld.IsNull then
-      Result := '<td><span class="w3-theme-text-muted">null</span></td>'
+  // colspan
+  if giis.Ex(IvColSpan) then
+    csp := Format(' colspan="%s"', [IvColSpan])
+  else
+    csp := '';
 
-    else if ivfld.FieldName = 'FldState' then
-      Result := Format('<td style="padding:6px 8px"><span class="w3-tag w3-round-xxlarge w3-%s" style="padding-top: 1.0px;padding-bottom: 1.5px">%s</span></td>', [TStaRec.ColorW3FromState(Result), Result]{, not Result.IsEmpty})
+  // nowrap
+  nwr := giif.Str(IvNoWrap, ' nowrap', '');
 
-    else if fld.FieldName.EndsWith('Md') then
-      Result := Format('<td>%s</td>', [TMkdRec.Process(Result)]);
-  end;
+  // style
+  IvStyle := IvStyle + ali;
 
-  procedure field_value_td_process; // *** ACCEPTABLE ***
-  begin
-    if fld.IsNull then
-      sbu.Add('<td><span class="w3-theme-text-muted">null</span></td>')
+  // build
+  Result := Elem(tag, '', IvCoName, IvTitle, IvContent, IvClass, IvStyle, Format('%s%s%s', [wid, csp, nwr]), false, false);
+end;
 
-    else if fld.FieldName = 'FldState' then
-      sbu.Add('<td style="padding:6px 8px"><span class="w3-tag w3-round-xxlarge w3-%s" style="padding-top: 1.0px;padding-bottom: 1.5px">%s</span></td>', [TStaRec.ColorW3FromState(fld.AsString), fld.AsString]{, not fld.AsString.IsEmpty})
+class function  THtmRec.Th(IvContent, IvClass, IvStyle, IvCoName, IvTitle, IvWidth, IvAlign, IvColSpan: string; IvNoWrap: boolean): string;
+begin
+  Result := Tx('th', IvContent, IvClass, IvStyle, IvCoName, IvTitle, IvWidth, IvAlign, IvColSpan, IvNoWrap);
+end;
 
-    end else if fld.FieldName.EndsWith('Md') then
-      sbu.Add('<td>%s</td>', [TMkdRec.Process(fld.AsString)])
+class function  THtmRec.Td(IvContent, IvClass, IvStyle, IvCoName, IvTitle, IvWidth, IvAlign, IvColSpan: string; IvNoWrap: boolean): string;
+begin
+  Result := Tx('td', IvContent, IvClass, IvStyle, IvCoName, IvTitle, IvWidth, IvAlign, IvColSpan, IvNoWrap);
+end;
 
-    else
-      sbu.Add('<td>%s</td>', [fld.AsString])
-    ;
-  end;*)
+class function  THtmRec.Tr(IvContent, IvClass, IvStyle, IvCoName: string): string;
+begin
+  Result := Elem('tr', '', IvCoName, IvClass, IvStyle, '', IvContent);
+end;
+
+class function  THtmRec.TableCaption(IvContent, IvClass, IvStyle, IvCoName: string): string;
+begin
+  Result := Elem('caption', '', IvCoName, IvClass, IvStyle, '', IvContent);
+end;
+
+class function  THtmRec.Table(IvContent, IvClass, IvStyle, IvCoName, IvCaption: string; IvResponsive: boolean): string;
+var
+  c: string;
+
+  {$REGION 'help'}
+  (*
+  <table>
+    <caption>Monthly savings</caption>
+    <thead>
+      <tr>
+        <th>Month</th>
+        <th>Savings</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>January</td>
+        <td>$100</td>
+      </tr>
+      <tr>
+        <td>February</td>
+        <td>$80</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td>Sum</td>
+        <td>$180</td>
+      </tr>
+    </tfoot>
+  </table>
+  *)
   {$ENDREGION}
 
 begin
+  c := giif.NxD(IvClass, 'w3-table w3-bordered w3-small w3-table-centered w3-hoverable');
+
+  Result := sLineBreak + Format('<table%s%s%s>', [AttrClassFromVec([c]), AttrStyleFromVec([IvStyle]), Attr('NameId', IvCoName)])
+                       +           IvCaption // iif.Str(IvCaption.Contains('/caption'), IvCaption, Tc(IvCaption))
+                       +           IvContent
+          + sLineBreak +        '</table>';
+
+  if IvResponsive then
+    Result :=         sLineBreak + '<div class="w3-responsive">'
+                                 +  Result
+                    + sLineBreak + '</div>';
+end;
+
+class function  THtmRec.TableFromDs(IvDs: TDataset; IvHtmlDefault, IvCoName, IvClass, IvStyle: string; IvEditable: boolean; IvEditJson: string; IvDir: THvDirEnum; IvDsRecordCountOff, IvDsHeaderOff: boolean; IvCaption: string): string;
+
+  {$REGION 'const'}
+const
+  USE_LOCAL_SNACKBAR = false;
+  FLDROWBGCOLOR      = 'FldRowBgColor';
+  {$ENDREGION}
+
+  {$REGION 'var'}
+var
+  // spare
+//okc: boolean;         // oktocontinue
+//str: string;          // buffer
+  sbu, sbu2: TSbuRec;   // txtbuilder
+  fbk: string;          // feedback
+  nus: string;          // nullstr
+  ems: string;          // emptystr
+  seq: integer;         // rownumber asc or desc
+
+  // common
+//  swb: TSwlRec;         // switchlist
+//  edr: TEdiRec;         // editinforec
+  edj: string;          // editinfojson
+//cef: string;          // coeditfbk
+
+  // names
+  nam: string;          // name
+  cpn: string;          // collapsename
+  tna: string;          // tablename
+  fkn: string;          // fbkname
+  ena: string;          // editorname
+  xna: string;          // editortextareaname
+  kna: string;          // editorokbtnname
+  cbn: string;          // editorcancelbtnname
+  ina: string;          // inlinectrlname  (valid for any inline text, select, date, time, datetime ... ctrl)
+
+  // table
+  tcl: string;          // class
+  tsy: string;          // style
+  the: string;          // header (the row containing the columns names)
+  tca: string;          // caption
+  tbl: string;          // table (editable)
+  tfo: string;          // footer (the rows containing the summaries... can be more than one?)
+
+  // row
+  roz: integer;         // count
+  row: string;          // row
+  ros: string;          // rows
+  rcl: string;          // class
+  rsy: string;          // style
+  roj: integer;         // rowidx
+
+  // fldcol
+  foz: integer;         // count
+  fna: string;          // fieldname
+//fcn: string;          // coname
+  coi: integer;         // colfldidx
+
+  // cell
+  cna: string;          // nametxt
+  ccn: string;          // coname
+//  cva: string;          // value
+//  csy: string;          // style
+
+  // body
+  bdy: string;          // body
+
+  // header&footer
+//hea: string;          // html before the table
+//foo: string;          // html after the table
+
+  // editinfo
+  ejs: string;          // editjson (comment removed)
+  fld: TField;          // field
+//fln: string;          // fieldname
+//flv: string;          // fieldvalue
+
+  jso: TJSONObject;     // editjsoninfo
+  jva: TJSonValue;      // ajsonval
+
+  fkv: TJSONArray;      // fieldkeyvector (a list with just ONE value for now ["FldAaa"])
+  fky: string;          // fieldkeyliststr
+
+  fev: TJSONArray;      // fieldeditablevector
+  fes: string;          // fieldeditableliststr
+
+  oyf: string;          // onewayfield
+  oyv: TJSONArray;      // onewayvector
+  oyl: string;          // onewayliststr
+
+  owf: string;          // ownerfield
+  wef: string;          // whenfield
+  wof: string;          // whofield
+
+  // styling
+//cyl: string;          // coluns styling
+//cyv: TStringDynArray; // colums styling vec
+  {$ENDREGION}
+
+  {$REGION 'macro'}
+  function  field_is_ghost(ivfield: string): boolean;
+  begin
+    Result := ivfield.EndsWith('Color')   // *** FldColor should be visible! ***
+           or ivfield.EndsWith('Tooltip')
+           or ivfield.EndsWith('Symbol')
+           or ivfield.EndsWith('Ghost');
+  end;
+
+  function  column_name(ivfldname: string): string; // FldPersonMd --> Person
+  begin
+    Result := ivfldname;
+
+    if Result.StartsWith('Fld', true) then
+      Result := TStrRec.strRemoveFirst(Result, 3);
+    //Result := StringReplace(Result, 'Fld', '', []); // if AnsiSameStr(Copy(fna, 1, 3), 'Fld') then Delete(fna, 1, 3);
+
+    if Result.EndsWith('Md') then // markdown
+      Result := TStrRec.StrRemoveLast(Result, 2);
+  end;
+
+  function  column_name_expanded(ivfldname: string): string;
+  begin
+    Result := ivfldname;
+    if Result.Contains('_') then
+      Result := StringReplace(Result, '_', '&nbsp;' , [rfReplaceAll]) // maybe delete
+    else
+      Result := TStrRec.StrExpand(Result);
+    Result := StringReplace(Result, 'Perc'  , '%'      , []            );
+    Result := StringReplace(Result, 'Dollar', '$'      , []            );
+    Result := StringReplace(Result, 'Euro'  , '€'      , []            );
+    Result := TRegEx.Replace(Result, 'Csv$', '(s)');
+  end;
+  {$ENDREGION}
+
+  {$REGION 'html'}
+(*function  toolbar(IvTitle: string; IvRowCount: integer; IvEditMenuVisible: boolean): string;
+  var
+    b: TSbuRec;
+  begin
+    b.Add('<div class="row">');
+    b.Add('  <div class="col-sm-6">');
+  //b.Add(     HElem('caption', '', '', '', '', '', '', IvTitle));
+    b.Fmt('    <div class="pull-left" title="%s">', [IvTitle]);
+    b.Add(       HBadge(Format('%d Row(s)', [IvRowCount])));
+    b.Add('    </div>');
+    b.Add('  </div>');
+    b.Add('  <div class="col-sm-6">');
+    if IvEditMenuVisible then begin
+    b.Add('    <div class="dropdown pull-right">');
+    b.Add('      <button class="btn btn-xs dropdown-toggle" type="button" data-toggle="dropdown" id="' + IvCoName+'Menu' + '"><span class="caret"></span></button>');
+    b.Add('      <ul class="dropdown-menu" role="menu" aria-labelledby="' + IvCoName+'Menu' + '">');
+    b.Add('        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="javascript:event.stopPropagation();" href="javascript: ' + IvCoName + 'AddNew();">Add New</a></li>');
+  //b.Add('        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="javascript:event.stopPropagation();" href="javascript: deleteSelected();">Delete Selected</a></li>');
+  //b.Add('        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="javascript:event.stopPropagation();" href="javascript: deleteAll();">Delete All</a></li>');
+  //b.Add('        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="javascript:event.stopPropagation();" href="javascript: fullEdit();">Full Edit</a></li>');
+    b.Add('      </ul>');
+    b.Add('    </div>');
+    end;
+    b.Add('  </div>');
+    b.Add('</div>');
+    Result := b.Text;
+  end;*)
+  {$ENDREGION}
+
+  {$REGION 'help'}
+(*
+   --------------------------------------------------------------
+  | aaa bbb ccc                                                  |    <-- local header html
+   --------------------------------------------------------------
+
+   2 row(s)                                           (+) (-) (x)      <-- toolbar = rowcount + menu(+)(-)(x) = add, deleteselected, cloneselected
+   --------------------------------------------------------------    \
+  |  Aaa  |     Bbb     | Ccc |   Ddd   |   Eee   |     Fff      |    |
+  |==============================================================|    |                     0,0
+  |  111  | bbbb        | ccc | ddddddd | eeee    | fffff        |    |-- table/datasets     +----> i    cols/rows reference
+  |--------------------------------------------------------------|    |                      |
+  |  222  | bbb         | ccc | ddddddd | eeee    | fffff        |    |                      |
+   --------------------------------------------------------------    /                       V j
+    _____________________________________________________________
+  ( snackbar                                                     )    <-- local feedback (normally hidden)
+   ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+   --------------------------------------------------------------
+  | ddd eee fff                                                  |    <-- local footer html
+   --------------------------------------------------------------
+
+  <script>...</script>                                                <-- local javascript
+
+
+  specialcolumns     ghost    note
+  ---------------------------------------------------------------
+  - FldState         no       rendered as a colored badge
+  - Fld*Md           no       content is rendered as Markdown
+  - FldColor         no       content, a color name, is rendered ad a little colored box
+  - FldTooltip       yes      used in canvasjs
+  - FldSymbol        yes      used in canvasjs
+  - Fld*Ghost        yes      used in canvasjs
+  - FldRowBgColor    yes      used to color the row background
+
+  html
+  ----
+  <div>header</div>
+  <table>
+    <caption></caption>                                optional, table description
+    <colgroup>                                         optional, groups cols for styling
+      <col span="2" style="background: #eee;">
+    </colgroup>
+    <thead>                                            optional, groups header rows
+      <tr><th>Month</th><th>Savings</th></tr>
+    </thead>
+    <tbody>                                            optional, groups main body rows
+      <tr><td>January</td><td>$100</td></tr>
+      <tr><td>February</td><td>$80</td></tr>
+      <tr><td>March</td><td>$20</td></tr>
+    </tbody>
+    <tfoot>                                            optional, groups footer rows
+      <tr><td>Sum</td><td>$200</td></tr>
+    </tfoot>
+  </table>
+  <div>snackbar</div>
+  <div>footer</div>
+  <script>
+  </script>
+
+  class
+  -----
+  table table-extra-condensed
+  table table-condensed
+  table table-bordered
+  table table-striped
+  table table-hover
+  table table-responsive
+  table table-nonfluid
+
+  style
+  -----
+  margin:auto; // centered
+  width:auto;  // width-minimized
+*)
+  {$ENDREGION}
+
+begin
+try
 
   {$REGION 'exit'}
+  if not Assigned(IvDs) then begin
+  //Result := '<p>Dataset is not assigned</p>';
+    Result := AlertW('Dataset', NOT_ASSIGNED_STR);
+    Exit
+  end;
+
   if IvDs.IsEmpty then begin
-    Result := giif.NxD(IvHtmlDefault, Format('<p>%s</p>', [NO_DATA_STR]));
+  //Result := giif.NxD(IvHtmlDefault, Format('<p>%s</p>', [NO_DATA_STR]));
+    Result := AlertI('Dataset', giif.NxD(IvHtmlDefault, NO_DATA_STR));
     Exit;
   end;
 
   if not (IvDir in [hvHorizontal, hvVertical]) then begin
-    Result := '<div class="w3-margin">Please set the table Mode as Horiz or Vert</div>';
+  //Result := '<div class="w3-margin">Please set the table Mode as Horiz or Vert</div>';
+    Result := AlertW('Table mode', 'Please set the table Mode as Horiz or Vert');
     Exit;
   end;
   {$ENDREGION}
 
   {$REGION 'names'}
-  nam := TNamRec.Co; // conamernd
+  if IvCoName.IsEmpty then
+    nam := TNamRec.Co // conamernd
+  else
+    nam := IvCoName;
+  cpn := nam + 'Collapse';
   tna := nam + 'Table';
-  fna := nam + 'Feedback';
+  fkn := nam + 'Feedback';
   ena := nam + 'Editor';
   xna := nam + 'Textarea';
   kna := nam + 'Ok';
-  cna := nam + 'Cancel';
+  cbn := nam + 'Cancel';
+  ina := nam + 'Inline';
+  {$ENDREGION}
+
+  {$REGION 'zip'}
+  nus := {giif.Str(swb.IsOn('CTnh'), '' ,} NULL_STR.ToLower{)};
+  ems := {giif.Str(swb.IsOn('CTes'), '-',} EMPTY_STR{)};
+  foz := IvDs.FieldCount;  // colscount
+  roz := IvDs.RecordCount; // rowscount
+  tcl := IvClass;
+  tsy := IvStyle;
   {$ENDREGION}
 
   {$REGION 'horizontal'}
 if IvDir = hvHorizontal then begin
-  // begin
+
+    {$REGION 'pre'}
   sbu.Add('<!-- tablehorizontal -->', true, 0);             // class = w3-table w3--striped w3-hoverable w3--border w3-bordered w3--card-4 w3--small w3-margin-bottom
   sbu.Add('<div class="w3-section">');                      // style = width:auto;margin-left:auto;margin-right:auto;
-  sbu.Add('<span class="w3-small">%d row(s)</span>', [IvDs.RecordCount], not IvDsRecordCountOff);
-  sbu.Add('<div class="w3-responsive">', true);
-  sbu.Add('<table class="%s" style="%s" %s>', [IvClass, IvStyle, THtmRec.IdName(tna)]);
+  sbu.Add('<span class="w3-small" style="cursor:pointer;" onclick="w3.toggleShow(''#%s'')">%d row(s)</span>', [cpn, roz], not IvDsRecordCountOff);
+  sbu.Add('<div class="w3-responsive" id="%s">', [cpn]);
+  sbu.Add('<table class="%s" style="%s" %s>', [tcl, tsy, THtmRec.IdName(tna)]);
+    {$ENDREGION}
 
-  // caption
+    {$REGION 'toolbar'}
+
+      {$REGION 'caption'}
+//    if tcl.Contains('no-caption') then
+//      tca := ''
+//    else begin
+//    //tca := Format('<caption class="wks-cursor-pointer w3-left-align" onclick="w3.toggleShow(''#%s'')">%d Record(s)', [tna, roz]);<br> // scompare insieme alla tabella
+//    //tca := Format('<button class="w3-button w3-small" onclick="w3.toggleShow(''#%s'')">%s%d Record(s)</button>', [tna, iif.ExA(IvCaption, ' - '), roz]);
+//      tca := Format('<div class="w3-text-gray w3small w3-center" onclick="w3.toggleShow(''#%s'')" style="cursor:pointer;">%s%d Record(s)</div>', [tna, giif.ExA(IvCaption, ' - '), roz]);
+//    end;
   //sbu.Add('<caption>');
+      {$ENDREGION}
 
-  // columnsgroup(styling)
+      {$REGION 'editbuttons'}
+      {$ENDREGION}
+
+    {$ENDREGION}
+
+    {$REGION 'colgroup(styling)'}
+//sbu.Add('<colgroup>');
 //cyl := IvDs.FieldByName('FldEditIni').AsString; // *** leggere da FldEditJson da cambiare in FldConfigJson ***
 //if not cyl.IsEmpty then begin
-//sbu.Add('<colgroup>');
 //  cyv := SplitString(cyl, '|');
 //  for str in cyv do begin
 //    if str.Trim.IsEmpty then
@@ -13214,37 +13723,154 @@ if IvDir = hvHorizontal then begin
 //    else
 //sbu.Add('<col style="%s" />', [str.Trim]);
 //  end;
+//end;
 //sbu.Add('</colgroup>');
-//end;
+    {$ENDREGION}
 
-  // header
+    {$REGION 'header'}
   gpro.TimerByName['TableFromDs.Horizontal.Header'].Start;
-//if not IvDsHeaderOff then begin
 //sbu.Add('<thead>');
-//sbu.Add('<tr class="w3-%s">', [gthe.Accent10Color]);
-  sbu.Aif('<tr style="visibility: hidden">', '<tr>', IvDsHeaderOff);
-  for fld in IvDs.Fields do begin
-    fln := field_name_process(fld.FieldName);
-    sbu.Add('<th>%s</th>', [fln]);
-  end;
-  sbu.Add('</tr>');
-//sbu.Add('</thead>');
-//end;
-  gpro.TimerByName['TableFromDs.Horizontal.Header'].Stop;
+  if not IvDsHeaderOff then begin
 
-  // body
+    {$REGION 'row'}
+//  sbu.Aif('<tr style="visibility: hidden">', '<tr>', IvDsHeaderOff);
+    sbu.Add('<tr class="w3-%s">', [gthe.Accent10Color]);
+
+    // numberingcell
+//    if false then
+//      row := Th('#', '', '', 'CoNo', 'No')
+//    else
+      row := '';
+
+    // otherscells
+//  for fld in IvDs.Fields do begin
+    for coi := 0 to foz - 1 do begin
+
+      {$REGION 'zzz'}
+      {
+      if      IvDs.Fields[i].Lookup then
+        ods(IvDs.Fields[i].FieldName + ' is a lookup field')
+      else if IvDs.Fields[i].Calculated then
+        ods(IvDs.Fields[i].FieldName + ' is a calculated field')
+      else begin // FieldKind should be ftData here, but might be ftAggregate or ftInternalCalc
+        if IvDs.Fields[i].FieldKind = ftAggregate then begin
+          ods(IvDs.Fields[i].FieldName + ' is an Aggregate field')
+        end else if IvDs.Fields[i].FieldKind = ftInternalCalc then begin
+          ods(IvDs.Fields[i].FieldName + ' is an InternalCalc field')
+        end else if IvDs.Fields[i].FieldKind = ftData then begin
+          case IvDs.Fields[i].FieldType of
+            ftString : ods(IvDs.Fields[i].FieldName + ' is a string field');
+            ftInteger: ods(IvDs.Fields[i].FieldName + ' is an integer field');
+            ftFloat  : ods(IvDs.Fields[i].FieldName + ' is a float field');
+            ftDate   : ods(IvDs.Fields[i].FieldName + ' is a date field');
+            ftBoolean: ods(IvDs.Fields[i].FieldName + ' is a boolean field');
+         // other possible FieldType values ...
+          end;
+        end;
+      end;
+      }
+      {$ENDREGION}
+
+      // fieldname
+      fna := IvDs.Fields[coi].FieldName{DisplayName};
+
+      // ghostskip
+      if field_is_ghost(fna) then
+        Continue;
+
+      // colname
+      cna := column_name(fna);
+      // colnameexpanded
+      cna := column_name_expanded(cna);
+
+      // coid
+      ccn := Format('Co%s', [fna]);
+
+      // cell
+      sbu.Add('<th id="%s" title="%s">%s</th>', [ccn, fna, cna]);
+    end;
+    sbu.Add('</tr>');
+    {$ENDREGION}
+
+  end;
+//sbu.Add('</thead>');
+  gpro.TimerByName['TableFromDs.Horizontal.Header'].Stop;
+    {$ENDREGION}
+
+    {$REGION 'footer'}
+//sbu.Add('<tfoot>');
+//  if          {swb.IsOn('CTfo')} false then begin
+//    row := '';
+//    for coi := 0 to foz - 1 do begin
+//      fna := IvDs.Fields[coi].FieldName{DisplayName};
+//      fcn := ''; // Format('Co%sFooter', [sna]); // coid
+//      if fna <> FLDROWBGCOLOR then
+//        row := row + Td('-', '', '', fcn);
+//    end;
+//    row := Tr(row);
+//    foo := Elem('tfoot', '', '', '', row);
+//
+//  end else if {swb.IsOn('CTft')} false then begin // need to be adjusted due to: FLDROWBGCOLOR
+//    row := '<td colspan="' + (foz + StrToInt(giif.Str({swb.Has('+CT#*')}false, '1', '0'))).ToString + '">' + BadgeI(Format('%d rows', [roz])) + '</td>';
+//    row := Tr(row);
+//    foo := Elem('tfoot', '', '', '', row);
+//
+//  end else
+//    foo := '';
+//sbu.Add('</tfoot>');
+    {$ENDREGION}
+
+    {$REGION 'body'}
   gpro.TimerByName['TableFromDs.Horizontal.Body'].Start;
 //sbu.Add('<tbody>');
+
+  // rows
+  ros := '';
+  roj := -1;
   IvDs.First;
   while not IvDs.Eof do begin
-    sbu.Add('<tr>');
-    for fld in IvDs.Fields do begin
-    //fln := field_name_process(fld.FieldName);
-    //flv := field_value_td_process(fld);
-    //field_value_td_process;
+    // rowinc
+    Inc(roj);
 
+    {$REGION 'row'}
+    sbu.Add('<tr>');
+    coi := -1;
+
+    // cellnumbering
+    if      {swb.Has('+CT#num')} false then begin
+      Inc(coi);
+      if {swb.Has('+CT#desc')}{IvDessc} false then
+        seq := roz-roj+1
+      else
+        seq := roj+1;
+      row := Th(seq.ToString, '', '', Format('CoR%dC%d', [roj, coi]));
+    end else
+      row := '';
+
+    // cellsothers
+    for fld in IvDs.Fields do begin
+      {$REGION 'zip'}
+      fna := fld.FieldName;                  // fieldname
+    //flv := fld.AsString;                   // ?
+      cna := column_name(fna);               // celltext
+      {$ENDREGION}
+
+      // colghostskip
+      if field_is_ghost(cna) then
+        Continue;
+
+      // colinc
+      Inc(coi);
+
+      // cellcoid
+      ccn := Format('CoR%dC%d', [roj, coi]);
+
+      // cell *** DUPLICATED ***
       if fld.IsNull then
-        sbu.Add('<td><span class="w3-theme-text-muted">null</span></td>')
+        sbu.Add('<td><span class="w3-theme-text-muted">%s</span></td>', [nus])
+
+      else if fld.AsString.IsEmpty then
+        sbu.Add('<td><span class="w3-theme-text-muted">%s</span></td>', [ems])
 
       else if fld.FieldName = 'FldNo' then
         sbu.Add('<td><span id="Co' + fld.AsString + '">' + fld.AsString + '</span></td>') // add handle for hook <a href=#CoNo></a> for example with No = P1, P2, ...
@@ -13253,111 +13879,141 @@ if IvDir = hvHorizontal then begin
       //sbu.Add('<span class="badge" style="background-color: ' + fld.AsString + '">&#9679</span>')
         sbu.Add('<td><div title="' + fld.AsString + '" style="display: inline-block; width: 1em; aspect-ratio: 1 / 1; vertical-align: middle; background-color: ' + fld.AsString + ';"></div></td>')
 
-      else if fld.FieldName = 'FldState' then begin
-        flv := fld.AsString;
-        sbu.Add('<td style="padding:6px 8px"><span class="w3-tag w3-round-xxlarge w3-%s" style="padding-top: 1.0px;padding-bottom: 1.5px;color: white;">%s</span></td>', [TStaRec.ColorW3FromState(flv), flv]{, not flv.IsEmpty})
+      else if fld.FieldName = 'FldState' then
+        sbu.Add('<td style="padding:6px 8px"><span class="w3-tag w3-round-xxlarge w3-%s" style="padding-top: 1.0px;padding-bottom: 1.5px;color: white;">%s</span></td>', [TStaRec.ColorW3FromState(fld.AsString), fld.AsString]{, not fld.AsString.IsEmpty})
 
-      end else if fld.FieldName.EndsWith('Md') then
+      else if 'FldFromMember,FldMember,FldOwner'.Contains(fld.FieldName) then
+        sbu.Add('<td><span class="w3-text-green" style="font-style: italic;">%s</span></td>', [fld.AsString])
+
+      else if fld.FieldName.EndsWith('Md') then
         sbu.Add('<td>%s</td>', [TMkdRec.Process(fld.AsString)])
 
-      else
-        sbu.Add('<td>%s</td>', [fld.AsString])
-      ;
-
+      else begin
+      //cva := StringReplace(cva, 'Dollar', '$', []);
+      //cva := StringReplace(cva, 'Euro'  , '€', []);
+      //cva := Strip(cva, false); // htmltagsstrip
+      //cva := Encode(cva);       // charsescape
+      //if cva.Contains(sLineBreak) then cva := StringReplace(cva, sLineBreak, HBR);
+        sbu.Add('<td>%s</td>', [fld.AsString]);
+      end;
     end;
     sbu.Add('</tr>');
+    {$ENDREGION}
+
+    // rownext
     IvDs.Next;
   end;
 //sbu.Add('</tbody>');
   gpro.TimerByName['TableFromDs.Horizontal.Body'].Stop;
+    {$ENDREGION}
 
-  // end
-//sbu.Add('<tfoot>');
-
-  // end
+    {$REGION 'post'}
   sbu.Add('</table>');
   sbu.Add('</div>');
   sbu.Add('</div>');
+    {$ENDREGION}
+
   {$ENDREGION}
 
   {$REGION 'vertical'}
 end else if IvDir = hvVertical then begin
   IvDs.First;
-  while not IvDs.Eof do begin
-    sbu.Add('<!-- tablevertical%d -->', [IvDs.RecNo], true, 0);
-    sbu.Add('<div class="w3-section">');
-    sbu.Add('<div class="w3-responsive">', true);
-    sbu.Add('<table class="%s" style="%s" %s>', [IvClass, IvStyle, THtmRec.IdName(Format('%s%d', [tna, IvDs.RecNo]))]);
-    for fld in IvDs.Fields do begin
-      fln := field_name_process(fld.FieldName);
-    //flv := field_value_td_process(fld);
-      flv := fld.AsString;
 
+    {$REGION 'pre'}
+//sbu.Add('<!-- tablesvertical -->', true, 0);
+//sbu.Add('<span class="w3-small">%d record(s)</span>', [roz], not IvDsRecordCountOff);
+    {$ENDREGION}
+
+    {$REGION 'tables *** MAY CALL ITSELF HORIZONTAL? ***'}
+  while not IvDs.Eof do begin
+    // reset
+    sbu2.Clr;
+
+    {$REGION 'pre'}
+    sbu2.Add('<!-- tablevertical%d -->', [IvDs.RecNo], true, 0);
+    sbu2.Add('<div class="w3-section">');
+    sbu2.Add('<div class="w3-responsive">', true);
+    sbu2.Add('<table class="%s" style="%s" %s>', [IvClass, IvStyle, THtmRec.IdName(Format('%s%d', [tna, IvDs.RecNo]))]);
+    {$ENDREGION}
+
+    {$REGION 'header'}
+    //hea := ''
+    {$ENDREGION}
+
+    {$REGION 'rows'}
+    for fld in IvDs.Fields do begin
+      sbu2.Add('<tr>');
+
+      // cellheaderkey
+      sbu2.Add('<th class="w3-left-align w3-%s w3-padding-medium" style="width: fit-content">%s</th>', [gthe.Theme, column_name(fld.FieldName)], not IvDsHeaderOff);
+
+      // cell *** DUPLICATED ***
       if fld.IsNull then
-        flv := '<span class="w3-theme-text-muted">null</span></td>'
+        sbu2.Add('<td><span class="w3-theme-text-muted">%s</span></td>', [nus])
+
+      else if fld.AsString.IsEmpty then
+        sbu2.Add('<td><span class="w3-theme-text-muted">%s</span></td>', [ems])
+
+      else if fld.FieldName = 'FldNo' then
+        sbu2.Add('<td><span id="Co' + fld.AsString + '">' + fld.AsString + '</span></td>') // add handle for hook <a href=#CoNo></a> for example with No = P1, P2, ...
+
+      else if TStrRec.StrIsLike(fld.FieldName, 'Fld*Color') then
+      //sbu2.Add('<span class="badge" style="background-color: ' + fld.AsString + '">&#9679</span>')
+        sbu2.Add('<td><div title="' + fld.AsString + '" style="display: inline-block; width: 1em; aspect-ratio: 1 / 1; vertical-align: middle; background-color: ' + fld.AsString + ';"></div></td>')
 
       else if fld.FieldName = 'FldState' then
-        flv := Format('<span class="w3-tag w3-round-xxlarge w3-%s" style="padding-top: 1.0px;padding-bottom: 1.5px">%s</span>', [TStaRec.ColorW3FromState(flv), flv]{, not flv.IsEmpty})
+        sbu2.Add('<td style="padding:6px 8px"><span class="w3-tag w3-round-xxlarge w3-%s" style="padding-top: 1.0px;padding-bottom: 1.5px;color: white;">%s</span></td>', [TStaRec.ColorW3FromState(fld.AsString), fld.AsString]{, not fld.AsString.IsEmpty})
+
+      else if 'FldMember,FldOwner'.Contains(fld.FieldName) then
+        sbu2.Add('<td><span class="w3-green" style="font-style: italic;">%s</span></td>', [fld.FieldName])
 
       else if fld.FieldName.EndsWith('Md') then
-        flv := TMkdRec.Process(fld.AsString)
-      ;
+        sbu2.Add('<td>%s</td>', [TMkdRec.Process(fld.AsString)])
 
-      sbu.Add('<tr>');
-    //sbu.Add('<th class="w3-left-align w3-%s" style="width: 0%%;%s">%s</th>', [gthe.Primary60BgColor, ifthen(IvDsHeaderOff, 'visibility: hidden', ''), fln]);
-      sbu.Add('<th class="w3-left-align w3-blue-gray w3-padding-medium" style="width: 0%%">%s</th>', [fln], not IvDsHeaderOff);
-      sbu.Add('<td>%s</td>', [flv]);
-      sbu.Add('</tr>');
+      else begin
+      //cva := StringReplace(cva, 'Dollar', '$', []);
+      //cva := StringReplace(cva, 'Euro'  , '€', []);
+      //cva := Strip(cva, false); // htmltagsstrip
+      //cva := Encode(cva);       // charsescape
+      //if cva.Contains(sLineBreak) then cva := StringReplace(cva, sLineBreak, HBR);
+        sbu2.Add('<td>%s</td>', [fld.AsString]);
+      end;
+
+      sbu2.Add('</tr>');
     end;
-    sbu.Add('</table>');
-    sbu.Add('</div>');
-    sbu.Add('</div>');
+    {$ENDREGION}
+
+    {$REGION 'post'}
+    sbu2.Add('</table>');
+    sbu2.Add('</div>');
+    sbu2.Add('</div>');
+    {$ENDREGION}
+
+    // add
+    sbu.Add(Collapse(
+      {IvDs.FieldByName(IvVertTitleField=FldObject).AsString} ''      // title
+    , Format('Record %d of %d', [IvDs.RecNo, IvDs.RecordCount])       // subtitle
+    , {IvDs.FieldByName(IvVertDescrField=FldDescription).AsString} '' // description
+    , sbu2.Text                                                       // body
+    , 6                                                               // hlevel
+    , ''                                                              // coname
+    , 'Left'                                                          // alignment
+    , false                                                           // panelon
+    , false                                                           // panelclosed
+    ));
+
     IvDs.Next;
   end;
+    {$ENDREGION}
+
 end;
   {$ENDREGION}
 
-  {$REGION 'json'}
+  {$REGION 'editable'}
 if IvEditable then begin
-  // editjson
-  jso := TJSONObject.Create;
-  try
-    try
-      // i
-      jso.Parse(BytesOf(IvEditJson), 0);
-      tbl := jso.GetValue<string>('EditData.EditTable');
-      fkv := jso.GetValue<TJSONArray>('EditData.EditKeyFieldList');
 
-      // ii
-      //jva := jso.ParseJSONValue(IvEditJson);
-      //tbl := jva.GetValue<string>('EditData.EditTable');
-      //fkv := jva.GetValue<TJSONArray>('EditData.EditKeyFieldList');
-
-      for jva in fkv do begin
-        fke := jva.GetValue<string>; // *** justone? ***
-      end;
-    except
-      on e: Exception do begin
-  sbu.Add('<script>wks.fbkFail("Table not editable: %s");</script>', [e.Message]);
-        IvEditable := false; // override
-      end;
-    end;
-  finally
-    jso.Free;
-  end;
-end;
-  {$ENDREGION}
-
-  {$REGION 'htmljs'}
-if IvEditable then begin
-  // localsnackbar
-  if USE_LOCAL_SNACKBAR then begin
-  sbu.Add('<!-- tablefeedbacksnackbar -->'                                                                                                                                       );
-  sbu.Add('<div class="w3-panel w3-padding-16 w3-card-4 w3-center w3-blue" style="display:none" %s></div>'                                                , [THtmRec.IdName(fna)]);
-  end;
-
-  // editor
-  sbu.Add('<!-- memoeditor -->' {*** duplicated ***}                                                                                                                             );
+    {$REGION 'gui modaleditor *** DUPLICATED *** already available as a standard in the .Page()'}
+  sbu.Add('<!-- modalmemoeditor -->'                                                                                                                                             );
   sbu.Add('<div class="w3-modal w3-animate-opacity" %s>'                                                                                                  , [THtmRec.IdName(ena)]);
   sbu.Add(  '<div class="w3-modal-content w3-card-4">' {w3-animate-zoom}                                                                                                         );
 //sbu.Add(    '<header class="w3-container w3-%s">'                                                                                                               , [the.BgColor]);
@@ -13373,62 +14029,156 @@ if IvEditable then begin
   sbu.Add(    '<div class="w3-container w3-light-grey w3-padding">'                                                                                                              );
   sbu.Add(      '<button class="w3-button w3-left w3-blue w3-border" onclick="document.getElementById(''%s'').value=''''">Clear</button>'                                 , [xna]);
   sbu.Add(      '<button class="w3-button w3-right w3-green w3-border" %s>Ok</button>'                                                                    , [THtmRec.IdName(kna)]);
-  sbu.Add(      '<button class="w3-button w3-right w3-white w3-border w3-margin-right" %s>Cancel</button>'                                                , [THtmRec.IdName(cna)]);
+  sbu.Add(      '<button class="w3-button w3-right w3-white w3-border w3-margin-right" %s>Cancel</button>'                                                , [THtmRec.IdName(cbn)]);
   sbu.Add(    '</div>'                                                                                                                                                           );
   sbu.Add(  '</div>'                                                                                                                                                             );
   sbu.Add('</div>'                                                                                                                                                               );
+    {$ENDREGION}
 
-  // script *** REPLACE ALL JQUERY WITH STANDARD JS  ***
-  sbu.Add('<!-- tablememoeditorscript -->'                                                                           );
-  sbu.Add('<script>'                                                                                                 );
-  sbu.Add('var $tb /*, $th*/, $td, $tr;'                                                                             ); // globalvar tableobj, thobj, trobj
-  sbu.Add('var ci, cn/*, rj*/, id, ov, nv;'                                                                          ); // globalvar coli, colname, rowj, fldid, oldvalue, newvalue
-
-  sbu.Add('$("#%s tr td").dblclick(function(tgt) {'                                                           , [tna]); // tblclick
-//sbu.Add('    if (!window.event.ctrlKey) {'                                                                         ); // ctrl was not held down during the click in the tbl
-//sbu.Add('        return;'                                                                                          ); // exit
-//sbu.Add('    };'                                                                                                   );
+    {$REGION 'gui fbklocal'}
   if USE_LOCAL_SNACKBAR then begin
-  sbu.Add('    $("#%s").html("");'                                                                            , [fna]); // fbksnackbarreset
-  sbu.Add('    $("#%s").hide();'                                                                              , [fna]); // fbksnackbarhide
+  sbu.Add('<!-- tablefeedbacksnackbar %s -->'                                                                             , [fkn]);
+  sbu.Add('<span id="%sEditFeedback"></span>'                                                                        , [IvCoName]); // *** OR ***
+  sbu.Add('<div class="w3-panel w3-padding-16 w3-card-4 w3-center w3-blue" style="display:none" %s></div>', [THtmRec.IdName(fkn)]); // *** OR ***
   end;
-  sbu.Add('    $tb=$(tgt.target).closest("table");'                                                                  ); // TABLE
-//sbu.Add('    $th=$(tgt.target).closest("th");'                                                                     ); // HEADER *** not working ***
-  sbu.Add('    $td=$(tgt.target).closest("td");'                                                                     ); // CELL
-  sbu.Add('    $tr=$td.closest("tr");'                                                                               ); // ROW
-  sbu.Add('    ci=$td.index();'                                                                                      ); // COL[i]               0, 1, ...
-  sbu.Add('    cn=$tb[0].rows[0].cells[ci].innerText;'                                                               ); // COL[i]NAME           (Fld)Xxx
-//sbu.Add('    rj=$tr.index();'                                                                                      ); // ROW[j]               0, 1, ... *** not needed ***
-  sbu.Add('    id=$tr[0].cells[0].textContent;'                                                                      ); // ROWFLDID             1234
-  sbu.Add('    ov=$td[0].innerText;'                                                                                 ); // CELLTEXT             celloldvalue *** innerHTML text() html() ***
-  sbu.Add('    $("#%s").val((ov == "null") ? "" : ov);'                                                       , [xna]); // textareasetwitholdvalue
-  sbu.Add('    $("#%s").show();'                                                                              , [ena]); // modaleditorshow
-//sbu.Add('    $("#%s").focus();'                                                                             , [ena]); // modaleditorfocus *** not working ***
-  sbu.Add('});'                                                                                                      );
+    {$ENDREGION}
 
-  sbu.Add('$("#%s").click(function() {'                                                                       , [cna]); // cancelbtn
-  if USE_LOCAL_SNACKBAR then begin
-  sbu.Add('    $("#%s").show();'                                                                              , [fna]); // fbksnackbarshow
-  sbu.Add('    $("#%s").text("nothing has been changed");'                                                    , [fna]); // fbksnackbarset
-  end else
-  sbu.Add('    wks.fbkInfo("nothing has been changed");'                                                             );
-  sbu.Add('    $("#%s").hide();'                                                                              , [ena]); // modaleditorhide
-  sbu.Add('});'                                                                                                      );
+    {$REGION 'editjson'}
+(*
+{
+  "EditMenu": {
+    "Visible": false
+  , "Items": [
+      {"Id": "AddNew", "Visible": true, "Title": "Add New"}
+    ]
+  }
+, "EditData": {
+    "InsertIfNotExists": false                         -- implemented?
+  , "Table"            : "DbaXxx.dbo.TblXxx"           -- ok
+  , "KeyFieldList"     : ["FldObjectId", "FldLocalId"] -- to make unique the record, one or more fields, cant be empty
+  , "FieldList": [                                     -- list of editable fields (should not contains the key fields))
+      {"Field": "FldLocalId" , "Ctrl": "Text"}         -- inline input text
+    , {"Field": "FldLocalPId", "Ctrl": "Text"}
+    , {"Field": "FldText"    , "Ctrl": "Text"}
+    , {"Field": "FldSelect1" , "Ctrl": "Select", "ItemsCsv": "*,1,2"}                                        -- inline input dropdownlist pre-loaded with items from csv
+    , {"Field": "FldSelect2" , "Ctrl": "Select", "ItemsSql": "select '*' union select '1' union select '2'"} -- inline input dropdownlist pre-loaded with items query
+    , {"Field": "FldSelect3" , "Ctrl": "Select", "ItemsGet": "/WksCodeIsapiProject.dll/Code?CoId=123"}       -- inline input dropdownlist pre-loaded with items from a API
+      {"Field": "FldMemo"    , "Ctrl": "Editor"}                                                             -- modal text editor
+      {"Field": "FldSql"     , "Ctrl": "Editor", "Type": "Sql"}                                              -- modal text editor with sql highlight
+      {"Field": "FldDate"    , "Ctrl": "Date"}                                                               -- inline date selector
+      {"Field": "FldTime"    , "Ctrl": "Time"}                                                               -- inline time selector
+      {"Field": "FldDatetime", "Ctrl": "FldDatetime"}                                                        -- inline datetime selector
+      {"Field": "FldBit"     , "Ctrl": "Boolean", "Type": "Checkbox"}                                        -- inline true/false input (checkbox, onoffcursor)
+    ]
+  , "OwnerField" : "FldOwner"             -- the record will be editable only if the logged user match this field
+  , "OneWayField": "FldState"             -- a field that, upon change, will not editable anymore
+  , "OneWayList" : ["Active", "Inactive"] -- usually just two, to toggle (i.e. if the record is Active and you change it, it become inactive and not editable anymore))
+  , "WhenField"  : "FldWhen"              -- FldWhen, if present, is update by default, add/set this key only if you need to update a different field
+  , "WhoField"   : "FldWho"               -- FldWho, if present, is update by default, add/set this key only if you need to update a different field
+  }
+}
+*)
 
-  sbu.Add('$("#%s").click(function() {'                                                                       , [kna]); // okbtn
-  sbu.Add('    nv = $("#%s").val().trim();'                                                                          , [xna]); // newvalue
-  sbu.Add('    if (nv == ov) {'                                                                                      ); // sametooldvalue
-  if USE_LOCAL_SNACKBAR then begin
-  sbu.Add('        $("#%s").show();'                                                                          , [fna]); // fbksnackbarshow
-  sbu.Add('        $("#%s").text("nothing has been changed");'                                                , [fna]); // fbksnackbarset
-  end else
-  sbu.Add('        wks.fbkInfo("nothing changed");'                                                                  );
+  jso := TJSONObject.Create;
+  try
+    try
+      // rv&nocomments
+      ejs := grva.Rva(IvEditJson, true); // TStrRec.StrCommentRemove(IvEditJson);
+
+      // notvalid
+      if not TJsoRec.IsValid(ejs, fbk) then
+  sbu.Add('<script>wks.fbkFail("Table not editable, please check the EditJson definition, %s");</script>', [fbk])
+
+      // valid
+      else begin
+        // parse
+        jso.Parse(BytesOf(ejs), 0);
+
+        // edittable
+        tbl := jso.GetValue<string>('EditData.Table');                          // 'DbaXxx.dbo.TblXxx'
+
+        // keyfieldlist jsonarray
+        fkv := jso.GetValue<TJSONArray>('EditData.KeyFieldList');               // ["FldObjectId", "FldLocalId"]
+
+        // keyfieldlist jsstring
+        fky := '[';
+        for jva in fkv do
+          fky := fky + jva.GetValue<string>.QuotedString('"') + ',';
+        fky := fky.Remove(fky.Length - 1) + ']';                                // '["FldObjectId", "FldLocalId"]'
+
+        // fieldeditablelist jsonarray
+        fev := jso.GetValue<TJSONArray>('EditData.FieldList');                  // [{"Field": "FldValue1", "Ctrl": "Text"}, {"Field": "FldValue2", "Ctrl": "Select", "ItemsCsv": "0,1,2"}, ...]
+        fes := fev.ToJSON;                                                      // '[{}, {}, ...]'
+        fes := fev.ToString;
+
+        // ownerfield
+        owf := jso.GetValue<string>('EditData.OwnerField');                     // 'FldOwner'
+
+        // onewayfield
+        oyf := jso.GetValue<string>('EditData.OneWayField');                    // 'FldState'
+
+        // onewaylist jsonarray
+        oyv := jso.GetValue<TJSONArray>('EditData.OneWayList');                 // ["Active", "Inactive"]
+
+        // onewaylist jsstring
+        oyl := '[';
+        for jva in oyv do
+          oyl := oyl + jva.GetValue<string>.QuotedString('"') + ',';
+        oyl := oyl.Remove(oyl.Length - 1) + ']';                                // '["Active", "Inactive"]'
+
+        // whenfield
+        wef := jso.GetValue<string>('EditData.WhenField');                      // 'FldLastUpdateDatetime'
+
+        // whofield
+        wof := jso.GetValue<string>('EditData.WhoField');                       // 'FldLastUpdateBy'
+      end;
+    except
+      on e: Exception do
+  sbu.Add('<script>wks.fbkFail("Table not editable, %s");</script>', [e.Message]);
+    end;
+  finally
+  //fkv.Free; nop!
+  //oyv.Free; nop!
+    jso.Free;
+  end;
+    {$ENDREGION}
+
+    {$REGION 'js *** REPLACE ALL JQUERY WITH STANDARD JS  ***'}
+
+      {$REGION 'js begin'}
+  sbu.Add('<!-- tablefieldeditorscript %s -->'                                                                , [fkn]);
+  sbu.Add('<script>'                                                                                                 );
+      {$ENDREGION}
+
+      {$REGION 'globalconsts'}
+  sbu.Add('var kfv = %s;'                                                                                     , [fky]); // ["FldObjectId", "FldLocalId"] keyfieldvector
+  sbu.Add('var oyf = "%s";'                                                                                   , [oyf]); // onewayfield
+  sbu.Add('var efvn= %s'                                                                                      , [fes]); // editfieldvectornested
+  sbu.Add('var efv = efvn.map(function(x){return x.Field;});'                                                        ); // editfieldvector   [] | ["FldA", "FldB"]
+      {$ENDREGION}
+
+      {$REGION 'globalvars'}
+  sbu.Add('var $tb /*, $th*/, $td, $tr;'                                                                             ); // tableobj, thobj, tdobj, trobj
+  sbu.Add('var ci, rj, fn, cn, ov, nv;'                                                                              ); // coli, rowj, fldname, columnname, oldvalue, newvalue
+  sbu.Add('var kvv=[];'                                                                                              ); // ["aaaa", "bbbb"] keyvaluevector, corresponding to keyfieldvector, used later
+      {$ENDREGION}
+
+      {$REGION 'globalfuncs'}
+  sbu.Add('function AjaxPost(fn, ov, nv, kfv, kvv) {'                                                                );
+  sbu.Add('    if (nv.trim() == ov.trim()) {'                                                                        ); // sametooldvalue
+  sbu.Add('        $td.text(ov);'                                                                                    ); // tablecellreset
+if USE_LOCAL_SNACKBAR then begin
+  sbu.Add('        $("#%s").show();'                                                                          , [fkn]); // fbksnackbarshow
+  sbu.Add('        $("#%s").text("nothing has been changed");'                                                , [fkn]); // fbksnackbarset
+end else
+  sbu.Add('        wks.fbkInfo("nothing has been changed");'                                                         );
   sbu.Add('    } else {'                                                                                             );
   sbu.Add('        var pl = {'                                                                                       ); // payloadprepare
-  sbu.Add('            dbaTable: "%s"'                                                                        , [tbl]); // tbl   DbaAaa.dbo.TblTest
-  sbu.Add('          , fldToSet: "Fld{0}".format(cn)'                                                                ); // fld
-  sbu.Add('          , fldValueNew: nv'                                                                              ); // newvalue
-  sbu.Add('          , where: "%s = ''{0}''".format(id)'                                                      , [fke]); // whereconditions
+  sbu.Add('            tblName: "%s"'                                                                         , [tbl]); // table to update   DbaXxx.dbo.TblXxx *** REMOVE, system already know it ***
+  sbu.Add('          , fldName: fn'                                                                                  ); // field to set      FldAaa
+  sbu.Add('          , fldValue: nv'                                                                                 ); // newvalue
+  sbu.Add('          , fldKeys: kfv'                                                                                 ); // wherefields
+  sbu.Add('          , fldValues: kvv'                                                                               ); // wherevalues
   sbu.Add('        };'                                                                                               );
   sbu.Add('        $.ajax({'                                                                                         ); // ajaxpost
   sbu.Add('            type: "POST"'                                                                                 ); // mode
@@ -13438,39 +14188,215 @@ if IvEditable then begin
   sbu.Add('          , contentType: "application/json; charset=utf-8"'                                               ); // ct
   sbu.Add('          , dataType: "json"'                                                                             ); // dt
   sbu.Add('          , success: function(data) {'                                                                    ); // SUCCESS
-//sbu.Add('              console.log(data);'                                                                         ); // dbg
-//sbu.Add('              console.log(data.message);'                                                                 ); // logmore
-//sbu.Add('              console.log(data.feedback);'                                                                ); // logmore
-  sbu.Add('              if (data.ok) {'                                                                             );
-  sbu.Add('                $td.text((nv == "") ? "null" : nv);'                                                      ); // tablecellset
-  sbu.Add('                fbk = "{0}: <b>{1}</b> changed to: <b>{2}</b> in {3} ms";'                                ); // fbkprepare
-  sbu.Add('                fbk = fbk.format(data.state.toUpperCase(), ov, (nv == "") ? "null" : nv, data.elapsedMs);'); // fbkcompile
-  sbu.Add('              } else {'                                                                                   );
-  sbu.Add('                fbk = "{0}: <b>{1}</b>";'                                                                 ); // fbkprepare
-  sbu.Add('                fbk = fbk.format(data.state.toUpperCase(), data.message);'                                ); // fbkcompile
-  sbu.Add('              }'                                                                                          );
+//sbu.Add('                console.log(data);'                                                                       ); // dbg
+//sbu.Add('                console.log(data.message);'                                                               ); // logmore
+//sbu.Add('                console.log(data.feedback);'                                                              ); // logmore
+  sbu.Add('                if (data.ok) {'                                                                           );
+  sbu.Add('                    $td.text((nv == "") ? "null" : nv);'                                                  ); // tablecellset
+  sbu.Add('                    fbk = "{0}: <b>{1}</b> changed to: <b>{2}</b> in {3} ms";'                            ); // fbkprepare
+  sbu.Add('                    fbk = fbk.format(data.state.toUpperCase(), ov, (nv == "") ? "null" : nv, data.elapsedMs);'); // fbkcompile
+  sbu.Add('                } else {'                                                                                 );
+  sbu.Add('                    fbk = "{0}: <b>{1}</b>";'                                                             ); // fbkprepare
+  sbu.Add('                    fbk = fbk.format(data.state.toUpperCase(), data.message);'                            ); // fbkcompile
+  sbu.Add('                }'                                                                                        );
   if USE_LOCAL_SNACKBAR then begin
-  sbu.Add('              $("#%s").show();'                                                                    , [fna]); // fbksnackbarshow
-  sbu.Add('              $("#%s").html(fbk);'                                                                 , [fna]); // fbksnackbarset
+  sbu.Add('                $("#%s").show();'                                                                  , [fkn]); // fbksnackbarshow
+  sbu.Add('                $("#%s").html(fbk);'                                                               , [fkn]); // fbksnackbarset
   end else
-  sbu.Add('              wks.fbkOkWarn(fbk, data.ok);'                                                               );
+  sbu.Add('                wks.fbkOkWarn(fbk, data.ok);'                                                             );
   sbu.Add('            }'                                                                                            );
   sbu.Add('          , error: function(err, ajaxOptions, thrownError) {'                                             ); // FAIL
-//sbu.Add('              console.log(err);'                                                                          ); // dbg
-//sbu.Add('              console.log(err.responseText);'                                                             ); // dbg *** BAD REQUEST ***
-  sbu.Add('              fbk = "<b>{0}</b>";'                                                                        ); // fbkprepare
-  sbu.Add('              fbk = fbk.format(err.responseText);'                                                        ); // fbkcompile
+//sbu.Add('                console.log(err);'                                                                        ); // dbg
+//sbu.Add('                console.log(err.responseText);'                                                           ); // dbg *** BAD REQUEST ***
+  sbu.Add('                fbk = "<b>{0}</b>";'                                                                      ); // fbkprepare
+  sbu.Add('                fbk = fbk.format(err.responseText);'                                                      ); // fbkcompile
   if USE_LOCAL_SNACKBAR then begin
-  sbu.Add('              $("#%s").show();'                                                                    , [fna]); // fbksnackbarshow
-  sbu.Add('              $("#%s").html(fbk);'                                                                 , [fna]); // snackbarset
+  sbu.Add('                $("#%s").show();'                                                                  , [fkn]); // fbksnackbarshow
+  sbu.Add('                $("#%s").html(fbk);'                                                               , [fkn]); // snackbarset
   end else
-  sbu.Add('              wks.fbkFail(fbk);'                                                                          );
+  sbu.Add('                wks.fbkFail(fbk);'                                                                        );
   sbu.Add('            }'                                                                                            );
-  sbu.Add('        });'                                                                                              );
+  sbu.Add('        })'                                                                                               );
+  sbu.Add('    }'                                                                                                    );
+  sbu.Add('}'                                                                                                        );
+      {$ENDREGION}
+
+      {$REGION 'ON DBLCLICK'}
+  sbu.Add('$("#%s tr td").dblclick(function(tgt) {'                                                           , [tna]); // tblclick
+
+  // exit
+//sbu.Add('    if (!(tgt.shiftKey||tgt.ctrlKey||tgt.altKey))'                                                        ); // ctrl was not held down during the click in the tbl
+//sbu.Add('    if (!window.event.ctrlKey)'                                                                           ); // alt
+//sbu.Add('        return;'                                                                                          );
+
+  // reset fbklocal
+  if USE_LOCAL_SNACKBAR then begin
+  sbu.Add('    $("#%s").html("");'                                                                            , [fkn]); // fbksnackbarreset
+  sbu.Add('    $("#%s").hide();'                                                                              , [fkn]); // fbksnackbarhide
+  end;
+
+  // cellobjects
+  sbu.Add('    $tb=$(tgt.target).closest("table");'                                                                  ); // TABLE                table
+//sbu.Add('    $th=$(tgt.target).closest("tr th");'                                                                  ); // HEADER               tr           *** not needed ***
+  sbu.Add('    $tr=$(tgt.target).closest("tr");'                                                                     ); // ROW                  tr
+  sbu.Add('    $td=$(tgt.target).closest("td");'                                                                     ); // CELL                 td
+//sbu.Add('    $tr=$td.closest("tr");'                                                                               ); // ROW                  tr
+
+  // col-i, row-j
+  sbu.Add('    ci=$td.index();'                                                                                      ); // COL[i]               0, 1, ...
+  sbu.Add('    rj=$tr.index();'                                                                                      ); // ROW[j]               0, 1, ...    *** not needed ***
+
+  // fldname & columnname
+  sbu.Add('    fn = $td.closest("table").find("th").eq($td.index()).attr("title");'                                  ); // COL[i]FLDNAME        FldAaa
+  sbu.Add('    cn = $tb[0].rows[0].cells[ci].innerText;'                                                             ); // COLNAME              Aaa          *** not needed ***
+
+  // field is not editable -> exit
+  sbu.Add('    if (efv.indexOf(fn) < 0) {'                                                                           );
+  sbu.Add('      alert("WARNING:   " + cn + "   column is not editable!\n\nEditable columns are:\n— " + efv.toString().replace(/Fld/g, "").replace(/,/g, "\n— "));');
+  sbu.Add('      return;'                                                                                            );
+  sbu.Add('    }'                                                                                                    );
+
+  // field is the onewayfield -> warning the user that might -> exit
+  sbu.Add('    if (oyf == fn) {'                                                                                     );
+  sbu.Add('        var go = confirm("WARNING:   "+fn+"   is a one-way field!\n\nIf you continue and change it the entire record will be no longer editable!");');
+  sbu.Add('        if (!go) {'                                                                                       );
+if USE_LOCAL_SNACKBAR then begin
+  sbu.Add('            $("#%s").show();'                                                                      , [fkn]); // fbksnackbarlocalshow
+  sbu.Add('            $("#%s").text("user cancelled the action");'                                           , [fkn]); // fbksnackbarlocalset
+end else
+  sbu.Add('            wks.fbkInfo("user cancelled the action");'                                                    ); // fbksnackbarglobalset (will close autonomously)
+  sbu.Add('            return;'                                                                                      );
+  sbu.Add('        };'                                                                                               );
   sbu.Add('    };'                                                                                                   );
-  sbu.Add('    $("#%s").hide();'                                                                              , [ena]); // modaleditorhide
+                    
+  // row-j key-values
+  sbu.Add('    kvv = [];'                                                                                            ); // ["aaaa", "bbbb"] keyvaluevector, corresponding to keyfieldvector, used later
+  sbu.Add('    for (i = 0; i < kfv.length; i++) {'                                                                   );
+//sbu.Add('        kvv.push($tr.find("td").eq(i).text());'                                                           );
+  sbu.Add('        var ii = $td.closest("table").find("th#Co"+kfv[i]).index();'                                      ); // col-i index              0, 1, ...
+  sbu.Add('        if (ii == -1) {'                                                                                  );
+  sbu.Add('            alert("Unable to find key field " + kfv[i] + " please check your JsonEdit.EditIni");'         );
+  sbu.Add('            return;'                                                                                      );
+  sbu.Add('        };'                                                                                               );
+  sbu.Add('        var kft = $tr.find("td").eq(ii).text();'                                                          ); // cell key text            1234
+  sbu.Add('        kvv.push(kft);'                                                                                   ); // keyvaluevector           ["1234", "Abcd"]
+  sbu.Add('    };'                                                                                                   );
+
+  // current field jsonspec, ctrltype, ...
+  sbu.Add('    var fldj = efvn.filter(function(x){return x.Field == fn})[0];'                                        ); // current field json spec  {"Field": "FldAaa", "Ctrl": "Select", "ItemCsv": "1,2,3", ...}
+  sbu.Add('    var ctr = fldj.Ctrl;'                                                                                 ); // ctrltype                 Select
+  // celloldvalue(text or html)
+  sbu.Add('    ov = $td[0].innerText;'                                                                               ); // CELLTEXT i               Aaa
+//sbu.Add('    ov = $td.text();'                                                                                     ); // CELLTEXT ii
+//sbu.Add('    ov = $td[0].innerHTML;'                                                                               ); // CELLHTML i
+//sbu.Add('    ov = $td.html();'                                                                                     ); // CELLHTML ii
+
+  // guessnewvalueusingoldvalue
+  sbu.Add('    var gv = ov;'                                                                                         ); // guessedvaluenew
+  sbu.Add('    if ("Active" == ov) {gv = "Inactive"} else if ("Inactive" == ov) {gv = "Active"};'                    );
+  sbu.Add('    if ("True"   == ov) {gv = "False"   } else if ("False"    == ov) {gv = "True"  };'                    );
+
+  // tempgui text ctrl
+  sbu.Add('           if (ctr == "Text") {'                                                                          );
+  sbu.Add('        var gui = ''<input type="text" class="w3-input w3-small" id="%s" />'';'                    , [ina]);
+  sbu.Add('        $(this).html(gui);'                                                                               ); // inject temp gui ctrl and
+  sbu.Add('        var xx = $(this).children().first();'                                                             ); // refer to it
+  sbu.Add('        xx.val(gv).change();'                                                                             ); // if ctrl loses focus without any change in the content, the event is not triggered, to trigger the event manually, apply .change()
+  sbu.Add('        xx.attr("size", gv.length+8);'                                                                    );
+  sbu.Add('        xx.focus();'                                                                                      );
+  sbu.Add('        xx.select();'                                                                                     );
+//sbu.Add('        xx.keypress(function(ky) {'                                                                       ); // enter key press
+//sbu.Add('            if (ky.which == 13) {'                                                                        );
+//sbu.Add('                nv = xx.val();'                                                                           );
+//sbu.Add('                AjaxPost(fn, ov, nv, kfv, kvv);'                                                          );
+//sbu.Add('                xx.blur();'                                                                               );
+//sbu.Add('            }'                                                                                            );
+//sbu.Add('        })'                                                                                               );
+  sbu.Add('        xx.on(''keyup blur'', function(e){'                                                               ); // esc|enterkey|blur - xx.on() has event delegation, xx.blur() does not
+  sbu.Add('            if (e.keyCode == ''27'') {'                                                                   );
+  sbu.Add('                xx.parent().text(ov);'                                                                    ); // reset
+  sbu.Add('            } else if (e.keyCode == ''13'') {'                                                            );
+  sbu.Add('                xx.blur();'                                                                               );
+  sbu.Add('            } else if (e.type == ''blur'') {'                                                             );
+  sbu.Add('                nv = xx.val();'                                                                           );
+  sbu.Add('                AjaxPost(fn, ov, nv, kfv, kvv);'                                                          );
+  sbu.Add('            }'                                                                                            );
+  sbu.Add('        })'                                                                                               );
+
+  // tempgui select ctrl
+  sbu.Add('    } else if (ctr == "Select") {'                                                                        );
+  sbu.Add('        alert("Select ctrl not implemented");'                                                            );
+(*sbu.Add('        var gui = ''<select class="w3-select" id="%s"><option value="Select11">Option 1</option><option value="Select12">Option 2</option><option value="Select31">Option 3</option></select>'';'                                , [ina]);
+  sbu.Add('        $(this).html(gui);'                                                                               );
+  sbu.Add('        var xx = $(this).children().first();'                                                             );
+  sbu.Add('        xx.val(gv).change();'                                                                             );
+  sbu.Add('        xx.focus();'                                                                                      );
+//sbu.Add('        xx.select();'                                                                                     );
+//sbu.Add('        xx.on(''select2:close'','); // this works for select2 but will complicate the code to much!
+  sbu.Add('        xx.on(''keyup blur'', function(e){'                                                               );
+  sbu.Add('            if (e.keyCode == ''27'') {'                                                                   );
+  sbu.Add('                xx.parent().text(ov);'                                                                    );
+  sbu.Add('            } else if (e.keyCode == ''13'') {'                                                            );
+  sbu.Add('                xx.blur();'                                                                               );
+  sbu.Add('            } else if (e.type == ''blur'') {'                                                             );
+  sbu.Add('                nv = xx.val();'                                                                           );
+  sbu.Add('                AjaxPost(fn, ov, nv, kfv, kvv);'                                                          );
+  sbu.Add('            }'                                                                                            );
+  sbu.Add('        })'                                                                                               );
+*)
+  sbu.Add('    } else if (ctr == "Date") {'                                                                          );
+  sbu.Add('        alert("Date ctrl not implemented");'                                                              );
+//sbu.Add('        var gui = ''<input type="text" class="form-control input-sm" id="%s" data-provide="datepicker" />'';', [ina]);
+
+  sbu.Add('    } else if (ctr == "Time") {'                                                                          );
+  sbu.Add('        alert("Time ctrl not implemented");'                                                              );
+//sbu.Add('        var gui = ''<input type="text" class="form-control input-sm" id="%s" />'';'                , [ina]);
+
+  sbu.Add('    } else if (ctr == "DateTime") {'                                                                      );
+  sbu.Add('        alert("DateTime ctrl not implemented");'                                                          );
+//sbu.Add('        var gui = ''<input type="text" class="form-control input-sm" id="%s" />'';'                , [ina]);
+
+  // tempgui editormodal ctrl
+  sbu.Add('    } else if (ctr == "Editor") {'                                                                        );
+//sbu.Add('        var gui = ''<input type="text" class="form-control input-sm" id="%s">'';'                  , [ina]); // altern
+  sbu.Add('        $("#%s").val((gv == "null") ? "" : gv);'                                                   , [xna]); // textarea set with gessed value
+  sbu.Add('        $("#%s").show();'                                                                          , [ena]); // modal editor show
+//sbu.Add('        $("#%s").focus();'                                                                         , [ena]); // modal editor focus *** not working ***
+  // editormodal cancel button click
+  sbu.Add('        $("#%s").click(function() {'                                                               , [cbn]); // cancelbtnclick
+if USE_LOCAL_SNACKBAR then begin
+  sbu.Add('            $("#%s").show();'                                                                      , [fkn]); // fbksnackbarlocalshow
+  sbu.Add('            $("#%s").text("nothing has been changed");'                                            , [fkn]); // fbksnackbarlocalset
+end else
+  sbu.Add('            wks.fbkInfo("nothing has been changed");'                                                     ); // fbksnackbarglobalset (will close autonomously)
+  sbu.Add('            $("#%s").hide();'                                                                      , [ena]); // modaleditorhide
+  sbu.Add('        });'                                                                                              );
+  // editormodal ok button click
+  sbu.Add('        $("#%s").click(function() {'                                                               , [kna]); // okbtnclick
+  sbu.Add('            nv = $("#%s").val();'                                                                  , [xna]); // newvalueget
+  sbu.Add('            $("#%s").hide();'                                                                      , [ena]); // modaleditorhide
+  sbu.Add('            AjaxPost(fn, ov, nv, kfv, kvv);'                                                              );
+  sbu.Add('        });'                                                                                              );
+
+  // tempgui prompt panel (default)
+  sbu.Add('    } else {'                                                                                             );
+  sbu.Add('        var nv = prompt("New Value", gv);'                                                                );
+  sbu.Add('        if (nv === null) {'                                                                               );
+  sbu.Add('            wks.fbkInfo("nothing has been changed");'                                                     );
+  sbu.Add('            return;'                                                                                      );
+  sbu.Add('        } else {'                                                                                         );
+  sbu.Add('            AjaxPost(fn, ov, nv, kfv, kvv);'                                                              );
+  sbu.Add('        }'                                                                                                );
+  sbu.Add('    }'                                                                                                    );
   sbu.Add('});'                                                                                                      );
+      {$ENDREGION}
+
+      {$REGION 'js end'}
   sbu.Add('</script>'                                                                                                );
+      {$ENDREGION}
+
+    {$ENDREGION}
+
 end;
   {$ENDREGION}
 
@@ -13478,86 +14404,208 @@ end;
   Result := sbu.Text;
   {$ENDREGION}
 
-end;
-
-class function  THtmRec.TableFromSql(IvSql, IvHtmlDefault, IvClass, IvStyle: string; IvEditable: boolean; IvEditJson: string; IvDir: THvDirEnum; IvDsRecordCountOff, IvDsHeaderOff: boolean): string;
-var
-  ok: boolean;
-  dst: TDataset;
-  fbk: string;
-begin
-  gpro.TimerByName['TableFromSql.DsFromSql'].Start;
-  ok := TDbaRec.DsFromSql(IvSql, dst, fbk, false);
-  gpro.TimerByName['TableFromSql.DsFromSql'].Stop;
-  if not ok then
-    Result := Modal(true, 'CoTableFromSqlFeedback', Code(IvSql, 'sql')
-                   , H(2, 'Unable to create html table from sql')
-                   + P(fbk, true, true)
-                   , ''
-                   , fmWarning)
-  else try
-  //gpro.TimerByName['TableFromSql.TableFromDs'].Start;
-    Result := TableFromDs(dst, IvHtmlDefault, IvClass, IvStyle, IvEditable, IvEditJson, IvDir, IvDsRecordCountOff, IvDsHeaderOff);
-  //gpro.TimerByName['TableFromSql.TableFromDs'].Stop;
-  finally
-    dst.Free;
+except
+  on e: Exception do begin
+    Result := THtmRec.AlertW('Warning', e.message);
   end;
 end;
+end;
 
-class function  THtmRec.TableFromSql2(IvSql, IvHtmlDefault, IvClass, IvStyle: string; IvEditable: boolean; IvEditJson: string; IvDir: THvDirEnum; IvDsRecordCountOff, IvDsHeaderOff: boolean): string;
+class function  THtmRec.TableFromSql(IvCtxId: integer; IvSql, IvConnStr, IvConnLib, IvHtmlDefault, IvCoName, IvClass, IvStyle: string; IvEditable: boolean; IvEditJson: string; IvDir: THvDirEnum; IvDsRecordCountOff, IvDsHeaderOff: boolean): string;
+
+  {$REGION 'var'}
+  // IvCtxId = the parent dataset # which sql may containings multiple sub-recordsets
+
+const
+  TABLES_SEPARATOR = '<br><br>';
+
 var
-  qry: TADOQuery;
-  sql: string;
+  // general
+  sql, fbk: string;
   aff{, i}: integer;
-  dst: TADODataSet;
+  cst: string;             // connection string
+  rix: integer;            // sub-recordset count
+  con: string;             // co-name
+  tcp: string;             // table caption
+
+  // datates
+//dsr: string;             // dataset result
+
+  // ado
+  aco: TADOConnection;     // conn
+  aqy: TADOQuery;          // query
+  dst: TADODataSet;        // dataset, datasetnext
+
+  // fd
+  fco: TFDConnection;      // conn
+  fqy: TFDQuery;           // query
+//fm1: TFDMemTable;        // memtable
+  {$ENDREGION}
+
+  {$REGION 'help'}
+(*
+
+  Dataset0                                                            <-- 1 select (can have multiple selects)
+  """"""""
+
+     2 row(s)                                                         <-- 1st subselect   \
+     --------------------------------------------------------------                        |
+    |  Aaa  |     Bbb     | Ccc |   Ddd   |   Eee   |     Fff      |                       |
+    |==============================================================|                       |__1st table/recordset
+    |  111  | bbbb        | ccc | ddddddd | eeee    | fffff        |                       |
+    |--------------------------------------------------------------|                       |
+    |  222  | bbb         | ccc | ddddddd | eeee    | fffff        |                       |
+     --------------------------------------------------------------                       /
+
+     1 row(s)                                                         <-- 2nd subselect   \
+     --------------------------------------------------------------                        |
+    |  Ggg  |      Hhh     |                  Iii                  |                       |__2nd table/recordset
+    |==============================================================|                       |
+    |  333  | hhhh         | iiii                                  |                       |
+     --------------------------------------------------------------                       /
+
+    ...
+*)
+  {$ENDREGION}
+
 begin
 try
-  gpro.TimerByName['TableFromSql2.TADOQuery'].Start;
-  qry := TADOQuery.Create(nil);
-  dst := TADODataSet.Create(nil);
-  try
-    // init
-    qry.ConnectionString := TDbaRec.DBA_CONN_STR;
-    sql := grva.Rva(IvSql);
-    qry.SQL.Text := sql;
 
-    // executes then move to the first recordset
-    qry.Open;
+  {$REGION 'FD'}
+  if SameText(IvConnLib, 'FD') then begin
 
-    // dstfirst
-    dst.Recordset := qry.Recordset;
+    gpro.TimerByName['TableFromSql.TFDQuery'].Start;
+  // CoInitialize(nil);
 
-    // rstloop
-  //i := 0;
-    Result := '';
-    repeat
-    //Inc(i);
+    // connstrresolve
+    if IsNumeric(IvConnStr) then begin
+      if not TDbaRec.ScalarStr('select FldConnStrFD from DbaSystem.dbo.TblSource where FldId = 4', cst, '', fbk) then begin
+        Result := AlertI('Datasource', 'Unable to resolve the FD connection string from the source id');
+        Exit;
+      end;
+    end else
+      cst := IvConnStr;
 
-      // dstscan
-    //while not dst.eof do begin
-      //for i := 0 to dst.Fields.Count - 1 do
-          //FieldValue := dst.Fields[I].Value; // or dst.Fields['Field'].Value
-      //dst.MoveNext;
-    //end;
+    // fdconn
+    fco := TFDConnection.Create(nil);
+  //fco.ConnectionString := cst;
+    fco.Params.Text := cst;
 
-      // dsttotable
-      Result := Result
-              + '<br><br><br>'
-            //+ Format('<div>Resutlset #%d</div>', [i])
-              + TableFromDs(dst, IvHtmlDefault, IvClass, IvStyle, IvEditable, IvEditJson, IvDir, IvDsRecordCountOff, IvDsHeaderOff);
+    // fdquery
+    fqy := TFDQuery.Create(nil);
+  //fqy.FetchOptions.Mode              := fmAll;                    // fmOnDemand
+    fqy.FetchOptions.RowsetSize        := {IvMaxRecords} 10000;     // limit
+  //fqy.FetchOptions.CursorKind        := ckForwardOnly;            // fast forward-only, read-only options
+  //fqy.FetchOptions.Unidirectional    := true;                     //
+    fqy.ResourceOptions.CmdExecTimeout := {IvTimeoutSec} 10 * 1000; // milliseconds !
+    fqy.FetchOptions.AutoClose         := false;                    // necessary to have multiple subrecordset
+    fqy.Connection                     := fco;                      // conn pooled?
+    fqy.SQL.Text                       := IvSql;                    // multiple queries-ds: 'select * from Tbl1; select * from Tbl2';
+  //fqy.Prepared                       := true;
 
-      // dstnext
-      dst.Recordset := qry.NextRecordset(aff);
-    until not Assigned(dst.Recordset);
-  finally
-    dst.Free;
-    qry.Free;
+    // do
+    try
+      fqy.Open;
+      fqy.FetchAll; // execute all the queries-ds at once
+
+      // recordset(s)
+      rix := -1;
+      if fqy.IsEmpty then begin
+        Inc(rix);
+        Result := Result + AlertI('Dataset' + IvCtxId.ToString + ' Recordset' + rix.ToString, 'No data')
+      end else begin
+        while not fqy.IsEmpty do begin
+          Inc(rix);
+          con := TNamRec.Co('TableDataset' + IvCtxId.ToString + ' Recordset' + rix.ToString);
+          tcp := Format('Recordset %d.%d', [IvCtxId + 1, rix + 1]);
+
+//        Result := Result + HTableDs(fqy, dsv[i].EditInfoRec, tc, cn, dsv[i].&Class, dsv[i].Style, 3, dsv[i].Switch, dsw.List);
+
+          // dsttotable
+          Result := Result
+                  + ifthen(rix = 0, '', TABLES_SEPARATOR)
+                //+ Format('<div>Resultset #%d</div>', [i])
+                  + TableFromDs(fqy, IvHtmlDefault, IvCoName, IvClass, IvStyle, IvEditable, IvEditJson, IvDir, IvDsRecordCountOff, IvDsHeaderOff);
+
+          // chartonlyfor1strs
+        //if rix = 0 then
+          //charts_add(i, fqy, rer, dsv[i].ChartRecVector);
+
+          // next
+          fqy.NextRecordSet;
+        end;
+      end;
+    finally
+      fqy.Free; // AndNil?
+      fco.Free; // AndNil?
+    //CoUninitialize;
+    end;
+    gpro.TimerByName['TableFromSql.TFDQuery'].Stop;
+  {$ENDREGION}
+
+  {$REGION 'ADO'}
+  end else begin
+
+    gpro.TimerByName['TableFromSql.TADOQuery'].Start;
+
+    // connstrresolve
+    if IvConnStr.Trim.IsEmpty then
+      cst := TDbaRec.DBA_CONN_STR
+    else if IsNumeric(IvConnStr) then begin
+      if not TDbaRec.ScalarStr('select FldConnStrADO from DbaSystem.dbo.TblSource where FldId = 4', cst, '', fbk) then begin
+        Result := AlertI('Datasource', 'Unable to resolve the ADO connection string from the source id');
+        Exit;
+      end;
+    end else
+      cst := IvConnStr;
+
+    aqy := TADOQuery.Create(nil);
+    dst := TADODataSet.Create(nil);
+    try
+      // init
+      aqy.ConnectionString := cst;
+      sql := grva.Rva(IvSql);
+      aqy.SQL.Text := sql;
+
+      // executes then move to the first recordset
+      aqy.Open;
+
+      // dstfirst
+      dst.Recordset := aqy.Recordset;
+
+      // rstloop
+    //i := 0;
+      Result := '';
+      repeat
+      //Inc(i);
+
+        // dstscan
+      //while not dst.eof do begin
+        //for i := 0 to dst.Fields.Count - 1 do
+            //FieldValue := dst.Fields[I].Value; // or dst.Fields['Field'].Value
+        //dst.MoveNext;
+      //end;
+
+        // dsttotable
+        Result := Result
+                + ifthen(rix = 0, '', TABLES_SEPARATOR)
+              //+ Format('<div>Resutlset #%d</div>', [i])
+                + TableFromDs(dst, IvHtmlDefault, IvCoName, IvClass, IvStyle, IvEditable, IvEditJson, IvDir, IvDsRecordCountOff, IvDsHeaderOff);
+
+        // dstnext
+        dst.Recordset := aqy.NextRecordset(aff);
+      until not Assigned(dst.Recordset);
+    finally
+      dst.Free;
+      aqy.Free;
+    end;
+    gpro.TimerByName['TableFromSql.TADOQuery'].Stop;
   end;
-  gpro.TimerByName['TableFromSql2.TADOQuery'].Stop;
+  {$ENDREGION}
 
 except
   on e: Exception do begin
-    glog.Log('TableFromSql2', e, sql);
+    glog.Log('TableFromSql', e, sql);
     Result := THtmRec.AlertW('Warning', e.message);
   end;
 end;
@@ -13721,6 +14769,7 @@ var
   rer: TReportRec;              // record
   rti: string;                  // title
 //rsh: string;                  // singlehtml
+  rhe: string;                  // help->obj.content
   rah: string;                  // allhtml
 
   // params
@@ -13759,7 +14808,8 @@ var
   ocv: TArray<string>;          // csv ->vec
   ojv: TArray<string>;          // json->vec
   oqv: TArray<string>;          // sql ->vec
-  ove: TArray<string>;          // total
+  oav: TArray<string>;          // total caption
+  ovv: TArray<string>;          // total value
 
   // datasets
   j  : integer;                 // idx
@@ -13768,6 +14818,8 @@ var
   dsh: string;                  // singlehtml
   dah: string;                  // allhtml
   ddi: THvDirEnum;              // mode
+  dcs: string;                  // connstr
+  dcl: string;                  // connlib
 
   // charts
   k  : integer;                 // idx
@@ -13850,10 +14902,10 @@ begin
    {  LineGrid12    }  p12 := pve[i].LineGrid12  ;
    {  OptionCsv     }  poc := pve[i].OptionCsv   ; ocv := TVecRec.VecFromStr(poc);
    {  OptionJson    }  poj := pve[i].OptionJson  ; ojv := [];
-   {  OptionQuery   }  poq := pve[i].OptionQuery ; oqv := []; ove := ocv + ojv + oqv;
+   {  OptionQuery   }  poq := pve[i].OptionQuery ; oqv := [];
    {  ConnStr       }  pcs := pve[i].ConnStr     ;
    {  ConnLib       }  plb := pve[i].ConnLib     ;
-   {  Classs        }  pcl := pve[i].&Class      ;
+   {  &Class        }  pcl := pve[i].&Class      ;
    {  Style         }  psy := pve[i].Style       ;
    {//Format        }//pfm := pve[i].Format      ;
    {//ReadOnly      }//pro := pve[i].ReadOnly    ;
@@ -13866,6 +14918,10 @@ begin
    {//ToTeam        }
    {//ToMember      }
    {  Value         }
+
+      // options caption/values *** json and sql not implemented ***
+      ovv := ocv + ojv + oqv;
+      oav := ovv;
 
       // value
       pva := gwrq.FieldGet(con, pve[i].Default);
@@ -13892,7 +14948,7 @@ begin
         continue;
 
       // html         kind, coname, title, captionvec, valuevec, class, style, tail, valuevec, disabledvec, readonly, label, help, labelwidth, helpwidth
-      psh := FormLine(pki , con   , pna  , ove       , ove     , pcl  , psy  , ''  , [pva]   , []         , false   , pna  , phe , 200       , 300      );
+      psh := FormLine(pki , con   , pna  , oav       , ovv     , pcl  , psy  , ''  , [pva]   , []         , false   , pna  , phe , 200       , 300      );
 
       // params
       pah := pah
@@ -13913,7 +14969,7 @@ begin
 
   // collapse
   if rer.ParamsTitleOn then
-    pah := Collapse('Params', 'Use the following parameters to filter the results', pah, 3, '', false, rer.ParamsPanelOn, rer.ParamsPanelClosed);
+    pah := Collapse('Params', 'Use the following parameters to filter the results', '', pah, 3, '', 'Left', rer.ParamsPanelOn, rer.ParamsPanelClosed);
 
   // reportparamshtmlblockadd(hidden)
   if pof then
@@ -13946,8 +15002,12 @@ begin
       // sql
       sql := params_replace(dve[j].Select, pve);
 
+      // connstr
+      dcs := dve[j].ConnStr;
+      dcl := dve[j].ConnLib;
+
       // table
-      dsh := TableFromSql2(sql, dve[j].FeedbackIfEmpty, dve[j].Classs, dve[j].Style, dve[j].Editable, dve[j].Json, ddi, rer.DsRecordCountOff, rer.DsHeaderOff);
+      dsh := TableFromSql(j, sql, dcs, dcl, dve[j].FeedbackIfEmpty, 'Co'+dve[j].Dataset, dve[j].&Class, dve[j].Style, dve[j].Editable, dve[j].Json, ddi, rer.DsRecordCountOff, rer.DsHeaderOff);
 
       // oppure
       // ritornare un vettore di ds da
@@ -13965,7 +15025,7 @@ begin
 
       // collapse
       if dve[j].TitleOn then
-        dsh := Collapse(giif.NxD(dve[j].Title, dve[j].Dataset), dve[j].Description, dsh, 3, '', false, dve[j].PanelOn, dve[j].PanelClosed);
+        dsh := Collapse(giif.NxD(dve[j].Title, dve[j].Dataset), dve[j].Description, '', dsh, 3, '', 'Left', dve[j].PanelOn, dve[j].PanelClosed);
 
       dsb.Add(dsh);
 
@@ -13973,6 +15033,9 @@ begin
       {$ENDREGION}
 
       {$REGION 'charts'}
+
+      // *** see TableFromDs where also there is a macro to inject charts in each sub-recordset ***
+
       gpro.TimerByName['Report.Chart'+dve[j].Dataset].Start;
 
       cve := dve[j].ChartRecVector;
@@ -13986,7 +15049,7 @@ begin
 
           // collapse
           if cve[j].TitleOn then
-            csh := Collapse(giif.NxD(cve[j].Title, cve[j].Dataset), cve[j].Description, csh, 3, '', false, cve[j].PanelOn, cve[j].PanelClosed);
+            csh := Collapse(giif.NxD(cve[j].Title, cve[j].Dataset), cve[j].Description, '', csh, 3, '', 'Left', cve[j].PanelOn, cve[j].PanelClosed);
 
           csb.Add(csh);
         end;
@@ -14008,6 +15071,25 @@ begin
   rsb.Add(dah);
   {$ENDREGION}
 
+  {$REGION 'help->obj.content'}
+  if not rer.Obj.Content.Trim.IsEmpty then begin
+    // preprocess
+    if SameText(rer.Obj.ContentKind, 'Md') then
+      rhe := TMkdRec.Process(rer.Obj.Content)
+    else if SameText(rer.Obj.ContentKind, 'Txt') then
+      rhe := Format('', [rer.Obj.Content])
+    else
+      rhe := rer.Obj.Content;
+
+    // collapse
+    rhe := Collapse('Help', '', '', rhe, 6, 'CoHelp', 'Right', true, false);
+
+    // add
+    rsb.Add('<br>');
+    rsb.Add(rhe);
+  end;
+  {$ENDREGION}
+
   {$REGION 'end'}
   // reporthtml
   rah := rsb.Text;
@@ -14025,7 +15107,7 @@ begin
     if {rer.ReportNumberOn}false then
       rti := Format('%s (%d)', [rti, rid]);
 
-    rah := Collapse(rti, rer.Obj.Subtitle, rah, 2, '', false, rer.ReportPanelOn, rer.ReportPanelClosed);
+    rah := Collapse(rti, rer.Obj.Subtitle, rer.Obj.Description, rah, 1, '', 'Left', rer.ReportPanelOn, rer.ReportPanelClosed);
   end;
 
   // result
@@ -14163,7 +15245,7 @@ var
   begin                                                // w3-medium   w3-xlarge   font-size (px)
          if gthe.SizeClass = 'w3-tiny'     then Result := '23'  //    '27'        10
     else if gthe.SizeClass = 'w3-small'    then Result := '26'  //    '30'        12
-    else if gthe.SizeClass = 'w3-medium'   then Result := '31'  //    '35'        15 default (changed to 12)
+    else if gthe.SizeClass = 'w3-medium'   then Result := '31'  //    '35'        15 default (changed to 12 in w3.css)
     else if gthe.SizeClass = 'w3-large'    then Result := '35'  //    '39'        18
     else if gthe.SizeClass = 'w3-xlarge'   then Result := '44'  //    '48'        24
     else if gthe.SizeClass = 'w3-xxlarge'  then Result := '60'  //    '64'        36
@@ -14530,9 +15612,9 @@ var
   sbu: TSbuRec;
   dst: TDataset;
 //mkd: TMarkdownProcessor; // not used
-  roi: integer; ror, rok, rot: string; // refobj id, rev, kind, title
+  roi: integer; ror, rok, rot, wpt: string; // refobj id, rev, kind, title, webpagetitle
   oid: integer; tit, cls, sty, sql, www: string; // page oid, title, class, style
-  env, wpt: string; // environment(dev,test,prod), webpagetitle
+ // pcl, pst: string;
   {$ENDREGION}
 
   {$REGION 'help'}
@@ -14579,20 +15661,12 @@ var
 
 begin
 
-  {$REGION 'www&env'}
+  {$REGION 'www'}
   /// www
   if IvUrlAbsolute then
     www := gorg.HttpWww
   else
     www := '';
-
-  // environment
-  if gwrq.Host.EndsWith('dev') then
-    env := 'DEV'
-  else if gwrq.Host.EndsWith('test') then
-    env := 'TEST'
-  else
-    env := 'PROD';
   {$ENDREGION}
 
   {$REGION 'referenceobjectcontainedeventual'}
@@ -14624,7 +15698,7 @@ begin
 
   // webpagetitle: homepage
   if oid = gorg.Obj.Id then begin
-    wpt := Format('%s - %s (%s)', [gorg.Obj.&Object.ToUpper, tit, env]);
+    wpt := Format('%s - %s (%s)', [gorg.Obj.&Object.ToUpper, tit, genv.Environment]);
 
   // webpagetitle: containedrefobj found (document or task)
   end else if roi > 0 then begin
@@ -14653,7 +15727,7 @@ begin
 //sbu.Add('<meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-8">'                                          ); // HTML 2.0..4.01 ISO-8859-1 is the default charset
   sbu.Add('<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">'                                               ); // HTML 4.01 also support utf-8
 //sbu.Add('<meta charset="ISO-8859-1">'                                                                                      ); // HTML5 alternative
-  sbu.Add('<meta charset="utf-8">'                                                                                           ); // HTML5 encouraged
+//sbu.Add('<meta charset="utf-8">'                                                                                           ); // HTML5 encouraged , is already above
   sbu.Add('<meta name="author" content="puppadrillo">'                                                                       ); // author
   sbu.Add('<meta name="description" content="working knowledge sysytem">'                                                    ); // description
   sbu.Add('<meta name="keywords" content="wks, spc, mes">'                                                                   ); // keywords
@@ -14778,24 +15852,34 @@ end;
 
     {$REGION 'container'}
 if IvPage.ContainerOn then begin                                                                                                        // containerbegin
-  // class
+  // classbase
   cls := 'w3-container';
-  if IvPage.ContentFixed then
-    ValAdd(cls, 'w3-content', ' ');
 
-  // style
-  if IvPage.ContentFixed then
-    sty := ''
-  else
+  // fixed or fitcontent
+  if IvPage.ContentFixed then begin
+    ClassAdd(cls, 'w3-content');
     sty := 'width:fit-content;';
-  if IvPage.Centered then
-    ValAdd(sty, 'margin-left:auto; margin-right:auto;', ';')
-  else begin                                                                                                                            // margins
-    ValAdd(sty, Format('margin-left:%dpx'  , [16 * IvPage.LeftSpace  ]), ';', IvPage.LeftSpace   > 0);
-    ValAdd(sty, Format('margin-right:%dpx' , [16 * IvPage.RightSpace ]), ';', IvPage.RightSpace  > 0);
   end;
-    ValAdd(sty, Format('margin-top:%dpx'   , [16 * IvPage.TopSpace   ]), ';', IvPage.TopSpace    > 0);
-    ValAdd(sty, Format('margin-bottom:%dpx', [16 * IvPage.BottomSpace]), ';', IvPage.BottomSpace > 0);
+
+  // horiz centered/withmargins(ifany)
+  if IvPage.Centered then
+    StyleAdd(sty, 'margin-left:auto; margin-right:auto;')
+  else begin                                                                                                                            // margins
+    StyleAdd(sty, Format('margin-left:%dpx'  , [16 * IvPage.LeftSpace  ]), IvPage.LeftSpace   > 0);
+    StyleAdd(sty, Format('margin-right:%dpx' , [16 * IvPage.RightSpace ]), IvPage.RightSpace  > 0);
+  end;
+
+  // vert withmargins(ifany)
+    StyleAdd(sty, Format('margin-top:%dpx'   , [16 * IvPage.TopSpace   ]), IvPage.TopSpace    > 0);
+    StyleAdd(sty, Format('margin-bottom:%dpx', [16 * IvPage.BottomSpace]), IvPage.BottomSpace > 0);
+
+  // pageclass explicitadd
+  if not IvPage.&Class.IsEmpty then
+    ClassAdd(cls, IvPage.&Class);
+
+  // pagestyle explicitadd
+  if not IvPage.Style.IsEmpty then
+    StyleAdd(sty, IvPage.Style);
 
   // html
   sbu.Add('<!-- container -->'                                                                                                       );
@@ -14809,7 +15893,7 @@ if not IvPage.Header.IsEmpty then begin
 end;
     {$ENDREGION}
 
-    {$REGION 'titles'}
+    {$REGION 'titles *** DUPLICATED in Report ***'}
 if IvPage.TitleShow then begin
   sbu.Add('<!-- titles -->'                                                                                                          ); // titles
   sbu.Add('<div>'                                                                                                                    );
@@ -14821,9 +15905,9 @@ if IvPage.TitleShow then begin
   sbu.Add('<img src="/WksImageIsapiProject.dll/Image?CoObjType=%s&CoObjId=%d" style="height: 54px;float: right;margin: 10px 0px 10px 10px;">', ['Page', oid]); // *** Wks have to be replaced by TSysRec.PREFIX ***
   sbu.Add('</div>'                                                                                                                   );
   end;
-  sbu.Add('<h6 class="w3-theme-text-dark">%s</h6>'      , [IvPage.Obj.Subtitle], IvPage.SubtitleShow and giis.Ex(IvPage.Obj.Subtitle));
-  sbu.Add('<p class="w3-theme-text-dark w3-text-italic w3-small">%s</p>'  , [IvPage.Obj.Description], giis.Ex(IvPage.Obj.Description));
-  sbu.Add('<hr>'                                                                                                                     );
+  sbu.Add('<h6 class="w3-text-gray      ">%s</h6>'      , [IvPage.Obj.Subtitle], IvPage.SubtitleShow and giis.Ex(IvPage.Obj.Subtitle));
+  sbu.Add('<p class="w3-text-gray w3-cursive w3-small">%s</p>'            , [IvPage.Obj.Description], giis.Ex(IvPage.Obj.Description));
+  sbu.Add('<hr>'                                                    , giis.Ex(IvPage.Obj.Subtitle) or giis.Ex(IvPage.Obj.Description));
   sbu.Add('</div>'                                                                                                                   );
 end;
     {$ENDREGION}
@@ -14865,27 +15949,28 @@ end;
     {$ENDREGION}
 
     {$REGION 'footer'}
-//sbu.Add('<hr>'                                                                                                                     );
-  sbu.Add('<footer class="w3-container w3-center">'                                                                                  );
+//sbu.Add('<hr>'                                                                                                                                   );
+  sbu.Add('<footer class="w3-container w3-center">'                                                                                                );
 if not IvPage.SystemInfoOff then begin
   if not TSysRec.WebSystemInfoOff then begin
-  sbu.Add(  '<!-- systeminfo -->'                                                                                                    );
-  sbu.Add(  '<p class="w3-small w3-text-gray">'                                                                                      ); // sysinfo
-  sbu.Add(  '%s %s application server (%s)', [TSysRec.ACRONYM, gctx.WksModule.ToUpper, TAaaRec.ProcessKindAsText]                    );
-  sbu.Add(  ' - %s - %s', [DateTimetoStr(Now()), gwrq.WebRequestOrig.RemoteAddr]                                                     );
+  sbu.Add(  '<!-- systeminfo -->'                                                                                                                  );
+  sbu.Add(  '<p class="w3-small w3-text-gray">'                                                                                                    ); // sysinfo
+  sbu.Add(  '%s %s application server (%s %s)', [TSysRec.ACRONYM, gctx.WksModule.ToUpper, genv.Environment, TAaaRec.ProcessKindAsText]             );
+  sbu.Add(  ' - %s - %s', [DateTimetoStr(Now()), gwrq.WebRequestOrig.RemoteAddr]                                                                   );
   sbu.Add(  ' - orga %d - client %d - session %d - request %d', [gorg.ObjectId, gwrq.FingerprintId, gwrq.SessionId{gses.SessionId}, gwrq.RequestId]);
-  sbu.Add(  ' - elapsed time $RvElapsedMs$ ms'                                                                                       );
-  sbu.Add(  '</p>'                                                                                                                   );
+  sbu.Add(  ' - elapsed time $RvElapsedMs$ ms'                                                                                                     );
+  sbu.Add(  '</p>'                                                                                                                                 );
   end;
 
   if not TSysRec.WebPoweredByOff then begin
-  sbu.Add(  '<p class="w3-small w3-text-gray">'                                                                                      ); // poweredby
-  sbu.Add(  '<!-- poweredby -->'                                                                                                     );
+  sbu.Add(  '<p class="w3-small w3-text-gray">'                                                                                                    ); // poweredby
+  sbu.Add(  '<!-- poweredby -->'                                                                                                                   );
   sbu.Add(  'Powered by <a href="%s" target="_blank"><img src="%s" class="w3-image" style="height:18px" title="%s"></a>', [TSysRec.HOME_URL, TSysRec.ICON_URL, TSysRec.NAME]);
-  sbu.Add(  '</p>'                                                                                                                   );
-  end;
+  sbu.Add(  '</p>'                                                                                                                                 );
+  end else
+  sbu.Add(  '<p></p>'                                                                                                                              );
 end;
-  sbu.Add('</footer>'                                                                                                                );
+  sbu.Add('</footer>'                                                                                                                              );
     {$ENDREGION}
 
     {$REGION 'utilswidgets'}
@@ -14912,23 +15997,24 @@ end;
       {$ENDREGION}
 
       {$REGION 'modalmemoeditor'}
-  sbu.Add('<!-- modalmemoeditor -->' {*** DUPLICATED ***}                                                                                                    ); // modalmemoeditor
-  sbu.Add('<div class="w3-modal w3-animate-opacity" id="CoModalMemoEditor">'                                                                                 );
-  sbu.Add(  '<div class="w3-modal-content w3-card-4 w3-animate-opacity">' {w3-animate-zoom}                                                                  );
-  sbu.Add(    '<header class="w3-container w3-theme-l3">'                                                                                                    );
+  sbu.Add('<!-- modalmemoeditor -->' {*** DUPLICATED ***}                                                                                                       ); // modalmemoeditor
+  sbu.Add('<div class="w3-modal w3-animate-opacity" id="CoModalMemoEditor">'                                                                                    );
+  sbu.Add(  '<div class="w3-modal-content w3-card-4 w3-animate-opacity">' {w3-animate-zoom}                                                                     );
+  sbu.Add(    '<header class="w3-container w3-theme-l3">'                                                                                                       );
   sbu.Add(      '<span class="w3-button w3-large w3-display-topright" onclick="document.getElementById(''CoModalMemoEditor'').style.display=''none''">&times;</span>');
-  sbu.Add(      '<h4>Memo Editor</h4>'                                                                                                                       );
-  sbu.Add(    '</header>'                                                                                                                                    );
-  sbu.Add(    '<div class="w3-container">'                                                                                                                   );
-  sbu.Add(      '<h1 id="CoModalMemoEditorTitle">Title</h1>'                                                                                                 );
-  sbu.Add(      '<textarea class="w3-input w3-border w3-margin-bottom" style="resize:none" rows="12" id="CoModalMemoEditorTextarea"></textarea>'             );
-  sbu.Add(    '</div>'                                                                                                                                       );
-  sbu.Add(    '<div class="w3-container w3-light-grey w3-padding">'                                                                                          );
-  sbu.Add(      '<button class="w3-button w3-right w3-green w3-border" onclick="wksMemoEditorExec()">Ok</button>'                                            ); // id="CoModalMemoEditorOk"
-  sbu.Add(      '<button class="w3-button w3-right w3-white w3-border w3-margin-right" onclick="wksMemoEditorClose()">Cancel</button>'                       ); // id="CoModalMemoEditorCancel"
-  sbu.Add(    '</div>'                                                                                                                                       );
-  sbu.Add(  '</div>'                                                                                                                                         );
-  sbu.Add('</div>'                                                                                                                                           );
+  sbu.Add(      '<h4>Memo Editor</h4>'                                                                                                                          );
+  sbu.Add(    '</header>'                                                                                                                                       );
+  sbu.Add(    '<div class="w3-container">'                                                                                                                      );
+  sbu.Add(      '<h1 id="CoModalMemoEditorTitle">Title</h1>'                                                                                                    );
+  sbu.Add(      '<textarea class="w3-input w3-border w3-margin-bottom" style="resize:none" rows="12" id="CoModalMemoEditorTextarea"></textarea>'                );
+  sbu.Add(    '</div>'                                                                                                                                          );
+  sbu.Add(    '<div class="w3-container w3-light-grey w3-padding">'                                                                                             );
+  sbu.Add(      '<button class="w3-button w3-left w3-blue w3-border" onclick="document.getElementById(''CoModalMemoEditorTextarea'').value=''''">Clear</button>');
+  sbu.Add(      '<button class="w3-button w3-right w3-green w3-border" onclick="wksMemoEditorExec()">Ok</button>'                                               ); // id="CoModalMemoEditorOk"
+  sbu.Add(      '<button class="w3-button w3-right w3-white w3-border w3-margin-right" onclick="wksMemoEditorClose()">Cancel</button>'                          ); // id="CoModalMemoEditorCancel"
+  sbu.Add(    '</div>'                                                                                                                                          );
+  sbu.Add(  '</div>'                                                                                                                                            );
+  sbu.Add('</div>'                                                                                                                                              );
       {$ENDREGION}
 
       {$REGION 'modalimagesviewer'}
@@ -15038,7 +16124,7 @@ begin
   end;
 end;
 
-class function  THtmRec.Page(IvTitle, IvSubTitle, IvContent, IvContentKind: string; IvTitleShow, IvImageShow, IvSubTitleShow, IvTopNavOff, IvSystemInfoOff, IvUrlAbsolute: boolean): string;
+class function  THtmRec.Page(IvTitle, IvSubTitle, IvContent, IvContentKind, IvClass, IvStyle: string; IvTitleShow, IvImageShow, IvSubTitleShow, IvTopNavOff, IvSystemInfoOff, IvUrlAbsolute: boolean): string;
 var
   pag: TPagRec;
 begin
@@ -15056,6 +16142,8 @@ begin
   pag.Centered        := true;
   pag.TopNavOff       := IvTopNavOff;
   pag.SystemInfoOff   := IvSystemInfoOff;
+  pag.&Class          := IvClass;
+  pag.Style           := IvStyle;
   Result              := Page(pag, IvUrlAbsolute);
 end;
 
@@ -15412,7 +16500,7 @@ const
         + sLineBreak
         + sLineBreak + '[Common]'
         + sLineBreak + 'OptionCryptoKey='
-        + sLineBreak + 'OptionPersistRootFolder=C:\$Persist'
+        + sLineBreak + 'OptionPersistRootFolder=C:\$\Persist'
         + sLineBreak + 'OptionTempFolder=' + TEMP_PATH
         + sLineBreak + 'OptionWeekWorkOneStart=44924.7916666667'
         ;
@@ -16405,8 +17493,8 @@ end;
 function  TMbrRec.Info: string;
 begin
   Result := JobTitle;
-  Result := TStrRec.StrWordAppend(Result, JobRole);
-  Result := TStrRec.StrWordAppend(Result, JobLevel);
+  Result := TStrRec.StrWordAppend(Result, JobRole, ' - ');
+  Result := TStrRec.StrWordAppend(Result, JobLevel, ' - ');
 end;
 
 procedure TMbrRec.Free;
@@ -16485,7 +17573,7 @@ begin
       JobLevel     := dst.FieldByName('FldJobLevel').AsString;
       &Unit        := dst.FieldByName('FldUnit').AsString;
       CostCenter   := dst.FieldByName('FldCostCenter').AsString;
-      TGraRec.FromBlobField(BadgeGraphic, TBlobField(dst.FieldByName('FldBadge')));
+      TGraRec.FromBlobField(BadgeGraphic, TBlobField(dst.FieldByName('FldBadge'))); // *** create an empty badge if nil ***
 
       IvFbk := Format('MbrRec loaded from database with %s and %s data', [IvOrganization, IvUsername]);
     end;
@@ -16578,7 +17666,7 @@ begin
   Result := Format('<img src="%s" title="%s" style="height:%dpx">', [BadgeUrl, Info, IvHeight])
 end;
 
-procedure TMbrRec.BadgeGenerate(var IvBadge: TBitmap; IvOrganization, IvSite, IvUsername: string);
+procedure TMbrRec.BadgeGenerate(var IvBadge: TBitmap; IvOrganization, IvWww, IvSite, IvUsername: string);
 
   {$REGION 'var'}
 {                                  54mm --> 127                    5   bra
@@ -16666,7 +17754,7 @@ begin
     TAggRec.Box(agg, 0, h2-MAR-HOH/2, HOW, HOH, HOH/2);
 
     // organizationlogo
-    org.InitRio(IvOrganization, fbk);
+    org.InitRio(IvOrganization, IvWww, fbk);
     try
       // smas
       if not Assigned(org.LogoLongGraphic) then
@@ -18495,6 +19583,7 @@ begin
   // detail
   ObjectId        := 0;
   Www             := IvOrganizationOrWwwDefault; // use host temporarily
+  WwwAlt          := '';
   Phone           := '';
   Email           := '';
   About           := '';
@@ -18506,14 +19595,24 @@ begin
   HomePageId      := 0;
 end;
 
-function  TOrgRec.InitDba(IvOrganization: string; var IvFbk: string): boolean;
+function  TOrgRec.InitDba(IvOrganization, IvWww: string; var IvFbk: string): boolean;
 var
   sql: string;
   dst: TDataset;
 begin
 //glog.Dbg('ORG.InitDba');
 
-  sql := Format('select top(1) b.* from DbaOrganization.dbo.TblObject a inner join DbaOrganization.dbo.TblOrganization b on (b.FldObjectId = a.FldId) where a.FldObject = ''%s''', [IvOrganization]);
+  sql := Format('''
+select top(1)
+    b.*
+from
+    DbaOrganization.dbo.TblObject a inner join
+    DbaOrganization.dbo.TblOrganization b on (b.FldObjectId = a.FldId)
+where
+    a.FldState = 'Active'
+and upper(a.FldObject) = '%s'
+and (b.FldWww = '%s' or b.FldWww = 'www.%s' or b.FldWwwAlt = '%s')
+''', [IvOrganization, IvWww, IvWww, IvWww]); // org will be upper!
   TDbaRec.DsFromSql(sql, dst);
   try
     // notdefined
@@ -18530,6 +19629,7 @@ begin
       // detail
       ObjectId     := dst.FieldByName('FldObjectId'    ).AsInteger;
       Www          := dst.FieldByName('FldWww'         ).AsString;
+      WwwAlt       := dst.FieldByName('FldWwwAlt'      ).AsString;
       Phone        := dst.FieldByName('FldPhone'       ).AsString;
       Email        := dst.FieldByName('FldEmail'       ).AsString;
       About        := dst.FieldByName('FldAbout'       ).AsString;
@@ -18554,17 +19654,26 @@ var
 begin
 //glog.Dbg('ORG.InitByWww');
 
-  sql := Format('select top(1) a.FldObject from DbaOrganization.dbo.TblObject a inner join DbaOrganization.dbo.TblOrganization b on (b.FldObjectId = a.FldId) where a.FldState = ''Active'' and b.FldWww = ''%s'' or b.FldWww = ''www.%s''', [IvWww, IvWww]);
+  sql := Format('''
+select top(1)
+    a.FldObject
+from
+    DbaOrganization.dbo.TblObject a inner join
+    DbaOrganization.dbo.TblOrganization b on (b.FldObjectId = a.FldId)
+where
+    a.FldState = 'Active'
+and (b.FldWww = '%s' or b.FldWww = 'www.%s' or b.FldWwwAlt = '%s')
+''', [IvWww, IvWww, IvWww]);
   org := TDbaRec.Scalar(sql, '');
   Result := not org.IsEmpty;
   if not Result then begin
     Reset('', true);
     IvFbk := Format('Unable to initialize TOrgRec by www "%s", it does not exists in the database', [IvWww{, org, sql}]); // (org=%s) (sql=%s)
   end else
-    Result := InitDba(org, IvFbk);
+    Result := InitDba(org, IvWww, IvFbk);
 end;
 
-function  TOrgRec.InitRio(IvOrganization: string; var IvFbk: string): boolean;
+function  TOrgRec.InitRio(IvOrganization, IvWww: string; var IvFbk: string): boolean;
 var
   rem: TOrgRem;
 begin
@@ -18572,7 +19681,7 @@ begin
 
   rem := TOrgRem.Create;
   try
-    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemOrganizationInitSoap(IvOrganization, rem, IvFbk);
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemOrganizationInitSoap(IvOrganization, IvWww, rem, IvFbk);
     if Result then begin
       // master
       Obj.RecFromRem(rem.ObjRem);
@@ -18580,6 +19689,7 @@ begin
       // detail
       ObjectId        := rem.ObjectId;
       Www             := rem.Www;
+      WwwAlt          := rem.WwwAlt;
       About           := rem.About;
       Phone           := rem.Phone;
       Email           := rem.Email;
@@ -18779,6 +19889,8 @@ begin
   BottomSpace              :=  0   ;
   LeftSpace                :=  0   ;
   RightSpace               :=  0   ;
+  &Class                   := ''   ;
+  Style                    := ''   ;
   AuthenticationNeeded     := false;
 
   // derived
@@ -18830,6 +19942,8 @@ begin
       BottomSpace              := dst.FieldByName('FldBottomSpace'         ).AsInteger;
       LeftSpace                := dst.FieldByName('FldLeftSpace'           ).AsInteger;
       RightSpace               := dst.FieldByName('FldRightSpace'          ).AsInteger;
+      &Class                   := dst.FieldByName('FldClass'               ).AsString ;
+      Style                    := dst.FieldByName('FldStyle'               ).AsString ;
       AuthenticationNeeded     := dst.FieldByName('FldAuthenticationNeeded').AsBoolean;
     end;
   finally
@@ -19742,7 +20856,7 @@ begin
       IvParamRecVector[i].OptionQuery    := dst.FieldByName('FldOptionQuery'   ).AsString ;  {  OptionQuery   }
       IvParamRecVector[i].ConnStr        := dst.FieldByName('FldConnStr'       ).AsString ;  {  ConnStr       }
       IvParamRecVector[i].ConnLib        := dst.FieldByName('FldConnLib'       ).AsString ;  {  ConnLib       }
-      IvParamRecVector[i].&Class         := dst.FieldByName('FldClass'         ).AsString ;  {  Classs        }
+      IvParamRecVector[i].&Class         := dst.FieldByName('FldClass'         ).AsString ;  {  &Class        }
       IvParamRecVector[i].Style          := dst.FieldByName('FldStyle'         ).AsString ;  {  Style         }
     //IvParamRecVector[i].Format         := dst.FieldByName('FldFormat'        ).AsString ;  {  Format        }
     //IvParamRecVector[i].ReadOnly       := dst.FieldByName('FldReadOnly'      ).AsBoolean;  {  ReadOnly      }
@@ -19834,7 +20948,7 @@ begin
       IvDatasetRecVector[i].EditIni         := dst.FieldByName('FldEditIni'        ).AsString ;
       IvDatasetRecVector[i].Json            := dst.FieldByName('FldJson'           ).AsString ;
       IvDatasetRecVector[i].Switch          := dst.FieldByName('FldSwitch'         ).AsString ;
-      IvDatasetRecVector[i].Classs          := dst.FieldByName('FldClass'          ).AsString.Replace(',', '');
+      IvDatasetRecVector[i].&Class          := dst.FieldByName('FldClass'          ).AsString.Replace(',', '');
       IvDatasetRecVector[i].Style           := dst.FieldByName('FldStyle'          ).AsString.Replace(',', ';');
       IvDatasetRecVector[i].TitleOn         := dst.FieldByName('FldTitleOn'        ).AsBoolean;
       IvDatasetRecVector[i].PanelOn         := dst.FieldByName('FldPanelOn'        ).AsBoolean;
@@ -20070,7 +21184,7 @@ begin
       CodeState         := dst.FieldByName('FldCodeState'        ).AsString ;
       CodeKind          := dst.FieldByName('FldCodeKind'         ).AsString ;
       Alias             := dst.FieldByName('FldAlias'            ).AsString ;
-      Classs            := dst.FieldByName('FldClass'            ).AsString ;
+      &Class            := dst.FieldByName('FldClass'            ).AsString ;
       Style             := dst.FieldByName('FldStyle'            ).AsString ;
       Layout            := dst.FieldByName('FldLayout'           ).AsString ;
 
@@ -20610,8 +21724,8 @@ var
     else if fun.Equals('HtmReport')              then Result := THtmRec.Report(a[0].ToInteger, a[1])                                                   // [RvHtmReportFromId(id | default-if-any-ds-is-empty)]]
     else if fun.Equals('HtmRepeatFromSql')       then Result := THtmRec.RepeatFromSql(a[0], a[1], a[2], a[3], a[4])                                    // [RvHtmRepeatSql(sql | html-block-with-$FldAaa$ | header | footer | default-if-empty)]
     else if fun.Equals('HtmSlidesFromSql')       then Result := THtmRec.SlidesFromSql(a[0], a[1], a[2], a[3], a[4], StrToIntDef(a[5], 1))              // [RvHtmSlidesSql(sql | html-slide-block-with-$FldAaa$ | header | footer | default-if-empty | slideid)] (similar to repeater)
-    else if fun.Equals('HtmTableFromSql')        then Result := THtmRec.TableFromSql(a[0], a[1], a[2], a[3], false, '', hvHorizontal, StrToBoolDef(a[4], false), StrToBoolDef(a[5], false)) // [RvHtmTableFromSql(sql | default-if-empty | class | style | recordcountoff | headeroff | editable-true-false | edit-json | direction-horiz-vert)
-    else if fun.Equals('HtmWordifyFromSql')      then Result := 'DaFare'
+    else if fun.Equals('HtmTableFromSql')        then Result := THtmRec.TableFromSql(StrToIntDef(a[0], 0), a[1], a[2], a[3], a[4], a[5], a[6], a[7], false, '', hvHorizontal, StrToBoolDef(a[4], false), StrToBoolDef(a[5], false))
+    else if fun.Equals('HtmWordifyFromSql')      then Result := 'DaFare'         // [RvHtmTableFromSql(dts# | sql | connstr | connlib | default-if-empty | coname | class | style | recordcountoff | headeroff | editable-true-false | edit-json | direction-horiz-vert)
     ;
   end;
 
@@ -20736,6 +21850,7 @@ var
          if fun.Equals('Organization')            then Result := gorg.Obj.&Object
     else if fun.Equals('OrganizationId')          then Result := gorg.Obj.Id.ToString
     else if fun.Equals('OrganizationWww')         then Result := gorg.Www
+    else if fun.Equals('OrganizationWwwAlt')      then Result := gorg.WwwAlt
     else if fun.Equals('OrganizationAbout')       then Result := gorg.About
     else if fun.Equals('OrganizationSlogan')      then Result := gorg.Slogan
     else if fun.Equals('OrganizationHomePageId')  then Result := gorg.HomePageId.ToString
@@ -21804,14 +22919,14 @@ class function  TSqlRec.SqlFilterRv(IvField, IvValue: string): string;
   complex-filter-str can be:
 
   expression :
-    #                   field is null  (= NULL)            (see last in yms code)
-    "                   field is empty (= empty = '')
-    ^                   field is blank (empty|spaces|tabs) (see last in yms code)
-    $                   field is valued, not null|empty|blank (remove records where value is null|empty|whitechar)
-    value               secco
-    value*              like
-    value1,value2       in
-    value1,value2*      C24A, K22B*    multy secco or like
+    #                   field is null    (= NULL)               (see last in wks code)
+    "                   field is empty   (= empty = '')
+    ^                   field is blank   (empty|spaces|tabs)    (see last in wks code)
+    $                   field is valued, not null|empty|blank   (remove records where value is null|empty|whitechar)
+    value               secco            (Aaa)
+    value*              like             (Aaa*)
+    value1,value2       in               (Aaa, Bbb)
+    value1,value2*      multy secco/like (Aaa, Bbb*)
 
   negated :
     ^ <expression>      '^ ' at beginning of the expression will negate the all elements (consider using !)
@@ -21823,12 +22938,20 @@ class function  TSqlRec.SqlFilterRv(IvField, IvValue: string): string;
     <expression> "      ' "' at the end of the expression will also add records with empty values
 
   +blank :
-    <expression> ^      ' ^' at the end of the expression will also add records with blank values
+    <expression> ^      ' ^' at the end of the expression will also add records with blank values (spaces, tabs, ...) (consider using = or _)
 
-  example:                secco          like           multy
-    ^ <expression> #    ^ C24A #   ;   ^ C24A* #   ;  ^ C24A, K22B* #   ( negated +nulls )
-    ^ <expression> #"   ^ C24A #"  ;   ^ C24A* #"  ;  ^ C24A, K22B* #"  ( negated +nulls +empty )
-    ^ <expression> #"^  ^ C24A #"^ ;   ^ C24A* #"^ ;  ^ C24A, K22B* #"^ ( negated +nulls +empty +null )
+  example:              secco       like         multy             multylike
+    <expression>        Aaa         Aaa*         Aaa, Bbb          Aaa, Bbb*         ( simple )
+    <expression> #      Aaa #       Aaa* #       Aaa, Bbb* #       Aaa, Bbb* #       ( +nulls )
+    <expression> "      Aaa "       Aaa* "       Aaa, Bbb* "       Aaa, Bbb* "       ( +empty )
+    <expression> ^      Aaa ^       Aaa* ^       Aaa, Bbb* "       Aaa, Bbb* "       ( +blanks )
+
+    <expression> #"     Aaa #"      Aaa* #"      Aaa, Bbb* #"      Aaa, Bbb* #"      ( +nulls +empty )
+    <expression> #^     Aaa #^      Aaa* #^      Aaa, Bbb* #^      Aaa, Bbb* #^      ( +nulls +blanks )
+    <expression> "^     Aaa "^      Aaa* "^      Aaa, Bbb* "^      Aaa, Bbb* "^      ( +empty +blanks )
+    <expression> #"^    Aaa #"^     Aaa* #"^     Aaa, Bbb* #"^     Aaa, Bbb* #"^     ( +nulls +empty +blanks )
+
+    all examples above plus a '^ ' in front of the expressions
   }
   {$ENDREGION}
 
@@ -21841,18 +22964,18 @@ begin
   // zip
   a := Trim(IvField);
   b := Trim(TStrRec.StrReplace(IvValue, '*', '%')); // * --> %
-  n := b.StartsWith('^ ');                          // if start with '^ ' then negate all after '^ ' i.e. ^ aaa,bbb*,ccc  -->  ^ at the beginning means "all" so both aaa and bbb* will be negated
+  n := b.StartsWith('^ ') or b.StartsWith('! ');    // if start with '^ ' then negate all after '^ ' i.e. ^ aaa,bbb*,ccc  -->  ^/! at the beginning means "all" so both aaa and bbb* will be negated
   if n then Delete(b, 1, 2);                        // remove '^ '
   m := b.EndsWith(' #');                            // if end with ' #' a " or FldXxx is null" will be added
   if m then b := LeftStr(b, Length(b)-2);           // remove ' #'
-  v := gvec.VecFromStr(b, ',', true);               // v[0]='C24A*' , v[1]='K22B*' , ...
+  v := gvec.VecFromStr(b, ',', true);               // v[0]='Aaa*' , v[1]='Bbb*' , ...
 
   // loop
   x := '';
   for i := Low(v) to High(v) do begin
     w := v[i];
 
-    if n then begin // ^ aaa,bbb*,ccc
+    if n then begin // ^ Aaa,Bbb*,Ccc
 
       {$REGION 'Negate'}
                if w.Contains('%') then begin                      // not like
@@ -21861,7 +22984,7 @@ begin
         x := x + ' and ' + Format('(%s != ''%s'')'      , [a, w])
       {$ENDREGION}
 
-    end else begin // aaa,bbb*,ccc
+    end else begin // Aaa,Bbb*,Ccc
 
       {$REGION 'Plain'}
                if w.Contains('%') then begin                      // like
@@ -22726,12 +23849,12 @@ begin
   Result := IvString;
 end;
 
-class function  TStrRec.StrWordAppend(IvStr, IvWord: string): string;
+class function  TStrRec.StrWordAppend(IvStr, IvWord, IvSeparator: string): string;
 begin
   if IvStr.IsEmpty then
     Result := IvWord
   else
-    Result := IvStr + ' ' + IvWord;
+    Result := IvStr + IvSeparator + IvWord;
 end;
 
 class function  TStrRec.StrKeep(IvStr: string; const IvCharToKeepSet: TSysCharSet): string;
@@ -23083,7 +24206,7 @@ var
   r: Winapi.Windows.TRect; // editorrect
 begin
   if ASearch = AReplace then
-    Action := raSkip // nothing to replace, they are equal
+    Action := SynEdit.raSkip // nothing to replace, they are equal. *** collide with firedac ***
 
   else begin
     p := PositionPoint(IvSynEdit, Column, Line);
@@ -23096,10 +24219,10 @@ begin
     ReplaceConfirmForm.PrepareShow(r, p.X, p.Y, p.Y + IvSynEdit.LineHeight, ASearch, AReplace);
 
     case ReplaceConfirmForm.ShowModal of
-      mrYes        : Action := raReplace;
-      mrNo         : Action := raSkip;
-      mrYesToAll   : Action := raReplaceAll;
-      else           Action := raCancel;
+      mrYes        : Action := SynEdit.raReplace;
+      mrNo         : Action := SynEdit.raSkip;
+      mrYesToAll   : Action := SynEdit.raReplaceAll;
+      else           Action := SynEdit.raCancel;
     end;
   end;
 end;
@@ -25588,7 +26711,7 @@ begin
   sbu.Add('.w3-padding-x-large  {padding-left:12px !important; padding-right:12px !important;}'           );
   sbu.Add('.w3-padding-x-xlarge {padding-left:16px !important; padding-right:16px !important;}'           );
 
-  sbu.Add('.w3-text-italic            {font-style: italic;}'                                              );
+//sbu.Add('.w3-text-italic            {font-style: italic;}'                                              ); // *** REMOVED, there is w3-cursive! ***
   sbu.Add('.w3-table-centered         {margin-left: auto;margin-right: auto; display: block;}'            );
   sbu.Add('.w3-table-centered-compact {margin-left: auto;margin-right: auto; display: block;width: 0;}'   );
 
@@ -26377,7 +27500,7 @@ end;
   {$REGION 'var'}
 var
   fid, sid: cardinal;
-  ipl, hos, ref, red{, dab, org}, fbk: string; // iplan, host, referer, redirect, datetimebegin, organization
+  rad, hos, hon, ref, red{, dab, org}, fbk: string; // remoteaddress, host, hostname, referer, redirect, datetimebegin, organization
 
   {function host_mistakes_fix(host: string): string;
   begin
@@ -26433,8 +27556,17 @@ begin
   IvWrq.WebRequestOrig := IvWebRequest;
 
   // init
-  ipl := IvWebRequest.RemoteAddr;
+  rad := IvWebRequest.RemoteAddr;
   hos := IvWebRequest.Host;
+  hon := TRegEx.Split(hos, '\.')[0];
+
+  // environment
+  if hon.EndsWith('dev') or SameText(hon, 'localhost') or TStrRec.StrIsNumeric(hon) then
+    genv.Environment := 'DEV' // class var
+  else if hon.EndsWith('test') then
+    genv.Environment := 'TEST'
+  else
+    genv.Environment := 'PROD';
 
   // org
   gorg.InitByWww(hos, fbk);
@@ -26468,7 +27600,7 @@ begin
   if sid <= 0 then begin                         // clienthasnotsessionid --> create new one then store it in dba and client
     Randomize();
     sid := TRndRec.RndInt(10000, 99999);
-    gses.Init('Web', sid, fid, ipl, 'Unknown', 'Unknown', 'Unknown', IvWebRequest.UserAgent, 'SeeUserAgent', hos, gses.Organization, gses.Username, fbk);
+    gses.Init('Web', sid, fid, rad, 'Unknown', 'Unknown', 'Unknown', IvWebRequest.UserAgent, 'SeeUserAgent', hos, gses.Organization, gses.Username, fbk);
     // savetodba
     gses.Insert(fbk);
     // savetoclient
@@ -26476,7 +27608,7 @@ begin
   end else begin
     gses.SessionId     := sid;
     gses.FingerprintId := fid;
-    gses.IpLan         := ipl;
+    gses.IpLan         := rad;
     gses.Server        := hos;
     gses.Username      := ''; // this will be resolved like ... where FldUser = null , not elegant!
     gses.Select(fbk);
@@ -26645,7 +27777,7 @@ end;
 if IvWebResponse.Content.Contains('"mermaid"') then begin
   sbu.Add('<!-- mermaid -->'                                                                                                        ); // jsafter
   sbu.Add('<script type="module">'                                                                                                  );
-  sbu.Add(  'import mermaid from ''https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs'';'                             );
+  sbu.Add(  'import mermaid from ''https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'';'                             );
   if IvWebResponse.Content.Contains('zenuml') then begin // ZenUML (https://mermaid.js.org/syntax/zenuml.html)
   sbu.Add(  'import zenuml  from ''https://cdn.jsdelivr.net/npm/@mermaid-js/mermaid-zenuml@0.1.0/dist/mermaid-zenuml.esm.min.mjs'';');
   sbu.Add(  'await mermaid.registerExternalDiagrams([zenuml]);'                                                                     );

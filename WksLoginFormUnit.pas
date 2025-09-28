@@ -829,7 +829,7 @@ begin
 
       {$REGION 'organizationrio'}
       Log('Requesting Organization data...', fmInfo);
-      if not gorg.InitRio(OrganizationEdit.Text, fbk) then begin
+      if not gorg.InitRio(OrganizationEdit.Text, gaps.Www, fbk) then begin
         Log('Organization problem: %s', [fbk], fmDanger);
         ControlsShow(true);
         Exit;
@@ -925,15 +925,15 @@ begin
       {$REGION 'clientrio'}
       Log('Requesting Client existence...', fmInfo);
       if not TSysRec.BinaryExistsRio(TBynRec.BinaryName, fbk) then begin
-        Log('Client warning: your client bynary is not registered on the server, %s', [fbk], fmWarning);
-        TMesRec.W(fbk);
+        Log('Client warning: your client is not registered on the system, %s', [fbk], fmWarning);
+        TMesRec.W('Your client is not registered on the system');
         ControlsShow(true);
         Exit;
       end;
       Log('Requesting Client version...', fmInfo);
       if not TSysRec.BinaryVersionIsOkRio(TBynRec.BinaryName, TBynRec.Ver, fbk) then begin
-        Log('Client warning: your client bynary  version is not the latest, %s', [fbk], fmWarning);
-        TMesRec.W(fbk);
+        Log('Client warning: your client version is not the latest, %s', [fbk], fmWarning);
+        TMesRec.W('Your client version is not the latest');
         ControlsShow(true);
       //Exit;
       end;

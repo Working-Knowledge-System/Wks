@@ -4,17 +4,17 @@ object XxxMainDataModule: TXxxMainDataModule
   Width = 540
   object XxxADOConnection: TADOConnection
     ConnectionString = 
-      'Provider=SQLOLEDB.1;Password=secret@123;Persist Security Info=Tr' +
-      'ue;User ID=sa;Initial Catalog=DbaXxx;Data Source=LOCALHOST'
+      'Provider=MSOLEDBSQL.1;Password=secret@123;Persist Security Info=' +
+      'True;User ID=sa;Initial Catalog=DbaXxx;Data Source=LOCALHOST'
     DefaultDatabase = 'DbaXxx'
     LoginPrompt = False
-    Provider = 'SQLOLEDB.1'
+    Provider = 'MSOLEDBSQL.1'
     Left = 80
     Top = 40
   end
   object XxxADOTable: TADOTable
     Connection = XxxADOConnection
-    CursorType = ctKeyset
+    CursorType = ctStatic
     IndexFieldNames = 'FldObjectId'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -39,7 +39,7 @@ object XxxMainDataModule: TXxxMainDataModule
   end
   object ObjectADOTable: TADOTable
     Connection = XxxADOConnection
-    CursorType = ctKeyset
+    CursorType = ctStatic
     TableName = 'TblObject'
     Left = 240
     Top = 40

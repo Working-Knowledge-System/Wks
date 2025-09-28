@@ -3,7 +3,6 @@ inherited MainForm: TMainForm
   StyleElements = [seFont, seClient, seBorder]
   TextHeight = 15
   inherited RightJvNetscapeSplitter: TJvNetscapeSplitter
-    Left = 578
     ExplicitLeft = 578
   end
   inherited TopPanel: TPanel
@@ -54,26 +53,16 @@ inherited MainForm: TMainForm
   inherited MainPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited MainPageControl: TPageControl
-      ExplicitWidth = 531
       inherited LogTabSheet: TTabSheet
         inherited LogTopPanel: TPanel
           StyleElements = [seFont, seClient, seBorder]
-          ExplicitWidth = 523
-        end
-        inherited LogSynEdit: TSynEdit
-          ExplicitWidth = 523
         end
       end
     end
   end
   inherited RightPanel: TPanel
-    Left = 588
-    Width = 420
     StyleElements = [seFont, seClient, seBorder]
-    ExplicitLeft = 588
-    ExplicitWidth = 420
     inherited RightPageControl: TPageControl
-      Width = 414
       ActivePage = TcpTabSheet
       ExplicitWidth = 414
       object TcpTabSheet: TTabSheet
@@ -81,7 +70,7 @@ inherited MainForm: TMainForm
         object TcpDBGrid: TDBGrid
           Left = 0
           Top = 31
-          Width = 406
+          Width = 466
           Height = 330
           Align = alClient
           BorderStyle = bsNone
@@ -96,13 +85,14 @@ inherited MainForm: TMainForm
         object TcpTopPanel: TPanel
           Left = 0
           Top = 0
-          Width = 406
+          Width = 466
           Height = 31
           Align = alTop
           BevelOuter = bvNone
           Caption = 'TcpTopPanel'
           ShowCaption = False
           TabOrder = 1
+          ExplicitWidth = 406
           object TcpCountLabel: TLabel
             AlignWithMargins = True
             Left = 356
@@ -113,7 +103,8 @@ inherited MainForm: TMainForm
             Align = alLeft
             Caption = 'TcpCountLabel'
             Layout = tlCenter
-            ExplicitHeight = 15
+            ExplicitLeft = 372
+            ExplicitTop = 0
           end
           object TcpDBNavigator: TDBNavigator
             AlignWithMargins = True
@@ -137,6 +128,8 @@ inherited MainForm: TMainForm
             Caption = 'Clear'
             TabOrder = 1
             OnClick = TcpClearButtonClick
+            ExplicitLeft = 238
+            ExplicitTop = 0
           end
           object TcpRefreshButton: TButton
             AlignWithMargins = True
@@ -155,10 +148,10 @@ inherited MainForm: TMainForm
   end
   object MqttADOConnection: TADOConnection
     ConnectionString = 
-      'Provider=SQLOLEDB.1;Password=secret@123;Persist Security Info=Tr' +
-      'ue;User ID=sa;Initial Catalog=DbaMqtt;Data Source=LOCALHOST'
+      'Provider=MSOLEDBSQL.1;Password=secret@123;Persist Security Info=' +
+      'True;User ID=sa;Initial Catalog=DbaMqtt;Data Source=LOCALHOST'
     LoginPrompt = False
-    Provider = 'SQLOLEDB.1'
+    Provider = 'MSOLEDBSQL.1'
     Left = 280
     Top = 280
   end
