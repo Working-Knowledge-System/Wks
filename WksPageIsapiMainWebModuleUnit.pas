@@ -72,6 +72,7 @@ type
     procedure MainWebModuleAccountCreateWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
     procedure MainWebModuleAccountRecoverWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
     procedure MainWebModuleAccountDeleteWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
+    procedure MainWebModuleReportWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
   private
     { Private declarations }
   //FIni: TIniCls;
@@ -95,9 +96,9 @@ implementation
 
 {$R *.dfm}
 
-//uses
-//    Data.DB
-//  ;
+uses
+    Data.DB
+  ;
 {$ENDREGION}
 
 {$REGION 'TMainWebModule'}
@@ -300,13 +301,17 @@ begin
   jes := TTblRec.TblEditJsonStr('DbaAaa.dbo.TblTest', ['FldId'], ['FldA', 'FldB', 'FldC', 'FldD']);
 
   con := THtmRec.TableFromSql(
-    'select * From DbaAaa.dbo.TblTest order by 1 desc' // sql
+    0                                                  // context dst#
+  , 'select * From DbaAaa.dbo.TblTest order by 1 desc' // sql
+  , ''                                                 // connstr
+  , ''                                                 // connlib
   , NO_DATA_STR                                        // default
+  , ''                                                 // coname
   , 'w3-table-all w3-hoverable'                        // class
   , ''                                                 // style
   , true                                               // editable
   , jes                                                // jsoneditstr
-  , hvHorizontal                                       // dir
+  , hvHorizontal                                       // mode
 //, false                                              // recordcountoff
 //, false                                              // headeroff
   );
@@ -463,7 +468,7 @@ procedure TMainWebModule.MainWebModuleAccountCreateWebActionAction(Sender: TObje
 var
   con: string;
 begin
-  con := THtmRec.PageInfo(NOT_IMPLEMENTED_STR, 'This page is actually under development');
+  con := THtmRec.PageInfo(NOT_IMPLEMENTED_STR, 'This page is not implemented yet');
   TWrsRec.ResponseSet(Response, con);
 end;
 
@@ -471,7 +476,7 @@ procedure TMainWebModule.MainWebModuleAccountRecoverWebActionAction(Sender: TObj
 var
   con: string;
 begin
-  con := THtmRec.PageInfo(NOT_IMPLEMENTED_STR, 'This page is actually under development');
+  con := THtmRec.PageInfo(NOT_IMPLEMENTED_STR, 'This page is not implemented yet');
   TWrsRec.ResponseSet(Response, con);
 end;
 
@@ -479,8 +484,60 @@ procedure TMainWebModule.MainWebModuleAccountDeleteWebActionAction(Sender: TObje
 var
   con: string;
 begin
-  con := THtmRec.PageInfo(NOT_IMPLEMENTED_STR, 'This page is actually under development');
+  con := THtmRec.PageInfo(NOT_IMPLEMENTED_STR, 'This page is not implemented yet');
   TWrsRec.ResponseSet(Response, con);
+end;
+    {$ENDREGION}
+
+    {$REGION 'Report'}
+procedure TMainWebModule.MainWebModuleReportWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+var
+  rid, aff: integer;
+  sql, fbk, cnt, pag: string;
+  dst: TDataset;
+begin
+  // input
+  rid := FWrq.FieldQueryGet('CoReportId', -1);
+
+  // error
+  if rid < 0 then
+    TWrsRec.ResponseSet(Response, THtmRec.PageWarning('CoReportId not found', 'The link need to hace a parametr like ?CoReportId=123'))
+
+  // reportinfo
+  else begin
+    // sql
+    sql := 'select * from DbaReport.dbo.TblObject a inner join DbaReport.dbo.TblReport b on (b.FldObjectId = a.FldId) where a.FldId = ' + rid.ToString;
+
+    // ds
+    if not TDbaRec.DsFromSql(sql, dst, aff, fbk) then
+      TWrsRec.ResponseSet(Response, THtmRec.PageWarning('Unable to get report info', fbk))
+
+    // go
+    else begin
+      // reportcontentsimulate
+      cnt := Format('[RvHtmReport(%d)]', [rid]);
+
+      // page
+      pag := THtmRec.Page(
+        TStrRec.StrCoalesce([dst.FieldByName('FldTitle').AsString, dst.FieldByName('FldObject').AsString]) // title        , needed for the htmlpage title
+      , {dst.FieldByName('FldSubtitle').AsString} ''                                                       // subtitle     , not needed
+      , cnt                                                                                                // content      , simulated
+      , ''                                                                                                 // contentkind
+      , dst.FieldByName('FldClass').AsString                                                               // class        , transferred from report to page
+      , dst.FieldByName('FldStyle').AsString                                                               // style        , idem
+      , {dst.FieldByName('FldReportTitleOn').AsBoolean} false {report engine will take care}               // titleshow    , mute page title
+      , false                                                                                              // imageshow    , mute page
+      , {dst.FieldByName('FldReportTitleOn').AsBoolean} false {report engine will take care}               // subtitleshow , mute page subtitle
+      , false                                                                                              // topnavoff
+      , false                                                                                              // systeminfooff
+      , false                                                                                              // urlabsolute
+      );
+
+      // reply
+      TWrsRec.ResponseSet(Response, pag);
+    end;
+
+  end;
 end;
     {$ENDREGION}
 

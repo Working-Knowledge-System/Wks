@@ -1,20 +1,20 @@
 object ReportMainDataModule: TReportMainDataModule
   OnCreate = SoapDataModuleCreate
   Height = 271
-  Width = 1155
+  Width = 1295
   object ReportADOConnection: TADOConnection
     ConnectionString = 
-      'Provider=SQLOLEDB.1;Password=secret@123;Persist Security Info=Tr' +
-      'ue;User ID=sa;Initial Catalog=DbaReport;Data Source=LOCALHOST'
+      'Provider=MSOLEDBSQL.1;Password=secret@123;Persist Security Info=' +
+      'True;User ID=sa;Initial Catalog=DbaReport;Data Source=LOCALHOST'
     DefaultDatabase = 'DbaReport'
     LoginPrompt = False
-    Provider = 'SQLOLEDB.1'
+    Provider = 'MSOLEDBSQL.1'
     Left = 80
     Top = 40
   end
   object ReportADOTable: TADOTable
     Connection = ReportADOConnection
-    CursorType = ctKeyset
+    CursorType = ctStatic
     IndexFieldNames = 'FldObjectId'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -39,14 +39,14 @@ object ReportMainDataModule: TReportMainDataModule
   end
   object ObjectADOTable: TADOTable
     Connection = ReportADOConnection
-    CursorType = ctKeyset
+    CursorType = ctStatic
     TableName = 'TblObject'
     Left = 240
     Top = 40
   end
   object ParamADOTable: TADOTable
     Connection = ReportADOConnection
-    CursorType = ctKeyset
+    CursorType = ctStatic
     IndexFieldNames = 'FldObjectId;FldOrder'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -56,7 +56,7 @@ object ReportMainDataModule: TReportMainDataModule
   end
   object DatasetADOTable: TADOTable
     Connection = ReportADOConnection
-    CursorType = ctKeyset
+    CursorType = ctStatic
     IndexFieldNames = 'FldObjectId;FldOrder'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -66,7 +66,7 @@ object ReportMainDataModule: TReportMainDataModule
   end
   object ChartADOTable: TADOTable
     Connection = ReportADOConnection
-    CursorType = ctKeyset
+    CursorType = ctStatic
     IndexFieldNames = 'FldObjectId;FldDataset'
     MasterFields = 'FldObjectId;FldDataset'
     MasterSource = DatasetDataSource
@@ -76,7 +76,7 @@ object ReportMainDataModule: TReportMainDataModule
   end
   object SerieADOTable: TADOTable
     Connection = ReportADOConnection
-    CursorType = ctKeyset
+    CursorType = ctStatic
     IndexFieldNames = 'FldObjectId;FldDataset;FldChart;FldOrder'
     MasterFields = 'FldObjectId;FldDataset;FldChart'
     MasterSource = ChartDataSource
@@ -113,5 +113,17 @@ object ReportMainDataModule: TReportMainDataModule
     DataSet = ChartADOTable
     Left = 880
     Top = 96
+  end
+  object GlobalADOTable: TADOTable
+    Connection = ReportADOConnection
+    CursorType = ctStatic
+    TableName = 'TblGlobal'
+    Left = 1192
+    Top = 40
+  end
+  object GlobalDataSetProvider: TDataSetProvider
+    DataSet = GlobalADOTable
+    Left = 1192
+    Top = 152
   end
 end

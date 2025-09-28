@@ -41,6 +41,8 @@ type
     StateDataSetProvider: TDataSetProvider;
     RequirementsADOTable: TADOTable;
     RequirementsDataSetProvider: TDataSetProvider;
+    SourceDataSetProvider: TDataSetProvider;
+    SourceADOTable: TADOTable;
     procedure SoapDataModuleCreate(Sender: TObject);
   private
     { Private declarations }

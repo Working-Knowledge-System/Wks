@@ -4,11 +4,11 @@ object InvoiceMainDataModule: TInvoiceMainDataModule
   Width = 540
   object InvoiceADOConnection: TADOConnection
     ConnectionString = 
-      'Provider=SQLOLEDB.1;Password=secret@123;Persist Security Info=Tr' +
-      'ue;User ID=sa;Initial Catalog=DbaInvoice;Data Source=LOCALHOST'
+      'Provider=MSOLEDBSQL.1;Password=secret@123;Persist Security Info=' +
+      'True;User ID=sa;Initial Catalog=DbaInvoice;Data Source=LOCALHOST'
     DefaultDatabase = 'DbaInvoice'
     LoginPrompt = False
-    Provider = 'SQLOLEDB.1'
+    Provider = 'MSOLEDBSQL.1'
     Left = 80
     Top = 40
   end

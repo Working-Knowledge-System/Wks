@@ -277,7 +277,6 @@ CREATE TABLE [DbaAccount].[dbo].[TblAccountOld](
 GO
 
 
-
 CREATE UNIQUE NONCLUSTERED INDEX [IX_TblAccountOld] ON [DbaAccount].[dbo].[TblAccountOld](
     [FldId] ASC
 ) ON [PRIMARY]
@@ -287,7 +286,7 @@ GO
 CREATE TABLE [DbaAccount].[dbo].[TblObject](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
-  , [FldId8]                                    [char](16)                      NULL
+  , [FldId8]                                    [char](8)                       NULL
   , [FldOrder]                                  [int]                           NULL
   , [FldRev]                                    [int]                           NULL
   , [FldCreated]                                [datetime]                      NULL
@@ -453,7 +452,7 @@ GO
 CREATE TABLE [DbaAgent].[dbo].[TblObject](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
-  , [FldId8]                                    [char](16)                      NULL
+  , [FldId8]                                    [char](8)                       NULL
   , [FldOrder]                                  [int]                           NULL
   , [FldRev]                                    [int]                           NULL
   , [FldCreated]                                [datetime]                      NULL
@@ -625,22 +624,6 @@ USE [DbaClient]
 GO
 
 
-
-
-CREATE TABLE [DbaClient].[dbo].[TblClient](
-    [FldState]                                  [varchar](16)                   NULL
-  , [FldObject]                                 [varchar](32)                   NULL
-  , [FldClient]                                 [varchar](32)               NOT NULL
-  , [FldOs]                                     [varchar](8)                    NULL
-  , [FldDescription]                            [varchar](512)                  NULL
-  , [FldOverview]                               [varchar](max)                  NULL
-  , [FldImageUrl]                               [varchar](512)                  NULL
-  , [FldNote]                                   [varchar](512)                  NULL
-  , [FldMessageWhenInactive]                    [varchar](256)                  NULL
-) ON [PRIMARY]
-GO
-
-
 CREATE TABLE [DbaClient].[dbo].[TblDomain](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
@@ -699,7 +682,7 @@ CREATE TABLE [DbaClient].[dbo].[TblRequest](                                    
   , [FldHttpMethod]                             [varchar](16)                   NULL -- {GET, POST                                }
   , [FldRequestId]                              [varchar](16)                   NULL -- {095EBA6CEcb.ConnId                       }
   , [FldConnection]                             [varchar](16)                   NULL -- {keep-alive                               }
-  , [FldHost]                                   [varchar](128)                  NULL -- {wksapp.foundry.com                       }
+  , [FldHost]                                   [varchar](128)                  NULL -- {wks.cloud                                }
   , [FldUrl]                                    [varchar](2048)                 NULL -- {/WksIsapiProject.dll *partial or empty*  }
   , [FldPathInfo]                               [varchar](256)                  NULL -- {/Info                                    }
   , [FldQuery]                                  [varchar](max)                  NULL -- {?CoId=381&CoXxx=2                        }
@@ -828,7 +811,7 @@ CREATE TABLE [DbaClient].[dbo].[ZzzTblClient](
 GO
 
 
-CREATE TABLE [DbaClient].[dbo].[ZzzTblSession](                                         *** this table tack user's Wks*Client-hits ***
+CREATE TABLE [DbaClient].[dbo].[ZzzTblSession](                                         *** this table track user's Wks*Client-hits ***
     [FldDomain]                                 [varchar](32)                   NULL *** rename to TblHit (the user session is tracked in the TblUser directly!) ***
   , [FldComputer]                               [varchar](32)                   NULL
   , [FldOsLogin]                                [varchar](32)                   NULL
@@ -905,7 +888,7 @@ GO
 CREATE TABLE [DbaCode].[dbo].[TblObject](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
-  , [FldId8]                                    [char](16)                      NULL
+  , [FldId8]                                    [char](8)                       NULL
   , [FldOrder]                                  [int]                           NULL
   , [FldRev]                                    [int]                           NULL
   , [FldCreated]                                [datetime]                      NULL
@@ -954,7 +937,7 @@ GO
 CREATE TABLE [DbaCode].[dbo].[TblObject2](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
-  , [FldId8]                                    [nvarchar](16)                  NULL
+  , [FldId8]                                    [char](8)                       NULL
   , [FldOrder]                                  [int]                           NULL
   , [FldRev]                                    [int]                           NULL
   , [FldCreated]                                [datetime]                      NULL
@@ -1581,6 +1564,7 @@ CREATE TABLE [DbaDatabase].[dbo].[TblField](
   , [FldDatabase]                               [varchar](64)               NOT NULL
   , [FldTable]                                  [varchar](64)               NOT NULL
   , [FldField]                                  [varchar](64)               NOT NULL
+  , [FldField2]                                 [varchar](64)                   NULL
   , [FldState]                                  [varchar](16)                   NULL
   , [FldKind]                                   [varchar](8)                    NULL
   , [FldType]                                   [varchar](64)                   NULL
@@ -1590,7 +1574,10 @@ CREATE TABLE [DbaDatabase].[dbo].[TblField](
   , [FldIsForeignKey]                           [bit]                           NULL -- redundant with TblIndex
   , [FldOrder]                                  [int]                           NULL
   , [FldDescription]                            [varchar](256)                  NULL
+  , [FldDescription2]                           [varchar](256)                  NULL
   , [FldNote]                                   [varchar](1024)                 NULL
+  , [FldWho]                                    [varchar](16)                   NULL
+  , [FldWhen]                                   [datetime]                      NULL
 ) ON [PRIMARY]
 GO
 
@@ -1628,18 +1615,21 @@ CREATE TABLE [DbaDatabase].[dbo].[TblTable](
     [FldSystem]                                 [varchar](16)                   NULL
   , [FldDatabase]                               [varchar](64)               NOT NULL
   , [FldTable]                                  [varchar](64)               NOT NULL
+  , [FldTable2]                                 [varchar](64)                   NULL
   , [FldState]                                  [varchar](16)                   NULL
   , [FldKind]                                   [varchar](8)                    NULL
+  , [FldDescription]                            [varchar](512)                  NULL
+  , [FldDescription2]                           [varchar](512)                  NULL
+  , [FldPrimaryKey]                             [varchar](128)                  NULL
+  , [FldForeignKey]                             [varchar](128)                  NULL
   , [FldRows]                                   [bigint]                        NULL
-  , [FldDescription]                            [varchar](1024)                 NULL
-  , [FldDescription2]                           [varchar](1024)                 NULL
-  , [FldPrimaryKey]                             [varchar](1024)                 NULL
-  , [FldForeignKey]                             [varchar](1024)                 NULL
-  , [FldNote]                                   [varchar](1024)                 NULL
   , [FldSizeMb]                                 [float]                         NULL
   , [FldRecordOldest]                           [datetime]                      NULL
   , [FldRecordYoungest]                         [datetime]                      NULL
   , [FldFieldCount]                             [int]                           NULL
+  , [FldNote]                                   [varchar](512)                  NULL
+  , [FldWho]                                    [varchar](16)                   NULL
+  , [FldWhen]                                   [datetime]                      NULL
 ) ON [PRIMARY]
 GO
 
@@ -1760,7 +1750,7 @@ GO
 CREATE TABLE [DbaDocument].[dbo].[TblObject](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
-  , [FldId8]                                    [varchar](16)                   NULL
+  , [FldId8]                                    [char](8)                       NULL
   , [FldOrder]                                  [int]                           NULL
   , [FldRev]                                    [int]                           NULL
   , [FldCreated]                                [datetime]                      NULL
@@ -1848,7 +1838,7 @@ GO
 CREATE TABLE [DbaDocument].[dbo].[TblObject2](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
-  , [FldId8]                                    [varchar](50)                   NULL
+  , [FldId8]                                    [char](8)                       NULL
   , [FldOrder]                                  [int]                           NULL
   , [FldRev]                                    [int]                           NULL
   , [FldCreated]                                [datetime]                      NULL
@@ -2020,7 +2010,7 @@ GO
 CREATE TABLE [DbaEquipment].[dbo].[TblObject](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
-  , [FldId8]                                    [char](16)                      NULL
+  , [FldId8]                                    [char](8)                       NULL
   , [FldOrder]                                  [int]                           NULL
   , [FldRev]                                    [int]                           NULL
   , [FldCreated]                                [datetime]                      NULL
@@ -2398,7 +2388,7 @@ GO
 CREATE TABLE [DbaFile].[dbo].[TblObject](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
-  , [FldId8]                                    [char](16)                      NULL
+  , [FldId8]                                    [char](8)                       NULL
   , [FldOrder]                                  [int]                           NULL
   , [FldRev]                                    [int]                           NULL
   , [FldCreated]                                [datetime]                      NULL
@@ -2545,7 +2535,8 @@ CREATE TABLE [DbaForm].[dbo].[TblForm](
   , [FldUpdateSql]                              [varchar](max)                  NULL
   , [FldDeleteSql]                              [varchar](max)                  NULL
   , [FldLogo]                                   [varchar](512)                  NULL
-  , [FldRoute]                                  [varchar](32)                   NULL
+  , [FldDepartment]                             [varchar](32)                   NULL
+  , [FldRev]                                    [int]                           NULL
 ) ON [PRIMARY]
 GO
 
@@ -3312,7 +3303,7 @@ GO
 CREATE TABLE [DbaInvoice].[dbo].[TblObject](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
-  , [FldId8]                                    [char](16)                      NULL
+  , [FldId8]                                    [char](8)                       NULL
   , [FldOrder]                                  [int]                           NULL
   , [FldRev]                                    [int]                           NULL
   , [FldCreated]                                [datetime]                      NULL
@@ -3978,7 +3969,7 @@ GO
 CREATE TABLE [DbaMember].[dbo].[TblObject](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
-  , [FldId8]                                    [char](16)                      NULL
+  , [FldId8]                                    [char](8)                       NULL
   , [FldOrder]                                  [int]                           NULL
   , [FldRev]                                    [int]                           NULL
   , [FldCreated]                                [datetime]                      NULL
@@ -4427,7 +4418,7 @@ GO
 CREATE TABLE [DbaOrganization].[dbo].[TblObject](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
-  , [FldId8]                                    [char](16)                      NULL
+  , [FldId8]                                    [char](8)                       NULL
   , [FldOrder]                                  [int]                           NULL
   , [FldRev]                                    [int]                           NULL
   , [FldCreated]                                [datetime]                      NULL
@@ -4476,6 +4467,7 @@ GO
 CREATE TABLE [DbaOrganization].[dbo].[TblOrganization](
     [FldObjectId]                               [int]                           NULL
   , [FldWww]                                    [varchar](64)                   NULL
+  , [FldWwwAlt]                                 [varchar](64)                   NULL
   , [FldPhone]                                  [varchar](32)                   NULL
   , [FldEmail]                                  [varchar](64)                   NULL
   , [FldAbout]                                  [varchar](128)                  NULL
@@ -4586,6 +4578,7 @@ GO
 CREATE TABLE [DbaOrganization].[dbo].[TblTheme](
     [FldObjectId]                               [int]                       NOT NULL
   , [FldTheme]                                  [varchar](16)               NOT NULL
+  , [FldState]                                  [varchar](16)                   NULL
   , [FldGrade]                                  [varchar](32)                   NULL
   , [FldFontFamily]                             [varchar](64)                   NULL
   , [FldFontWeight]                             [varchar](16)                   NULL
@@ -4623,7 +4616,7 @@ GO
 CREATE TABLE [DbaPage].[dbo].[TblObject](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
-  , [FldId8]                                    [char](16)                      NULL
+  , [FldId8]                                    [char](8)                       NULL
   , [FldOrder]                                  [int]                           NULL
   , [FldRev]                                    [int]                           NULL
   , [FldCreated]                                [datetime]                      NULL
@@ -4693,6 +4686,8 @@ CREATE TABLE [DbaPage].[dbo].[TblPage](
   , [FldBottomSpace]                            [int]                           NULL
   , [FldLeftSpace]                              [int]                           NULL
   , [FldRightSpace]                             [int]                           NULL
+  , [FldClass]                                  [varchar](128)                  NULL
+  , [FldStyle]                                  [varchar](128)                  NULL
   , [FldAuthenticationNeeded]                   [bit]                           NULL
 ) ON [PRIMARY]
 GO
@@ -4931,7 +4926,7 @@ GO
 CREATE TABLE [DbaPerson].[dbo].[TblObject](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
-  , [FldId8]                                    [char](16)                      NULL
+  , [FldId8]                                    [char](8)                       NULL
   , [FldOrder]                                  [int]                           NULL
   , [FldRev]                                    [int]                           NULL
   , [FldCreated]                                [datetime]                      NULL
@@ -5221,8 +5216,6 @@ CREATE UNIQUE NONCLUSTERED INDEX [IX_TblVacationZzz] ON [DbaPerson].[dbo].[TblVa
     [FldId] ASC
 ) ON [PRIMARY]
 GO
-
-
 
 
 ------------------------------------------------------------------------------------ DbaPlace
@@ -5810,6 +5803,8 @@ CREATE TABLE [DbaReport].[dbo].[TblDataset](
   , [FldPanelClosed]                            [bit]                           NULL
   , [FldTimeoutSec]                             [int]                           NULL
   , [FldFeedbackIfEmpty]                        [varchar](2048)                 NULL
+  , [FldHeader]                                 [varchar](max)                  NULL
+  , [FldFooter]                                 [varchar](max)                  NULL
 ) ON [PRIMARY]
 GO
 
@@ -5835,7 +5830,7 @@ GO
 CREATE TABLE [DbaReport].[dbo].[TblObject](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
-  , [FldId8]                                    [char](16)                      NULL
+  , [FldId8]                                    [char](8)                       NULL
   , [FldOrder]                                  [int]                           NULL
   , [FldRev]                                    [int]                           NULL
   , [FldCreated]                                [datetime]                      NULL
@@ -7018,7 +7013,7 @@ CREATE TABLE [DbaSystem].[dbo].[TblAudit](
   , [FldWhere]                                  [varchar](max)                  NULL
   , [FldQuery]                                  [varchar](max)                  NULL
   , [FldState]                                  [varchar](16)                   NULL
-  , [FldMesssage]                               [varchar](256)                  NULL
+  , [FldMessage]                                [varchar](256)                  NULL
   , [FldInMs]                                   [int]                           NULL
 ) ON [PRIMARY]
 GO
@@ -7089,7 +7084,7 @@ GO
 CREATE TABLE [DbaSystem].[dbo].[TblObject](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
-  , [FldId8]                                    [char](16)                      NULL
+  , [FldId8]                                    [char](8)                       NULL
   , [FldOrder]                                  [int]                           NULL
   , [FldRev]                                    [int]                           NULL
   , [FldCreated]                                [datetime]                      NULL
@@ -7162,20 +7157,16 @@ GO
 CREATE TABLE [DbaSystem].[dbo].[TblSource](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
-  , [FldOrder]                                  [int]                           NULL
+  , [FldSource]                                 [varchar](64)               NOT NULL
   , [FldKind]                                   [varchar](16)                   NULL
   , [FldState]                                  [varchar](16)                   NULL
-  , [FldOrganization]                           [varchar](32)                   NULL
+  , [FldEnv]                                    [varchar](16)                   NULL
+  , [FldServer]                                 [varchar](16)                   NULL
+  , [FldDescription]                            [varchar](64)                   NULL
+  , [FldConnStrADO]                             [varchar](max)                  NULL
+  , [FldConnStrFD]                              [varchar](max)                  NULL
+  , [FldUserCsv]                                [varchar](1024)                 NULL
   , [FldOwner]                                  [varchar](16)                   NULL
-  , [FldProxyCsv]                               [varchar](256)                  NULL
-  , [FldCreated]                                [datetime]                      NULL
-  , [FldUpdated]                                [datetime]                      NULL
-  , [FldExpire]                                 [datetime]                      NULL
-  , [FldSpare]                                  [varchar](max)                  NULL
-  , [FldCaption]                                [varchar](32)                   NULL
-  , [FldImage]                                  [image]                         NULL
-  , [FldSource]                                 [varchar](32)               NOT NULL
-  , [FldContent]                                [text]                          NULL
 ) ON [PRIMARY]
 GO
 
@@ -7187,11 +7178,13 @@ GO
 
 
 CREATE TABLE [DbaSystem].[dbo].[TblState](
-    [FldState]                                  [varchar](32)                   NULL
+    [FldState]                                  [varchar](32)               NOT NULL
   , [FldBgColor]                                [varchar](32)                   NULL
   , [FldFgColor]                                [varchar](32)                   NULL
   , [FldBorderColor]                            [varchar](32)                   NULL
   , [FldW3Color]                                [varchar](32)                   NULL
+  , [FldWho]                                    [varchar](16)                   NULL
+  , [FldWhen]                                   [datetime]                      NULL
 ) ON [PRIMARY]
 GO
 
@@ -7215,6 +7208,33 @@ CREATE TABLE [DbaSystem].[dbo].[TblUom](
 GO
 
 
+CREATE TABLE [DbaSystem].[dbo].[ZzzTblSource](
+    [FldId]                                     [int]                       NOT NULL
+  , [FldPId]                                    [int]                       NOT NULL
+  , [FldOrder]                                  [int]                           NULL
+  , [FldKind]                                   [varchar](16)                   NULL
+  , [FldState]                                  [varchar](16)                   NULL
+  , [FldOrganization]                           [varchar](32)                   NULL
+  , [FldOwner]                                  [varchar](16)                   NULL
+  , [FldProxyCsv]                               [varchar](256)                  NULL
+  , [FldCreated]                                [datetime]                      NULL
+  , [FldUpdated]                                [datetime]                      NULL
+  , [FldExpire]                                 [datetime]                      NULL
+  , [FldSpare]                                  [varchar](max)                  NULL
+  , [FldCaption]                                [varchar](32)                   NULL
+  , [FldImage]                                  [image]                         NULL
+  , [FldSource]                                 [varchar](32)               NOT NULL
+  , [FldContent]                                [text]                          NULL
+) ON [PRIMARY]
+GO
+
+
+CREATE UNIQUE NONCLUSTERED INDEX [IX_ZzzTblSource] ON [DbaSystem].[dbo].[ZzzTblSource](
+    [FldId] ASC
+) ON [PRIMARY]
+GO
+
+
 ------------------------------------------------------------------------------------ DbaTask
 USE [master]
 GO
@@ -7233,7 +7253,7 @@ GO
 CREATE TABLE [DbaTask].[dbo].[TblObject](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
-  , [FldId8]                                    [char](16)                      NULL
+  , [FldId8]                                    [char](8)                       NULL
   , [FldOrder]                                  [int]                           NULL
   , [FldRev]                                    [int]                           NULL
   , [FldCreated]                                [datetime]                      NULL
@@ -7577,43 +7597,6 @@ GO
 
 
 USE [DbaUser]
-GO
-
-
-CREATE TABLE [DbaUser].[dbo].[TblObject](
-    [FldId]                                     [int]                       NOT NULL
-  , [FldPId]                                    [int]                       NOT NULL
-  , [FldOrder]                                  [int]                           NULL
-  , [FldOrganization]                           [varchar](32)                   NULL
-  , [FldArea]                                   [varchar](32)                   NULL
-  , [FldOwner]                                  [varchar](32)                   NULL
-  , [FldProxyCsv]                               [varchar](256)                  NULL
-  , [FldRoute]                                  [varchar](64)                   NULL
-  , [FldCreated]                                [datetime]                      NULL
-  , [FldUpdated]                                [datetime]                      NULL
-  , [FldExpire]                                 [datetime]                      NULL
-  , [FldKind]                                   [varchar](16)                   NULL
-  , [FldState]                                  [varchar](16)                   NULL
-  , [FldTitle]                                  [varchar](256)                  NULL
-  , [FldSubtitle]                               [varchar](256)                  NULL
-  , [FldCaption]                                [varchar](64)                   NULL
-  , [FldDescription]                            [varchar](256)                  NULL
-  , [FldSpare]                                  [varchar](256)                  NULL
-  , [FldEncrypted]                              [bit]                           NULL
-  , [FldPersist]                                [bit]                           NULL
-  , [FldMarkdown]                               [bit]                           NULL
-  , [FldImage]                                  [image]                         NULL
-  , [FldContent]                                [varchar](max)                  NULL
-  , [FldJson]                                   [varchar](max)                  NULL
-  , [FldNote]                                   [varchar](max)                  NULL
-  , [FldObject]                                 [varchar](64)               NOT NULL
-) ON [PRIMARY]
-GO
-
-
-CREATE UNIQUE NONCLUSTERED INDEX [IX_TblObject] ON [DbaUser].[dbo].[TblObject](
-    [FldId] ASC
-) ON [PRIMARY]
 GO
 
 
@@ -8277,7 +8260,7 @@ GO
 CREATE TABLE [DbaXxx].[dbo].[TblObject](
     [FldId]                                     [int]                       NOT NULL
   , [FldPId]                                    [int]                       NOT NULL
-  , [FldId8]                                    [char](16)                      NULL
+  , [FldId8]                                    [char](8)                       NULL
   , [FldOrder]                                  [int]                           NULL
   , [FldRev]                                    [int]                           NULL
   , [FldCreated]                                [datetime]                      NULL
@@ -8347,10 +8330,14 @@ GO
 
 CREATE TABLE [DbaXxx].[dbo].[TblXxx](
     [FldObjectId]                               [int]                       NOT NULL
-  , [FldId]                                     [int]                           NULL
-  , [FldPId]                                    [int]                           NULL
-  , [FldValue1]                                 [varchar](32)                   NULL
-  , [FldValue2]                                 [varchar](32)                   NULL
+  , [FldLocalId]                                [int]                           NULL
+  , [FldLocalPId]                               [int]                           NULL
+  , [FldText]                                   [varchar](32)                   NULL
+  , [FldSelect1]                                [varchar](32)                   NULL
+  , [FldSelect2]                                [varchar](32)                   NULL
+  , [FldSelect3]                                [varchar](32)                   NULL
+  , [FldMemo]                                   [varchar](max)                  NULL
+  , [FldSql]                                    [varchar](max)                  NULL
 ) ON [PRIMARY]
 GO
 

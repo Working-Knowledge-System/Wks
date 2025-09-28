@@ -39,6 +39,8 @@ type
     SerieDataSetProvider: TDataSetProvider;
     DatasetDataSource: TDataSource;
     ChartDataSource: TDataSource;
+    GlobalADOTable: TADOTable;
+    GlobalDataSetProvider: TDataSetProvider;
     procedure SoapDataModuleCreate(Sender: TObject);
   private
     { Private declarations }

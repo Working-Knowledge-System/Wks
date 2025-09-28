@@ -1,14 +1,14 @@
 object SystemMainDataModule: TSystemMainDataModule
   OnCreate = SoapDataModuleCreate
-  Height = 251
+  Height = 472
   Width = 1469
   object SystemADOConnection: TADOConnection
     ConnectionString = 
-      'Provider=SQLOLEDB.1;Password=secret@123;Persist Security Info=Tr' +
-      'ue;User ID=sa;Initial Catalog=DbaSystem;Data Source=LOCALHOST'
+      'Provider=MSOLEDBSQL.1;Password=secret@123;Persist Security Info=' +
+      'True;User ID=sa;Initial Catalog=DbaSystem;Data Source=LOCALHOST'
     DefaultDatabase = 'DbaSystem'
     LoginPrompt = False
-    Provider = 'SQLOLEDB.1'
+    Provider = 'MSOLEDBSQL.1'
     Left = 80
     Top = 40
   end
@@ -71,7 +71,7 @@ object SystemMainDataModule: TSystemMainDataModule
       '  , FldWhere'
       '  , FldQuery'
       '  , FldState'
-      '  , FldMesssage'
+      '  , FldMessage'
       '  , FldInMs'
       'from'
       '    DbaSystem.dbo.TblAudit'
@@ -133,5 +133,16 @@ object SystemMainDataModule: TSystemMainDataModule
     DataSet = RequirementsADOTable
     Left = 1336
     Top = 152
+  end
+  object SourceDataSetProvider: TDataSetProvider
+    DataSet = SourceADOTable
+    Left = 240
+    Top = 368
+  end
+  object SourceADOTable: TADOTable
+    Connection = SystemADOConnection
+    TableName = 'TblSource'
+    Left = 240
+    Top = 256
   end
 end

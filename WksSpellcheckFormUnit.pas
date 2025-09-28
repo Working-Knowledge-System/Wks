@@ -5,11 +5,11 @@ interface
 {$REGION 'Use'}
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls, Vcl.ToolWin,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls, Vcl.ToolWin, Vcl.Buttons,
   System.Actions, Vcl.ActnList, System.ImageList, Vcl.ImgList, Vcl.ExtCtrls
   , System.Generics.Collections
   , Winapi.ActiveX
-  , MsSpellCheckLib_TLB, Vcl.Buttons
+  , MsSpellCheckLib_TLB
   ;
 {$ENDREGION}
 

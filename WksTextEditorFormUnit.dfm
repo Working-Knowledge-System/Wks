@@ -413,7 +413,7 @@ object TextEditorForm: TTextEditorForm
           ParentColor = True
           TabOrder = 0
           object OptionGeneralJvScrollMaxBand: TJvScrollMaxBand
-            Width = 206
+            Width = 0
             Height = 195
             Caption = 'General'
             ExpandedHeight = 195
@@ -427,27 +427,25 @@ object TextEditorForm: TTextEditorForm
               AlignWithMargins = True
               Left = 19
               Top = 30
-              Width = 168
+              Width = 89
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Default Directory'
               OnClick = OptionDirDefaultLabelClick
-              ExplicitWidth = 89
             end
             object OptionTabWidthLabel: TLabel
               AlignWithMargins = True
               Left = 19
               Top = 80
-              Width = 168
+              Width = 51
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Tab width'
               OnClick = OptionDirDefaultLabelClick
-              ExplicitWidth = 51
             end
             object OptionDirDefaultEdit: TEdit
               AlignWithMargins = True
@@ -502,7 +500,7 @@ object TextEditorForm: TTextEditorForm
             end
           end
           object OptionPythonJvScrollMaxBand: TJvScrollMaxBand
-            Width = 206
+            Width = 0
             Height = 148
             Caption = 'Python'
             ExpandedHeight = 148
@@ -516,13 +514,12 @@ object TextEditorForm: TTextEditorForm
               AlignWithMargins = True
               Left = 19
               Top = 30
-              Width = 168
+              Width = 41
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Version:'
-              ExplicitWidth = 41
             end
             object OptionPythonEngineRecycleSpeedButton: TSpeedButton
               AlignWithMargins = True
@@ -626,7 +623,7 @@ object TextEditorForm: TTextEditorForm
       ExplicitWidth = 1342
       inherited LogPageControl: TPageControl
         Width = 1342
-        ExplicitWidth = 1342
+        ExplicitWidth = 618
         inherited OutputTabSheet: TTabSheet
           ExplicitWidth = 1334
           inherited OutputRichEdit: TRichEdit

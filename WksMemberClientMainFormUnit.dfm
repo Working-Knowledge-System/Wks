@@ -2,7 +2,6 @@ inherited MemberMainForm: TMemberMainForm
   Cursor = crHandPoint
   Caption = 'MemberMainForm'
   StyleElements = [seFont, seClient, seBorder]
-  ExplicitLeft = -1086
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
     ExplicitHeight = 696
@@ -136,7 +135,6 @@ inherited MemberMainForm: TMemberMainForm
     inherited LeftPageControl: TPageControl
       inherited ObjectTreeTabSheet: TTabSheet
         inherited ObjectNodeInfoLabel: TLabel
-          Width = 292
           StyleElements = [seFont, seClient, seBorder]
         end
         inherited ObjectDBNavigator: TDBNavigator
@@ -368,9 +366,6 @@ inherited MemberMainForm: TMemberMainForm
             end
             inherited ObjectImageClearLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectImageDBImage: TDBImage
-              Height = 0
             end
           end
           inherited ObjectTypeJvScrollMaxBand: TJvScrollMaxBand
@@ -1243,45 +1238,12 @@ inherited MemberMainForm: TMemberMainForm
   inherited MainPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited MainPageControl: TPageControl
-      inherited ObjectContentPrevTabSheet: TTabSheet
-        inherited ObjectContentPrevTopPanel: TPanel
-          inherited ObjectContentPrevCharCountLabel: TLabel
-            Height = 22
-          end
-        end
-      end
       inherited ObjectContentTabSheet: TTabSheet
         inherited ObjectContentSplitter: TSplitter
           ExplicitHeight = 536
         end
-        inherited ObjectContentTopPanel: TPanel
-          inherited ObjectContentCharCountLabel: TLabel
-            Height = 22
-          end
-        end
         inherited ObjectContentSplitView: TSplitView
           DoubleBuffered = True
-        end
-      end
-      inherited ObjectDataTabSheet: TTabSheet
-        inherited ObjectDataTopPanel: TPanel
-          inherited ObjectDataCharCountLabel: TLabel
-            Height = 22
-          end
-        end
-      end
-      inherited ObjectNoteTabSheet: TTabSheet
-        inherited ObjectNoteTopPanel: TPanel
-          inherited ObjectNoteCharCountLabel: TLabel
-            Height = 22
-          end
-        end
-      end
-      inherited FilesRioTabSheet: TTabSheet
-        inherited FilesRioTopPanel: TPanel
-          inherited FilesRioInfoLabel: TLabel
-            Height = 31
-          end
         end
       end
     end

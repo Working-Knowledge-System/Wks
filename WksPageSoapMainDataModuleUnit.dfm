@@ -4,11 +4,11 @@ object PageMainDataModule: TPageMainDataModule
   Width = 540
   object PageADOConnection: TADOConnection
     ConnectionString = 
-      'Provider=SQLOLEDB.1;Password=secret@123;Persist Security Info=Tr' +
-      'ue;User ID=sa;Initial Catalog=DbaPage;Data Source=LOCALHOST'
+      'Provider=MSOLEDBSQL.1;Password=secret@123;Persist Security Info=' +
+      'True;User ID=sa;Initial Catalog=DbaPage;Data Source=LOCALHOST'
     DefaultDatabase = 'DbaPage'
     LoginPrompt = False
-    Provider = 'SQLOLEDB.1'
+    Provider = 'MSOLEDBSQL.1'
     Left = 80
     Top = 40
   end

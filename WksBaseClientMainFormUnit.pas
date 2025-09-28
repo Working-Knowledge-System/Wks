@@ -110,6 +110,7 @@ uses
   , JvComponentBase
   , JvNavigationPane
   , VirtualTrees
+//, VirtualTrees.Types
   , DTClientTree
   , DTDBTreeView
   , PythonEngine
@@ -870,6 +871,7 @@ begin
             prv := (cmp as TClientDataSet).ProviderName;
             if not prv.IsEmpty then
               if TStrRec.StrHas(csv, prv) then begin
+                // *** I think here a remote provider name might be set ***
                 (cmp as TClientDataSet).Open;
               Inc(z)
             end;
@@ -1211,15 +1213,18 @@ var
   htm: string;
 begin
     htm := THtmRec.Page(
-      TStrRec.StrCoalesce([ObjectTitleDBEdit.Text, ObjectDBEdit.Text], '')
-    , ObjectSubTitleDBEdit.Text
-    , ObjectContentDBSynEdit.Text
-    , ObjectContentKindDBComboBox.Text
-    , true
-    , true
-    , true
-    , true
-    , true
+      TStrRec.StrCoalesce([ObjectTitleDBEdit.Text, ObjectDBEdit.Text], '') // title
+    , ObjectSubTitleDBEdit.Text                                            // subtitle
+    , ObjectContentDBSynEdit.Text                                          // content
+    , ObjectContentKindDBComboBox.Text                                     // contentkind
+    , ''                                                                   // class
+    , ''                                                                   // style
+    , true                                                                 // titleshow
+    , true                                                                 // imageshow
+    , true                                                                 // subtitleshow
+    , true                                                                 // topnavoff
+    , true                                                                 // systeminfooff
+    , false                                                                // urlabsolute
     );
 
     // navigate
@@ -1326,46 +1331,46 @@ begin
   FIdGui := FId;
 
   // option (common)
-  OptionCryptoKeyEdit.Text                         := gini.CryGet( 'Common/OptionCryptoKey'                  , '12345'                    );
-  OptionPersistRootFolderEdit.Text                 := gini.StrGet( 'Common/OptionPersistRootFolder'          , 'C:\$Persist'              );
-  OptionTempFolderEdit.Text                        := gini.StrGet( 'Common/OptionTempFolder'                 , 'C:\$Tmp'                  );
-  OptionWeekWorkOneStartJvDateTimePicker.DateTime  := gini.FloGet( 'Common/OptionWeekWorkOneStart'           , IncHour(Date(), 19)        ); OptionWeekWorkOneStartJvDateTimePickerChange(nil);
+  OptionCryptoKeyEdit.Text                          := gini.CryGet('Common/OptionCryptoKey'                   , '12345'                    );
+  OptionPersistRootFolderEdit.Text                  := gini.StrGet('Common/OptionPersistRootFolder'           , 'C:\$\Persist'             );
+  OptionTempFolderEdit.Text                         := gini.StrGet('Common/OptionTempFolder'                  , 'C:\$\Temp'                );
+  OptionWeekWorkOneStartJvDateTimePicker.DateTime   := gini.FloGet('Common/OptionWeekWorkOneStart'            , IncHour(Date(), 19)        ); OptionWeekWorkOneStartJvDateTimePickerChange(nil);
 
   // optionfiles (common)
-  OptionFilesShowOnlyMyFilesCheckBox.Checked        := gini.BooGet(  'File/OptionFilesShowOnlyMyFiles'       , true                       );
-  OptionFilesLocalFileOverrideAskCheckBox.Checked   := gini.BooGet(  'File/OptionFilesLocalFileOverrideAsk'  , true                       );
-  OptionFilesReadOnlyDownloadedFileCheckBox.Checked := gini.BooGet(  'File/OptionFilesReadOnlyDownloadedFile', true                       );
-  OptionFilesOpenAfterChechOutCheckBox.Checked      := gini.BooGet(  'File/OptionFilesOpenAfterChechOut'     , true                       );
-  OptionFilesDeleteAfterUploadCheckBox.Checked      := gini.BooGet(  'File/OptionFilesDeleteAfterUpload'     , true                       );
-  OptionFilesBackupBeforeCheckInCheckBox.Checked    := gini.BooGet(  'File/OptionFilesBackupBeforeCheckIn'   , true                       );
-  OptionFilesWorkingFolderUseCheckBox.Checked       := gini.BooGet(  'File/OptionFilesWorkingFolderUse'      , true                       );
-  OptionFilesWorkingFolderSelectButtonedEdit.Text   := gini.StrGet(  'File/OptionFilesWorkingFolderSelect'   , FILE_WORKING_FOLDER_DEFAULT);
-  OptionFilesOnDoubleClickComboBox.ItemIndex        := gini.IntGet(  'File/OptionFilesOnDoubleClick'         , 0                          );
+  OptionFilesShowOnlyMyFilesCheckBox.Checked        := gini.BooGet('File/OptionFilesShowOnlyMyFiles'          , true                       );
+  OptionFilesLocalFileOverrideAskCheckBox.Checked   := gini.BooGet('File/OptionFilesLocalFileOverrideAsk'     , true                       );
+  OptionFilesReadOnlyDownloadedFileCheckBox.Checked := gini.BooGet('File/OptionFilesReadOnlyDownloadedFile'   , true                       );
+  OptionFilesOpenAfterChechOutCheckBox.Checked      := gini.BooGet('File/OptionFilesOpenAfterChechOut'        , true                       );
+  OptionFilesDeleteAfterUploadCheckBox.Checked      := gini.BooGet('File/OptionFilesDeleteAfterUpload'        , true                       );
+  OptionFilesBackupBeforeCheckInCheckBox.Checked    := gini.BooGet('File/OptionFilesBackupBeforeCheckIn'      , true                       );
+  OptionFilesWorkingFolderUseCheckBox.Checked       := gini.BooGet('File/OptionFilesWorkingFolderUse'         , true                       );
+  OptionFilesWorkingFolderSelectButtonedEdit.Text   := gini.StrGet('File/OptionFilesWorkingFolderSelect'      , FILE_WORKING_FOLDER_DEFAULT);
+  OptionFilesOnDoubleClickComboBox.ItemIndex        := gini.IntGet('File/OptionFilesOnDoubleClick'            , 0                          );
 
   // optiongeneral (by obj)
-  OptionStateDefaultComboBox.ItemIndex             := gini.IntGet(FObj + '/OptionStateDefaul'                , 0                          );
-  OptionFontSizeJvSpinEdit.Value                   := gini.FloGet(FObj + '/OptionFontSize'                   , 10                         ); OptionFontSizeJvSpinEditChange(nil);
-  OptionTabWidthJvSpinEdit.Value                   := gini.FloGet(FObj + '/OptionTabWidth'                   , 2                          ); OptionTabWidthJvSpinEditChange(nil);
-  OptionAutoRunCheckBox.Checked                    := gini.BooGet(FObj + '/OptionAutoRun'                    , false                      );
-  OptionAutoLoginCheckBox.Checked                  := gini.BooGet(FObj + '/OptionAutoLogin'                  , false                      );
-  OptionAutoHideCheckBox.Checked                   := gini.BooGet(FObj + '/OptionAutoHide'                   , false                      );
-  OptionAutoRefreshCheckBox.Checked                := gini.BooGet(FObj + '/OptionAutoRefresh'                , false                      );
-  OptionShowInTrayCheckBox.Checked                 := gini.BooGet(FObj + '/OptionShowInTray'                 , true                       );
-  OptionMessageBeforeHideCheckBox.Checked          := gini.BooGet(FObj + '/OptionMessageBeforeHide'          , true                       );
-  OptionPasswordOnMaximizeCheckBox.Checked         := gini.BooGet(FObj + '/OptionPasswordOnMaximize'         , false                      );
-  OptionBackupOnExitCheckBox.Checked               := gini.BooGet(FObj + '/OptionBackupOnExit'               , false                      );
-  OptionAlwaysOnTopCheckBox.Checked                := gini.BooGet(FObj + '/OptionAlwaysOnTop'                , false                      );
-  OptionCommentRemoveCheckBox.Checked              := gini.BooGet(FObj + '/OptionCommentRemove'              , true                       );
-  OptionVerboseCheckBox.Checked                    := gini.BooGet(FObj + '/OptionVerbose'                    , false                      );
+  OptionStateDefaultComboBox.ItemIndex           := gini.IntGet(FObj + '/OptionStateDefaul'                   , 0                          );
+  OptionFontSizeJvSpinEdit.Value                 := gini.FloGet(FObj + '/OptionFontSize'                      , 10                         ); OptionFontSizeJvSpinEditChange(nil);
+  OptionTabWidthJvSpinEdit.Value                 := gini.FloGet(FObj + '/OptionTabWidth'                      , 2                          ); OptionTabWidthJvSpinEditChange(nil);
+  OptionAutoRunCheckBox.Checked                  := gini.BooGet(FObj + '/OptionAutoRun'                       , false                      );
+  OptionAutoLoginCheckBox.Checked                := gini.BooGet(FObj + '/OptionAutoLogin'                     , false                      );
+  OptionAutoHideCheckBox.Checked                 := gini.BooGet(FObj + '/OptionAutoHide'                      , false                      );
+  OptionAutoRefreshCheckBox.Checked              := gini.BooGet(FObj + '/OptionAutoRefresh'                   , false                      );
+  OptionShowInTrayCheckBox.Checked               := gini.BooGet(FObj + '/OptionShowInTray'                    , true                       );
+  OptionMessageBeforeHideCheckBox.Checked        := gini.BooGet(FObj + '/OptionMessageBeforeHide'             , true                       );
+  OptionPasswordOnMaximizeCheckBox.Checked       := gini.BooGet(FObj + '/OptionPasswordOnMaximize'            , false                      );
+  OptionBackupOnExitCheckBox.Checked             := gini.BooGet(FObj + '/OptionBackupOnExit'                  , false                      );
+  OptionAlwaysOnTopCheckBox.Checked              := gini.BooGet(FObj + '/OptionAlwaysOnTop'                   , false                      );
+  OptionCommentRemoveCheckBox.Checked            := gini.BooGet(FObj + '/OptionCommentRemove'                 , true                       );
+  OptionVerboseCheckBox.Checked                  := gini.BooGet(FObj + '/OptionVerbose'                       , false                      );
 
   // optionshow (by obj)
-  OptionTextBoxInfoShowCheckBox.Checked            := gini.BooGet(FObj + '/OptionTextBoxInfoShow'            , true                       );
-  OptionFoldingLineShowCheckBox.Checked            := gini.BooGet(FObj + '/OptionFoldingLineShow'            , false                      );
+  OptionTextBoxInfoShowCheckBox.Checked          := gini.BooGet(FObj + '/OptionTextBoxInfoShow'               , true                       );
+  OptionFoldingLineShowCheckBox.Checked          := gini.BooGet(FObj + '/OptionFoldingLineShow'               , false                      );
 
   // searchreplace (by obj)
-  SearchInContentCheckBox.Checked                  := gini.BooGet(FObj + '/SearchInContent'                  , true                       );
-  SearchInDataCheckBox.Checked                     := gini.BooGet(FObj + '/SearchInData'                     , false                      );
-  SearchInNoteCheckBox.Checked                     := gini.BooGet(FObj + '/SearchInNote'                     , false                      );
+  SearchInContentCheckBox.Checked                := gini.BooGet(FObj + '/SearchInContent'                     , true                       );
+  SearchInDataCheckBox.Checked                   := gini.BooGet(FObj + '/SearchInData'                        , false                      );
+  SearchInNoteCheckBox.Checked                   := gini.BooGet(FObj + '/SearchInNote'                        , false                      );
   {$ENDREGION}
 
   {$REGION 'proxy'}
@@ -1424,7 +1429,7 @@ begin
   TPicRec.PicFromGraphic(OrganizationLogoImage.Picture, gorg.LogoGraphic, 44);
   OrganizationLogoImage.Hint            := gorg.Slogan;
   OrganizationOrganizationLabel.Caption := gorg.Obj.&Object;
-  OrganizationNameLabel.Caption         := gorg.Www;
+  OrganizationNameLabel.Caption         := gorg.Www; // '(' + gorg.Www + ')'
   {$ENDREGION}
 
   {$REGION 'objtree'}
@@ -1490,7 +1495,7 @@ begin
   {$ENDREGION}
 
   {$REGION 'clock'}
-  TimerJvClock.Enabled       := true;
+  TimerJvClock.Enabled := true;
   {$ENDREGION}
 
   {$REGION 'timer'}
@@ -1510,19 +1515,23 @@ begin
     {$REGION 'object (common/fixed)'}
   // objectkind
   ObjectKindDBComboBox.Items.Add('');
-  for str in TObjRec.ObjKindVector do ObjectKindDBComboBox.Items.Add(str);
+  for str in TObjRec.ObjKindVector do
+    ObjectKindDBComboBox.Items.Add(str);
 
   // contentkind
   ObjectContentKindDBComboBox.Items.Add('');
-  for coi in TCodRec.Vector do ObjectContentKindDBComboBox.Items.Add(coi.Kind);
+  for coi in TCodRec.Vector do
+    ObjectContentKindDBComboBox.Items.Add(coi.Kind);
 
   // datakind
   ObjectDataKindDBComboBox.Items.Add('');
-  for coi in TCodRec.Vector do ObjectDataKindDBComboBox.Items.Add(coi.Kind); // *** TO BE UPDATED ***
+  for coi in TCodRec.Vector do
+    ObjectDataKindDBComboBox.Items.Add(coi.Kind); // *** TO BE UPDATED ***
 
   // state
   ObjectStateDBComboBox.Items.Add('');
-  for sti in TStaRec.Vector do ObjectStateDBComboBox.Items.Add(sti.Name);
+  for sti in TStaRec.Vector do
+    ObjectStateDBComboBox.Items.Add(sti.Name);
     {$ENDREGION}
 
     {$REGION 'xxx (specific/variable)'}
@@ -2559,7 +2568,7 @@ begin
   end else
     ObjectDescriptionShowSpeedButton.Caption := '+';
 end;
-{$ENDREGION}
+  {$ENDREGION}
 
   {$REGION 'Data'}
 procedure TBaseMainForm.ObjectDataDBSynEditChange(Sender: TObject);

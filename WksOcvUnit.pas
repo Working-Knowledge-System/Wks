@@ -61,9 +61,6 @@ uses
   , Vcl.Graphics
 //, WksBoxPlotCtrlUnit
 //, WksAllUnit
-  , YmsAllUnit
-  , YmsFbkUnit
-  , YmsFsUnit
 ;
 {$ENDREGION}
 
@@ -4574,7 +4571,7 @@ end;
 
 {$REGION 'Zzz'}
 (*
-procedure YmsOcvRecipe(IvDevice, IvFailBin, IvStrategy: string; var IvRecipe: string; var IvFbk: string);
+procedure WksOcvRecipe(IvDevice, IvFailBin, IvStrategy: string; var IvRecipe: string; var IvFbk: string);
 var
   q, f: string;
   d: TDataSet;
@@ -4589,7 +4586,7 @@ begin
   + sLineBreak + ' and FldStrategy = ''%s'''
   , [IvDevice, IvFailBin, IvStrategy]
   );
-//  d := FDba.Ds(YmsDbaAiwymsdbAdoConn, q, f); // 31-Agosto-2020
+//  d := FDba.Ds(WksDbaAdoConn, q, f);
   try
     if d.IsEmpty then begin
       IvRecipe := '';

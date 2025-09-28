@@ -34,7 +34,7 @@ type
     function  SystemUserIsAuthenticatedSoap (const IvUsername, IvPassword: string; var IvFbk: string): boolean; stdcall;
     function  SystemUserInitSoap            (const IvUsername: string; var IvUserRem: TUsrRem; var IvFbk: string): boolean; stdcall;
     // organization/theme methods
-    function  SystemOrganizationInitSoap    (const IvOrganization: string; var IvOrganizationRem: TOrgRem; var IvFbk: string): boolean; stdcall;
+    function  SystemOrganizationInitSoap    (const IvOrganization, IvWww: string; var IvOrganizationRem: TOrgRem; var IvFbk: string): boolean; stdcall;
     function  SystemThemeInitSoap           (const IvOrganizationId: integer; var IvThemeRem: TTheRem; var IvFbk: string): boolean; stdcall;
     // member methods
     function  SystemMemberInitSoap          (const IvOrganization, IvUsername: string; var IvMemberRem: TMbrRem; IvFbk: string): boolean; stdcall;
@@ -309,7 +309,7 @@ end;
   {$ENDREGION}
 
   {$REGION 'Organization/Theme'}
-function  TSystemSoapMainService.SystemOrganizationInitSoap(const IvOrganization: string; var IvOrganizationRem: TOrgRem; var IvFbk: string): boolean; // [B]
+function  TSystemSoapMainService.SystemOrganizationInitSoap(const IvOrganization, IvWww: string; var IvOrganizationRem: TOrgRem; var IvFbk: string): boolean; // [B]
 var
   org: TOrgRec;
   obr: TObjRem;
@@ -323,7 +323,7 @@ begin
   end;
 
   // rec
-  Result := org.InitDba(IvOrganization, IvFbk);
+  Result := org.InitDba(IvOrganization, IvWww, IvFbk);
 
   // rem
   if not Assigned(IvOrganizationRem) then
@@ -341,6 +341,7 @@ begin
   // detail
   IvOrganizationRem.ObjectId      := org.ObjectId;
   IvOrganizationRem.Www           := org.Www;
+  IvOrganizationRem.WwwAlt        := org.WwwAlt;
   IvOrganizationRem.Phone         := org.Phone;
   IvOrganizationRem.Email         := org.Email;
   IvOrganizationRem.About         := org.About;
@@ -371,6 +372,7 @@ begin
   // detail
   IvThemeRem.ObjectId           := the.ObjectId          ;
   IvThemeRem.Theme              := the.Theme             ;
+  IvThemeRem.State              := the.State             ;
   IvThemeRem.Grade              := the.Grade             ;
   IvThemeRem.FontFamily         := the.FontFamily        ; // Inconsolata, Consolas, Verdana, ...
   IvThemeRem.FontWeight         := the.FontWeight        ; // 500..900
@@ -716,18 +718,21 @@ begin
   + sLineBreak + '  + ''     ''''Wks''''          as FldSystem'''
   + sLineBreak + '  + ''   , '''''' + @d + '''''' as FldDatabase'''
   + sLineBreak + '  + ''   , table_name           as FldTable'''
+  + sLineBreak + '  + ''   , null                 as FldTable2'''
   + sLineBreak + '  + ''   , ''''Active''''       as FldState'''
   + sLineBreak + '  + ''   , null                 as FldKind'''
-  + sLineBreak + '  + ''   , null                 as FldRows'''
   + sLineBreak + '  + ''   , null                 as FldDescription'''
   + sLineBreak + '  + ''   , null                 as FldDescription2'''
   + sLineBreak + '  + ''   , null                 as FldPrimaryKey'''
   + sLineBreak + '  + ''   , null                 as FldForeignKey'''
-  + sLineBreak + '  + ''   , null                 as FldNote'''
+  + sLineBreak + '  + ''   , null                 as FldRows'''
   + sLineBreak + '  + ''   , null                 as FldSizeMb'''
   + sLineBreak + '  + ''   , null                 as FldRecordOldest'''
   + sLineBreak + '  + ''   , null                 as FldRecordYoungest'''
   + sLineBreak + '  + ''   , null                 as FldFieldCount'''
+  + sLineBreak + '  + ''   , null                 as FldNote'''
+  + sLineBreak + '  + ''   , null                 as FldWho'''
+  + sLineBreak + '  + ''   , null                 as FldWhen'''
   + sLineBreak + '  + '' from'''
   + sLineBreak + '  + ''     information_schema.tables'''
   + sLineBreak + '  + '' order by'''
@@ -744,6 +749,7 @@ begin
   + sLineBreak + '  + ''   , table_catalog                                         as FldDatabase'''
   + sLineBreak + '  + ''   , table_name                                            as FldTable'''
   + sLineBreak + '  + ''   , column_name                                           as FldField'''
+  + sLineBreak + '  + ''   , null                                                  as FldField2'''
   + sLineBreak + '  + ''   , ''''Active''''                                        as FldState'''
   + sLineBreak + '  + ''   , null                                                  as FldKind'''
   + sLineBreak + '  + ''   , data_type                                             as FldType'''
@@ -753,7 +759,10 @@ begin
   + sLineBreak + '  + ''   , null                                                  as FldIsForeignKey'''
   + sLineBreak + '  + ''   , ordinal_position                                      as FldOrder'''
   + sLineBreak + '  + ''   , null                                                  as FldDescription'''
+  + sLineBreak + '  + ''   , null                                                  as FldDescription2'''
   + sLineBreak + '  + ''   , null                                                  as FldNote'''
+  + sLineBreak + '  + ''   , null                                                  as FldWho'''
+  + sLineBreak + '  + ''   , null                                                  as FldWhen'''
   + sLineBreak + '  + '' from'''
   + sLineBreak + '  + ''     information_schema.columns'''
   + sLineBreak + '  + '' where'''

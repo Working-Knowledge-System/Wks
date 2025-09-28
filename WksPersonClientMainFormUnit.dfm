@@ -1,36 +1,141 @@
 inherited PersonMainForm: TPersonMainForm
   Caption = 'PersonMainForm'
-  ClientHeight = 842
-  ClientWidth = 1580
+  StyleElements = [seFont, seClient, seBorder]
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
-    Height = 596
     ExplicitHeight = 606
   end
   inherited RightJvNetscapeSplitter: TJvNetscapeSplitter
-    Left = 1270
-    Height = 596
     ExplicitLeft = 871
     ExplicitHeight = 606
   end
   inherited BottomJvNetscapeSplitter: TJvNetscapeSplitter
-    Top = 670
-    Width = 1580
     ExplicitTop = 689
     ExplicitWidth = 1184
   end
   inherited TopPanel: TPanel
-    Width = 1580
+    StyleElements = [seFont, seClient, seBorder]
     inherited TopPageControl: TPageControl
-      ExplicitWidth = 1160
+      inherited TopSearchTabSheet: TTabSheet
+        inherited SearchReplaceOutLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceInLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceSwapLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceOutEdit: TEdit
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceInEdit: TEdit
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+    end
+    inherited TopPageControl3: TPageControl
+      inherited TimeTabSheet: TTabSheet
+        inherited YearLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MonthLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited DayLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited TimerLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited WeekdayLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited WeekLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited TimerJvClock: TJvClock
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited PersonTabSheet: TTabSheet
+        inherited PersonNameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited PersonSurnameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited PersonSurnameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited PersonNameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited UserTabSheet: TTabSheet
+        inherited UserUsernameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited UserPasswordLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited UserPasswordLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited UserUsernameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited MemberTabSheet: TTabSheet
+        inherited MemberMemberLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MemberMemberLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MemberRoleLevelLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MemberRoleLevelLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited OrganizationTabSheet: TTabSheet
+        inherited OrganizationOrganizationLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited OrganizationNameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited OrganizationNameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited OrganizationOrganizationLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+    end
+    inherited TopPageControl2: TPageControl
+      inherited ObjectTabSheet: TTabSheet
+        inherited ObjectIdDBText: TDBText
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited ObjectKindDBText: TDBText
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited ObjectStateDBText: TDBText
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
     end
   end
   inherited LeftPanel: TPanel
-    Height = 596
+    StyleElements = [seFont, seClient, seBorder]
     inherited LeftPageControl: TPageControl
       inherited ObjectTreeTabSheet: TTabSheet
         inherited ObjectNodeInfoLabel: TLabel
           Width = 292
+          StyleElements = [seFont, seClient, seBorder]
         end
         inherited ObjectDBNavigator: TDBNavigator
           Hints.Strings = ()
@@ -39,16 +144,17 @@ inherited PersonMainForm: TPersonMainForm
     end
   end
   inherited BottomPanel: TPanel
-    Top = 680
-    Width = 1580
+    StyleElements = [seFont, seClient, seBorder]
     inherited LogFrame: TLogFrame
-      Width = 1580
       inherited LogPageControl: TPageControl
-        Width = 1580
         inherited OutputTabSheet: TTabSheet
-          ExplicitWidth = 1572
           inherited OutputRichEdit: TRichEdit
-            Width = 1570
+            StyleElements = [seFont, seClient, seBorder]
+          end
+        end
+        inherited LogTabSheet: TTabSheet
+          inherited LogRichEdit: TRichEdit
+            StyleElements = [seFont, seClient, seBorder]
           end
         end
         inherited SoapTabSheet: TTabSheet
@@ -74,23 +180,247 @@ inherited PersonMainForm: TPersonMainForm
                 Control = LogFrame.SoapResponseRichEdit
                 Row = 1
               end>
+            StyleElements = [seFont, seClient, seBorder]
+            inherited SoapResponseLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited SoapRequestRichEdit: TRichEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited SoapRequestLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited SoapResponseRichEdit: TRichEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+        end
+        inherited OptionTabSheet: TTabSheet
+          inherited OptionOutputLineWidthMaxLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited OptionOutputLinesMaxLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited OptionOutputLineWidthMaxEdit: TEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited OptionOutputLinesMaxEdit: TEdit
+            StyleElements = [seFont, seClient, seBorder]
           end
         end
       end
     end
   end
   inherited RightPanel: TPanel
-    Left = 1280
-    Height = 596
+    StyleElements = [seFont, seClient, seBorder]
     inherited RightPageControl: TPageControl
-      Height = 596
       inherited PropertyTabSheet: TTabSheet
-        ExplicitHeight = 566
         inherited ObjectJvScrollMax: TJvScrollMax
-          Height = 566
+          StyleElements = [seFont, seClient, seBorder]
+          inherited ObjectIdJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectOrderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectRevLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectPIdLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectIdLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectId8Label: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectOrderDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectPIdDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectRevDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectIdDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectId8DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectDateJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectCreatedLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectCreatedDBText: TDBText
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedDBText: TDBText
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedByDBText: TDBText
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedByLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectFromJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectFromOrganizationLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromMemberLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromTeamLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromAreaLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromDepartmentLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromOrganizationDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromMemberDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromTeamDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromAreaDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromDepartmentDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectToJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectToOrganizationLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToMemberLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToTeamLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToAreaLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToDepartmentLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectJobGradeMinLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectJobGradeCalculateLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToOrganizationDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToMemberDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToTeamDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToAreaDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToDepartmentDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectJobGradeMinDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectApprovalJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectRouteLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectRouteDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
           inherited ObjectImageJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectImageLoadLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageSaveLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageEditLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageFitLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageClearLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited ObjectImageDBImage: TDBImage
               Height = 0
+            end
+          end
+          inherited ObjectTypeJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectContentKindLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectKindLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDataKindLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectContentKindDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectKindDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDataKindDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectGeneralJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectStateLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSpareLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDescriptionLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectTitleLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSubtitleLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectStateDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSpareDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDescriptionDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectTitleDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSubtitleDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
             end
           end
           object PersonJvScrollMaxBand: TJvScrollMaxBand
@@ -692,35 +1022,131 @@ inherited PersonMainForm: TPersonMainForm
         end
       end
       inherited SearchTabSheet: TTabSheet
-        ExplicitHeight = 566
+        inherited SearchFilterPanel: TPanel
+          StyleElements = [seFont, seClient, seBorder]
+          inherited SearchLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited ReplaceLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited SearchReplaceSwapLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited SearchInLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited SearchButtonedEdit: TButtonedEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited ReplaceButtonedEdit: TButtonedEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+        end
         inherited SearchResultListBox: TListBox
-          Height = 429
-          ExplicitHeight = 429
+          StyleElements = [seFont, seClient, seBorder]
         end
       end
       inherited OptionTabSheet: TTabSheet
-        ExplicitHeight = 566
         inherited OptionJvScrollMax: TJvScrollMax
-          Height = 566
-          ExplicitHeight = 566
+          StyleElements = [seFont, seClient, seBorder]
+          inherited OptionDateTimeJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionWeekWorkOneStartLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekDayLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekTimeLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekDayEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekTimeEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionInterfaceJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionTabWidthLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionStateDefaultLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFontSizeLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTabWidthJvSpinEdit: TJvSpinEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionStateDefaultComboBox: TComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFontSizeJvSpinEdit: TJvSpinEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionFoldersJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionPersistRootFolderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTempFolderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPersistRootFolderEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTempFolderEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionSecurityJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionCryptoKeyLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionCryptoKeyEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionPythonJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionPythonVersionLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPythonExePathLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPythonVersionComboBox: TComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPythonExePathEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionFilesJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionFilesWorkingFolderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesOnDoubleClickLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesWorkingFolderClearLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesOnDoubleClickComboBox: TComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesWorkingFolderSelectButtonedEdit: TButtonedEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
         end
       end
     end
   end
-  inherited StatusBar: TStatusBar
-    Top = 820
-    Width = 1574
-  end
   inherited MainPanel: TPanel
-    Height = 596
+    StyleElements = [seFont, seClient, seBorder]
     inherited MainPageControl: TPageControl
-      inherited ObjectContentPrevTabSheet: TTabSheet
-        inherited ObjectContentPrevTopPanel: TPanel
-          inherited ObjectContentPrevCharCountLabel: TLabel
-            Height = 22
-          end
-        end
-      end
       inherited ObjectContentTabSheet: TTabSheet
         inherited ObjectContentSplitter: TSplitter
           ExplicitHeight = 536
@@ -730,26 +1156,8 @@ inherited PersonMainForm: TPersonMainForm
             Height = 22
           end
         end
-      end
-      inherited ObjectDataTabSheet: TTabSheet
-        inherited ObjectDataTopPanel: TPanel
-          inherited ObjectDataCharCountLabel: TLabel
-            Height = 22
-          end
-        end
-      end
-      inherited ObjectNoteTabSheet: TTabSheet
-        inherited ObjectNoteTopPanel: TPanel
-          inherited ObjectNoteCharCountLabel: TLabel
-            Height = 22
-          end
-        end
-      end
-      inherited FilesRioTabSheet: TTabSheet
-        inherited FilesRioTopPanel: TPanel
-          inherited FilesRioInfoLabel: TLabel
-            Height = 31
-          end
+        inherited ObjectContentSplitView: TSplitView
+          DoubleBuffered = True
         end
       end
     end

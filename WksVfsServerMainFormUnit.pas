@@ -55,7 +55,7 @@ type
     Body: string;
   end;
 
-  TReplyRec = record // full replay: YMS <code> <json>
+  TReplyRec = record // full replay: WKS <code> <json>
     Code: string;    // IGNORED
     Json: string;    // {"yourmessage": "bla bla bla..."}
     procedure Init(IvCode: string; IvJson: string = ''); overload;
@@ -242,7 +242,7 @@ uses
   , System.IOUtils
   , System.RegularExpressions
   , MarkdownProcessor
-//  , MarkdownUtils
+//, MarkdownUtils
   ;
 {$ENDREGION}
 
@@ -252,17 +252,17 @@ const
   COLOR_BLACK = '#404040';
 
   MESSAGE_REC_VEC: array[0..4] of TMessageRec = (
-    (Many: false; Name: 'yms disconnect'     ; Body: 'YMS DISCONNECT')
-  , (Many: false; Name: 'yms yourclientid'   ; Body: 'YMS YOURCLIENTID "%s"')
-  , (Many: false; Name: 'yms draw text'      ; Body: 'YMS SCENEDRAW [{"type": "text", "x": 200, "y": 100, "rot": 0, "font": "100px arial", "text": "%s","textFillStyle": "pink", "textLineStyle": "red"}]')
-  , (Many: true ; Name: 'yms draw texts     '; Body: 'YMS SCENECLEAR'
-                                          + #13#10 + 'YMS SCENEDRAW ['
+    (Many: false; Name: 'wks disconnect'     ; Body: 'WKS DISCONNECT')
+  , (Many: false; Name: 'wks yourclientid'   ; Body: 'WKS YOURCLIENTID "%s"')
+  , (Many: false; Name: 'wks draw text'      ; Body: 'WKS SCENEDRAW [{"type": "text", "x": 200, "y": 100, "rot": 0, "font": "100px arial", "text": "%s","textFillStyle": "pink", "textLineStyle": "red"}]')
+  , (Many: true ; Name: 'wks draw texts     '; Body: 'WKS SCENECLEAR'
+                                          + #13#10 + 'WKS SCENEDRAW ['
                                           + #13#10 + '  {"type": "text", "x": 200, "y": 100, "rot": 30, "text": "aaa", "font": "100px arial","textFillStyle": "pink", "textLineStyle": "red"}'
                                           + #13#10 + ', {"type": "text", "x": 200, "y": 200, "rot": 0 , "text": "bbb", "font": "100px arial","textFillStyle": "lime", "textLineStyle": "green"}'
                                           + #13#10 + ', {"type": "text", "x": 200, "y": 300, "rot": 20, "text": "ccc", "font": "100px arial","textFillStyle": "peru", "textLineStyle": "sienna"}'
                                           + #13#10 + ']')
-  , (Many: true ; Name: 'yms draw boxes'     ; Body: 'YMS SCENECLEAR'
-                                          + #13#10 + 'YMS SCENEDRAW ['
+  , (Many: true ; Name: 'wks draw boxes'     ; Body: 'WKS SCENECLEAR'
+                                          + #13#10 + 'WKS SCENEDRAW ['
                                           + #13#10 + '  {"type": "box", "x": 175, "y": 100, "w": 100, "h": 80, "fillStyle": "lawngreen", "text": "ETPP5X", "font": "12px arial", "textFillStyle": "forestgreen"}'
                                           + #13#10 + ', {"type": "box", "x": 350, "y": 100, "w": 100, "h": 80, "fillStyle": "lawngreen", "text": "ETSB1X", "font": "12px arial", "textFillStyle": "forestgreen"}'
                                           + #13#10 + ', {"type": "box", "x": 525, "y": 100, "w": 100, "h": 80, "fillStyle": "lawngreen", "text": "ETXP1X", "font": "12px arial", "textFillStyle": "forestgreen"}'
@@ -604,7 +604,7 @@ function  SqlFilter(IvField, IvValue{Filter}: string): string;
   complex-filter-str can be:
 
   expression :
-    #                   field is null  (= NULL see last in yms code)
+    #                   field is null  (= NULL see last in wks code)
     "                   field is empty (= empty = '')
     ^                   field is blank (= spaces|tabs)
     $                   field is valued, not null|empty|blank (remove records where value is null|empty|whitechar)
@@ -1378,7 +1378,7 @@ begin
       LogDb(ABird, 'registered');
 
       // not working
-      //ABird.Send(Format('YMS YOURCLIENTID "%s.%d"', [ABird.IPAdress, ABird.Id]));
+      //ABird.Send(Format('WKS YOURCLIENTID "%s.%d"', [ABird.IPAdress, ABird.Id]));
     end
   );
 
@@ -1634,23 +1634,23 @@ try
     msu := msg.Trim.ToUpper; // EMPTY, WHITESPACES, PING, HELLO, BYE, CLI CMD DATA
 
     {$REGION 'COMMON'}
-    {EMPTY -> YMS EMPTY}
+    {EMPTY -> WKS EMPTY}
     if msg.IsEmpty then begin
       rpl.Init('EMPTY', '{"message": "request was empty"}');
 
-    {WHITESPACES -> YMS WHITESPACES}
+    {WHITESPACES -> WKS WHITESPACES}
     end else if msu.IsEmpty then begin
       rpl.Init('WHITESPACES', '{"message": "request was whitespaces"');
 
-    {PING -> YMS PONG}
+    {PING -> WKS PONG}
     end else if msu.Equals('PING') then begin
       rpl.Init('PONG');
 
-    {HELLO -> YMS YOUAREWELCOME}
+    {HELLO -> WKS YOUAREWELCOME}
     end else if msu.Equals('HELLO') then begin
       rpl.Init('YOUAREWELCOME');
 
-    {BYE -> YMS SEEYOUSOON}
+    {BYE -> WKS SEEYOUSOON}
     end else if msu.Equals('BYE') then begin
       rpl.Init('SEEYOUSOON');
     {$ENDREGION}
@@ -1776,14 +1776,14 @@ try
           // CLI GET {"what": "BAYMESLIST"} request to send back the bay list
           end else if wha = 'BAYMESLIST' then begin
             ca9 := PClientDataRec(IvConn.CustomRec).AreaF9;
-            IvConn.Send('YMS MARQUEEJSON %s', [MarqueeJson(ca9)]); // *** REMOVE ***
+            IvConn.Send('WKS MARQUEEJSON %s', [MarqueeJson(ca9)]); // *** REMOVE ***
             rpl.Init('BAYMESLISTJSON', BayMesListHtmlJson(ca9));
 
           // CLI GET {"what": "BAYLIST"} request to send back the bay list
           end else if wha = 'BAYCADLIST' then begin
             ca3 := PClientDataRec(IvConn.CustomRec).Area3;
             ca9 := PClientDataRec(IvConn.CustomRec).AreaF9;
-            IvConn.Send('YMS MARQUEEJSON %s', [MarqueeJson(ca9)]); // *** REMOVE ***
+            IvConn.Send('WKS MARQUEEJSON %s', [MarqueeJson(ca9)]); // *** REMOVE ***
             rpl.Init('BAYCADLISTJSON', BayCadListHtmlJson(ca3));
 
           // CLI GET {"what": "VIEWSHAPELIST"} request to send back a list of shapes for a specific view
@@ -1821,8 +1821,8 @@ try
     {$ENDREGION}
 
     {$REGION 'SEND'}
-    Log('%s < YMS %s%s', [cid, rpl.Code, StrPrepend(rpl.Json, ' ')]);
-    IvConn.Send('YMS %s%s', [rpl.Code, StrPrepend(rpl.Json, ' ')]);
+    Log('%s < WKS %s%s', [cid, rpl.Code, StrPrepend(rpl.Json, ' ')]);
+    IvConn.Send('WKS %s%s', [rpl.Code, StrPrepend(rpl.Json, ' ')]);
     {$ENDREGION}
 
   end;
@@ -1913,7 +1913,7 @@ begin
     // dataget
     TThread.Synchronize(nil, procedure begin
         txt := DataCode(ids, ARequestInfo.Params);
-        Log('%s < YMSHTTP : %s', [ARequestInfo.RemoteIP, txt.Substring(1, 20)+'...']);
+        Log('%s < WKSHTTP : %s', [ARequestInfo.RemoteIP, txt.Substring(1, 20)+'...']);
     end);
     // reply
     AResponseInfo.ResponseNo := 200;
@@ -1965,12 +1965,12 @@ end;
 
 procedure TMainForm.WsClientDisconnectButtonClick(Sender: TObject);
 begin
-  MessageSendToCurrent('YMS DISCONNECT');
+  MessageSendToCurrent('WKS DISCONNECT');
 end;
 
 procedure TMainForm.WsClientDisconnectAllButtonClick(Sender: TObject);
 begin
-  MessageSendToAll('YMS DISCONNECT');
+  MessageSendToAll('WKS DISCONNECT');
 end;
 
 procedure TMainForm.WsClientDataButtonClick(Sender: TObject);
@@ -2015,7 +2015,7 @@ begin
 
   Result := StringReplace(Result, sLineBreak, '', [rfReplaceAll]);
 
-  Result := StringReplace(Result, 'YMS ', sLineBreak + 'YMS ', [rfReplaceAll]);
+  Result := StringReplace(Result, 'WKS ', sLineBreak + 'WKS ', [rfReplaceAll]);
 
   Result := Result.Trim;
 end;
@@ -2217,11 +2217,11 @@ begin
       ca3 := PClientDataRec(bsc.CustomRec).Area3;
       ca9 := PClientDataRec(bsc.CustomRec).AreaF9;
       msg := MarqueeJson(ca9); // allareas + (specific area if car is not empty)
-      bsc.Send('YMS MARQUEEJSON %s', [msg]);
+      bsc.Send('WKS MARQUEEJSON %s', [msg]);
       str := Format('marquee sent (all areas + %s)', [ca3]);
     end;
 
-    Log('%s < YMS MARQUEEJSON %s', [cid, str]);
+    Log('%s < WKS MARQUEEJSON %s', [cid, str]);
   end;
 end;
 

@@ -73,6 +73,10 @@ type
     PageJsLabel: TLabel;
     CodeJsAfterTopPanel: TPanel;
     PageImageShowDBCheckBox: TDBCheckBox;
+    PageClassDBEdit: TDBEdit;
+    PageClassLabel: TLabel;
+    PageStyleLabel: TLabel;
+    PageStyleDBEdit: TDBEdit;
     procedure FormCreate(Sender: TObject);
     procedure ActionPostActionExecute(Sender: TObject);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);

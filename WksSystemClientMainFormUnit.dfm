@@ -1,7 +1,6 @@
 inherited SystemMainForm: TSystemMainForm
   Caption = 'SystemMainForm'
-  ExplicitWidth = 1588
-  ExplicitHeight = 879
+  StyleElements = [seFont, seClient, seBorder]
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
     ExplicitHeight = 592
@@ -15,28 +14,32 @@ inherited SystemMainForm: TSystemMainForm
     ExplicitWidth = 1252
   end
   inherited TopPanel: TPanel
-    ExplicitWidth = 1572
+    StyleElements = [seFont, seClient, seBorder]
     inherited TopPageControl: TPageControl
-      Width = 1156
-      ExplicitWidth = 1152
-      inherited TopClientTabSheet: TTabSheet
-        ExplicitWidth = 1148
-      end
-      inherited TopActionTabSheet: TTabSheet
-        ExplicitWidth = 1148
-      end
+      ExplicitLeft = 0
+      ExplicitTop = 0
       inherited TopTextTabSheet: TTabSheet
-        ExplicitWidth = 1148
         inherited TextToolBar: TToolBar
           Width = 785
           ExplicitWidth = 785
         end
       end
       inherited TopSearchTabSheet: TTabSheet
-        ExplicitWidth = 1148
-      end
-      inherited TopUtilsTabSheet: TTabSheet
-        ExplicitWidth = 1148
+        inherited SearchReplaceOutLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceInLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceSwapLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceOutEdit: TEdit
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceInEdit: TEdit
+          StyleElements = [seFont, seClient, seBorder]
+        end
       end
       object SystemTabSheet: TTabSheet
         Caption = 'System'
@@ -44,41 +47,16 @@ inherited SystemMainForm: TSystemMainForm
         object SystemToolBar: TToolBar
           Left = 0
           Top = 0
-          Width = 485
+          Width = 95
           Height = 44
           Align = alLeft
           AutoSize = True
           ButtonHeight = 46
-          ButtonWidth = 97
+          ButtonWidth = 95
           Caption = 'SystemToolBar'
           Images = SystemImageList24
           ShowCaptions = True
           TabOrder = 0
-          object SystemDbaDefinitionRebuildToolButton: TToolButton
-            Left = 0
-            Top = 0
-            Action = SystemDbaDefinitionRebuildAction
-          end
-          object SystemDbaCreateDdlToolButton: TToolButton
-            Left = 97
-            Top = 0
-            Action = SystemDbaCreateDdlAction
-          end
-          object SystemDbaDeleteDdlToolButton: TToolButton
-            Left = 194
-            Top = 0
-            Action = SystemDbaDeleteDdlAction
-          end
-          object SystemDbaBackupDdlToolButton: TToolButton
-            Left = 291
-            Top = 0
-            Action = SystemDbaBackupDdlAction
-          end
-          object SystemDbaRestoreDdlToolButton: TToolButton
-            Left = 388
-            Top = 0
-            Action = SystemDbaRestoreDdlAction
-          end
         end
       end
       object TopServiceTabSheet: TTabSheet
@@ -158,48 +136,131 @@ inherited SystemMainForm: TSystemMainForm
       end
     end
     inherited TopPageControl3: TPageControl
-      Left = 1276
-      ExplicitLeft = 1272
+      inherited TimeTabSheet: TTabSheet
+        inherited YearLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MonthLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited DayLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited TimerLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited WeekdayLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited WeekLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited TimerJvClock: TJvClock
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited PersonTabSheet: TTabSheet
+        inherited PersonNameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited PersonSurnameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited PersonSurnameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited PersonNameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited UserTabSheet: TTabSheet
+        inherited UserUsernameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited UserPasswordLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited UserPasswordLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited UserUsernameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited MemberTabSheet: TTabSheet
+        inherited MemberMemberLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MemberMemberLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MemberRoleLevelLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MemberRoleLevelLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited OrganizationTabSheet: TTabSheet
+        inherited OrganizationOrganizationLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited OrganizationNameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited OrganizationNameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited OrganizationOrganizationLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
     end
     inherited TopPageControl2: TPageControl
-      Left = 1156
-      ExplicitLeft = 1152
+      inherited ObjectTabSheet: TTabSheet
+        inherited ObjectIdDBText: TDBText
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited ObjectKindDBText: TDBText
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited ObjectStateDBText: TDBText
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
     end
   end
   inherited LeftPanel: TPanel
-    ExplicitHeight = 594
+    StyleElements = [seFont, seClient, seBorder]
     inherited LeftPageControl: TPageControl
-      Height = 595
-      ExplicitHeight = 594
       inherited ObjectTreeTabSheet: TTabSheet
-        ExplicitHeight = 565
         inherited ObjectNodeInfoLabel: TLabel
-          Top = 550
           Width = 292
-        end
-        inherited ObjectDTClientTree: TDTClientTree
-          Height = 525
-          ExplicitHeight = 525
+          StyleElements = [seFont, seClient, seBorder]
         end
         inherited ObjectDBNavigator: TDBNavigator
           Hints.Strings = ()
         end
       end
-      inherited WordTabSheet: TTabSheet
-        ExplicitHeight = 565
-      end
     end
   end
   inherited BottomPanel: TPanel
-    ExplicitTop = 679
-    ExplicitWidth = 1576
+    StyleElements = [seFont, seClient, seBorder]
+    ExplicitTop = 680
+    ExplicitWidth = 1580
     inherited LogFrame: TLogFrame
-      ExplicitWidth = 1576
+      ExplicitWidth = 1580
       inherited LogPageControl: TPageControl
-        ExplicitWidth = 1572
+        ExplicitWidth = 1580
         inherited OutputTabSheet: TTabSheet
           inherited OutputRichEdit: TRichEdit
-            ExplicitWidth = 1562
+            StyleElements = [seFont, seClient, seBorder]
+            ExplicitWidth = 1570
+          end
+        end
+        inherited LogTabSheet: TTabSheet
+          inherited LogRichEdit: TRichEdit
+            StyleElements = [seFont, seClient, seBorder]
           end
         end
         inherited SoapTabSheet: TTabSheet
@@ -225,22 +286,249 @@ inherited SystemMainForm: TSystemMainForm
                 Control = LogFrame.SoapResponseRichEdit
                 Row = 1
               end>
+            StyleElements = [seFont, seClient, seBorder]
+            inherited SoapResponseLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited SoapRequestRichEdit: TRichEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited SoapRequestLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited SoapResponseRichEdit: TRichEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+        end
+        inherited OptionTabSheet: TTabSheet
+          inherited OptionOutputLineWidthMaxLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited OptionOutputLinesMaxLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited OptionOutputLineWidthMaxEdit: TEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited OptionOutputLinesMaxEdit: TEdit
+            StyleElements = [seFont, seClient, seBorder]
           end
         end
       end
     end
   end
   inherited RightPanel: TPanel
-    ExplicitLeft = 1272
-    ExplicitHeight = 594
+    StyleElements = [seFont, seClient, seBorder]
     inherited RightPageControl: TPageControl
-      ExplicitHeight = 594
+      ExplicitLeft = -1
+      ExplicitTop = -1
       inherited PropertyTabSheet: TTabSheet
         inherited ObjectJvScrollMax: TJvScrollMax
-          ExplicitHeight = 564
+          StyleElements = [seFont, seClient, seBorder]
+          inherited ObjectIdJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectOrderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectRevLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectPIdLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectIdLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectId8Label: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectOrderDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectPIdDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectRevDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectIdDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectId8DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectDateJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectCreatedLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectCreatedDBText: TDBText
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedDBText: TDBText
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedByDBText: TDBText
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedByLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectFromJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectFromOrganizationLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromMemberLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromTeamLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromAreaLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromDepartmentLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromOrganizationDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromMemberDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromTeamDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromAreaDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromDepartmentDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectToJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectToOrganizationLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToMemberLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToTeamLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToAreaLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToDepartmentLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectJobGradeMinLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectJobGradeCalculateLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToOrganizationDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToMemberDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToTeamDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToAreaDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToDepartmentDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectJobGradeMinDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectApprovalJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectRouteLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectRouteDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
           inherited ObjectImageJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectImageLoadLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageSaveLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageEditLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageFitLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageClearLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited ObjectImageDBImage: TDBImage
               Height = 0
+            end
+          end
+          inherited ObjectTypeJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectContentKindLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectKindLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDataKindLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectContentKindDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectKindDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDataKindDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectGeneralJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectStateLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSpareLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDescriptionLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectTitleLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSubtitleLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectStateDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSpareDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDescriptionDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectTitleDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSubtitleDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
             end
           end
           object SystemJvScrollMaxBand: TJvScrollMaxBand
@@ -350,25 +638,139 @@ inherited SystemMainForm: TSystemMainForm
           end
         end
       end
+      inherited SearchTabSheet: TTabSheet
+        inherited SearchFilterPanel: TPanel
+          StyleElements = [seFont, seClient, seBorder]
+          inherited SearchLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited ReplaceLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited SearchReplaceSwapLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited SearchInLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited SearchButtonedEdit: TButtonedEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited ReplaceButtonedEdit: TButtonedEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+        end
+        inherited SearchResultListBox: TListBox
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited OptionTabSheet: TTabSheet
+        inherited OptionJvScrollMax: TJvScrollMax
+          StyleElements = [seFont, seClient, seBorder]
+          inherited OptionDateTimeJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionWeekWorkOneStartLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekDayLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekTimeLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekDayEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekTimeEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionInterfaceJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionTabWidthLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionStateDefaultLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFontSizeLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTabWidthJvSpinEdit: TJvSpinEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionStateDefaultComboBox: TComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFontSizeJvSpinEdit: TJvSpinEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionFoldersJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionPersistRootFolderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTempFolderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPersistRootFolderEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTempFolderEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionSecurityJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionCryptoKeyLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionCryptoKeyEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionPythonJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionPythonVersionLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPythonExePathLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPythonVersionComboBox: TComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPythonExePathEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionFilesJvScrollMaxBand: TJvScrollMaxBand
+            Height = 21
+            Expanded = False
+            ExpandedHeight = 21
+            ExplicitHeight = 21
+            inherited OptionFilesWorkingFolderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesOnDoubleClickLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesWorkingFolderClearLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesOnDoubleClickComboBox: TComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesWorkingFolderSelectButtonedEdit: TButtonedEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+        end
+      end
     end
   end
-  inherited StatusBar: TStatusBar
-    ExplicitTop = 818
-    ExplicitWidth = 1566
-  end
   inherited MainPanel: TPanel
+    StyleElements = [seFont, seClient, seBorder]
     OnClick = MainPanelClick
-    ExplicitHeight = 594
     inherited MainPageControl: TPageControl
-      Height = 595
-      ActivePage = SystemBinariesTabSheet
-      ExplicitHeight = 594
+      ActivePage = SystemSysLogTabSheet
       inherited ObjectContentPrevTabSheet: TTabSheet
-        ExplicitHeight = 565
-        inherited ObjectContentPrevDBSynEdit: TDBSynEdit
-          Height = 537
-          ExplicitHeight = 537
-        end
         inherited ObjectContentPrevTopPanel: TPanel
           inherited ObjectContentPrevCharCountLabel: TLabel
             Height = 22
@@ -376,9 +778,7 @@ inherited SystemMainForm: TSystemMainForm
         end
       end
       inherited ObjectContentTabSheet: TTabSheet
-        ExplicitHeight = 565
         inherited ObjectContentSplitter: TSplitter
-          Height = 537
           ExplicitHeight = 536
         end
         inherited ObjectContentTopPanel: TPanel
@@ -387,24 +787,10 @@ inherited SystemMainForm: TSystemMainForm
           end
         end
         inherited ObjectContentSplitView: TSplitView
-          Height = 537
-          inherited ObjectContentEdgeBrowser: TEdgeBrowser
-            Height = 537
-          end
-        end
-        inherited ObjectContentLeftPanel: TPanel
-          Height = 537
-          inherited ObjectContentDBSynEdit: TDBSynEdit
-            Height = 429
-          end
+          DoubleBuffered = True
         end
       end
       inherited ObjectDataTabSheet: TTabSheet
-        ExplicitHeight = 565
-        inherited ObjectDataDBSynEdit: TDBSynEdit
-          Height = 537
-          ExplicitHeight = 537
-        end
         inherited ObjectDataTopPanel: TPanel
           inherited ObjectDataCharCountLabel: TLabel
             Height = 22
@@ -412,11 +798,6 @@ inherited SystemMainForm: TSystemMainForm
         end
       end
       inherited ObjectNoteTabSheet: TTabSheet
-        ExplicitHeight = 565
-        inherited ObjectNoteDBSynEdit: TDBSynEdit
-          Height = 537
-          ExplicitHeight = 537
-        end
         inherited ObjectNoteTopPanel: TPanel
           inherited ObjectNoteCharCountLabel: TLabel
             Height = 22
@@ -424,15 +805,10 @@ inherited SystemMainForm: TSystemMainForm
         end
       end
       inherited FilesRioTabSheet: TTabSheet
-        ExplicitHeight = 565
         inherited FilesRioTopPanel: TPanel
           inherited FilesRioInfoLabel: TLabel
             Height = 31
           end
-        end
-        inherited FilesRioTree: TVirtualStringTree
-          Height = 519
-          ExplicitHeight = 519
         end
       end
       object SystemSysLogTabSheet: TTabSheet
@@ -485,6 +861,64 @@ inherited SystemMainForm: TSystemMainForm
             Height = 24
             Action = SystemSyslogCleanAction
             Align = alLeft
+            Flat = True
+            Glyph.Data = {
+              F6060000424DF606000000000000360000002800000018000000180000000100
+              180000000000C0060000C21E0000C21E00000000000000000000FFFFFFFFFFFF
+              FFFFFFFEFEFEF8F8F8EFEFEFE7E7E7DFDFDFD8D8D8D2D2D2A0C4CC54B4C867B4
+              C790BAC4BABEBFBFBFBFC2C2C2C6C6C6CBCBCBD0D0D0D7D7D7DEDEDEE6E6E6EE
+              EEEEFFFFFFFFFFFFFEFEFEF7F7F7EDEDEDE4E4E4DBDBDBD2D2D2C9C9C9ADBEC2
+              3AB7D061CBDE5AD0E252C5DB25ACCB4FA8BD90ABB1B1B1B1B8B8B8C0C0C0C8C8
+              C8D1D1D1DADADAE3E3E3FFFFFFFFFFFFFCFCFCF2F2F2E9E9E9DFDFDFD5D5D5CC
+              CCCCC2C2C246AFC761D1E304B2D047D0E20DAFCD44D0E267D2E328B3CF43A8BE
+              96ACB2B7B7B7C1C1C1CACACAD4D4D4DEDEDEFFFFFFFFFFFFFDFDFDF5F5F5EBEB
+              EBE2E2E2D8D8D8CFCFCF98BEC749C5DB25BBD51BC6DC25B8D30CC2DB51D6E617
+              B2CF48D1E34BC6DB23B2CD61AEC0C2C4C5CECECED7D7D7E0E0E0FFFFFFFFFFFF
+              FFFFFFFCFCFCF4F4F4EBEBEBE3E3E3DADADA4FB6CC57D4E507B7D32BCAE00CB8
+              D52DD2E73EC7DE15BCD63CC7DD02B1CF2FCCE06BD3E443B4CDC5D3D7E1E1E1EA
+              EAEAFFFFFFFFFFFFFFFFFFFFFFFFFEFEFEF9F9F9F2F2F2DCE6E83BBDD625C4DB
+              0DC4DE1CBFDA1DD0E846D9ED11B3D138CDE108AECD07C2DA46D1E441C9DE30B8
+              D246BCD4CEE5EAF8F8F8FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA9
+              DEEA46C9DE0BC0DA1DD2EA18C2DF2ADBF32BC1DC22CAE31AB7D302BFD838CEE1
+              2ABED720B9D46FDBE962CADE66C6DBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+              FFFFFFFFFFFFFF74CADF4BD4E619CCE527D6EF29D3ED2FDCF414BCDA27C7E105
+              BDD726C9DE20BAD527C1D97BDBE94FBFD7B7E4EEFFFFFFFFFFFFFFFFFFFFFFFF
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF59C4DB47D9EC29D9F12ED6F040E3FA22C7
+              E329D5EE13C1DC18C7DE18BBD526C5DC78D7E65FC3DBEEF9FBFFFFFFFFFFFFFF
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF51C3DB47DFF33BE4FB
+              40DBF246DEF431D5EF21CEE81BCEE612BDD720C6DC6BD0E276CBDFFDFEFFFFFF
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBFBFCABABCD47
+              B8D551E6F94BE5FA59E4F845D8EF3CDFF725D5ED12C5DE20C7DD5BCADE89D2E3
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+              FF8B8BBB0000A40914914C93C36CE9FB67E6F958E8FB38E0F721D4EC2FCFE347
+              C4D998D8E7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+              FFFFFFFFFFFFFFFFFF6C6FAE0000A70707C71A1ABB2F3D9D6BB9DB54E9FD35E1
+              F84EDBED3EBFD8ACE0ECFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFFACDFEB2FB7D22789BA0E1F952929CF4C4CF3
+              2C2CB73359A554C0DC4ABDD6D0EDF4FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE5F5F91FAECC39CBE041D9EC5E
+              DFF33976B3292DAC3939DD1E1EC54B559EFDFEFEFFFFFFFFFFFFFFFFFFFFFFFF
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF1F9
+              FB5AB9D239BFDA7BEAF97AEEFD70D1EA274B9B0D0D8DB9B9D5FFFFFFFFFFFFFF
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+              FFFFFFFFFFFFF4F8FA2F79A71075AB1296BE5ED2E691F0FC4DC4DDF4F4F8FFFF
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFF6A9DBE257EB50E70AD1570A856A3C24BC0D8
+              45BDD6FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB1CBDC3283B7157CBD157AB81C
+              70A5E6EEF4FCFEFECEECF3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE7EFF43C83B12C8C
+              C8107CC02F8BC56297BBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+              6097BA4899CC0F7CC01680C23584B7CDDDE8FFFFFFFFFFFFFFFFFFFFFFFFFFFF
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+              FFFFFFFFFFFFFFFF3B83B1347EAD337DAB3D95CB4E8CB3FFFFFFFFFFFFFFFFFF
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4487B34186B24084AF458FBEAEC9DAFF
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFADC8DA3881AF4086
+              B384AEC9FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+              FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
             ExplicitLeft = 76
             ExplicitTop = 0
             ExplicitHeight = 30
@@ -495,7 +929,7 @@ inherited SystemMainForm: TSystemMainForm
           Left = 3
           Top = 33
           Width = 936
-          Height = 529
+          Height = 530
           Align = alClient
           BorderStyle = bsNone
           Font.Charset = ANSI_CHARSET
@@ -547,16 +981,41 @@ inherited SystemMainForm: TSystemMainForm
             AlignWithMargins = True
             Left = 16
             Top = 3
-            Width = 53
+            Width = 77
             Height = 24
             Margins.Left = 16
             Align = alLeft
             Caption = 'Refresh'
             Flat = True
+            Glyph.Data = {
+              36030000424D3603000000000000360000002800000010000000100000000100
+              18000000000000030000C20E0000C20E00000000000000000000FF00FFFF00FF
+              FF00FFFF00FFFF00FFFF00FFADDCAE91D29890D196ABDBACFF00FFFF00FFFF00
+              FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF78D58734D1582FEB541E
+              F83617FB2926EE442DD14B71CF7CFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+              D5EDD53BC8532CE0522FE55924EF4318F52C13F8231BF43127ED493CE4685CD2
+              6FE0F4E0FF00FFFF00FFFF00FFFF00FF32BB4415D82620DD3C2CE2542DE85625
+              EE4723F04127ED4932E65B4BE56B6CE87E96E39FFF00FFFF00FFFF00FF6DB976
+              07CE0E0CD51718DA2C23DE4234DD6138D16236CB5E3BD9664AE56A68E77C88EB
+              91A7EFADD6F2D8FF00FFFF00FF11991B00C50004D1090ED61B2DCF4BACE5B7FF
+              00FFFF00FFC2DFC889D8999DEFA5B6F2BACEF6CFFF00FFFF00FFADCDB006930B
+              00B30000C8000CC717A8DEAFFF00FFFF00FFFF00FFFF00FFFF00FFDAF5DCFF00
+              FFFF00FFFF00FFFF00FF8EB8930F921013A61307B6070EA716FF00FFFF00FFFF
+              00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF8EB9944CB74D
+              4EBB4E1FA91F0E9616FF00FFFF00FFFF00FFFF00FF1EA42E21B3282EB33529B0
+              3114A91C0DA717ABE7B4B0D1B65EB9606BC96B4CB54C058A09ABD6B2FF00FFFF
+              00FFFF00FF85BD8D09D30D2EE72E62E6626CDF6C59CF5994E7A5FF00FF58AC5F
+              87D58787D587259C25168C1FABCFB0FF00FFFF00FFADD0B20FAD170ACF0A78E3
+              7887E28788DE8895ECA6FF00FF7CBC839BDC9C9FDF9F97DA9730A1300383060F
+              7B150F7D1503930614B4147EDD7E9FE69F9FE49FA2E3A291EB9EFF00FFFF00FF
+              67BE6DB4E8B4B3E8B3B4E8B48DD28D61BA615BB85B7ACB7AAEE6AEB3E9B3B4E9
+              B4ACE7ADB6E9B68CEA96FF00FFFF00FFD3EED56BCD70C0ECC0C4EEC4C4EEC4C4
+              EEC4C4EEC4C4EEC4C4EEC4C0EDC16CD57178DE7EA0E8A287E98CFF00FFFF00FF
+              FF00FFFF00FF7AD67C7FD680C6EEC6D7F5D7D7F5D7C8EFC880D68078D579FF00
+              FFFF00FFB3EFB4DDF7DDFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFC9EDC9DF
+              F2DFE0F2E0CAEDCAFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF}
             OnClick = LogRefreshSpeedButtonClick
-            ExplicitLeft = 28
-            ExplicitTop = 6
-            ExplicitHeight = 22
+            ExplicitLeft = 15
           end
         end
         object LogJvDBUltimGrid: TJvDBUltimGrid
@@ -564,7 +1023,7 @@ inherited SystemMainForm: TSystemMainForm
           Left = 3
           Top = 33
           Width = 936
-          Height = 529
+          Height = 530
           Align = alClient
           BorderStyle = bsNone
           DataSource = LogDataSource
@@ -625,16 +1084,40 @@ inherited SystemMainForm: TSystemMainForm
             AlignWithMargins = True
             Left = 16
             Top = 3
-            Width = 53
+            Width = 77
             Height = 24
             Margins.Left = 16
             Align = alLeft
             Caption = 'Refresh'
             Flat = True
+            Glyph.Data = {
+              36030000424D3603000000000000360000002800000010000000100000000100
+              18000000000000030000C20E0000C20E00000000000000000000FF00FFFF00FF
+              FF00FFFF00FFFF00FFFF00FFADDCAE91D29890D196ABDBACFF00FFFF00FFFF00
+              FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF78D58734D1582FEB541E
+              F83617FB2926EE442DD14B71CF7CFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+              D5EDD53BC8532CE0522FE55924EF4318F52C13F8231BF43127ED493CE4685CD2
+              6FE0F4E0FF00FFFF00FFFF00FFFF00FF32BB4415D82620DD3C2CE2542DE85625
+              EE4723F04127ED4932E65B4BE56B6CE87E96E39FFF00FFFF00FFFF00FF6DB976
+              07CE0E0CD51718DA2C23DE4234DD6138D16236CB5E3BD9664AE56A68E77C88EB
+              91A7EFADD6F2D8FF00FFFF00FF11991B00C50004D1090ED61B2DCF4BACE5B7FF
+              00FFFF00FFC2DFC889D8999DEFA5B6F2BACEF6CFFF00FFFF00FFADCDB006930B
+              00B30000C8000CC717A8DEAFFF00FFFF00FFFF00FFFF00FFFF00FFDAF5DCFF00
+              FFFF00FFFF00FFFF00FF8EB8930F921013A61307B6070EA716FF00FFFF00FFFF
+              00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF8EB9944CB74D
+              4EBB4E1FA91F0E9616FF00FFFF00FFFF00FFFF00FF1EA42E21B3282EB33529B0
+              3114A91C0DA717ABE7B4B0D1B65EB9606BC96B4CB54C058A09ABD6B2FF00FFFF
+              00FFFF00FF85BD8D09D30D2EE72E62E6626CDF6C59CF5994E7A5FF00FF58AC5F
+              87D58787D587259C25168C1FABCFB0FF00FFFF00FFADD0B20FAD170ACF0A78E3
+              7887E28788DE8895ECA6FF00FF7CBC839BDC9C9FDF9F97DA9730A1300383060F
+              7B150F7D1503930614B4147EDD7E9FE69F9FE49FA2E3A291EB9EFF00FFFF00FF
+              67BE6DB4E8B4B3E8B3B4E8B48DD28D61BA615BB85B7ACB7AAEE6AEB3E9B3B4E9
+              B4ACE7ADB6E9B68CEA96FF00FFFF00FFD3EED56BCD70C0ECC0C4EEC4C4EEC4C4
+              EEC4C4EEC4C4EEC4C4EEC4C0EDC16CD57178DE7EA0E8A287E98CFF00FFFF00FF
+              FF00FFFF00FF7AD67C7FD680C6EEC6D7F5D7D7F5D7C8EFC880D68078D579FF00
+              FFFF00FFB3EFB4DDF7DDFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFC9EDC9DF
+              F2DFE0F2E0CAEDCAFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF}
             OnClick = AuditRefreshSpeedButtonClick
-            ExplicitLeft = 28
-            ExplicitTop = 6
-            ExplicitHeight = 22
           end
         end
         object AuditJvDBUltimGrid: TJvDBUltimGrid
@@ -642,7 +1125,7 @@ inherited SystemMainForm: TSystemMainForm
           Left = 3
           Top = 33
           Width = 936
-          Height = 529
+          Height = 530
           Align = alClient
           BorderStyle = bsNone
           DataSource = AuditDataSource
@@ -673,7 +1156,7 @@ inherited SystemMainForm: TSystemMainForm
         ImageIndex = 7
         object Splitter1: TSplitter
           Left = 0
-          Top = 369
+          Top = 370
           Width = 942
           Height = 3
           Cursor = crVSplit
@@ -754,7 +1237,7 @@ inherited SystemMainForm: TSystemMainForm
           Left = 3
           Top = 49
           Width = 936
-          Height = 317
+          Height = 318
           Align = alClient
           BorderStyle = bsNone
           DataSource = BinariesDataSource
@@ -781,13 +1264,12 @@ inherited SystemMainForm: TSystemMainForm
         end
         object PageControl1: TPageControl
           Left = 0
-          Top = 372
+          Top = 373
           Width = 942
           Height = 193
           ActivePage = BinariesDescriptionTabSheet
           Align = alBottom
           TabOrder = 2
-          ExplicitTop = 371
           object BinariesDescriptionTabSheet: TTabSheet
             Caption = 'Description'
             object BinariesDescriptionDBMemo: TDBMemo
@@ -833,6 +1315,260 @@ inherited SystemMainForm: TSystemMainForm
           end
         end
       end
+      object SystemDatabaseTabSheet: TTabSheet
+        Caption = 'Database'
+        ImageIndex = 9
+        object DatabasePanel: TPanel
+          AlignWithMargins = True
+          Left = 0
+          Top = 0
+          Width = 941
+          Height = 46
+          Margins.Left = 0
+          Margins.Top = 0
+          Margins.Right = 1
+          Margins.Bottom = 0
+          Align = alTop
+          BevelOuter = bvNone
+          Caption = 'AuditTopPanel'
+          ParentBackground = False
+          ShowCaption = False
+          TabOrder = 0
+          object DatabaseToolBar: TToolBar
+            Left = 0
+            Top = 0
+            Width = 485
+            Height = 46
+            Align = alLeft
+            AutoSize = True
+            ButtonHeight = 46
+            ButtonWidth = 97
+            Caption = 'BinariesToolBar'
+            Images = SystemImageList24
+            ShowCaptions = True
+            TabOrder = 0
+            object SystemDbaDefinitionRebuildToolButton: TToolButton
+              Left = 0
+              Top = 0
+              Action = SystemDbaDefinitionRebuildAction
+            end
+            object SystemDbaCreateDdlToolButton: TToolButton
+              Left = 97
+              Top = 0
+              Action = SystemDbaCreateDdlAction
+            end
+            object SystemDbaBackupDdlToolButton: TToolButton
+              Left = 194
+              Top = 0
+              Action = SystemDbaBackupDdlAction
+            end
+            object SystemDbaRestoreDdlToolButton: TToolButton
+              Left = 291
+              Top = 0
+              Action = SystemDbaRestoreDdlAction
+            end
+            object SystemDbaDeleteDdlToolButton: TToolButton
+              Left = 388
+              Top = 0
+              Action = SystemDbaDeleteDdlAction
+            end
+          end
+        end
+      end
+      object SystemSourceTabSheet: TTabSheet
+        Caption = 'Sources'
+        ImageIndex = 10
+        object SystemSourceLeftSplitter: TSplitter
+          Left = 260
+          Top = 0
+          Height = 566
+          ExplicitLeft = 360
+          ExplicitTop = 248
+          ExplicitHeight = 100
+        end
+        object SystemSourceLeftPanel: TPanel
+          Left = 0
+          Top = 0
+          Width = 260
+          Height = 566
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = 'SystemSourceLeftPanel'
+          ShowCaption = False
+          TabOrder = 0
+          object SystemSourceDTClientTree: TDTClientTree
+            AlignWithMargins = True
+            Left = 0
+            Top = 31
+            Width = 257
+            Height = 532
+            Margins.Left = 0
+            Align = alClient
+            BorderStyle = bsNone
+            Colors.BorderColor = 15987699
+            Colors.DisabledColor = clGray
+            Colors.DropMarkColor = 15385233
+            Colors.DropTargetColor = 15385233
+            Colors.DropTargetBorderColor = 15385233
+            Colors.FocusedSelectionColor = 15385233
+            Colors.FocusedSelectionBorderColor = 15385233
+            Colors.GridLineColor = 15987699
+            Colors.HeaderHotColor = clBlack
+            Colors.HotColor = clBlack
+            Colors.SelectionRectangleBlendColor = 15385233
+            Colors.SelectionRectangleBorderColor = 15385233
+            Colors.SelectionTextColor = clBlack
+            Colors.TreeLineColor = 9471874
+            Colors.UnfocusedColor = clGray
+            Colors.UnfocusedSelectionColor = clWhite
+            Colors.UnfocusedSelectionBorderColor = clWhite
+            Header.AutoSizeIndex = 0
+            Header.MainColumn = -1
+            NodeDataSize = 4
+            TabOrder = 0
+            TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowRoot, toShowTreeLines, toThemeAware]
+            Touch.InteractiveGestures = [igPan, igPressAndTap]
+            Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+            DataSource = SourceDataSource
+            DBTreeFields.KeyFieldName = 'FldId'
+            DBTreeFields.ParentFieldName = 'FldPId'
+            DBTreeFields.ListFieldName = 'FldSource'
+            DBTreeFields.ParentOfRootValue = '0'
+            DBTreeImages.HasChildrenImageIndex = -1
+            DBTreeImages.HasChildrenSelectedIndex = -1
+            DBTreeImages.NoChildrenImageIndex = -1
+            DBTreeImages.NoChildrenSelectedIndex = -1
+            UseFilter = True
+            Columns = <>
+          end
+          object SystemSourceDBNavigator: TDBNavigator
+            AlignWithMargins = True
+            Left = 0
+            Top = 3
+            Width = 257
+            Height = 25
+            Margins.Left = 0
+            Margins.Bottom = 0
+            DataSource = SourceDataSource
+            VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
+            Align = alTop
+            Flat = True
+            TabOrder = 1
+          end
+        end
+        object SystemSourceMainPanel: TPanel
+          Left = 263
+          Top = 0
+          Width = 679
+          Height = 566
+          Align = alClient
+          BevelOuter = bvNone
+          Caption = 'SystemSourceMainPanel'
+          ShowCaption = False
+          TabOrder = 1
+          object SystemSourceConnStrAdoLabel: TLabel
+            AlignWithMargins = True
+            Left = 8
+            Top = 182
+            Width = 663
+            Height = 15
+            Margins.Left = 8
+            Margins.Right = 8
+            Align = alTop
+            Caption = 'Connection String ADO'
+            ExplicitWidth = 124
+          end
+          object SystemSourceConnStrFdLabel: TLabel
+            AlignWithMargins = True
+            Left = 8
+            Top = 371
+            Width = 663
+            Height = 15
+            Margins.Left = 8
+            Margins.Right = 8
+            Align = alTop
+            Caption = 'Connection String FD (Firedac)'
+            ExplicitWidth = 162
+          end
+          object SystemSourceDBGrid: TDBGrid
+            AlignWithMargins = True
+            Left = 8
+            Top = 8
+            Width = 663
+            Height = 168
+            Margins.Left = 8
+            Margins.Top = 8
+            Margins.Right = 8
+            Align = alTop
+            DataSource = SourceDataSource
+            TabOrder = 0
+            TitleFont.Charset = DEFAULT_CHARSET
+            TitleFont.Color = clWindowText
+            TitleFont.Height = -12
+            TitleFont.Name = 'Segoe UI'
+            TitleFont.Style = []
+          end
+          object SystemSourceConnStrAdoDBSynEdit: TDBSynEdit
+            AlignWithMargins = True
+            Left = 8
+            Top = 203
+            Width = 663
+            Height = 162
+            Cursor = crIBeam
+            Margins.Left = 8
+            Margins.Right = 8
+            DataField = 'FldConnStrADO'
+            DataSource = SourceDataSource
+            Align = alTop
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = 'Consolas'
+            Font.Style = []
+            Font.Quality = fqClearTypeNatural
+            ParentColor = False
+            ParentFont = False
+            TabOrder = 1
+            Gutter.Font.Charset = DEFAULT_CHARSET
+            Gutter.Font.Color = clWindowText
+            Gutter.Font.Height = -11
+            Gutter.Font.Name = 'Consolas'
+            Gutter.Font.Style = []
+            Gutter.Font.Quality = fqClearTypeNatural
+            Gutter.Bands = <>
+          end
+          object SystemSourceConnStrFdDBSynEdit: TDBSynEdit
+            AlignWithMargins = True
+            Left = 8
+            Top = 392
+            Width = 663
+            Height = 166
+            Cursor = crIBeam
+            Margins.Left = 8
+            Margins.Right = 8
+            Margins.Bottom = 8
+            DataField = 'FldConnStrFD'
+            DataSource = SourceDataSource
+            Align = alClient
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = 'Consolas'
+            Font.Style = []
+            Font.Quality = fqClearTypeNatural
+            ParentColor = False
+            ParentFont = False
+            TabOrder = 2
+            Gutter.Font.Charset = DEFAULT_CHARSET
+            Gutter.Font.Color = clWindowText
+            Gutter.Font.Height = -11
+            Gutter.Font.Name = 'Consolas'
+            Gutter.Font.Style = []
+            Gutter.Font.Quality = fqClearTypeNatural
+            Gutter.Bands = <>
+          end
+        end
+      end
     end
   end
   object SystemClientDataSet: TClientDataSet [15]
@@ -855,6 +1591,9 @@ inherited SystemMainForm: TSystemMainForm
     DataSet = SystemClientDataSet
     Left = 208
     Top = 432
+  end
+  inherited MainSoapConnection: TSoapConnection
+    URL = 'http://localhost/WksSystemSoapProject.dll/soap'
   end
   object SystemImageList24: TImageList [27]
     ColorDepth = cd32Bit
@@ -2210,5 +2949,19 @@ inherited SystemMainForm: TSystemMainForm
     DataSet = BinariesClientDataSet
     Left = 208
     Top = 600
+  end
+  object SourceClientDataSet: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'SourceDataSetProvider'
+    RemoteServer = MainSoapConnection
+    AfterRefresh = BinariesClientDataSetAfterRefresh
+    Left = 72
+    Top = 656
+  end
+  object SourceDataSource: TDataSource
+    DataSet = SourceClientDataSet
+    Left = 208
+    Top = 656
   end
 end

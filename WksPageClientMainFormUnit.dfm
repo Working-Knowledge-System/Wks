@@ -17,6 +17,8 @@ inherited PageMainForm: TPageMainForm
   inherited TopPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited TopPageControl: TPageControl
+      ExplicitLeft = 0
+      ExplicitTop = 0
       inherited TopSearchTabSheet: TTabSheet
         inherited SearchReplaceOutLabel: TLabel
           StyleElements = [seFont, seClient, seBorder]
@@ -135,6 +137,7 @@ inherited PageMainForm: TPageMainForm
     inherited LeftPageControl: TPageControl
       inherited ObjectTreeTabSheet: TTabSheet
         inherited ObjectNodeInfoLabel: TLabel
+          Width = 292
           StyleElements = [seFont, seClient, seBorder]
         end
         inherited ObjectDBNavigator: TDBNavigator
@@ -367,6 +370,9 @@ inherited PageMainForm: TPageMainForm
             inherited ObjectImageClearLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectImageDBImage: TDBImage
+              Height = 0
+            end
           end
           inherited ObjectTypeJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectContentKindLabel: TLabel
@@ -425,7 +431,7 @@ inherited PageMainForm: TPageMainForm
             Height = 21
             Expanded = False
             Caption = 'Page'
-            ExpandedHeight = 289
+            ExpandedHeight = 394
             ButtonFont.Charset = ANSI_CHARSET
             ButtonFont.Color = clWindowText
             ButtonFont.Height = -11
@@ -480,6 +486,31 @@ inherited PageMainForm: TPageMainForm
               Align = alTop
               Caption = 'Icon (Font Awesome)'
               ExplicitWidth = 113
+            end
+            object PageClassLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 253
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Class'
+              ExplicitWidth = 27
+            end
+            object PageStyleLabel: TLabel
+              AlignWithMargins = True
+              Left = 16
+              Top = 303
+              Width = 249
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Style'
+              ExplicitTop = 331
+              ExplicitWidth = 25
             end
             object PageObjectIdDBEdit: TDBEdit
               AlignWithMargins = True
@@ -555,7 +586,7 @@ inherited PageMainForm: TPageMainForm
             object PageAuthenticationNeededDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 258
+              Top = 358
               Width = 249
               Height = 17
               Margins.Left = 16
@@ -566,6 +597,35 @@ inherited PageMainForm: TPageMainForm
               DataField = 'FldAuthenticationNeeded'
               DataSource = PageDataSource
               TabOrder = 5
+              ExplicitTop = 374
+            end
+            object PageClassDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 274
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldClass'
+              DataSource = PageDataSource
+              TabOrder = 6
+              ExplicitTop = 302
+            end
+            object PageStyleDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 16
+              Top = 324
+              Width = 249
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              Align = alTop
+              DataField = 'FldStyle'
+              DataSource = PageDataSource
+              TabOrder = 7
+              ExplicitTop = 352
             end
           end
           object PageFlagsJvScrollMaxBand1: TJvScrollMaxBand
@@ -643,7 +703,7 @@ inherited PageMainForm: TPageMainForm
             object PageSubtitleShowDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 160
+              Top = 137
               Width = 249
               Height = 17
               Margins.Left = 16
@@ -653,6 +713,7 @@ inherited PageMainForm: TPageMainForm
               DataField = 'FldSubtitleShow'
               DataSource = PageDataSource
               TabOrder = 4
+              ExplicitLeft = 15
             end
             object PageTopNavOffDBCheckBox: TDBCheckBox
               AlignWithMargins = True
@@ -686,7 +747,7 @@ inherited PageMainForm: TPageMainForm
             object PageImageShowDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 137
+              Top = 160
               Width = 249
               Height = 17
               Margins.Left = 16
@@ -696,6 +757,7 @@ inherited PageMainForm: TPageMainForm
               DataField = 'FldImageShow'
               DataSource = PageDataSource
               TabOrder = 7
+              ExplicitTop = 137
             end
           end
           object PageMarginJvScrollMaxBand: TJvScrollMaxBand
@@ -929,13 +991,44 @@ inherited PageMainForm: TPageMainForm
   inherited MainPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited MainPageControl: TPageControl
+      inherited ObjectContentPrevTabSheet: TTabSheet
+        inherited ObjectContentPrevTopPanel: TPanel
+          inherited ObjectContentPrevCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
       inherited ObjectContentTabSheet: TTabSheet
+        inherited ObjectContentTopPanel: TPanel
+          inherited ObjectContentCharCountLabel: TLabel
+            Height = 22
+          end
+        end
         inherited ObjectContentSplitView: TSplitView
           DoubleBuffered = True
         end
       end
       inherited ObjectDataTabSheet: TTabSheet
         ParentFont = False
+        inherited ObjectDataTopPanel: TPanel
+          inherited ObjectDataCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited ObjectNoteTabSheet: TTabSheet
+        inherited ObjectNoteTopPanel: TPanel
+          inherited ObjectNoteCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited FilesRioTabSheet: TTabSheet
+        inherited FilesRioTopPanel: TPanel
+          inherited FilesRioInfoLabel: TLabel
+            Height = 31
+          end
+        end
       end
       object PageHeaderTabSheet: TTabSheet
         Caption = 'Header'
@@ -1290,11 +1383,12 @@ inherited PageMainForm: TPageMainForm
             Left = 782
             Top = 0
             Width = 159
-            Height = 15
+            Height = 28
             Align = alRight
             Alignment = taCenter
             Caption = 'javascript before page loading'
             Layout = tlCenter
+            ExplicitHeight = 15
           end
         end
       end
@@ -1321,11 +1415,12 @@ inherited PageMainForm: TPageMainForm
             Left = 792
             Top = 0
             Width = 149
-            Height = 15
+            Height = 28
             Align = alRight
             Alignment = taCenter
             Caption = 'javascript after page loading'
             Layout = tlCenter
+            ExplicitHeight = 15
           end
         end
         object PageJsAfterDBSynEdit: TDBSynEdit

@@ -62,22 +62,30 @@ type
     XxxClientDataSet: TClientDataSet;
     XxxDBNavigator: TDBNavigator;
     XxxDataSource: TDataSource;
-    XxxIdDBEdit: TDBEdit;
-    XxxIdLabel: TLabel;
+    XxxLocalIdDBEdit: TDBEdit;
+    XxxLocalIdLabel: TLabel;
     XxxImageList24: TImageList;
     XxxJvScrollMaxBand: TJvScrollMaxBand;
     XxxObjectIdDBEdit: TDBEdit;
     XxxObjectIdLabel: TLabel;
-    XxxPIdDBEdit: TDBEdit;
-    XxxPIdLabel: TLabel;
+    XxxLocalPIdDBEdit: TDBEdit;
+    XxxLocalPIdLabel: TLabel;
     XxxTabSheet: TTabSheet;
     XxxTestAction: TAction;
     XxxTestToolButton: TToolButton;
     XxxToolBar: TToolBar;
-    XxxValue1DBEdit: TDBEdit;
-    XxxValue1Label: TLabel;
-    XxxValue2DBEdit: TDBEdit;
-    XxxValue2Label: TLabel;
+    XxxTextDBEdit: TDBEdit;
+    XxxTextLabel: TLabel;
+    XxxSelect1DBEdit: TDBEdit;
+    XxxSelect1Label: TLabel;
+    XxxSelect2Label: TLabel;
+    XxxSelect2DBEdit: TDBEdit;
+    XxxSelect3Label: TLabel;
+    XxxSelect3DBEdit: TDBEdit;
+    XxxMemoLabel: TLabel;
+    XxxMemoDBRichEdit: TDBRichEdit;
+    XxxSqlLabel: TLabel;
+    XxxSqlDBRichEdit: TDBRichEdit;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
@@ -179,7 +187,7 @@ begin
   {$ENDREGION}
 
   {$REGION 'detail'}
-  // ... continue from ancestor DELETING ALL CHILDS
+  // ... continue from ancestor DELETING ALL CHILDS of Xxx
   if XxxClientDataSet.Locate('FldObjectId', FId, []) then begin
     XxxClientDataSet.Delete;
     if XxxClientDataSet.ApplyUpdates(0) > 0 then
@@ -189,6 +197,8 @@ begin
       LogFrame.Log('%s detail data deleted from remote server', [FObj]);
     end;
   end;
+
+  // ... continue from ancestor DELETING ALL CHILDS of Yyy if any
   {$ENDREGION}
 
 end;
@@ -227,8 +237,8 @@ begin
   // set
   DataSet.Edit;
 //DataSet.FieldByName('FldObjectId').Value := FId; // automatic
-  DataSet.FieldByName('FldId'      ).Value := 1;                         // \
-  DataSet.FieldByName('FldPId'     ).Value := 0;                         //  |__ need to be removed/updated
+  DataSet.FieldByName('FldLocalId' ).Value := 1;   // tblmax+1           // \
+  DataSet.FieldByName('FldLocalPId').Value := 0;   // ?                  //  |__ need to be removed/updated
   DataSet.FieldByName('FldValue1'  ).Value := TNamRec.RndInt('Value1');  //  |
   DataSet.FieldByName('FldValue2'  ).Value := TNamRec.RndInt('Value2');  // /
   DataSet.Post;
