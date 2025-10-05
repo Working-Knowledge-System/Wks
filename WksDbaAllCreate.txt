@@ -731,7 +731,7 @@ CREATE TABLE [DbaClient].[dbo].[TblRequest](                                    
 GO
 
 
-CREATE TABLE [DbaClient].[dbo].[TblRequestWeb](
+CREATE TABLE [DbaClient].[dbo].[TblRequest](
     [FldFingerprintId]                          [bigint]                        NULL
   , [FldSessionId]                              [bigint]                        NULL
   , [FldRequestId]                              [bigint]                        NULL

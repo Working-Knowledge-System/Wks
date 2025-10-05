@@ -176,6 +176,7 @@ type
     ClientVersionCheckToolButton: TToolButton;
     ClientnfoToolButton: TToolButton;
     DayLabel: TLabel;
+    FileKindImageList24: TImageList;
     FilesLocalDeleteAction: TAction;
     FilesLocalFolderOpenAction: TAction;
     FilesLocalOpenAction: TAction;
@@ -299,6 +300,7 @@ type
     ObjectIdDBText: TDBText;
     ObjectIdJvScrollMaxBand: TJvScrollMaxBand;
     ObjectIdLabel: TLabel;
+    ObjectImage2DBImage: TDBImage;
     ObjectImageClearLabel: TLabel;
     ObjectImageDBImage: TDBImage;
     ObjectImageEditLabel: TLabel;
@@ -408,6 +410,8 @@ type
     OptionTempFolderEdit: TEdit;
     OptionTempFolderLabel: TLabel;
     OptionTextBoxInfoShowCheckBox: TCheckBox;
+    OptionTextRightEdgeComboBox: TComboBox;
+    OptionTextRightEdgeLabel: TLabel;
     OptionVerboseCheckBox: TCheckBox;
     OptionWeekWorkOneStartJvDateTimePicker: TJvDateTimePicker;
     OptionWeekWorkOneStartLabel: TLabel;
@@ -539,10 +543,8 @@ type
     UtilsToolBar: TToolBar;
     WeekLabel: TLabel;
     WeekdayLabel: TLabel;
-    YearLabel: TLabel;
-    FileKindImageList24: TImageList;
     WordTabSheet: TTabSheet;
-    ObjectImage2DBImage: TDBImage;
+    YearLabel: TLabel;
     procedure ActionBrowseActionExecute(Sender: TObject);
     procedure ActionEditActionExecute(Sender: TObject);
     procedure ActionFitActionExecute(Sender: TObject);
@@ -578,6 +580,7 @@ type
     procedure FilesRioTabSheetShow(Sender: TObject);
     procedure FilesRioTreeChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure FilesRioTreeClick(Sender: TObject);
+    procedure FilesRioTreeDblClick(Sender: TObject);
     procedure FilesRioTreeEditCancelled(Sender: TBaseVirtualTree; Column: TColumnIndex);
     procedure FilesRioTreeEdited(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
     procedure FilesRioTreeEditing(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var Allowed: boolean);
@@ -637,6 +640,8 @@ type
     procedure ObjectDataDBSynEditMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure ObjectDataValidateSpeedButtonClick(Sender: TObject);
     procedure ObjectDescriptionShowSpeedButtonClick(Sender: TObject);
+    procedure ObjectIdDBTextDblClick(Sender: TObject);
+    procedure ObjectImage2DBImageDblClick(Sender: TObject);
     procedure ObjectImageClearLabelClick(Sender: TObject);
     procedure ObjectImageFitLabelClick(Sender: TObject);
     procedure ObjectImageLoadLabelClick(Sender: TObject);
@@ -655,6 +660,7 @@ type
     procedure OptionPythonVersionComboBoxChange(Sender: TObject);
     procedure OptionTabWidthJvSpinEditChange(Sender: TObject);
     procedure OptionTextBoxInfoShowCheckBoxClick(Sender: TObject);
+    procedure OptionTextRightEdgeComboBoxChange(Sender: TObject);
     procedure OptionWeekWorkOneStartJvDateTimePickerChange(Sender: TObject);
     procedure ReplaceButtonedEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ReplaceButtonedEditLeftButtonClick(Sender: TObject);
@@ -694,11 +700,8 @@ type
     procedure TimerJvThreadTimerTimer(Sender: TObject);
     procedure UtilsPythonExecActionExecute(Sender: TObject);
     procedure WeekLabelClick(Sender: TObject);
-    procedure FilesRioTreeDblClick(Sender: TObject);
-    procedure WordTabSheetShow(Sender: TObject);
     procedure WordTabSheetHide(Sender: TObject);
-    procedure ObjectIdDBTextDblClick(Sender: TObject);
-    procedure ObjectImage2DBImageDblClick(Sender: TObject);
+    procedure WordTabSheetShow(Sender: TObject);
   private
     { Private declarations }
     // chache
@@ -717,7 +720,7 @@ type
   //FSynEditIsDragging   : boolean;                // syneditselectiondrag
   //FSynEditDragStartPos : TPoint;                 // syneditselectiondrag
     // text
-    FTextUtilsLineBeginWith: string;
+    FTextUtilsLineBeginWith: string;               // 
     // python
     FPythonEngine         : TPythonEngine;         // local
     FPythonGUIInputOutput : TPythonGUIInputOutput; // local
@@ -743,8 +746,8 @@ type
     procedure ObjectSynEditsSetup;
     procedure ObjectSynEditsFreeze;
     procedure ObjectSynEditsUnfreeze;
-    procedure ObjectSynEditStateStoreToDb;
-    procedure ObjectSynEditStateRestoreFromDb;
+//    procedure ObjectSynEditStateStoreToDb;
+//    procedure ObjectSynEditStateRestoreFromDb;
     procedure ObjectTabsUpdate;
     procedure ObjectContentSplitterUpdate;
     procedure ObjectContentEdgeBrowserUpdate;
@@ -1084,8 +1087,9 @@ end;
 
 procedure TBaseMainForm.ObjectSynEditsSetup;
 var
-  idx: integer;
+  idx, tab: integer;
   cke: TCodKindEnum;
+//dke: TDatKindEnum;
 begin
   // exit
   if not ObjectClientDataSet.Active then
@@ -1098,82 +1102,105 @@ begin
   else
     cke := TCodRec.CodeKindEnumFromInt(idx);
 
-  gsyn.Setup(ObjectDescriptionDBSynEdit, Trunc(OptionTabWidthJvSpinEdit.Value));
-  gsyn.Setup(ObjectContentPrevDBSynEdit, Trunc(OptionTabWidthJvSpinEdit.Value), cke                , OptionFoldingLineShowCheckBox.Checked);
-  gsyn.Setup(ObjectContentDBSynEdit    , Trunc(OptionTabWidthJvSpinEdit.Value), cke                , OptionFoldingLineShowCheckBox.Checked);
-  gsyn.Setup(ObjectDataDBSynEdit       , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckJson, OptionFoldingLineShowCheckBox.Checked); // *** NOP, depends on DataType ***
-  gsyn.Setup(ObjectNoteDBSynEdit       , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckTxt , OptionFoldingLineShowCheckBox.Checked);
+  // tabspaces
+  tab := Trunc(OptionTabWidthJvSpinEdit.Value);
+
+  // selectively
+           if MainPageControl.ActivePage = ObjectContentPrevTabSheet then begin
+    ObjectContentPrevDBSynEdit.BeginUpdate;
+    gsyn.Setup(ObjectContentPrevDBSynEdit, tab, cke                , OptionFoldingLineShowCheckBox.Checked);
+    ObjectContentPrevDBSynEdit.EndUpdate;
+
+  end else if MainPageControl.ActivePage = ObjectContentTabSheet then begin
+    ObjectDescriptionDBSynEdit.BeginUpdate;
+    gsyn.Setup(ObjectDescriptionDBSynEdit, tab);
+    ObjectDescriptionDBSynEdit.EndUpdate;
+    ObjectContentDBSynEdit.BeginUpdate;
+    gsyn.Setup(ObjectContentDBSynEdit    , tab, cke                , OptionFoldingLineShowCheckBox.Checked);
+    ObjectContentDBSynEdit.EndUpdate;
+
+  end else if MainPageControl.ActivePage =ObjectDataTabSheet then begin
+    ObjectDataDBSynEdit.BeginUpdate;
+    gsyn.Setup(ObjectDataDBSynEdit       , tab, TCodKindEnum.ckJson, OptionFoldingLineShowCheckBox.Checked); // *** NOP, depends on DataType --> dke? ***
+    ObjectDataDBSynEdit.EndUpdate;
+
+  end else if MainPageControl.ActivePage =ObjectDataTabSheet then begin
+    ObjectNoteDBSynEdit.BeginUpdate;
+    gsyn.Setup(ObjectNoteDBSynEdit       , tab, TCodKindEnum.ckTxt , OptionFoldingLineShowCheckBox.Checked);
+    ObjectNoteDBSynEdit.EndUpdate;
+  end;
 
   // adjust
   ObjectDBEdit.Margins.Left := 35;
 
-  TextFoldingAction.Checked := true; // the above setup will activate the folding
+  // codefolding
+  TextFoldingAction.Checked := true; // the above setup will activate the codefolding
 end;
 
-procedure TBaseMainForm.ObjectSynEditStateStoreToDb;
-var
-  sts: TStringStream; // vec : TArray<TSynFoldRange>
-begin
-  // *** warning, ds should already be in edit mode ***
+//procedure TBaseMainForm.ObjectSynEditStateStoreToDb;
+//var
+//  sts: TStringStream; // vec : TArray<TSynFoldRange>
+//begin
+//  // *** warning, ds should already be in edit mode ***
+//
+//  // caret
+//  //FSynEditCaretPos   := ObjectContentDBSynEdit.CaretXY;
+//  //FSynEditTopLinePos := ObjectContentDBSynEdit.TopLine;
+//  ObjectClientDataset.FieldByName('FldEditorCaret').Value := Format('%d,%d,%d', [ObjectContentDBSynEdit.CaretX, ObjectContentDBSynEdit.CaretY, ObjectContentDBSynEdit.TopLine]);
+//
+//  // foldingstate
+//  sts := TStringStream.Create;
+//  try
+//    sts.Clear;
+//    ObjectContentDBSynEdit.AllFoldRanges.StoreCollapsedState(sts);
+//    ObjectClientDataset.FieldByName('FldEditorFolding').Value := sts.Bytes{DataString}; // *** WARNING if --[REGION ''] are not present the sts will be empty and field will be null so the restore will fail!
+//  finally
+//    sts.Clear;
+//    sts.Free;
+//  end;
+//end;
 
-  // caret
-  //FSynEditCaretPos   := ObjectContentDBSynEdit.CaretXY;
-  //FSynEditTopLinePos := ObjectContentDBSynEdit.TopLine;
-  ObjectClientDataset.FieldByName('FldEditorCaret').Value := Format('%d,%d,%d', [ObjectContentDBSynEdit.CaretX, ObjectContentDBSynEdit.CaretY, ObjectContentDBSynEdit.TopLine]);
-
-  // foldingstate
-  sts := TStringStream.Create;
-  try
-    sts.Clear;
-    ObjectContentDBSynEdit.AllFoldRanges.StoreCollapsedState(sts);
-    ObjectClientDataset.FieldByName('FldEditorFolding').Value := sts.Bytes{DataString}; // *** WARNING if --[REGION ''] are not present the sts will be empty and field will be null so the restore will fail!
-  finally
-    sts.Clear;
-    sts.Free;
-  end;
-end;
-
-procedure TBaseMainForm.ObjectSynEditStateRestoreFromDb;
-var
-  sts: TStringStream;
-  car: string;
-begin
-  // caret
-  //ObjectContentDBSynEdit.CaretXY := FSynEditCaretPos  ;
-  //ObjectContentDBSynEdit.TopLine := FSynEditTopLinePos;
-  // reset
-  //FSynEditCaretPos   := BufferCoord(1, 1);
-  //FSynEditTopLinePos := 1;
-
-  // caret
-  car := TStrRec.StrCoalesce([ObjectClientDataset.FieldByName('FldEditorCaret').AsString, '1,1,1']);
-  ObjectContentDBSynEdit.CaretX  := TCsvRec.CsvRowField(car, 0);
-  ObjectContentDBSynEdit.CaretY  := TCsvRec.CsvRowField(car, 1);
-  ObjectContentDBSynEdit.TopLine := TCsvRec.CsvRowField(car, 2);
-
-  // exit
-  if ObjectClientDataset.FieldByName('FldEditorFolding').Value = null then
-    Exit;
-
-  // foldingstate
-  sts := TStringStream.Create;
-  try
-    TStmRec.FromByteArray(ObjectClientDataset.FieldByName('FldEditorFolding').AsBytes, sts);
-    sts.Seek(0, soBeginning);
-
-    // folding
-    ObjectContentDBSynEdit.AllFoldRanges.RestoreCollapsedState(sts);
-
-    // folding
-  //  gsyn.CodeKind := TCodKindEnum(ObjectContentDBSynEdit.Tag); // *** must be set before caling ScanForFoldRanges ***
-  //  ObjectContentDBSynEdit.OnScanForFoldRanges := gsyn.ScanForFoldRanges;
-  //  ObjectContentDBSynEdit.UseCodeFolding := false;
-  //  ObjectContentDBSynEdit.UseCodeFolding := true;
-  finally
-    sts.Clear;
-    sts.Free;
-  end;
-end;
+//procedure TBaseMainForm.ObjectSynEditStateRestoreFromDb;
+//var
+//  sts: TStringStream;
+//  car: string;
+//begin
+//  // caret
+//  //ObjectContentDBSynEdit.CaretXY := FSynEditCaretPos  ;
+//  //ObjectContentDBSynEdit.TopLine := FSynEditTopLinePos;
+//  // reset
+//  //FSynEditCaretPos   := BufferCoord(1, 1);
+//  //FSynEditTopLinePos := 1;
+//
+//  // caret
+//  car := TStrRec.StrCoalesce([ObjectClientDataset.FieldByName('FldEditorCaret').AsString, '1,1,1']);
+//  ObjectContentDBSynEdit.CaretX  := TCsvRec.CsvRowField(car, 0);
+//  ObjectContentDBSynEdit.CaretY  := TCsvRec.CsvRowField(car, 1);
+//  ObjectContentDBSynEdit.TopLine := TCsvRec.CsvRowField(car, 2);
+//
+//  // exit
+//  if ObjectClientDataset.FieldByName('FldEditorFolding').Value = null then
+//    Exit;
+//
+//  // foldingstate
+//  sts := TStringStream.Create;
+//  try
+//    TStmRec.FromByteArray(ObjectClientDataset.FieldByName('FldEditorFolding').AsBytes, sts);
+//    sts.Seek(0, soBeginning);
+//
+//    // folding
+//    ObjectContentDBSynEdit.AllFoldRanges.RestoreCollapsedState(sts);
+//
+//    // folding
+//  //  gsyn.CodeKind := TCodKindEnum(ObjectContentDBSynEdit.Tag); // *** must be set before caling ScanForFoldRanges ***
+//  //  ObjectContentDBSynEdit.OnScanForFoldRanges := gsyn.ScanForFoldRanges;
+//  //  ObjectContentDBSynEdit.UseCodeFolding := false;
+//  //  ObjectContentDBSynEdit.UseCodeFolding := true;
+//  finally
+//    sts.Clear;
+//    sts.Free;
+//  end;
+//end;
 
 procedure TBaseMainForm.ObjectSynEditsFreeze;
 begin
@@ -1351,6 +1378,7 @@ begin
   OptionStateDefaultComboBox.ItemIndex           := gini.IntGet(FObj + '/OptionStateDefaul'                   , 0                          );
   OptionFontSizeJvSpinEdit.Value                 := gini.FloGet(FObj + '/OptionFontSize'                      , 10                         ); OptionFontSizeJvSpinEditChange(nil);
   OptionTabWidthJvSpinEdit.Value                 := gini.FloGet(FObj + '/OptionTabWidth'                      , 2                          ); OptionTabWidthJvSpinEditChange(nil);
+  OptionTextRightEdgeComboBox.ItemIndex          := gini.IntGet(FObj + '/OptionTextRightEdge'                 , 5 {128}                    ); OptionTextRightEdgeComboBoxChange(nil);
   OptionAutoRunCheckBox.Checked                  := gini.BooGet(FObj + '/OptionAutoRun'                       , false                      );
   OptionAutoLoginCheckBox.Checked                := gini.BooGet(FObj + '/OptionAutoLogin'                     , false                      );
   OptionAutoHideCheckBox.Checked                 := gini.BooGet(FObj + '/OptionAutoHide'                      , false                      );
@@ -1631,6 +1659,7 @@ begin
   gini.IntSet(FObj + '/OptionStateDefaul'               , OptionStateDefaultComboBox.ItemIndex             );
   gini.FloSet(FObj + '/OptionFontSize'                  , OptionFontSizeJvSpinEdit.Value                   );
   gini.FloSet(FObj + '/OptionTabWidth'                  , OptionTabWidthJvSpinEdit.Value                   );
+  gini.IntSet(FObj + '/OptionTextRightEdge'             , OptionTextRightEdgeComboBox.ItemIndex            );
   gini.BooSet(FObj + '/OptionAutoRun'                   , OptionAutoRunCheckBox.Checked                    );
   gini.BooSet(FObj + '/OptionAutoLogin'                 , OptionAutoLoginCheckBox.Checked                  );
   gini.BooSet(FObj + '/OptionAutoHide'                  , OptionAutoHideCheckBox.Checked                   );
@@ -1966,7 +1995,7 @@ begin
   // syneditsetupandstate
   if gsyn.Focused.UseCodeFolding then begin
     ObjectSynEditsSetup;
-    ObjectSynEditStateRestoreFromDb;
+//    ObjectSynEditStateRestoreFromDb;
   end;
 end;
 
@@ -2513,7 +2542,7 @@ begin
 //  str := SynStatusChangesToString(Changes);
 //  LogFrame.Log(str);
 //
-//  if str = '[scCaretX,scCaretY,scSelection]' then
+//  if str = '[scCaretX,scCaretY, scSelection]' then
 //    if not (ObjectClientDataSet.State in [dsEdit]) then begin
 //      ObjectClientDataSet.Edit;
 end;
@@ -2529,13 +2558,13 @@ end;
 
 procedure TBaseMainForm.ObjectContentDBSynEditMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-  if ( not (ObjectClientDataSet.State in [dsEdit]) ) and (ObjectContentDBSynEdit.SelLength > 0) and (Button = mbLeft) then begin
+//  if ( not (ObjectClientDataSet.State in [dsEdit]) ) and (ObjectContentDBSynEdit.SelLength > 0) and (Button = mbLeft) then begin
 //  FSynEditIsDragging := true;
 //  FSynEditDragStartPos := Point(X, Y);
 //  LogFrame.Log('Start dragging...');
-    ObjectClientDataSet.Edit;
+//    ObjectClientDataSet.Edit;
 //  LogFrame.Log('Editing...');
-  end;
+//  end;
 end;
 
 procedure TBaseMainForm.ObjectContentDBSynEditMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
@@ -2761,7 +2790,7 @@ begin
 
   // synsetupandstate
   ObjectSynEditsSetup;
-  ObjectSynEditStateRestoreFromDb;
+//  ObjectSynEditStateRestoreFromDb;
 
   // edge
   if ActionMarkdownAction.Checked then begin
@@ -3079,6 +3108,17 @@ begin
   ObjectDataDBSynEdit.Font.Size        := siz;
   ObjectNoteDBSynEdit.Font.Size        := siz;
 end;
+
+procedure TBaseMainForm.OptionTextRightEdgeComboBoxChange(Sender: TObject);
+var
+  col: integer;
+begin
+  col := StrToInt(OptionTextRightEdgeComboBox.Text);
+  ObjectContentPrevDBSynEdit.RightEdge := col;
+  ObjectContentDBSynEdit.RightEdge     := col;
+  ObjectDataDBSynEdit.RightEdge        := col;
+  ObjectNoteDBSynEdit.RightEdge        := col;
+end;
     {$ENDREGION}
 
     {$REGION 'Show'}
@@ -3090,7 +3130,7 @@ begin
 
   // syneditsetupandstate
   ObjectSynEditsSetup;
-  ObjectSynEditStateRestoreFromDb;
+//  ObjectSynEditStateRestoreFromDb;
 end;
     {$ENDREGION}
 
@@ -3178,7 +3218,7 @@ begin
 
   // syneditsetupandstate
   ObjectSynEditsSetup;
-  ObjectSynEditStateRestoreFromDb;
+//  ObjectSynEditStateRestoreFromDb;
 
   // notworking
 //ObjectDTClientTree.Invalidate;
@@ -3214,7 +3254,7 @@ begin
   FObject           := DataSet.FieldByName('FldObject'          ).AsString;
 
   // info
-  ObjectNodeInfoLabel.Caption := Format('total %d', [{FId, DataSet.RecNo,} DataSet.RecordCount]);
+  ObjectNodeInfoLabel.Caption := Format('total %d  childs %d', [{FId, DataSet.RecNo,} DataSet.RecordCount, ObjectDTClientTree.FocusedNode.ChildCount]);
   ObjectIdDBText.Hint         := Format('Parent id: %d', [FPId]);
 
   // unfreeze
@@ -3226,19 +3266,24 @@ begin
   // kind
   ObjectContentKindDBComboBoxChange(nil);
 
-  // syneditsetupandstate *** IMPORTANT already done in prev line ***
-//ObjectSynEditsSetup;
-//ObjectSynEditFoldRestoreFromDb;
+  // syneditsetupandstate
+//ObjectSynEditsSetup;             *** unnecessary, already done in prev line ***
+//ObjectSynEditFoldRestoreFromDb;  *** unnecessary, already done in prev line ***
 
-  // contentjsonnotecharcount
-  if MainPageControl.ActivePage = ObjectContentPrevTabSheet then
+  // contentjsonnote focus and charcount
+       if MainPageControl.ActivePage = ObjectContentPrevTabSheet then begin
+    ObjectContentPrevDBSynEdit.SetFocus;
     ObjectContentPrevInfoUpdate;
-  if MainPageControl.ActivePage = ObjectContentTabSheet then
+  end else if MainPageControl.ActivePage = ObjectContentTabSheet then begin
     ObjectContentInfoUpdate;
-  if MainPageControl.ActivePage = ObjectDataTabSheet then
+    ObjectContentDBSynEdit.SetFocus;
+  end else if MainPageControl.ActivePage = ObjectDataTabSheet then begin
     ObjectDataInfoUpdate;
-  if MainPageControl.ActivePage = ObjectNoteTabSheet then
+    ObjectDataDBSynEdit.SetFocus;
+  end else if MainPageControl.ActivePage = ObjectNoteTabSheet then begin
     ObjectNoteInfoUpdate;
+    ObjectNoteDBSynEdit.SetFocus;
+  end;
 
   // edge
   if ActionMarkdownAction.Checked then begin
@@ -3279,7 +3324,7 @@ begin
 
   {$REGION 'object'}
   // syneditstate
-  ObjectSynEditStateStoreToDb;
+//  ObjectSynEditStateStoreToDb;
 
   // lastupdated
   DataSet.FieldByName('FldUpdated').Value := Now;
@@ -3346,8 +3391,8 @@ begin
     end;
 
     // syneditsetupandstate
-    ObjectSynEditsSetup;
-    ObjectSynEditStateRestoreFromDb;
+//    ObjectSynEditsSetup;
+//    ObjectSynEditStateRestoreFromDb;
   end;
   {$ENDREGION}
 
@@ -3431,7 +3476,7 @@ begin
       DataSet.FieldByName('FldToDepartment'    ).Value := gmbr.Department;
       DataSet.FieldByName('FldToArea'          ).Value := gmbr.Area;
       DataSet.FieldByName('FldToTeam'          ).Value := gmbr.Team;
-      DataSet.FieldByName('FldToMember'        ).Value := '*';
+      DataSet.FieldByName('FldToMember'        ).Value := '%'; // *** when solved the onjects sharing address problem, set back to '*' ***
     //DataSet.FieldByName('FldJobGradeMin'     ).Value := null;
     //DataSet.FieldByName('FldRoute'           ).Value := null;
       DataSet.FieldByName('FldObjectKind'      ).Value := vav[0];

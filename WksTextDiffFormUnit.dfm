@@ -10,7 +10,7 @@ object TextDiffForm: TTextDiffForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  Position = poMainFormCenter
+  Position = poDesigned
   ShowHint = True
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -30,7 +30,6 @@ object TextDiffForm: TTextDiffForm
     Images = ImageList24
     ShowCaptions = True
     TabOrder = 0
-    ExplicitWidth = 1002
     object DoneToolButton: TToolButton
       Left = 0
       Top = 0
@@ -139,16 +138,14 @@ object TextDiffForm: TTextDiffForm
     ActivePage = EditTabSheet
     Align = alClient
     TabOrder = 1
-    ExplicitWidth = 1002
-    ExplicitHeight = 449
     object EditTabSheet: TTabSheet
       Caption = '  Edit'
       ImageIndex = 1
       object EditGridPanel: TGridPanel
         Left = 0
         Top = 0
-        Width = 994
-        Height = 421
+        Width = 990
+        Height = 420
         Align = alClient
         BevelOuter = bvNone
         Caption = 'EditGridPanel'
@@ -197,8 +194,8 @@ object TextDiffForm: TTextDiffForm
           AlignWithMargins = True
           Left = 3
           Top = 23
-          Width = 491
-          Height = 395
+          Width = 489
+          Height = 394
           Align = alClient
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -213,6 +210,7 @@ object TextDiffForm: TTextDiffForm
           Gutter.Font.Height = -11
           Gutter.Font.Name = 'Consolas'
           Gutter.Font.Style = []
+          Gutter.Font.Quality = fqClearTypeNatural
           Gutter.ShowLineNumbers = True
           Gutter.Bands = <
             item
@@ -234,9 +232,8 @@ object TextDiffForm: TTextDiffForm
             end>
           Lines.Strings = (
             'SynEdit1')
-          Options = [eoAltSetsColumnMode, eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces, eoTrimTrailingSpaces]
+          ScrollbarAnnotations = <>
           SearchEngine = SynEditRegexSearch
-          SelectedColor.Alpha = 0.400000005960464500
           OnChange = SynEdit1Change
           OnPaint = SynEdit1Paint
           OnScroll = SynEdit1Scroll
@@ -245,10 +242,10 @@ object TextDiffForm: TTextDiffForm
         end
         object SynEdit2: TSynEdit
           AlignWithMargins = True
-          Left = 500
+          Left = 498
           Top = 23
-          Width = 491
-          Height = 395
+          Width = 489
+          Height = 394
           Align = alClient
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -263,6 +260,7 @@ object TextDiffForm: TTextDiffForm
           Gutter.Font.Height = -11
           Gutter.Font.Name = 'Consolas'
           Gutter.Font.Style = []
+          Gutter.Font.Quality = fqClearTypeNatural
           Gutter.ShowLineNumbers = True
           Gutter.Bands = <
             item
@@ -284,12 +282,11 @@ object TextDiffForm: TTextDiffForm
             end>
           Lines.Strings = (
             'SynEdit2')
-          Options = [eoAltSetsColumnMode, eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces, eoTrimTrailingSpaces]
-          SelectedColor.Alpha = 0.400000005960464500
+          ScrollbarAnnotations = <>
           OnChange = SynEdit1Change
         end
         object Label2: TLabel
-          Left = 730
+          Left = 727
           Top = 3
           Width = 31
           Height = 13
@@ -299,7 +296,7 @@ object TextDiffForm: TTextDiffForm
           ExplicitTop = 4
         end
         object Label1: TLabel
-          Left = 233
+          Left = 232
           Top = 3
           Width = 31
           Height = 13
@@ -490,8 +487,6 @@ object TextDiffForm: TTextDiffForm
         Width = 500
       end>
     OnDrawPanel = StatusBarDrawPanel
-    ExplicitTop = 502
-    ExplicitWidth = 1008
   end
   object ImageList24: TImageList
     ColorDepth = cd32Bit
