@@ -45,8 +45,8 @@ type
     // object methods
     function  SystemObjectIdNextSoap        (const IvObj: string; var IvIdNext: integer; var IvFbk: string): boolean; stdcall;
     function  SystemObjectNewRio            (const IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvFromOrganization, IvFromMember: string; var IvIdNew: integer): boolean; stdcall;
-    function  SystemObjectTreeContent       (const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean                    ; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; stdcall;
-    function  SystemObjectTreeContentSave   (const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean; IvFileSpec: string; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; stdcall;
+    function  SystemObjectTreeContent       (const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean                          ; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; stdcall;
+    function  SystemObjectTreeContentSave   (const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean; IvRemoteFileSpec: string; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; stdcall;
     function  SystemObjSoapFieldGet         (const IvObj, IvIdOrPath, IvField: string;   var IvValue: variant; const IvDefault: variant): boolean; stdcall;
     function  SystemObjSoapFieldSet         (const IvObj, IvIdOrPath, IvField: string; const IvValue: variant): boolean; stdcall;
     // dba methods

@@ -70,13 +70,11 @@ object BaseMainForm: TBaseMainForm
       Top = 0
       Width = 1160
       Height = 74
-      ActivePage = TopActionTabSheet
+      ActivePage = TopTextTabSheet
       Align = alClient
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0
-      ExplicitLeft = -2
-      ExplicitTop = -3
       object TopClientTabSheet: TTabSheet
         Caption = 'Client'
         object ClientToolBar: TToolBar
@@ -936,11 +934,12 @@ object BaseMainForm: TBaseMainForm
         object ObjectNodeInfoLabel: TLabel
           Left = 0
           Top = 551
-          Width = 113
+          Width = 292
           Height = 15
           Align = alBottom
           Alignment = taCenter
           Caption = 'ObjectNodeInfoLabel'
+          ExplicitWidth = 113
         end
         object ObjectDTClientTree: TDTClientTree
           Left = 0
@@ -1040,7 +1039,7 @@ object BaseMainForm: TBaseMainForm
       ExplicitWidth = 1580
       inherited LogPageControl: TPageControl
         Width = 1580
-        ExplicitWidth = 624
+        ExplicitWidth = 1580
         inherited OutputTabSheet: TTabSheet
           ExplicitWidth = 1572
           inherited OutputRichEdit: TRichEdit
@@ -1923,7 +1922,7 @@ object BaseMainForm: TBaseMainForm
               Left = 16
               Top = 43
               Width = 249
-              Height = -38
+              Height = 0
               Margins.Left = 16
               Margins.Top = 24
               Margins.Right = 16
@@ -1932,7 +1931,6 @@ object BaseMainForm: TBaseMainForm
               DataField = 'FldImage'
               DataSource = ObjectDataSource
               TabOrder = 0
-              ExplicitHeight = 0
             end
           end
           object ObjectTypeJvScrollMaxBand: TJvScrollMaxBand
@@ -2493,7 +2491,7 @@ object BaseMainForm: TBaseMainForm
             Height = 21
             Expanded = False
             Caption = 'Interface'
-            ExpandedHeight = 380
+            ExpandedHeight = 404
             ButtonFont.Charset = DEFAULT_CHARSET
             ButtonFont.Color = clWindowText
             ButtonFont.Height = -11
@@ -2507,23 +2505,30 @@ object BaseMainForm: TBaseMainForm
             object OptionTabWidthLabel: TLabel
               Left = 16
               Top = 90
-              Width = 53
+              Width = 51
               Height = 15
-              Caption = 'Tab Width'
+              Caption = 'Tab width'
             end
             object OptionStateDefaultLabel: TLabel
               Left = 16
               Top = 36
-              Width = 67
+              Width = 66
               Height = 15
-              Caption = 'Default State'
+              Caption = 'Default state'
             end
             object OptionFontSizeLabel: TLabel
               Left = 16
               Top = 63
-              Width = 47
+              Width = 46
               Height = 15
-              Caption = 'Font Size'
+              Caption = 'Font size'
+            end
+            object OptionTextRightEdgeLabel: TLabel
+              Left = 16
+              Top = 117
+              Width = 78
+              Height = 15
+              Caption = 'Text right edge'
             end
             object OptionTabWidthJvSpinEdit: TJvSpinEdit
               Left = 229
@@ -2540,7 +2545,7 @@ object BaseMainForm: TBaseMainForm
             object OptionShowInTrayCheckBox: TCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 207
+              Top = 235
               Width = 254
               Height = 17
               Margins.Left = 16
@@ -2552,7 +2557,7 @@ object BaseMainForm: TBaseMainForm
             object OptionMessageBeforeHideCheckBox: TCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 230
+              Top = 258
               Width = 254
               Height = 17
               Margins.Left = 16
@@ -2564,7 +2569,7 @@ object BaseMainForm: TBaseMainForm
             object OptionAlwaysOnTopCheckBox: TCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 253
+              Top = 281
               Width = 254
               Height = 17
               Margins.Left = 16
@@ -2576,11 +2581,11 @@ object BaseMainForm: TBaseMainForm
             object OptionAutoRunCheckBox: TCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 115
+              Top = 143
               Width = 254
               Height = 17
               Margins.Left = 16
-              Margins.Top = 96
+              Margins.Top = 124
               Margins.Right = 16
               Align = alTop
               Caption = ' Auto run'
@@ -2589,7 +2594,7 @@ object BaseMainForm: TBaseMainForm
             object OptionBackupOnExitCheckBox: TCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 299
+              Top = 327
               Width = 254
               Height = 17
               Margins.Left = 16
@@ -2601,7 +2606,7 @@ object BaseMainForm: TBaseMainForm
             object OptionAutoHideCheckBox: TCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 161
+              Top = 189
               Width = 254
               Height = 17
               Margins.Left = 16
@@ -2613,7 +2618,7 @@ object BaseMainForm: TBaseMainForm
             object OptionPasswordOnMaximizeCheckBox: TCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 276
+              Top = 304
               Width = 254
               Height = 17
               Margins.Left = 16
@@ -2625,7 +2630,7 @@ object BaseMainForm: TBaseMainForm
             object OptionAutoRefreshCheckBox: TCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 184
+              Top = 212
               Width = 254
               Height = 17
               Margins.Left = 16
@@ -2637,7 +2642,7 @@ object BaseMainForm: TBaseMainForm
             object OptionAutoLoginCheckBox: TCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 138
+              Top = 166
               Width = 254
               Height = 17
               Margins.Left = 16
@@ -2661,7 +2666,7 @@ object BaseMainForm: TBaseMainForm
             object OptionCommentRemoveCheckBox: TCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 322
+              Top = 350
               Width = 254
               Height = 17
               Margins.Left = 16
@@ -2685,7 +2690,7 @@ object BaseMainForm: TBaseMainForm
             object OptionVerboseCheckBox: TCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 345
+              Top = 373
               Width = 254
               Height = 17
               Hint = 'Show addtional info in the log panel'
@@ -2694,6 +2699,25 @@ object BaseMainForm: TBaseMainForm
               Align = alTop
               Caption = ' Verbose messages'
               TabOrder = 13
+            end
+            object OptionTextRightEdgeComboBox: TComboBox
+              Left = 197
+              Top = 114
+              Width = 73
+              Height = 23
+              TabOrder = 14
+              Text = 'OptionTextRightEdgeComboBox'
+              OnChange = OptionTextRightEdgeComboBoxChange
+              Items.Strings = (
+                '8'
+                '16'
+                '32'
+                '64'
+                '80'
+                '128'
+                '256'
+                '512'
+                '1024')
             end
           end
           object OptionFoldersJvScrollMaxBand: TJvScrollMaxBand
@@ -2986,13 +3010,14 @@ object BaseMainForm: TBaseMainForm
           end
           object OptionFilesJvScrollMaxBand: TJvScrollMaxBand
             Width = 286
-            Height = 274
+            Height = 21
+            Expanded = False
             Caption = 'Files'
             ExpandedHeight = 274
             Beveled = False
             DesignSize = (
               286
-              274)
+              21)
             object OptionFilesWorkingFolderLabel: TLabel
               Left = 16
               Top = 238
@@ -3161,7 +3186,7 @@ object BaseMainForm: TBaseMainForm
   object MainPanel: TPanel
     Left = 310
     Top = 74
-    Width = 950
+    Width = 907
     Height = 596
     Align = alLeft
     BevelOuter = bvNone
@@ -3171,7 +3196,7 @@ object BaseMainForm: TBaseMainForm
     object MainPageControl: TPageControl
       Left = 0
       Top = 0
-      Width = 950
+      Width = 907
       Height = 596
       ActivePage = ObjectContentTabSheet
       Align = alClient
@@ -3183,7 +3208,7 @@ object BaseMainForm: TBaseMainForm
         object ObjectContentPrevDBSynEdit: TDBSynEdit
           Left = 0
           Top = 28
-          Width = 942
+          Width = 899
           Height = 538
           Cursor = crIBeam
           DataField = 'FldContentPrev'
@@ -3231,7 +3256,7 @@ object BaseMainForm: TBaseMainForm
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 941
+          Width = 898
           Height = 28
           Margins.Left = 0
           Margins.Top = 0
@@ -3263,10 +3288,10 @@ object BaseMainForm: TBaseMainForm
           end
           object ObjectContentPrevCharCountLabel: TLabel
             AlignWithMargins = True
-            Left = 746
+            Left = 703
             Top = 3
             Width = 187
-            Height = 15
+            Height = 22
             Margins.Right = 8
             Align = alRight
             Caption = 'ObjectContentPrevCharCountLabel'
@@ -3277,13 +3302,14 @@ object BaseMainForm: TBaseMainForm
             Font.Style = []
             ParentFont = False
             Layout = tlCenter
+            ExplicitHeight = 15
           end
         end
       end
       object ObjectContentTabSheet: TTabSheet
         Caption = 'Content'
         object ObjectContentSplitter: TSplitter
-          Left = 732
+          Left = 689
           Top = 28
           Width = 10
           Height = 538
@@ -3295,7 +3321,7 @@ object BaseMainForm: TBaseMainForm
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 941
+          Width = 898
           Height = 28
           Margins.Left = 0
           Margins.Top = 0
@@ -3309,18 +3335,19 @@ object BaseMainForm: TBaseMainForm
           TabOrder = 0
           object ObjectContentCharCountLabel: TLabel
             AlignWithMargins = True
-            Left = 741
+            Left = 698
             Top = 3
             Width = 164
-            Height = 15
+            Height = 22
             Margins.Right = 8
             Align = alRight
             Caption = 'ObjectContentCharCountLabel'
             Layout = tlCenter
+            ExplicitHeight = 15
           end
           object ObjectDescriptionShowSpeedButton: TSpeedButton
             AlignWithMargins = True
-            Left = 916
+            Left = 873
             Top = 3
             Width = 22
             Height = 22
@@ -3346,7 +3373,7 @@ object BaseMainForm: TBaseMainForm
             AlignWithMargins = True
             Left = 35
             Top = 3
-            Width = 700
+            Width = 657
             Height = 22
             Margins.Left = 35
             Align = alClient
@@ -3365,7 +3392,7 @@ object BaseMainForm: TBaseMainForm
           end
         end
         object ObjectContentSplitView: TSplitView
-          Left = 742
+          Left = 699
           Top = 28
           Width = 200
           Height = 538
@@ -3389,7 +3416,7 @@ object BaseMainForm: TBaseMainForm
         object ObjectContentLeftPanel: TPanel
           Left = 0
           Top = 28
-          Width = 732
+          Width = 689
           Height = 538
           Align = alClient
           BevelOuter = bvNone
@@ -3398,65 +3425,20 @@ object BaseMainForm: TBaseMainForm
           TabOrder = 2
           object ObjectDescriptionSplitter: TSplitter
             Left = 0
-            Top = 98
-            Width = 732
+            Top = 108
+            Width = 689
             Height = 10
             Cursor = crVSplit
             Align = alTop
-            ExplicitWidth = 334
-          end
-          object ObjectDescriptionDBSynEdit: TDBSynEdit
-            Left = 0
-            Top = 0
-            Width = 732
-            Height = 98
-            Cursor = crIBeam
-            Hint = 'Description'
-            DataField = 'FldDescription'
-            DataSource = ObjectDataSource
-            Align = alTop
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clGray
-            Font.Height = -13
-            Font.Name = 'Consolas'
-            Font.Style = [fsItalic]
-            Font.Quality = fqClearTypeNatural
-            ParentColor = False
-            ParentFont = False
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 0
-            BorderStyle = bsNone
-            Gutter.Font.Charset = DEFAULT_CHARSET
-            Gutter.Font.Color = clWindowText
-            Gutter.Font.Height = -11
-            Gutter.Font.Name = 'Consolas'
-            Gutter.Font.Style = []
-            Gutter.Font.Quality = fqClearTypeNatural
-            Gutter.Bands = <
-              item
-                Kind = gbkMarks
-                Width = 13
-              end
-              item
-                Kind = gbkLineNumbers
-              end
-              item
-                Kind = gbkFold
-              end
-              item
-                Kind = gbkTrackChanges
-              end
-              item
-                Kind = gbkMargin
-                Width = 3
-              end>
+            ExplicitLeft = 14
+            ExplicitTop = 124
+            ExplicitWidth = 732
           end
           object ObjectContentDBSynEdit: TDBSynEdit
             Left = 0
-            Top = 108
-            Width = 732
-            Height = 430
+            Top = 118
+            Width = 689
+            Height = 420
             Cursor = crIBeam
             DataField = 'FldContent'
             DataSource = ObjectDataSource
@@ -3469,7 +3451,7 @@ object BaseMainForm: TBaseMainForm
             Font.Quality = fqClearTypeNatural
             ParentColor = False
             ParentFont = False
-            TabOrder = 1
+            TabOrder = 0
             OnDragOver = ObjectContentDBSynEditDragOver
             OnKeyUp = ObjectContentDBSynEditKeyUp
             OnMouseDown = ObjectContentDBSynEditMouseDown
@@ -3503,6 +3485,50 @@ object BaseMainForm: TBaseMainForm
             OnChange = ObjectContentDBSynEditChange
             OnStatusChange = ObjectContentDBSynEditStatusChange
           end
+          object ObjectDescriptionDBSynEdit: TDBSynEdit
+            Left = 0
+            Top = 0
+            Width = 689
+            Height = 108
+            Cursor = crIBeam
+            DataField = 'FldDescription'
+            DataSource = ObjectDataSource
+            Align = alTop
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clGray
+            Font.Height = -13
+            Font.Name = 'Consolas'
+            Font.Style = [fsItalic]
+            Font.Quality = fqClearTypeNatural
+            ParentColor = False
+            ParentFont = False
+            TabOrder = 1
+            BorderStyle = bsNone
+            Gutter.Font.Charset = DEFAULT_CHARSET
+            Gutter.Font.Color = clWindowText
+            Gutter.Font.Height = -11
+            Gutter.Font.Name = 'Consolas'
+            Gutter.Font.Style = []
+            Gutter.Font.Quality = fqClearTypeNatural
+            Gutter.Bands = <
+              item
+                Kind = gbkMarks
+                Width = 13
+              end
+              item
+                Kind = gbkLineNumbers
+              end
+              item
+                Kind = gbkFold
+              end
+              item
+                Kind = gbkTrackChanges
+              end
+              item
+                Kind = gbkMargin
+                Width = 3
+              end>
+          end
         end
       end
       object ObjectDataTabSheet: TTabSheet
@@ -3511,7 +3537,7 @@ object BaseMainForm: TBaseMainForm
         object ObjectDataDBSynEdit: TDBSynEdit
           Left = 0
           Top = 28
-          Width = 942
+          Width = 899
           Height = 538
           Cursor = crIBeam
           DataField = 'FldData'
@@ -3559,7 +3585,7 @@ object BaseMainForm: TBaseMainForm
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 941
+          Width = 898
           Height = 28
           Margins.Left = 0
           Margins.Top = 0
@@ -3573,14 +3599,15 @@ object BaseMainForm: TBaseMainForm
           TabOrder = 1
           object ObjectDataCharCountLabel: TLabel
             AlignWithMargins = True
-            Left = 788
+            Left = 745
             Top = 3
             Width = 145
-            Height = 15
+            Height = 22
             Margins.Right = 8
             Align = alRight
             Caption = 'ObjectDataCharCountLabel'
             Layout = tlCenter
+            ExplicitHeight = 15
           end
           object ObjectDataValidateSpeedButton: TSpeedButton
             AlignWithMargins = True
@@ -3602,7 +3629,7 @@ object BaseMainForm: TBaseMainForm
         object ObjectNoteDBSynEdit: TDBSynEdit
           Left = 0
           Top = 28
-          Width = 942
+          Width = 899
           Height = 538
           Cursor = crIBeam
           DataField = 'FldNote'
@@ -3650,7 +3677,7 @@ object BaseMainForm: TBaseMainForm
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 941
+          Width = 898
           Height = 28
           Margins.Left = 0
           Margins.Top = 0
@@ -3664,14 +3691,15 @@ object BaseMainForm: TBaseMainForm
           TabOrder = 1
           object ObjectNoteCharCountLabel: TLabel
             AlignWithMargins = True
-            Left = 786
+            Left = 743
             Top = 3
             Width = 147
-            Height = 15
+            Height = 22
             Margins.Right = 8
             Align = alRight
             Caption = 'ObjectNoteCharCountLabel'
             Layout = tlCenter
+            ExplicitHeight = 15
           end
         end
       end
@@ -3682,7 +3710,7 @@ object BaseMainForm: TBaseMainForm
         object FilesRioTopPanel: TPanel
           Left = 0
           Top = 0
-          Width = 942
+          Width = 899
           Height = 46
           Align = alTop
           BevelOuter = bvNone
@@ -3691,10 +3719,10 @@ object BaseMainForm: TBaseMainForm
           TabOrder = 0
           object FilesRioInfoLabel: TLabel
             AlignWithMargins = True
-            Left = 747
+            Left = 704
             Top = 12
             Width = 187
-            Height = 22
+            Height = 31
             Margins.Top = 12
             Margins.Right = 8
             Align = alRight
@@ -3705,6 +3733,7 @@ object BaseMainForm: TBaseMainForm
             Font.Name = 'Courier New'
             Font.Style = [fsBold]
             ParentFont = False
+            ExplicitHeight = 22
           end
           object FilesRioToolBar: TToolBar
             Left = 0
@@ -3799,7 +3828,7 @@ object BaseMainForm: TBaseMainForm
         object FilesRioTree: TVirtualStringTree
           Left = 0
           Top = 46
-          Width = 942
+          Width = 899
           Height = 520
           Align = alClient
           BorderStyle = bsNone
