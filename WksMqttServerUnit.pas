@@ -29,29 +29,29 @@ type
   TMqttServerClass = class;
 
   {$REGION 'tcpip events'}
-  TOnClientJoin    = procedure(AContext: TIdContext) of object;
-  TOnClientDisjoin = procedure(AContext: TIdContext) of object;
-  TOnClientData    = procedure(Sender: TObject) of object;
+  TClientOnJoin    = procedure(AContext: TIdContext) of object;
+  TClientOnDisjoin = procedure(AContext: TIdContext) of object;
+  TClientOnData    = procedure(Sender: TObject) of object;
   {$ENDREGION}
 
   {$REGION 'broker events'}
   // client connection packet event
-  TOnMQTTClientConnect = procedure(Sender: TMqttServerClass; ClientIdentifier: string; var Accept: boolean; var ReturnCode: TMqttConnectReturnCode) of object;
+  TMQTTClientOnConnect = procedure(Sender: TMqttServerClass; ClientIdentifier: string; var Accept: boolean; var ReturnCode: TMqttConnectReturnCode) of object;
 
   // client publish packet event
-  TOnMQTTClientPublish = procedure(Sender: TMqttServerClass; ClientIdentifier: string; var Accept: boolean; Reason: TMqttPublishReturnCode) of object;
+  TMQTTClientPublishOn = procedure(Sender: TMqttServerClass; ClientIdentifier: string; var Accept: boolean; Reason: TMqttPublishReturnCode) of object;
 
   // client subscribe packet event
-  TOnMQTTClientSubscribe = procedure(Sender: TMqttServerClass; ClientIdentifier: string; var Accept: boolean; Reason: TMqttSubscribeReturnCode) of object;
+  TMQTTClientOnSubscribe = procedure(Sender: TMqttServerClass; ClientIdentifier: string; var Accept: boolean; Reason: TMqttSubscribeReturnCode) of object;
 
   // client unsubscribe packet event
-  TOnMQTTClientUnsubscribe = procedure(Sender: TMqttServerClass; ClientIdentifier: string; var Accept: boolean; Reason: TMqttUnsubscribeReturnCode) of object;
+  TMQTTClientOnUnsubscribe = procedure(Sender: TMqttServerClass; ClientIdentifier: string; var Accept: boolean; Reason: TMqttUnsubscribeReturnCode) of object;
 
   // client pingreq packet event
-  TOnMQTTClientPingreq = procedure(Sender: TMqttServerClass; ClientIdentifier: string; var Accept: boolean; Reason: TMqttPingreqReturnCode) of object;
+  TMQTTClientOnPingreq = procedure(Sender: TMqttServerClass; ClientIdentifier: string; var Accept: boolean; Reason: TMqttPingreqReturnCode) of object;
 
   // client disconnection packet event
-  TOnMQTTClientDisconnect = procedure(Sender: TMqttServerClass; ClientIdentifier: string; var Accept: boolean; Reason: TMqttDisconnectReturnCode) of object;
+  TMQTTClientOnDisconnect = procedure(Sender: TMqttServerClass; ClientIdentifier: string; var Accept: boolean; Reason: TMqttDisconnectReturnCode) of object;
   {$ENDREGION}
 
   {$REGION 'broker events handlers arguments'}
@@ -157,31 +157,31 @@ type
     FRetainedMessages: TDictionary<string, TMqttMessageRec>;
 
     // tcpipserver events
-    FOnClientJoin   : TOnClientJoin;
-    FOnClientDisjoin: TOnClientDisjoin;
-    FOnClientData   : TOnClientData;
+    FClientOnJoin   : TClientOnJoin;
+    FClientOnDisjoin: TClientOnDisjoin;
+    FClientOnData   : TClientOnData;
 
     // broker events
-    FOnClientConnect    : TOnMQTTClientConnect;
-    FOnClientPingReq    : TOnMQTTClientPingReq;
-    FOnClientPublish    : TOnMQTTClientPublish;
-    FOnClientSubscribe  : TOnMQTTClientSubscribe;
-    FOnClientUnsubscribe: TOnMQTTClientUnsubscribe;
-    FOnClientMessage    : TOnMQTTMessage;
-    FOnClientDisconnect : TOnMQTTClientDisconnect;
+    FClientOnConnect    : TMQTTClientOnConnect;
+    FClientOnPingReq    : TMQTTClientOnPingreq;
+    FClientOnPublish    : TMQTTClientPublishOn;
+    FClientOnSubscribe  : TMQTTClientOnSubscribe;
+    FClientOnUnsubscribe: TMQTTClientOnUnsubscribe;
+    FClientOnMessage    : TMQTTOnMessage;
+    FClientOnDisconnect : TMQTTClientOnDisconnect;
 //  FOnMessageDeliver   : TOnMessageDeliveryHandler;
 //  FOnRetainedMessage  : TOnRetainedMessageHandler;
 //  FOnAuthenticate     : TOnAuthenticationHandler;
 //  FOnError            : TOnErrorHandler;
 
     // tcpipserver events handlers
-    procedure OnClientJoinHandler(AContext: TIdContext);
-    procedure OnClientDisjoinHandler(AContext: TIdContext);
-    procedure OnClientDataReceiveHandler(AContext: TIdContext);
+    procedure ClientOnJoinHandler(AContext: TIdContext);
+    procedure ClientOnDisjoinHandler(AContext: TIdContext);
+    procedure ClientOnDataReceiveHandler(AContext: TIdContext);
 
     // broker events handlers
-    procedure OnClientConnectHandler(AContext: TIdContext);
-    procedure OnClientDisconnectHandler(AContext: TIdContext);
+    procedure ClientOnConnectHandler(AContext: TIdContext);
+    procedure ClientOnDisconnectHandler(AContext: TIdContext);
 
     // connectroutines
     function  ConnectPacketProcess(ASession: TMqttSessionDataClass; APacket: TMqttPacketClass; out AConnectPacket: TMqttConnectPacketRec): TMqttConnectReturnCode;
@@ -228,14 +228,14 @@ type
     function SessionGet(AClientIdentifier: string): TMqttSessionDataClass;
 
     // tcp event properties
-    property OnClientJoin    : TOnClientJoin             read FOnClientJoin       write FOnClientJoin;
-    property OnClientDisjoin : TOnClientDisjoin          read FOnClientDisjoin    write FOnClientDisjoin;
-    property OnClientData    : TOnClientData             read FOnClientData       write FOnClientData;
+    property ClientOnJoin    : TClientOnJoin             read FClientOnJoin       write FClientOnJoin;
+    property ClientOnDisjoin : TClientOnDisjoin          read FClientOnDisjoin    write FClientOnDisjoin;
+    property ClientOnData    : TClientOnData             read FClientOnData       write FClientOnData;
 
     // broker event properties
-    property OnClientConnect   : TOnMQTTClientConnect    read FOnClientConnect    write FOnClientConnect;
-    property OnClientDisconnect: TOnMQTTClientDisconnect read FOnClientDisconnect write FOnClientDisconnect;
-    property OnClientMessage   : TOnMQTTMessage          read FOnClientMessage    write FOnClientMessage;
+    property ClientOnConnect   : TMQTTClientOnConnect    read FClientOnConnect    write FClientOnConnect;
+    property ClientOnDisconnect: TMQTTClientOnDisconnect read FClientOnDisconnect write FClientOnDisconnect;
+    property ClientOnMessage   : TMQTTOnMessage          read FClientOnMessage    write FClientOnMessage;
   end;
 {$ENDREGION}
 
@@ -248,9 +248,9 @@ begin
 
   // tcpserver
   FTCPServer := TIdTCPServer.Create(nil);
-  FTCPServer.OnConnect    := OnClientJoinHandler;
-  FTCPServer.OnDisconnect := OnClientDisjoinHandler;
-  FTCPServer.OnExecute    := OnClientDataReceiveHandler;
+  FTCPServer.OnConnect    := ClientOnJoinHandler;
+  FTCPServer.OnDisconnect := ClientOnDisjoinHandler;
+  FTCPServer.OnExecute    := ClientOnDataReceiveHandler;
 
   // broker
   FSessions         := TDictionary<string, TMqttSessionDataClass>.Create; // store ...
@@ -335,8 +335,8 @@ begin
         ses := cxt.Data as TMqttSessionDataClass;
 
         // notify disconnection event
-        if Assigned(FOnClientDisconnect) then
-          FOnClientDisconnect(Self, ses.ClientIdentifier, accept, disconrcSERVER_STOPPING);
+        if Assigned(FClientOnDisconnect) then
+          FClientOnDisconnect(Self, ses.ClientIdentifier, accept, disconrcSERVER_STOPPING);
 
         // send DISCONNECT packet if connection is still active
         if cxt.Connection.Connected then begin
@@ -434,8 +434,8 @@ if AConnectPacket.ConnectFlags.PasswordFlag then
 
   {$REGION 'events'}
   // fire connection event
-  if Assigned(FOnClientConnect) then
-    FOnClientConnect(Self, AConnectPacket.ClientIdentifier, accept, Result);
+  if Assigned(FClientOnConnect) then
+    FClientOnConnect(Self, AConnectPacket.ClientIdentifier, accept, Result);
   {$ENDREGION}
 
   // exit
@@ -511,8 +511,8 @@ begin
 
   {$REGION 'events'}
   // fire publishing event
-  if Assigned(FOnClientPublish) then
-    FOnClientPublish(Self, ASession.ClientIdentifier, accept, Result);
+  if Assigned(FClientOnPublish) then
+    FClientOnPublish(Self, ASession.ClientIdentifier, accept, Result);
   {$ENDREGION}
 
   // exit
@@ -656,8 +656,8 @@ begin
 
   {$REGION 'events'}
   // fire subscribe event
-  if Assigned(FOnClientSubscribe) then
-    FOnClientSubscribe(Self, ASession.ClientIdentifier, accept, Result);
+  if Assigned(FClientOnSubscribe) then
+    FClientOnSubscribe(Self, ASession.ClientIdentifier, accept, Result);
   {$ENDREGION}
 
   {$REGION 'sendback'}
@@ -708,8 +708,8 @@ begin
 
   {$REGION 'events'}
   // fire unsubscribe event
-  if Assigned(FOnClientUnsubscribe) then
-    FOnClientUnsubscribe(Self, ASession.ClientIdentifier, accept, Result);
+  if Assigned(FClientOnUnsubscribe) then
+    FClientOnUnsubscribe(Self, ASession.ClientIdentifier, accept, Result);
   {$ENDREGION}
 
   {$REGION 'sendback'}
@@ -744,8 +744,8 @@ begin
 
   {$REGION 'events'}
   // fire pingreq event
-  if Assigned(FOnClientPingReq) then
-    FOnClientPingReq(Self, ASession.ClientIdentifier, accept, Result);
+  if Assigned(FClientOnPingReq) then
+    FClientOnPingReq(Self, ASession.ClientIdentifier, accept, Result);
   {$ENDREGION}
 
   {$REGION 'sendback'}
@@ -786,8 +786,8 @@ begin
 
     {$REGION 'events'}
     // fire disconnection event
-    if Assigned(FOnClientDisconnect) then
-      FOnClientDisconnect(Self, ASession.ClientIdentifier, accept, Result);
+    if Assigned(FClientOnDisconnect) then
+      FClientOnDisconnect(Self, ASession.ClientIdentifier, accept, Result);
     {$ENDREGION}
 
     {$REGION 'will'}
@@ -868,29 +868,29 @@ end;
 {$ENDREGION}
 
 {$REGION 'TCPServerHandlers'}
-procedure TMqttServerClass.OnClientJoinHandler(AContext: TIdContext);
+procedure TMqttServerClass.ClientOnJoinHandler(AContext: TIdContext);
 begin
   //Log('client %d joined from: %s', [AContext.Binding.ID, AContext.Binding.PeerIP]);
 
   // trigger (invike) the event if it’s assigned
-  if Assigned(FOnClientJoin) then
-    FOnClientJoin(AContext);
+  if Assigned(FClientOnJoin) then
+    FClientOnJoin(AContext);
 
 //Accept := IsClientAllowed(ClientIdentifier);
 //if not Accept then
 //  ReturnCode := rcNOT_AUTHORIZED;
 end;
 
-procedure TMqttServerClass.OnClientDisjoinHandler(AContext: TIdContext);
+procedure TMqttServerClass.ClientOnDisjoinHandler(AContext: TIdContext);
 begin
   //Log('client %d disjoined from: %s reason: %s', [AContext.Binding.ID{ClientIdentifier}, AContext.Binding.PeerIP, 'AReason']);
 
   // trigger (invike) the event if it’s assigned
-  if Assigned(FOnClientDisjoin) then
-    FOnClientDisjoin(AContext);
+  if Assigned(FClientOnDisjoin) then
+    FClientOnDisjoin(AContext);
 end;
 
-procedure TMqttServerClass.OnClientDataReceiveHandler(AContext: TIdContext); // IncomingPacketProcess
+procedure TMqttServerClass.ClientOnDataReceiveHandler(AContext: TIdContext); // IncomingPacketProcess
 
   {$REGION 'var'}
 var
@@ -1235,7 +1235,7 @@ end;
 {$ENDREGION}
 
 {$REGION 'BrokerHandlers'}
-procedure TMqttServerClass.OnClientConnectHandler(AContext: TIdContext);
+procedure TMqttServerClass.ClientOnConnectHandler(AContext: TIdContext);
 var
   cid: string;  // clientidentifier
   cls: boolean; // cleansession
@@ -1268,8 +1268,8 @@ begin
     args.Accept           := true; // default to accepting connection
 
     // trigger event
-    if Assigned(FOnClientConnect) then
-      FOnClientConnect(args);
+    if Assigned(FClientOnConnect) then
+      FClientOnConnect(args);
 
     // Handle decision
     if not args.Accept then
@@ -1285,15 +1285,15 @@ begin
 
 end;
 
-procedure TMqttServerClass.OnClientDisconnectHandler(AContext: TIdContext);
+procedure TMqttServerClass.ClientOnDisconnectHandler(AContext: TIdContext);
 var
   session: TMqttSessionDataClass;
   accept: boolean;
 begin
   session := AContext.Data as TMqttSessionDataClass;
   if Assigned(session) then begin
-    if Assigned(FOnClientDisconnect) then
-      FOnClientDisconnect(Self, session.ClientIdentifier, accept, disconrcCLIENT_DISCONNECTED);
+    if Assigned(FClientOnDisconnect) then
+      FClientOnDisconnect(Self, session.ClientIdentifier, accept, disconrcCLIENT_DISCONNECTED);
 
     // handle will message if exists
 //    if session.WillMessage.Topic <> '' then

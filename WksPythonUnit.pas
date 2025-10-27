@@ -19,6 +19,7 @@ type
   {$REGION 'PythonRec'}
 TPythonRec = record
 public
+//class function  CodeIsValid(IvScript: string; var IvFbk: string): boolean;
   class function  PythonVersionInfo(IvPythonVersion: TPythonVersion): string; static;
   class function  PythonExePath: string; static;
   class function  PythonComponentsInit(IvOwner: TComponent; var IvPythonEngine: TPythonEngine; var IvPythonGUIInputOutput: TPythonGUIInputOutput; var IvMemo: TCustomMemo; IvOptionPythonVersionItemIndex: integer; var IvFbk: string): boolean; static;
@@ -148,6 +149,11 @@ var
   stl: TStringList;
   fis: string; // filespec
 begin
+  // exit
+//Result := CodeIsValid(IvCode, IvMsg);
+//if not Result then
+  //Exit;
+
   // stringlist
   stl := TStringList.Create;
   try

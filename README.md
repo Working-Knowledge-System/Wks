@@ -7,6 +7,7 @@
 This project is inspired to "Integrate" and "Productive 4.0" projects funded by Europe during the period 2010 - 2020.
 These projects was conducted by several companies and organization related to the semiconductor industry.
 
+
 # Wks
 Wks is a **Working Knowledge System** for the industry, companies or organizations.
 
@@ -22,18 +23,22 @@ It does not assume that everything is already known and predefined up front.
 The system is in an experimental early stage. Currently, an instance lives in a development environment on the cloud and does not yet have any real installations in place.
 However, it is actively seeking for real use cases to address.
 
+
 # Technologies
 The system uses a variety of technologies, languages, and libraries, prioritizing open-source solutions:
 
 - Object Pascal
 - ISAPI, SOAP, REST
 - MS SQL Server, MongoDB, Redis, DuckDB
-- MQTT, NATS, UNS
+- MQTT, NATS, ZeroMQ
 - WebSocket
 - HTML, CSS, JavaScript
 - W3CSS, W3JS, PicoCSS
 - HTMX, Alpine, Datastar
 - ESP8266, ESP32
+
+
+
 
 # Objects
 The system comprises an *open* collection of Objects.
@@ -91,15 +96,17 @@ Objects list:
 - Member
 - Organization
 - Page
+- Part (Article, Product)
 - Passdown
 - Person
-- Product
 - Report
 - Spc
 - System
 - Task
+- Ticket
 - Training
 - User
+- Wafer
 
 
 

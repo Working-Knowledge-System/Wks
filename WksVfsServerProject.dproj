@@ -1,4 +1,4 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{199A2197-9058-432B-9EC8-4A5F268CAC62}</ProjectGuid>
         <MainSource>WksVfsServerProject.dpr</MainSource>

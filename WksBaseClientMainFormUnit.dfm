@@ -1007,12 +1007,6 @@ object BaseMainForm: TBaseMainForm
           TabOrder = 1
         end
       end
-      object WordTabSheet: TTabSheet
-        Caption = 'Words'
-        ImageIndex = 5
-        OnHide = WordTabSheetHide
-        OnShow = WordTabSheetShow
-      end
     end
   end
   object BottomPanel: TPanel
@@ -1155,7 +1149,7 @@ object BaseMainForm: TBaseMainForm
           ButtonFont.Name = 'Segoe UI'
           ButtonFont.Style = []
           AutoHeight = False
-          ScrollBarWidth = 8
+          ScrollBarWidth = 10
           OneExpanded = True
           Align = alClient
           BevelOuter = bvNone
@@ -1164,7 +1158,7 @@ object BaseMainForm: TBaseMainForm
           ShowHint = True
           TabOrder = 0
           object ObjectIdJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'Ids'
@@ -1180,7 +1174,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 177
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1192,7 +1186,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 227
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1204,7 +1198,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 77
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1216,7 +1210,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 27
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Top = 8
@@ -1229,7 +1223,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 127
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1241,7 +1235,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 198
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1254,7 +1248,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 98
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1268,7 +1262,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 248
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1281,7 +1275,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 48
-              Width = 249
+              Width = 247
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -1299,7 +1293,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 148
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1310,7 +1304,7 @@ object BaseMainForm: TBaseMainForm
             end
           end
           object ObjectDateJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'Dates'
@@ -1326,7 +1320,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 27
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Top = 8
@@ -1339,7 +1333,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 48
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -1347,12 +1341,13 @@ object BaseMainForm: TBaseMainForm
               DataField = 'FldCreated'
               DataSource = ObjectDataSource
               ExplicitTop = 47
+              ExplicitWidth = 249
             end
             object ObjectUpdatedLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 71
-              Width = 249
+              Width = 247
               Height = 15
               Hint = 'Set Updated field to current date and time'
               Margins.Left = 16
@@ -1371,7 +1366,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 92
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -1379,12 +1374,13 @@ object BaseMainForm: TBaseMainForm
               DataField = 'FldUpdated'
               DataSource = ObjectDataSource
               ExplicitTop = 88
+              ExplicitWidth = 249
             end
             object ObjectUpdatedByDBText: TDBText
               AlignWithMargins = True
               Left = 16
               Top = 136
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -1393,12 +1389,13 @@ object BaseMainForm: TBaseMainForm
               DataSource = ObjectDataSource
               ExplicitLeft = 56
               ExplicitTop = 177
+              ExplicitWidth = 249
             end
             object ObjectUpdatedByLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 115
-              Width = 249
+              Width = 247
               Height = 15
               Hint = 'Set Updated field to current date and time'
               Margins.Left = 16
@@ -1415,7 +1412,7 @@ object BaseMainForm: TBaseMainForm
             end
           end
           object ObjectFromJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'From'
@@ -1431,7 +1428,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 27
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Top = 8
@@ -1444,7 +1441,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 227
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1456,7 +1453,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 177
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1468,7 +1465,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 127
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1480,7 +1477,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 77
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1492,7 +1489,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 48
-              Width = 249
+              Width = 247
               Height = 23
               Hint = 'Organization'
               Margins.Left = 16
@@ -1509,7 +1506,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 248
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1523,7 +1520,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 198
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1537,7 +1534,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 148
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1553,7 +1550,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 98
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1567,7 +1564,7 @@ object BaseMainForm: TBaseMainForm
             end
           end
           object ObjectToJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'To'
@@ -1580,13 +1577,13 @@ object BaseMainForm: TBaseMainForm
             Beveled = False
             ParentButtonFont = False
             DesignSize = (
-              281
+              279
               21)
             object ObjectToOrganizationLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 27
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Top = 8
@@ -1599,7 +1596,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 227
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1611,7 +1608,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 177
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1623,7 +1620,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 127
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1635,7 +1632,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 77
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1647,7 +1644,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 277
-              Width = 249
+              Width = 247
               Height = 15
               Hint = 
                 'A two digit number, first indicate Function, second indicate exp' +
@@ -1659,7 +1656,7 @@ object BaseMainForm: TBaseMainForm
               ExplicitWidth = 76
             end
             object ObjectJobGradeCalculateLabel: TLabel
-              Left = 216
+              Left = 214
               Top = 277
               Width = 49
               Height = 15
@@ -1672,12 +1669,13 @@ object BaseMainForm: TBaseMainForm
               Font.Style = [fsUnderline]
               ParentFont = False
               OnClick = ObjectJobGradeCalculateLabelClick
+              ExplicitLeft = 216
             end
             object ObjectToOrganizationDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
               Top = 48
-              Width = 249
+              Width = 247
               Height = 23
               Hint = 'Organization'
               Margins.Left = 16
@@ -1693,7 +1691,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 248
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1706,7 +1704,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 198
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1719,7 +1717,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 148
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1734,7 +1732,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 98
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1749,7 +1747,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 298
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1789,7 +1787,7 @@ object BaseMainForm: TBaseMainForm
             end
           end
           object ObjectApprovalJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'Approval'
@@ -1805,7 +1803,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 27
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Top = 8
@@ -1818,7 +1816,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 48
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1831,7 +1829,7 @@ object BaseMainForm: TBaseMainForm
             end
           end
           object ObjectImageJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'Image'
@@ -1921,7 +1919,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 43
-              Width = 249
+              Width = 247
               Height = 0
               Margins.Left = 16
               Margins.Top = 24
@@ -1934,7 +1932,7 @@ object BaseMainForm: TBaseMainForm
             end
           end
           object ObjectTypeJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'Types'
@@ -1950,7 +1948,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 82
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Top = 8
@@ -1963,7 +1961,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 27
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Top = 8
@@ -1976,7 +1974,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 137
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Top = 8
@@ -1989,7 +1987,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 103
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -2005,7 +2003,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 48
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -2021,7 +2019,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 158
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -2031,11 +2029,11 @@ object BaseMainForm: TBaseMainForm
               DataSource = ObjectDataSource
               DropDownCount = 32
               TabOrder = 2
-              OnChange = ObjectContentKindDBComboBoxChange
+              OnChange = ObjectDataKindDBComboBoxChange
             end
           end
           object ObjectGeneralJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'General'
@@ -2053,7 +2051,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 22
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -2065,7 +2063,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 172
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -2077,7 +2075,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 273
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -2090,7 +2088,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 72
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -2102,7 +2100,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 122
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -2114,7 +2112,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 43
-              Width = 249
+              Width = 247
               Height = 23
               Hint = 'State'
               Margins.Left = 16
@@ -2131,7 +2129,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 193
-              Width = 249
+              Width = 247
               Height = 23
               Hint = 'Page'
               Margins.Left = 16
@@ -2147,7 +2145,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 227
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Top = 8
@@ -2163,7 +2161,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 294
-              Width = 249
+              Width = 247
               Height = 23
               Hint = 'Page'
               Margins.Left = 16
@@ -2180,7 +2178,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 250
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -2194,7 +2192,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 93
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -2209,7 +2207,7 @@ object BaseMainForm: TBaseMainForm
               AlignWithMargins = True
               Left = 16
               Top = 143
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -3165,6 +3163,12 @@ object BaseMainForm: TBaseMainForm
           end
         end
       end
+      object WordTabSheet: TTabSheet
+        Caption = 'Words'
+        ImageIndex = 5
+        OnHide = WordTabSheetHide
+        OnShow = WordTabSheetShow
+      end
     end
   end
   object StatusBar: TStatusBar
@@ -3198,7 +3202,7 @@ object BaseMainForm: TBaseMainForm
       Top = 0
       Width = 907
       Height = 596
-      ActivePage = ObjectContentTabSheet
+      ActivePage = ObjectDataTabSheet
       Align = alClient
       TabOrder = 0
       StyleName = 'Windows'
@@ -3451,6 +3455,7 @@ object BaseMainForm: TBaseMainForm
             Font.Quality = fqClearTypeNatural
             ParentColor = False
             ParentFont = False
+            PopupMenu = SynEditContentPopup
             TabOrder = 0
             OnDragOver = ObjectContentDBSynEditDragOver
             OnKeyUp = ObjectContentDBSynEditKeyUp
@@ -3532,7 +3537,7 @@ object BaseMainForm: TBaseMainForm
         end
       end
       object ObjectDataTabSheet: TTabSheet
-        Caption = '  Data'
+        Caption = ' Data'
         ImageIndex = 1
         object ObjectDataDBSynEdit: TDBSynEdit
           Left = 0
@@ -6778,128 +6783,128 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000000000000000000000000000AF91
-      71FF955F37FF955F37FF955F37FF955F37FF955F37FF955F37FF955F37FF955F
-      37FFAF9171FF0000000000000000000000000000000F080400357C4100C8CA6A
+      7300006A7F00006A7F00006A7F00006A7F00006A7F00006A7F00006A7F00006A
+      7F00AF9173000000000000000000000000000000000F080400357C4100C8CA6A
       00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A
       00FFCA6A00FFA75700E80B06003E000000020000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000000000000000000000000000B7B1A9FF9E9992FF9E99
       92FF9A958EFF9A958EFF9A958EFF9A958EFF9A958EFF9A958EFF9A958EFF9A95
-      8EFF9A958EFF9A958EFF9A958EFFAAA49CFF00000000AF9171FF955F37FF955F
-      37FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF94
-      00FF955F37FF955F37FFAF9171FF000000001108004A391E0088AA5900EACA6A
+      8EFF9A958EFF9A958EFF9A958EFFAAA49CFF00000000AF917300006A7F00006A
+      7F0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8
+      FF00006A7F00006A7F00AF917300000000001108004A391E0088AA5900EACA6A
       00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A
       00FFCA6A00FFC56800FC814400CC160B00550000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000D79C6DFFB95832FFAB4D2AFFAB4D
       2AFFA94B29FFA94B29FFA94B29FFA94B29FFA94B29FFA94B29FFA94B29FFA94B
-      29FFA94B29FFAA4D29FFA94B29FFA7724DFFAF9171FF955F37FFFF9400FFFF94
-      00FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF94
-      00FFFF9400FFFF9400FF955F37FFAF9171FF975000DDAE5B00EDC56800FCCA6A
+      29FFA94B29FFAA4D29FFA94B29FFA7724DFFAF917300006A7F0000D8FF0000D8
+      FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8
+      FF0000D8FF0000D8FF00006A7F00AF917300975000DDAE5B00EDC56800FCCA6A
       00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A
       00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FF0000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000D38147FF514438FF000000FF0000
       00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
-      00FF000000FF000000FF514438FFD38147FF955F37FFFF9400FFFF9400FFFF94
-      00FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF94
-      00FFFF9400FFFF9400FFFF9400FF955F37FFCA6A00FFCA6A00FFCA6A00FFCA6A
+      00FF000000FF000000FF514438FFD38147FF006A7F0000D8FF0000D8FF0000D8
+      FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8
+      FF0000D8FF0000D8FF0000D8FF00006A7F00CA6A00FFCA6A00FFCA6A00FFCA6A
       00FFCA6A00FFCA6A00FFCA6C00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A
       00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FF00000000000000FF000000FF0000
       00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
       00FF000000FF000000FF000000FF00000000E78F51FF000000FF000000FF0000
       00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
-      00FF000000FF000000FF000000FFD27A45FF955F37FFFF9400FFFFFFFFFFFFFF
-      FFFFFFFFFFFFFFFFFFFFFF9400FFFF9400FFFFFFFFFFFF9400FFFF9400FFFFFF
-      FFFFFFFFFFFFFFFFFFFFFF9400FF976038FFCA6A00FFCA6A00FFCA6A00FFCA6A
+      00FF000000FF000000FF000000FFD27A45FF006A7F0000D8FF00000000000000
+      0000000000000000000000D8FF0000D8FF000000000000D8FF0000D8FF000000
+      0000000000000000000000D8FF00006A7F00CA6A00FFCA6A00FFCA6A00FFCA6A
       00FFCA6A00FFCA6A00FFFDFBF8FFF3DFC7FFCA6A00FFCA6A00FFCA6A00FFCA6A
       00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FF000000FF000000FFFFFFFFFFFFFF
       FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
       FFFFFFFFFFFFFFFFFFFF000000FF000000FFE58C4EFF000000FF000000FF4444
       44FFFFFFFFFFFFFFFFFF444444FF000000FF000000FF000000FF000000FF4444
-      44FFFFFFFFFF000000FF000000FFD07742FF955F37FFFF9400FFFFFFFFFFFF94
-      00FFFF9400FFFF9400FFFF9400FFFF9400FFFFFFFFFFFF9400FFFF9400FFFFFF
-      FFFFFF9400FFFF9400FFFF9400FF976038FFCA6A00FFCA6A00FFCA6A00FFCA6C
+      44FFFFFFFFFF000000FF000000FFD07742FF006A7F0000D8FF000000000000D8
+      FF0000D8FF0000D8FF0000D8FF0000D8FF000000000000D8FF0000D8FF000000
+      000000D8FF0000D8FF0000D8FF00006A7F00CA6A00FFCA6A00FFCA6A00FFCA6C
       00FFDC9E56FFEFD2B3FFE6B885FFFFFFFFFFCA6B00FFCA6A00FFE5BB88FFE4B5
       80FFCC6F06FFCA6A00FFCA6A00FFCA6A00FF000000FFFFFFFFFFFFFFFFFFFFFF
       FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
       FFFFFFFFFFFFFFFFFFFFFFFFFFFF000000FFE4884CFF000000FF000000FFFFFF
       FFFF444444FF444444FFFFFFFFFF000000FFFFFFFFFF000000FF000000FFFFFF
-      FFFF444444FF000000FF000000FFCF7340FF955F37FFFF9400FFFFFFFFFFFFFF
-      FFFFFFFFFFFFFFFFFFFFFF9400FFFF9400FFFFFFFFFFFF9400FFFF9400FFFFFF
-      FFFFFF9400FFFF9400FFFF9400FF976038FFCA6A00FFCC710AFFE9C092FFFFFF
+      FFFF444444FF000000FF000000FFCF7340FF006A7F0000D8FF00000000000000
+      0000000000000000000000D8FF0000D8FF000000000000D8FF0000D8FF000000
+      000000D8FF0000D8FF0000D8FF00006A7F00CA6A00FFCC710AFFE9C092FFFFFF
       FFFFFFFFFFFFECCAA5FFCC7008FFFFFFFFFFD4882FFFCA6A00FFE1AB6EFFFFFF
       FFFFFFFFFFFFEFD2B3FFCF7A19FFCA6A00FF000000FFFFFFFFFF000000FF0000
       00FF000000FFFFFFFFFF000000FFFFFFFFFFFFFFFFFF000000FFFFFFFFFF0000
       00FF000000FF000000FFFFFFFFFF000000FFE3854AFF000000FF000000FFFFFF
       FFFF000000FF000000FF000000FF000000FF000000FF000000FF444444FFFFFF
-      FFFF000000FF000000FF000000FFCE703EFF955F37FFFF9400FFFFFFFFFFFF94
-      00FFFF9400FFFF9400FFFF9400FFFF9400FFFFFFFFFFFF9400FFFF9400FFFFFF
-      FFFFFF9400FFFF9400FFFF9400FF976038FFEDCFABFFFFFFFFFFFEFDFDFFDDA0
+      FFFF000000FF000000FF000000FFCE703EFF006A7F0000D8FF000000000000D8
+      FF0000D8FF0000D8FF0000D8FF0000D8FF000000000000D8FF0000D8FF000000
+      000000D8FF0000D8FF0000D8FF00006A7F00EDCFABFFFFFFFFFFFEFDFDFFDDA0
       5BFFC65F00FFC35500FFC65E00FFFFFFFFFFEDCEACFFC76200FFC65E00FFC55C
       00FFD89040FFF8EEE2FFFFFFFFFFF9F2E8FF000000FFFFFFFFFFFFFFFFFF0000
       00FFFFFFFFFFFFFFFFFF000000FFFFFFFFFF000000FF000000FFFFFFFFFFFFFF
       FFFF000000FFFFFFFFFFFFFFFFFF000000FFE28148FF000000FF000000FFFFFF
       FFFF444444FF444444FFFFFFFFFF000000FFFFFFFFFF000000FFFFFFFFFF4444
-      44FF000000FF000000FF000000FFCD6C3CFF955F37FFFF9400FFFFFFFFFFFFFF
-      FFFFFFFFFFFFFFFFFFFFFF9400FFFFFFFFFFFFFFFFFFFFFFFFFFFF9400FFFFFF
-      FFFFFF9400FFFF9400FFFF9400FF976038FFF2DBC2FFFFFFFFFFF8F0E3FFD791
+      44FF000000FF000000FF000000FFCD6C3CFF006A7F0000D8FF00000000000000
+      0000000000000000000000D8FF0000000000000000000000000000D8FF000000
+      000000D8FF0000D8FF0000D8FF00006A7F00F2DBC2FFFFFFFFFFF8F0E3FFD791
       42FFC45800FFC75F00FFC86300FFEAC79FFFFFFFFFFFC65E00FFC45700FFC459
       00FFD28327FFF3DFC7FFFFFFFFFFFFFFFFFF000000FFFFFFFFFFFFFFFFFF0000
       00FFFFFFFFFFFFFFFFFF000000FF000000FF000000FF000000FFFFFFFFFFFFFF
       FFFF000000FFFFFFFFFFFFFFFFFF000000FFE07845FF000000FF000000FF4444
       44FFFFFFFFFFFFFFFFFF444444FF000000FF000000FF000000FFFFFFFFFF0000
-      00FF000000FF000000FF000000FFCB6739FF955F37FFFF9400FFFF9400FFFF94
-      00FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF94
-      00FFFF9400FFFF9400FFFF9400FF976038FFCA6A00FFCF7817FFECCCA7FFFFFF
+      00FF000000FF000000FF000000FFCB6739FF006A7F0000D8FF0000D8FF0000D8
+      FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8
+      FF0000D8FF0000D8FF0000D8FF00006A7F00CA6A00FFCF7817FFECCCA7FFFFFF
       FFFFFFFFFFFFEAC69EFFCA6A00FFD28429FFFFFFFFFFCD7109FFDB9C53FFFFFF
       FFFFFFFFFFFFF3DDC4FFD3842AFFCA6B00FF000000FFFFFFFFFFFFFFFFFF0000
       00FFFFFFFFFFFFFFFFFF000000FF000000FFFFFFFFFF000000FFFFFFFFFFFFFF
       FFFF000000FFFFFFFFFFFFFFFFFF000000FFDF7442FF000000FF000000FF0000
       00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
-      00FF000000FF000000FF000000FFCA6336FF955F37FFFF9400FFFF9400FF955F
-      37FF955F37FF955F37FF955F37FF955F37FF955F37FF955F37FF955F37FF955F
-      37FFA1673DFFFF9400FFFF9400FF976038FFCA6A00FFCA6A00FFCA6A00FFCC6F
+      00FF000000FF000000FF000000FFCA6336FF006A7F0000D8FF0000D8FF00006A
+      7F00006A7F00006A7F00006A7F00006A7F00006A7F00006A7F00006A7F00006A
+      7F0000D8FF0000D8FF0000D8FF00006A7F00CA6A00FFCA6A00FFCA6A00FFCC6F
       06FFE2AF73FFF4E3D0FFCA6A00FFC96700FFFFFFFFFFE8BF90FFE5BB8AFFEAC5
       9BFFCF7615FFCA6A00FFCA6A00FFCA6A00FF000000FFFFFFFFFF000000FF0000
       00FF000000FFFFFFFFFF000000FFFFFFFFFFFFFFFFFF000000FFFFFFFFFF0000
       00FF000000FF000000FFFFFFFFFF000000FFDD7040FF514438FF000000FF0000
       00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
-      00FF000000FF000000FF514438FFC85F34FF955F37FF955F37FF955F37FF955F
-      37FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF94
-      00FF955F37FF955F37FF955F37FF905B35FFCA6A00FFCA6A00FFCA6A00FFCA6A
+      00FF000000FF000000FF514438FFC85F34FF006A7F00006A7F00006A7F00006A
+      7F0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8
+      FF00006A7F00006A7F00006A7F00006A7F00CA6A00FFCA6A00FFCA6A00FFCA6A
       00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFF1DCC4FFFFFFFFFFC96600FFCA6A
       00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FF000000FFFFFFFFFFFFFFFFFFFFFF
       FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
       FFFFFFFFFFFFFFFFFFFFFFFFFFFF000000FFDF6D3FFFDA693CFFCA5C33FFCA5C
       33FFC75A31FFC75A31FFC75A31FFC75A31FFC75A31FFC75A31FFC75A31FFC75A
-      31FFC75A31FFC95C32FFC75A31FFC75A31FF955F37FF955F37FFFF9400FFFF94
-      00FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF94
-      00FFFF9400FFFF9400FF955F37FF9A6B48FFCA6A00FFCA6A00FFCA6A00FFCA6A
+      31FFC75A31FFC95C32FFC75A31FFC75A31FF006A7F00006A7F0000D8FF0000D8
+      FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8
+      FF0000D8FF0000D8FF00006A7F00006A7F00CA6A00FFCA6A00FFCA6A00FFCA6A
       00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCF7918FFD99546FFCA6A00FFCA6A
       00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FF000000FF000000FFFFFFFFFFFFFF
       FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
       FFFFFFFFFFFFFFFFFFFF000000FF000000FFD57318FFE38D28FFE3871DFFE387
       1DFFE3861BFFE38719FFE3851AFFE3871CFFE3861BFFE38414FFE18111FFE385
-      19FFE58618FFE08723FFCA792DFFC15D1DFFAF9171FF955F37FFFF9400FFFF94
-      00FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF94
-      00FFFF9400FFFF9400FF955F37FFAF9171FF9B5100DFBC6200F6CA6A00FFCA6A
+      19FFE58618FFE08723FFCA792DFFC15D1DFFAF917300006A7F0000D8FF0000D8
+      FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8
+      FF0000D8FF0000D8FF00006A7F00AF9173009B5100DFBC6200F6CA6A00FFCA6A
       00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A
       00FFCA6A00FFCA6A00FFC06500F98F4B00D700000000000000FF000000FF0000
       00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
       00FF000000FF000000FF000000FF00000000EABCA7FFB36242FFB36142FFB361
       42FFB36142FFB36142FFB36142FFB36142FFB36142FFB36142FFB36142FFB361
-      42FFB36142FFB36141FFD15A36FFE39984FF00000000AF9171FF955F37FF955F
-      37FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF9400FFFF94
-      00FF955F37FF955F37FFA27758FF000000000D070042522B00A3BC6200F6CA6A
+      42FFB36142FFB36141FFD15A36FFE39984FF00000000AF917300006A7F00006A
+      7F0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8FF0000D8
+      FF00006A7F00006A7F00A2795A00000000000D070042522B00A3BC6200F6CA6A
       00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A
       00FFCA6A00FFCA6A00FF723C00C0090500380000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000000000000000000000000000AF91
-      71FF955F37FF955F37FF955F37FF955F37FF955F37FF955F37FF955F37FF955F
-      37FFAF9171FF000000000000000000000000000000080D070042995000DECA6A
+      7300006A7F00006A7F00006A7F00006A7F00006A7F00006A7F00006A7F00006A
+      7F00AF917300000000000000000000000000000000080D070042995000DECA6A
       00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A00FFCA6A
       00FFCA6A00FFCA6A00FF2212006A000000070000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9239,7 +9244,7 @@ object BaseMainForm: TBaseMainForm
     Left = 208
     Top = 152
   end
-  object SysEditImageList24: TImageList
+  object SysEditContentImageList24: TImageList
     ColorDepth = cd32Bit
     DrawingStyle = dsTransparent
     Height = 24
@@ -9247,8 +9252,8 @@ object BaseMainForm: TBaseMainForm
     Left = 375
     Top = 432
     Bitmap = {
-      494C010103001100040018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
-      0000000000003600000028000000600000001800000001002000000000000024
+      494C010104001100040018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      0000000000003600000028000000600000003000000001002000000000000048
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9262,6 +9267,297 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFF3F3F3FFF3F3F3FFF3F3F3FFF3F3F3FFF3F3F3FFF3F3F3FFF3F3F
+      3FFF3F3F3FFF3F3F3FFF3F3F3FFF3F3F3FFF3F3F3FFF3F3F3FFF3F3F3FFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000696969FF696969FF696969FF696969FF696969FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9271,21 +9567,9 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000696969FF696969FF696969FF696969FF696969FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000696969FF0000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000696969FF0000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000696969FF0000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000696969FF0000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9295,21 +9579,9 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000696969FF0000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000696969FF0000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000696969FF0000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000696969FF0000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000696969FF0000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9319,21 +9591,9 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000696969FF0000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000696969FF0000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000696969FF0000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000696969FF0000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000696969FF0000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9343,21 +9603,9 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000696969FF0000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000696969FF0000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000696969FF0000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000696969FF0000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000696969FF0000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9367,21 +9615,9 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000696969FF0000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000696969FF0000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000696969FF0000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000696969FF0000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000696969FF0000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9391,9 +9627,69 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000696969FF0000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000696969FF0000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
+      0000696969FF0000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000696969FF0000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000696969FF0000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000696969FF0000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000696969FF0000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000696969FF0000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000696969FF0000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000696969FF0000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000696969FF0000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000696969FF0000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000696969FF0000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000696969FF0000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000696969FF0000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000696969FF0000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000696969FF696969FF696969FF696969FF6969
       69FF696969FF696969FF696969FF696969FF696969FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9403,9 +9699,9 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000696969FF696969FF696969FF696969FF6969
       69FF696969FF696969FF696969FF696969FF696969FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
       F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9415,21 +9711,9 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
       F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
-      F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
-      F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
-      F0FF696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
       F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9439,9 +9723,9 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
       F0FF696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000
+      FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
       F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9451,9 +9735,21 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
       F0FF696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000
+      FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
+      F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
+      F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
+      F0FF696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000
+      FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
       F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9463,9 +9759,9 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000696969FFF0F0F0FF696969FF696969FF6969
       69FF696969FF696969FF696969FF696969FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000
+      FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
       F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9475,9 +9771,9 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
       F0FF696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000
+      FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
       F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9487,9 +9783,9 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
       F0FF696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000
+      FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
       F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9499,9 +9795,9 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
       F0FF696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
       F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9511,9 +9807,9 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000696969FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0
       F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FFF0F0F0FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00003F3F3FFF3F3F3FFF3F3F3FFF3F3F3FFF3F3F3FFF3F3F3FFF3F3F3FFF3F3F
+      3FFF3F3F3FFF3F3F3FFF3F3F3FFF3F3F3FFF3F3F3FFF3F3F3FFF3F3F3FFF3F3F
+      3FFF000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000696969FF696969FF696969FF696969FF6969
       69FF696969FF696969FF696969FF696969FF696969FF696969FF000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9522,9 +9818,6 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000696969FF696969FF696969FF696969FF6969
       69FF696969FF696969FF696969FF696969FF696969FF696969FF000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9538,50 +9831,77 @@ object BaseMainForm: TBaseMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000424D3E000000000000003E000000
-      2800000060000000180000000100010000000000200100000000000000000000
-      000000000000000000000000FFFFFF00FFFFFFFFFFFFFFFFFF000000FFF03FFF
-      F03FFFF03F000000FFF7FFFFF7FFFFF7FF000000FFF7FFFFF7FFFFF7FF000000
-      FFF7FFFFF7FFFFF7FF000000FFF7FFFFF7FFFFF7FF000000FFF7FFFFF7FFFFF7
-      FF000000FFF7FFFFF7FFFFF7FF000000FFF7FFFFF7FFFFF7FF000000FFF7FFFF
-      F7FFFFF7FF000000FFF7FFFFF7FFFFF7FF000000FFF7FFFFF7FFFFF7FF000000
-      FE003FFE003FFE003F000000FE003FFE003FFE003F000000FE003FFE003FFE00
-      3F000000FE003FFE003FFE003F000000FE003FFE003FFE003F000000FE003FFE
-      003FFE003F000000FE003FFE003FFE003F000000FE003FFE003FFE003F000000
-      FE003FFE003FFE003F000000FE003FFE003FFE003F000000FE003FFE003FFE00
-      3F000000FFFFFFFFFFFFFFFFFF00000000000000000000000000000000000000
+      2800000060000000300000000100010000000000400200000000000000000000
+      000000000000000000000000FFFFFF0000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000000000FFFFFFFFFFFFFFFFFF000000FF
+      F03FFFF03FFFF03F000000FFF7FFFFF7FFFFF7FF000000FFF7FFFFF7FFFFF7FF
+      000000FFF7FFFFF7FFFFF7FF000000FFF7FFFFF7FFFFF7FF000000FFF7FFFFF7
+      FFFFF7FF000000FFF7FFFFF7FFFFF7FF000000FFF7FFFFF7FFFFF7FF000000FF
+      F7FFFFF7FFFFF7FF000000FFF7FFFFF7FFFFF7FF000000FFF7FFFFF7FFFFF7FF
+      000000FE003FFE003FFE003F000000FE003FFE003FFE003F000000FE003FFE00
+      3FFE003F000000FE003FFE003FFE003F000000FE003FFE003FFE003F000000FE
+      003FFE003FFE003F000000FE003FFE003FFE003F000000FE003FFE003FFE003F
+      000000FE003FFE003FFE003F000000FE003FFE003FFE003F000000FE003FFE00
+      3FFE003F000000FFFFFFFFFFFFFFFFFF00000000000000000000000000000000
       000000000000}
   end
-  object SynEditPopup: TPopupMenu
+  object SynEditContentPopup: TPopupMenu
     Left = 480
     Top = 432
-    object SynEditRegionInsertPopup: TMenuItem
-      Action = SynEditRegionInsertAction
-    end
     object SynEditInsertRegionPopup: TMenuItem
-      Action = SynEditRegionCollapseAction
+      Action = SynEditContentRegionCollapseAction
     end
     object RegionExpand1: TMenuItem
-      Action = SynEditRegionExpandAction
+      Action = SynEditContentRegionExpandAction
+    end
+    object SynEditRegionInsertPopup: TMenuItem
+      Action = SynEditContentRegionInsertAction
+    end
+    object SynEditHeaderInsertPopup: TMenuItem
+      Action = SynEditContentHeaderInsertAction
+    end
+    object SynEditContentTemplateInsertPopup: TMenuItem
+      Action = SynEditContentTemplateInsertAction
+      OnClick = SynEditContentTemplateInsertPopupClick
     end
   end
-  object SysEditAction: TActionList
-    Images = SysEditImageList24
+  object SysEditContentAction: TActionList
+    Images = SysEditContentImageList24
     Left = 584
     Top = 432
-    object SynEditRegionInsertAction: TAction
-      Caption = 'Region Insert'
+    object SynEditContentHeaderInsertAction: TAction
+      Caption = 'Header Insert'
       ImageIndex = 0
-      OnExecute = SynEditRegionInsertActionExecute
+      OnExecute = SynEditContentHeaderInsertActionExecute
     end
-    object SynEditRegionCollapseAction: TAction
-      Caption = 'Region Collapse'
+    object SynEditContentRegionInsertAction: TAction
+      Caption = 'Region Insert'
       ImageIndex = 1
-      OnExecute = SynEditRegionCollapseActionExecute
+      OnExecute = SynEditContentRegionInsertActionExecute
     end
-    object SynEditRegionExpandAction: TAction
-      Caption = 'Region Expand'
+    object SynEditContentRegionCollapseAction: TAction
+      Caption = 'Region Collapse'
       ImageIndex = 2
-      OnExecute = SynEditRegionExpandActionExecute
+      OnExecute = SynEditContentRegionCollapseActionExecute
+    end
+    object SynEditContentRegionExpandAction: TAction
+      Caption = 'Region Expand'
+      ImageIndex = 3
+      OnExecute = SynEditContentRegionExpandActionExecute
+    end
+    object SynEditContentTemplateInsertAction: TAction
+      Caption = 'Content Template Insert'
+    end
+    object SynEditDataJsonTemplateInsertAction: TAction
+      Caption = 'Data Json Template Insert'
     end
   end
   object OpenDialog: TOpenDialog

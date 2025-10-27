@@ -361,7 +361,7 @@ end;
 constructor TMqttClientWorkerThread.Create(AIndex: integer; ABarrier: TLightweightEvent);
 begin
   inherited Create(false);  // run immediately
-  FreeOnTerminate := false; // must be free manually after termination
+  FreeOnTerminate := false; // must be free manually after termination using a metod connected to .OnTerminate
 
   FIndex := AIndex;
   FBarrier := ABarrier;

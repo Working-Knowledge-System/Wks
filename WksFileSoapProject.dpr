@@ -1,12 +1,11 @@
 library WksFileSoapProject;
 
-// http://agnisoft.com/white_papers/soapbinaryfile.asp
-
 {$R 'Wks000Res.res' 'Wks000Res.rc'}
 
 {WARNING: WksComUnit must be the last file imported}
 
 uses
+  Midaslib,
   Winapi.Windows,
   Winapi.ActiveX,
   System.Win.ComObj,
@@ -37,3 +36,5 @@ begin
   Application.WebModuleClass := WebModuleClass;
   Application.Run;
 end.
+
+// http://agnisoft.com/white_papers/soapbinaryfile.asp

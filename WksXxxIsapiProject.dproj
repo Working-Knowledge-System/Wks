@@ -1,4 +1,4 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{D29F1423-E8CA-4B2F-A19D-83A41082D3E5}</ProjectGuid>
         <ProjectVersion>20.1</ProjectVersion>
@@ -100,7 +100,6 @@
         <DCCReference Include="Wks000Unit.pas"/>
         <DCCReference Include="WksXxxIsapiMainWebModuleUnit.pas">
             <Form>MainWebModule</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TWebModule</DesignClass>
         </DCCReference>
         <DCCReference Include="WksComUnit.pas"/>

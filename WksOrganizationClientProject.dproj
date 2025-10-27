@@ -1,4 +1,4 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{631E888A-661F-4F09-8CB4-5856B0A30418}</ProjectGuid>
         <MainSource>WksOrganizationClientProject.dpr</MainSource>

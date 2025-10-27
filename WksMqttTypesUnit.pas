@@ -171,7 +171,7 @@ type
   end;
 
   // basic message event type (used in both client and server)
-  TOnMQTTMessage = reference to procedure(const ATopicName: string; const AApplicationMessage: TBytes; AQoSLevel: TMqttQOSType; ARetain: boolean);
+  TMQTTOnMessage = reference to procedure(const ATopicName: string; const AApplicationMessage: TBytes; AQoSLevel: TMqttQOSType; ARetain: boolean);
   {$ENDREGION}
 
   {$REGION 'Packet'}

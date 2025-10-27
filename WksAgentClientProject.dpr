@@ -3,6 +3,7 @@ program WksAgentClientProject;
 {$R 'Wks000Res.res' 'Wks000Res.rc'}
 
 uses
+  MidasLib,
   Vcl.Forms,
   WksBaseClientMainFormUnit in 'WksBaseClientMainFormUnit.pas' {BaseMainForm},
   WksAgentClientMainFormUnit in 'WksAgentClientMainFormUnit.pas' {AgentMainForm},

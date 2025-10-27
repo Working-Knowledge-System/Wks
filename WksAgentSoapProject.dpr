@@ -5,6 +5,7 @@ library WksAgentSoapProject;
 {WARNING: WksComUnit must be the last file imported}
 
 uses
+  Midaslib,
   Winapi.Windows,
   Winapi.ActiveX,
   System.Win.ComObj,

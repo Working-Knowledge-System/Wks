@@ -16,7 +16,6 @@ uses
   , Vcl.StdCtrls
   , Vcl.ExtCtrls
   , Vcl.ComCtrls
-//, MidasLib // only for clients (not present in wsk000unit)
   , Wks000Unit
   ;
 {$ENDREGION}

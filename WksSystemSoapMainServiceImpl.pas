@@ -496,7 +496,7 @@ begin
   ses.Server        := IvServer        ; // FldServer
   ses.Organization  := IvOrganization  ; // FldOrganization
   ses.Username      := IvUsername      ; // FldUsername
-  Result := ses.Close(IvFbk);
+  Result := ses.Close(IvFbk); // ses.Reset   done in gses.Close
 end;
   {$ENDREGION}
 
@@ -1017,7 +1017,7 @@ begin
   // script
   sbu.Anl(2);
   sbu.Add('-- vars');
-  sbu.Add('declare @p varchar(256); set @p = ''C:\$Bak\Dba'' -- rootpath without \Year\Week');
+  sbu.Add('declare @p varchar(256); set @p = ''C:\$\Bakup\Dba'' -- rootpath without \Year\Week');
   sbu.Anl(2);
   sbu.Add('-- calc');
   sbu.Add('declare @d varchar(20) ; set @d = convert(varchar, getdate(), 112)                                                      -- date');

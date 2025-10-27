@@ -3,6 +3,7 @@ program WksBaseClientProject;
 {$R 'Wks000Res.res' 'Wks000Res.rc'}
 
 uses
+  MidasLib,
   Vcl.Forms,
   Wks000Unit in 'Wks000Unit.pas',
   WksPythonUnit in 'WksPythonUnit.pas',
