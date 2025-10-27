@@ -3,6 +3,7 @@ library WksMemberSoapProject;
 {$R 'Wks000Res.res' 'Wks000Res.rc'}
 
 uses
+  Midaslib,
   Winapi.Windows,
   Winapi.ActiveX,
   System.Win.ComObj,

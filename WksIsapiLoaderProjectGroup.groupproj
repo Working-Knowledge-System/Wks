@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{5319C3E7-BE9D-4822-A86C-A15DCBC106B1}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="WksIsapiLoaderHelloProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksIsapiLoaderProject.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="WksIsapiLoaderHelloProject">
+        <MSBuild Projects="WksIsapiLoaderHelloProject.dproj"/>
+    </Target>
+    <Target Name="WksIsapiLoaderHelloProject:Clean">
+        <MSBuild Projects="WksIsapiLoaderHelloProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksIsapiLoaderHelloProject:Make">
+        <MSBuild Projects="WksIsapiLoaderHelloProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksIsapiLoaderProject">
+        <MSBuild Projects="WksIsapiLoaderProject.dproj"/>
+    </Target>
+    <Target Name="WksIsapiLoaderProject:Clean">
+        <MSBuild Projects="WksIsapiLoaderProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksIsapiLoaderProject:Make">
+        <MSBuild Projects="WksIsapiLoaderProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="WksIsapiLoaderHelloProject;WksIsapiLoaderProject"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="WksIsapiLoaderHelloProject:Clean;WksIsapiLoaderProject:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="WksIsapiLoaderHelloProject:Make;WksIsapiLoaderProject:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

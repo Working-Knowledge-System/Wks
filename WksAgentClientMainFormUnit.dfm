@@ -1,6 +1,7 @@
 inherited AgentMainForm: TAgentMainForm
   Margins.Top = 8
   Caption = 'AgentMainForm'
+  StyleElements = [seFont, seClient, seBorder]
   OnCloseQuery = FormCloseQuery
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
@@ -15,14 +16,33 @@ inherited AgentMainForm: TAgentMainForm
     ExplicitWidth = 1180
   end
   inherited TopPanel: TPanel
+    StyleElements = [seFont, seClient, seBorder]
     inherited TopPageControl: TPageControl
+      ActivePage = AgentTabSheet
+      inherited TopSearchTabSheet: TTabSheet
+        inherited SearchReplaceOutLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceInLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceSwapLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceOutEdit: TEdit
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited SearchReplaceInEdit: TEdit
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
       object AgentTabSheet: TTabSheet
         Caption = 'Agent'
         ImageIndex = 2
         object AgentToolBar: TToolBar
           Left = 0
           Top = 0
-          Width = 153
+          Width = 204
           Height = 44
           Align = alLeft
           AutoSize = True
@@ -37,21 +57,26 @@ inherited AgentMainForm: TAgentMainForm
             Top = 0
             Action = AgentTestAction
           end
-          object AgentRunToolButton: TToolButton
+          object AgentResultToolButton: TToolButton
             Left = 51
+            Top = 0
+            Action = AgentResultAction
+          end
+          object AgentRunToolButton: TToolButton
+            Left = 102
             Top = 0
             Action = AgentRunAction
           end
           object AgentActiveToolButton: TToolButton
-            Left = 102
+            Left = 153
             Top = 0
             Action = AgentActiveAction
           end
         end
         object AgentMonitorPanel: TPanel
-          Left = 153
+          Left = 204
           Top = 0
-          Width = 1205
+          Width = 948
           Height = 44
           Align = alClient
           BevelOuter = bvNone
@@ -123,11 +148,110 @@ inherited AgentMainForm: TAgentMainForm
         end
       end
     end
+    inherited TopPageControl3: TPageControl
+      inherited TimeTabSheet: TTabSheet
+        inherited YearLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MonthLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited DayLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited TimerLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited WeekdayLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited WeekLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited TimerJvClock: TJvClock
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited PersonTabSheet: TTabSheet
+        inherited PersonNameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited PersonSurnameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited PersonSurnameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited PersonNameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited UserTabSheet: TTabSheet
+        inherited UserUsernameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited UserPasswordLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited UserPasswordLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited UserUsernameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited MemberTabSheet: TTabSheet
+        inherited MemberMemberLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MemberMemberLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MemberRoleLevelLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited MemberRoleLevelLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited OrganizationTabSheet: TTabSheet
+        inherited OrganizationOrganizationLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited OrganizationNameLabel2: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited OrganizationNameLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited OrganizationOrganizationLabel: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+    end
+    inherited TopPageControl2: TPageControl
+      inherited ObjectTabSheet: TTabSheet
+        inherited ObjectIdDBText: TDBText
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited ObjectKindDBText: TDBText
+          StyleElements = [seFont, seClient, seBorder]
+        end
+        inherited ObjectStateDBText: TDBText
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+    end
   end
   inherited LeftPanel: TPanel
+    StyleElements = [seFont, seClient, seBorder]
     OnResize = LeftPanelResize
     inherited LeftPageControl: TPageControl
       inherited ObjectTreeTabSheet: TTabSheet
+        inherited ObjectNodeInfoLabel: TLabel
+          Width = 292
+          StyleElements = [seFont, seClient, seBorder]
+        end
         inherited ObjectDBNavigator: TDBNavigator
           Hints.Strings = ()
         end
@@ -154,7 +278,7 @@ inherited AgentMainForm: TAgentMainForm
           Left = 0
           Top = 25
           Width = 292
-          Height = 545
+          Height = 541
           Align = alClient
           AllowDelete = False
           AllowInsert = False
@@ -277,7 +401,7 @@ inherited AgentMainForm: TAgentMainForm
           Left = 3
           Top = 33
           Width = 286
-          Height = 534
+          Height = 530
           Margins.Top = 8
           Align = alClient
           BorderStyle = bsNone
@@ -314,8 +438,24 @@ inherited AgentMainForm: TAgentMainForm
     end
   end
   inherited BottomPanel: TPanel
+    StyleElements = [seFont, seClient, seBorder]
+    ExplicitTop = 680
+    ExplicitWidth = 1580
     inherited LogFrame: TLogFrame
+      ExplicitWidth = 1580
       inherited LogPageControl: TPageControl
+        ExplicitWidth = 1580
+        inherited OutputTabSheet: TTabSheet
+          inherited OutputRichEdit: TRichEdit
+            StyleElements = [seFont, seClient, seBorder]
+            ExplicitWidth = 1570
+          end
+        end
+        inherited LogTabSheet: TTabSheet
+          inherited LogRichEdit: TRichEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+        end
         inherited SoapTabSheet: TTabSheet
           inherited SoapGridPanel: TGridPanel
             ControlCollection = <
@@ -339,18 +479,251 @@ inherited AgentMainForm: TAgentMainForm
                 Control = LogFrame.SoapResponseRichEdit
                 Row = 1
               end>
+            StyleElements = [seFont, seClient, seBorder]
+            inherited SoapResponseLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited SoapRequestRichEdit: TRichEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited SoapRequestLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited SoapResponseRichEdit: TRichEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+        end
+        inherited OptionTabSheet: TTabSheet
+          inherited OptionOutputLineWidthMaxLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited OptionOutputLinesMaxLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited OptionOutputLineWidthMaxEdit: TEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited OptionOutputLinesMaxEdit: TEdit
+            StyleElements = [seFont, seClient, seBorder]
           end
         end
       end
     end
   end
   inherited RightPanel: TPanel
+    StyleElements = [seFont, seClient, seBorder]
     inherited RightPageControl: TPageControl
       inherited PropertyTabSheet: TTabSheet
         inherited ObjectJvScrollMax: TJvScrollMax
-          ExplicitHeight = 569
+          StyleElements = [seFont, seClient, seBorder]
+          inherited ObjectIdJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectOrderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectRevLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectPIdLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectIdLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectId8Label: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectOrderDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectPIdDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectRevDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectIdDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectId8DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectDateJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectCreatedLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectCreatedDBText: TDBText
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedDBText: TDBText
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedByDBText: TDBText
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectUpdatedByLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectFromJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectFromOrganizationLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromMemberLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromTeamLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromAreaLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromDepartmentLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromOrganizationDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromMemberDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromTeamDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromAreaDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectFromDepartmentDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectToJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectToOrganizationLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToMemberLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToTeamLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToAreaLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToDepartmentLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectJobGradeMinLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectJobGradeCalculateLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToOrganizationDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToMemberDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToTeamDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToAreaDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectToDepartmentDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectJobGradeMinDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectApprovalJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectRouteLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectRouteDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectImageJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectImageLoadLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageSaveLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageEditLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageFitLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageClearLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectImageDBImage: TDBImage
+              Height = 0
+            end
+          end
+          inherited ObjectTypeJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectContentKindLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectKindLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDataKindLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectContentKindDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectKindDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDataKindDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectGeneralJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectStateLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSpareLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDescriptionLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectTitleLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSubtitleLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectStateDBComboBox: TDBComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSpareDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectDescriptionDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectTitleDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectSubtitleDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
           object AgentJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'Agent'
@@ -366,7 +739,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 53
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -378,7 +751,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 74
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -395,7 +768,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 3
               Top = 22
-              Width = 275
+              Width = 273
               Height = 25
               DataSource = AgentDataSource
               VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
@@ -405,11 +778,11 @@ inherited AgentMainForm: TAgentMainForm
             end
           end
           object AgentRunAtJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'RunAt'
-            ExpandedHeight = 475
+            ExpandedHeight = 465
             ButtonFont.Charset = ANSI_CHARSET
             ButtonFont.Color = clWindowText
             ButtonFont.Height = -11
@@ -420,8 +793,8 @@ inherited AgentMainForm: TAgentMainForm
             object AgentRunAtYearLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 148
-              Width = 249
+              Top = 35
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Top = 16
@@ -433,11 +806,10 @@ inherited AgentMainForm: TAgentMainForm
             object AgentRunAtQuarterLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 35
-              Width = 249
+              Top = 85
+              Width = 247
               Height = 15
               Margins.Left = 16
-              Margins.Top = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Quarter (empty or * or csv of quarters)'
@@ -446,8 +818,8 @@ inherited AgentMainForm: TAgentMainForm
             object AgentRunAtMonthLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 198
-              Width = 249
+              Top = 135
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -458,8 +830,8 @@ inherited AgentMainForm: TAgentMainForm
             object AgentRunAtWeekLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 85
-              Width = 249
+              Top = 185
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -470,8 +842,8 @@ inherited AgentMainForm: TAgentMainForm
             object AgentRunAtDayLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 248
-              Width = 249
+              Top = 235
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -482,8 +854,8 @@ inherited AgentMainForm: TAgentMainForm
             object AgentRunAtSecondLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 411
-              Width = 249
+              Top = 398
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -494,8 +866,8 @@ inherited AgentMainForm: TAgentMainForm
             object AgentRunAtMinuteLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 361
-              Width = 249
+              Top = 348
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -506,8 +878,8 @@ inherited AgentMainForm: TAgentMainForm
             object AgentRunAtHourLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 311
-              Width = 249
+              Top = 298
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Top = 16
@@ -519,8 +891,8 @@ inherited AgentMainForm: TAgentMainForm
             object AgentRunAtYearDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 169
-              Width = 249
+              Top = 56
+              Width = 247
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -535,8 +907,8 @@ inherited AgentMainForm: TAgentMainForm
             object AgentRunAtQuarterDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 56
-              Width = 249
+              Top = 106
+              Width = 247
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -551,8 +923,8 @@ inherited AgentMainForm: TAgentMainForm
             object AgentRunAtMonthDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 219
-              Width = 249
+              Top = 156
+              Width = 247
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -567,8 +939,8 @@ inherited AgentMainForm: TAgentMainForm
             object AgentRunAtWeekDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 106
-              Width = 249
+              Top = 206
+              Width = 247
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -583,8 +955,8 @@ inherited AgentMainForm: TAgentMainForm
             object AgentRunAtDayDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 269
-              Width = 249
+              Top = 256
+              Width = 247
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -599,8 +971,8 @@ inherited AgentMainForm: TAgentMainForm
             object AgentRunAtSecondDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 432
-              Width = 249
+              Top = 419
+              Width = 247
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -615,8 +987,8 @@ inherited AgentMainForm: TAgentMainForm
             object AgentRunAtMinuteDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 382
-              Width = 249
+              Top = 369
+              Width = 247
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -631,8 +1003,8 @@ inherited AgentMainForm: TAgentMainForm
             object AgentRunAtHourDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 332
-              Width = 249
+              Top = 319
+              Width = 247
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -646,11 +1018,11 @@ inherited AgentMainForm: TAgentMainForm
             end
           end
           object AgentEventsJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'Events'
-            ExpandedHeight = 198
+            ExpandedHeight = 205
             ButtonFont.Charset = ANSI_CHARSET
             ButtonFont.Color = clWindowText
             ButtonFont.Height = -11
@@ -662,7 +1034,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 35
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Top = 16
@@ -675,7 +1047,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 85
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -687,7 +1059,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 135
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -699,7 +1071,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 56
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -712,7 +1084,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 106
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -725,7 +1097,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 156
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -737,9 +1109,131 @@ inherited AgentMainForm: TAgentMainForm
           end
         end
       end
+      inherited SearchTabSheet: TTabSheet
+        inherited SearchFilterPanel: TPanel
+          StyleElements = [seFont, seClient, seBorder]
+          inherited SearchLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited ReplaceLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited SearchReplaceSwapLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited SearchInLabel: TLabel
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited SearchButtonedEdit: TButtonedEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+          inherited ReplaceButtonedEdit: TButtonedEdit
+            StyleElements = [seFont, seClient, seBorder]
+          end
+        end
+        inherited SearchResultListBox: TListBox
+          StyleElements = [seFont, seClient, seBorder]
+        end
+      end
       inherited OptionTabSheet: TTabSheet
         inherited OptionJvScrollMax: TJvScrollMax
-          ExplicitHeight = 570
+          StyleElements = [seFont, seClient, seBorder]
+          inherited OptionDateTimeJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionWeekWorkOneStartLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekDayLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekTimeLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekDayEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionWorkWeekTimeEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionInterfaceJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionTabWidthLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionStateDefaultLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFontSizeLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTextRightEdgeLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTabWidthJvSpinEdit: TJvSpinEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionStateDefaultComboBox: TComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFontSizeJvSpinEdit: TJvSpinEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTextRightEdgeComboBox: TComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionFoldersJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionPersistRootFolderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTempFolderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPersistRootFolderEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTempFolderEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionSecurityJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionCryptoKeyLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionCryptoKeyEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionPythonJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionPythonVersionLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPythonExePathLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPythonVersionComboBox: TComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionPythonExePathEdit: TEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited OptionFilesJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionFilesWorkingFolderLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesOnDoubleClickLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesWorkingFolderClearLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesOnDoubleClickComboBox: TComboBox
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionFilesWorkingFolderSelectButtonedEdit: TButtonedEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
           object OptionJclJvScrollMaxBand: TJvScrollMaxBand
             Width = 286
             Height = 21
@@ -772,15 +1266,52 @@ inherited AgentMainForm: TAgentMainForm
       end
     end
   end
-  inherited StatusBar: TStatusBar
-    ExplicitTop = 823
-    ExplicitWidth = 1728
-  end
   inherited MainPanel: TPanel
+    StyleElements = [seFont, seClient, seBorder]
     inherited MainPageControl: TPageControl
+      ActivePage = ObjectContentTabSheet
+      inherited ObjectContentPrevTabSheet: TTabSheet
+        inherited ObjectContentPrevTopPanel: TPanel
+          inherited ObjectContentPrevCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
       inherited ObjectContentTabSheet: TTabSheet
         inherited ObjectContentSplitter: TSplitter
           ExplicitHeight = 536
+        end
+        inherited ObjectContentTopPanel: TPanel
+          inherited ObjectContentCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+        inherited ObjectContentSplitView: TSplitView
+          DoubleBuffered = True
+        end
+      end
+      inherited ObjectDataTabSheet: TTabSheet
+        inherited ObjectDataDBSynEdit: TDBSynEdit
+          PopupMenu = SynEditDataPopup
+        end
+        inherited ObjectDataTopPanel: TPanel
+          inherited ObjectDataCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited ObjectNoteTabSheet: TTabSheet
+        inherited ObjectNoteTopPanel: TPanel
+          inherited ObjectNoteCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited FilesRioTabSheet: TTabSheet
+        inherited FilesRioTopPanel: TPanel
+          inherited FilesRioInfoLabel: TLabel
+            Height = 31
+          end
         end
       end
       object RunInfoTabSheet: TTabSheet
@@ -791,7 +1322,7 @@ inherited AgentMainForm: TAgentMainForm
           AlignWithMargins = True
           Left = 3
           Top = 3
-          Width = 1086
+          Width = 893
           Height = 48
           Align = alTop
           BevelOuter = bvNone
@@ -885,7 +1416,7 @@ inherited AgentMainForm: TAgentMainForm
             Caption = 'RunInfoElapsedValueLabel'
           end
           object RunInfoAffectedLabel: TLabel
-            Left = 550
+            Left = 663
             Top = 8
             Width = 51
             Height = 15
@@ -898,7 +1429,7 @@ inherited AgentMainForm: TAgentMainForm
             ParentFont = False
           end
           object RunInfoAffectedValueLabel: TLabel
-            Left = 604
+            Left = 717
             Top = 8
             Width = 143
             Height = 15
@@ -909,7 +1440,7 @@ inherited AgentMainForm: TAgentMainForm
           AlignWithMargins = True
           Left = 3
           Top = 57
-          Width = 1086
+          Width = 893
           Height = 440
           Align = alTop
           BevelOuter = bvNone
@@ -956,7 +1487,7 @@ inherited AgentMainForm: TAgentMainForm
             AlignWithMargins = True
             Left = 3
             Top = 3
-            Width = 532
+            Width = 435
             Height = 23
             Margins.Right = 8
             Align = alTop
@@ -977,9 +1508,9 @@ inherited AgentMainForm: TAgentMainForm
           end
           object RunInfoReportLabel: TLabel
             AlignWithMargins = True
-            Left = 546
+            Left = 449
             Top = 3
-            Width = 532
+            Width = 436
             Height = 23
             Margins.Right = 8
             Align = alTop
@@ -1000,9 +1531,9 @@ inherited AgentMainForm: TAgentMainForm
           end
           object RunInfoReportRichEdit: TRichEdit
             AlignWithMargins = True
-            Left = 551
+            Left = 454
             Top = 32
-            Width = 527
+            Width = 431
             Height = 405
             Margins.Left = 8
             Margins.Right = 8
@@ -1025,7 +1556,7 @@ inherited AgentMainForm: TAgentMainForm
             AlignWithMargins = True
             Left = 8
             Top = 32
-            Width = 527
+            Width = 430
             Height = 405
             Margins.Left = 8
             Margins.Right = 8
@@ -1044,6 +1575,26 @@ inherited AgentMainForm: TAgentMainForm
             ScrollBars = ssBoth
             TabOrder = 1
           end
+        end
+      end
+      object ResultTabSheet: TTabSheet
+        Caption = 'Result'
+        ImageIndex = 6
+        object ResultDBGrid: TDBGrid
+          AlignWithMargins = True
+          Left = 3
+          Top = 3
+          Width = 893
+          Height = 560
+          Align = alClient
+          BorderStyle = bsNone
+          DataSource = ResultDataSource
+          TabOrder = 0
+          TitleFont.Charset = DEFAULT_CHARSET
+          TitleFont.Color = clWindowText
+          TitleFont.Height = -12
+          TitleFont.Name = 'Segoe UI'
+          TitleFont.Style = []
         end
       end
     end
@@ -1466,8 +2017,8 @@ inherited AgentMainForm: TAgentMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000FFF0CD00FFD9
-      5D00FFD54100FFE6A200FFFCFB000000000000000000000000006F526F00271C
-      2800412E3E00321925007C717800000000000000000000000000000000000000
+      5D00FFD54100FFE6A200FFFCFB00000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000000000000000000000000000000000009964D0DB365D
       F1FE3337DDF68756D0DE8C5B8E90201D20210000000000000000000000000000
@@ -1479,9 +2030,9 @@ inherited AgentMainForm: TAgentMainForm
       000000000000000000000000000000000000FFFEFC00FFFBF600FFF7ED00FFF8
       EE00FFFAF400FFFDFC00000000000000000000000000FFF7E700FFD95B00FFDC
       6A00FFF1D400FFFEFB0000000000000000000000000000000000000000000000
-      0000000000000008160012261F00504241008F638300BB90A700000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      00000000000000000000000000000000000000000000000000009964D0DB5084
+      0000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF0000000000000000000000000000000000000000009964D0DB5084
       FBFF0F36EAFF0724E1FD5442D8EF9E5FC5CE734F737411101112000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1490,10 +2041,10 @@ inherited AgentMainForm: TAgentMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000FFFAF700FFF1C400FFE77600FFE24900FFE03D00FFE0
       3D00FFE04A00FFE37700FFF0CB00FFF7EF00FFEFCD00FFDB5B00FFDF7200FFF4
-      DE00FFFEFE00000000000000000000000000000000000000000000000000221C
-      170012202700619EC500294862000000000000030000282A1200A68493000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      00000000000000000000000000000000000000000000000000009964D1DB558B
+      DE00FFFEFE000000000000000000000000000000000000000000000000006633
+      3300663333006633330066333300663333006633330066333300663333006633
+      3300663333006633330066333300663333006633330066333300663333006633
+      3300FFFFFF0000000000000000000000000000000000000000009964D1DB558B
       FDFF436BF3FF001EE7FF001CE4FF0E26DCFC764ED4E5A463B3B8574157580606
       0607000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1502,10 +2053,10 @@ inherited AgentMainForm: TAgentMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000FFFFFE00FFF8E600FFE37200FFDE4100FFE45E00FFE56500FFE46200FFE2
       6200FFE26500FFE16200FFDB4B00FFD84B00FFDB5600FFD95900FFEAB600FFFE
-      FD00000000000000000000000000000000000000000000000000000000009068
-      850038504B0092E5ED0062A4C400395C89003F6180000008110029251600BA96
-      A400000000000000000000000000000000000000000000000000000000000000
-      00000000000000000000000000000000000000000000000000009965D1DB578E
+      FD00000000000000000000000000000000000000000000000000000000006633
+      3300FFFFFF00FFFFFF00FFFFFF00CC999900FFFFFF00FFFFFF00FFFFFF00CC99
+      9900FFFFFF00FFFFFF00FFFFFF00CC999900FFFFFF00FFFFFF00FFFFFF006633
+      3300FFFFFF0000000000000000000000000000000000000000009965D1DB578E
       FEFF6498FBFF0E36EBFF001DE6FF001CE3FF001FDFFE282DD9F89159CCD99B60
       A1A43F333F400202020300000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000202
@@ -1514,10 +2065,10 @@ inherited AgentMainForm: TAgentMainForm
       0000000000000000000000000000000000000000000000000000FFFEFD00FFF9
       F200FFECB800FFD84700FFDD5600FFE05500FFDC3E00FFDA3E00FFD93E00FFD8
       3D00FFD73C00FFD53C00FFD84E00FFD95800FFD24300FFD25000FFFBF5000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000284E3E00A3FFFF00C5FFFF0054C7FF000088F50058372F007D250000815C
-      4B00A98C9B000000000000000000000000000000000000000000000000000000
-      00000000000000000000000000000000000000000000000000009265D4DF5A92
+      0000000000000000000000000000000000000000000000000000000000006633
+      3300FFFFFF00FFFFFF00FFFFFF00CC999900FFFFFF00FFFFFF00FFFFFF00CC99
+      9900FFFFFF00FFFFFF00FFFFFF00CC999900FFFFFF00FFFFFF00FFFFFF006633
+      3300FFFFFF0000000000000000000000000000000000000000009265D4DF5A92
       FFFF6096FEFF4772F4FF001EE8FF001DE5FF001CE3FF001AE0FF001DDCFE3D35
       D4F4A05FC2CB865887892C262C2D000000000000000000000000000000000000
       00000000000000000000000000000000000000000000000000002D262D2EBC64
@@ -1526,10 +2077,10 @@ inherited AgentMainForm: TAgentMainForm
       00000000000000000000000000000000000000000000FFFEFB00FFE69B00FFCB
       4300FFCF4200FFDB5F00FFDB4C00FFDA4700FFD94700FFD84600FFD74600FFD6
       4600FFD54500FFD44500FFD24400FFD04300FFCF4300FFD66C00FFFCF9000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000736F7B006EA09D0060DEFF0047D9FF005E98A500DD793200E65103008C3E
-      1700704E2F00A886940000000000000000000000000000000000000000000000
-      00000000000000000000000000000000000000000000000000009165D6E15C94
+      0000000000000000000000000000000000000000000000000000000000006633
+      3300FFFFFF00FFFFFF00FFFFFF00CC999900FFFFFF00FFFFFF00FFFFFF00CC99
+      9900FFFFFF00FFFFFF00FFFFFF00CC999900FFFFFF00FFFFFF00FFFFFF006633
+      3300FFFFFF0000000000000000000000000000000000000000009165D6E15C94
       FFFF5C93FFFF70A5FAFF0932ECFF001EE7FF001DE5FF001BE2FF001ADFFF0019
       DDFF001AD7FE6948D1E9A463B5BA704D70711816181900000000000000000000
       000000000000000000000000000000000000000000003C313C3DA74A4DF6745D
@@ -1538,10 +2089,10 @@ inherited AgentMainForm: TAgentMainForm
       00000000000000000000000000000000000000000000FFFDFB00FFDB7400FFDA
       6600FFDA5A00FFD85100FFD85100FFD85100FFD75000FFD64F00FFD64F00FFD5
       4E00FFD44E00FFD24D00FFD14D00FFCF4C00FFCE4B00FFCB4800FFF5E4000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      00000000000062454A000068BC0061B3BB00FFB01100FC901900E16A1400C24E
-      13009D4722006C4A2500A8899700000000000000000000000000000000000000
-      00000000000000000000000000000000000000000000000000009165D6E15F97
+      0000000000000000000000000000000000000000000000000000000000006633
+      3300663333006633330066333300663333006633330066333300663333006633
+      3300663333006633330066333300663333006633330066333300663333006633
+      3300FFFFFF0000000000000000000000000000000000000000009165D6E15F97
       FFFF5D95FFFF6EA5FDFF406DF3FF001FE9FF001DE6FF001CE3FF001BE1FF001A
       DEFF0018DCFF0017D9FF0E21D1FC8653CCDF9C61A3A6584158590F0F0F100000
       00000000000000000000000000000000000005050506BA6090E0706409FF48AF
@@ -1550,10 +2101,10 @@ inherited AgentMainForm: TAgentMainForm
       AABFB369AABF775177780E0E0E0F000000000000000000000000FFECC000FFD4
       5000FFD75A00FFD75A00FFD75A00FFD75A00FFD75A00FFD65C00FFD65D00FFD4
       5A00FFD25600FFD15600FFD05500FFCF5500FFCD5400FFCE5600FFD68000FFFD
-      FB00000000000000000000000000000000000000000000000000000000000000
-      00000000000000000000B5A77E00D2CE4400FFDE5200FFB02D00EE811600D860
-      1300BF4F150094421C0078574400AB90A1000000000000000000000000000000
-      00000000000000000000000000000000000000000000000000009165D7E1629A
+      FB00000000000000000000000000000000000000000000000000000000006633
+      3300FFFFFF00FFFFFF00FFFFFF00CC999900FFFFFF00FFFFFF00FFFFFF00CC99
+      9900FFFFFF00FFFFFF00FFFFFF00CC999900FFFFFF00FFFFFF00FFFFFF006633
+      3300FFFFFF0000000000000000000000000000000000000000009165D7E1629A
       FFFF6098FFFF639BFEFF71A9FBFF0730ECFF001EE8FF001DE5FF001CE3FF001B
       E0FF0019DEFF0018DBFF0017D9FF0015D6FF1C26D0FA9D5EC4D08E5B90924335
       434404040405000000000000000000000000694A696A8E4012FF4AAD00FF48B0
@@ -1562,10 +2113,10 @@ inherited AgentMainForm: TAgentMainForm
       4EFF6F754AFF8D4525FFBA64A2D2100F10110000000000000000FFF8F100FFCF
       4D00FFD66200FFD66300FFD66400FFD76700FFD76900FFD86C00FFD86F00FFD8
       7100FFD56C00FFD16000FFD05F00FFCF5E00FFCD5E00FFCC5E00FFC54500FFF0
-      DB00000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000FBC35B00E1CC2800FCDB4A00FFB73800EF7E
-      1300DE661300C64D11008A3D130077564400A486960000000000000000000000
-      00000000000000000000000000000000000000000000000000009166D7E1669E
+      DB00000000000000000000000000000000000000000000000000000000006633
+      3300FFFFFF00FFFFFF00FFFFFF00CC999900FFFFFF00FFFFFF00FFFFFF00CC99
+      9900FFFFFF00FFFFFF00FFFFFF00CC999900FFFFFF00FFFFFF00FFFFFF006633
+      3300FFFFFF0000000000000000000000000000000000000000009166D7E1669E
       FFFF649BFFFF629AFFFF81B2FEFF3462F3FF0028EBFF0023E8FF0020E6FF001E
       E3FF001CE0FF001BDDFF0019DBFF0017D8FF0016D6FF0018D1FE3D32CEF4A462
       B8BF7A527A7B302830310202020300000000AE66A6B76E6808FF48B000FF48B0
@@ -1574,10 +2125,10 @@ inherited AgentMainForm: TAgentMainForm
       92FF48D092FF4BC98CFF894E2CFF8C5A8B8E0000000000000000FFF9F300FFCB
       5000FFD66F00FFD77200FFD87400FFD87700FFD97900FFD97C00FFD97E00FFDA
       8100FFDA8300FFD77E00FFD06A00FFCF6800FFCD6700FFCC6700FFC95A00FFD6
-      8C00FFFEFD000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000D8AE5000F0DB5500FFE04D00FFB3
-      3300F18B1D00E66C1200C64D110092421C0066462400A7849500000000000000
-      00000000000000000000000000000000000000000000000000009B67D4DC69A1
+      8C00FFFEFD000000000000000000000000000000000000000000000000006633
+      3300FFFFFF00FFFFFF00FFFFFF00CC999900FFFFFF00FFFFFF00FFFFFF00CC99
+      9900FFFFFF00FFFFFF00FFFFFF00CC999900FFFFFF00FFFFFF00FFFFFF006633
+      3300FFFFFF0000000000000000000000000000000000000000009B67D4DC69A1
       FFFF679EFFFF659DFFFF6FA8FFFF67A0FBFF315EF5FF204BF4FF1D47F2FF1B45
       F0FF1A43EEFF1941ECFF173FEAFF163CE8FF1439E6FF1337E3FF1134E0FF1532
       DAFE674ED4EDA163A8AC4838484900000000B965A4CF618603FF48B000FF48B0
@@ -1586,10 +2137,10 @@ inherited AgentMainForm: TAgentMainForm
       92FF48D092FF48D092FF63955DFFB965A4CF0000000000000000FFF6E900FFC4
       4700FFD97F00FFD98100FFDA8400FFDA8600FFDB8900FFDC8B00FFDC8D00FFDC
       8F00FFDC9200FFDC9400FFD98D00FFCF7200FFCE7000FFCD7000FFCC7000FFCD
-      7900FFFCFB000000000000000000000000000000000000000000000000000000
-      00000000000000000000000000000000000000000000EBBB6500F3DB4600FFDC
-      5600FBAB2B00F18B1D00DE661300BF4F15009D472100704B3500AA89A1000000
-      0000000000000000000000000000000000000000000000000000A46CCDD36BA3
+      7900FFFCFB000000000000000000000000000000000000000000000000006633
+      3300663333006633330066333300663333006633330066333300663333006633
+      3300663333006633330066333300663333006633330066333300663333006633
+      3300FFFFFF000000000000000000000000000000000000000000A46CCDD36BA3
       FFFF69A1FFFF679FFFFF71AAFFFF69A3FFFF3B6CFEFF2D5DFEFF2C5BFDFF2D5D
       FDFF2D5DFCFF2F5EFCFF305EFBFF315FFAFF315EF9FF325EF8FF325EF5FF355C
       F0FE6557DBF0A564B1B64E3C4E4F00000000B965A4CF638203FF48B000FF48B0
@@ -1598,10 +2149,10 @@ inherited AgentMainForm: TAgentMainForm
       92FF48D092FF48D092FF659159FFBA66A5CE00000000FFFEFD00FFDDA000FFC8
       6300FFDA8E00FFDB9000FFDC9200FFDD9500FFDD9700FFDE9900FFDE9B00FFDE
       9D00FFDF9F00FFDFA200FFDFA400FFD99500FFCF7A00FFCE7A00FFC76A00FFE5
-      C000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000DFB85E00E1C9
-      1900FFDE5900FFB43400EE7E1400DA601200CC500D0089400D0074533F00B98A
-      9E00000000000000000000000000000000000000000000000000A86DC9CE6EA6
+      C000000000000000000000000000000000000000000000000000000000006633
+      3300FFFFFF00FFFFFF00FFFFFF00CC999900FFFFFF00FFFFFF00FFFFFF00CC99
+      9900FFFFFF00FFFFFF00FFFFFF00CC999900FFFFFF00FFFFFF00FFFFFF006633
+      3300FFFFFF000000000000000000000000000000000000000000A86DC9CE6EA6
       FFFF6CA4FFFF6AA3FFFF86B6FFFF3B6DFFFF1143FFFF1445FFFF1748FFFF1B4C
       FFFF1F50FFFF2354FFFF2858FFFF2C5CFFFF3060FFFF3A66FCFE5B62ECF6AA6B
       C3C784578587382E383903030304000000009D619AA172610AFF48B000FF48B0
@@ -1610,10 +2161,10 @@ inherited AgentMainForm: TAgentMainForm
       92FF48D092FF4FC186FF8D4525FF78517879FFFEFD00FDE7C300FDBA5500FFDB
       9800FFDD9C00FFDE9E00FFDFA000FFDFA300FFE0A400FFE0A600FFE1A900FFE1
       AA00FFE2AD00FFE2AF00FFE2B000FFE2B200FED69300FDCB7A00FDD79E00FFFD
-      FB00000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000000000000000000000000000DCB5
-      5A00E6D03800FDDB4700FFB83700EC801500CE641B00884D25002B2E3C002B2E
-      3C00644A5D000000000000000000000000000000000000000000A86DC9CE71AA
+      FB00000000000000000000000000000000000000000000000000000000006633
+      3300FFFFFF00FFFFFF00FFFFFF00CC999900FFFFFF00FFFFFF00FFFFFF00CC99
+      9900FFFFFF00FFFFFF00FFFFFF00CC999900FFFFFF00FFFFFF00FFFFFF006633
+      3300FFFFFF000000000000000000000000000000000000000000A86DC9CE71AA
       FFFF6FA8FFFF71A9FFFF74ADFFFF1244FFFF0A3CFFFF0E40FFFF1243FFFF1647
       FFFF1B4CFFFF1F50FFFF2454FFFF2858FEFF3C5BF5FB9F68D0D6975F9A9C4C3A
       4C4D070707080000000000000000000000004B3A4B4C923914FF4EA600FF48B0
@@ -1622,10 +2173,10 @@ inherited AgentMainForm: TAgentMainForm
       42FF80613BFF913C1EFFAA64A4B104040405FFEDD200F8B45800FEDBA000FFDF
       A700FFE0A900FFE1AB00FFE2AD00FFE2AF00FFE3B100FFE3B300FFE4B500FFE4
       B600FFE4B800FEE5BA00FEE5BC00FDE5BE00FCE1B800F8B55100FDEFDD000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000D5AA4C00ECD85000FFE04800EFAC3E00A8866200687079004B708C00395A
-      72002B2E3C0060465F0000000000000000000000000000000000A86DC9CE74AD
+      0000000000000000000000000000000000000000000000000000000000006633
+      3300FFFFFF00FFFFFF00FFFFFF00CC999900FFFFFF00FFFFFF00FFFFFF00CC99
+      9900FFFFFF00FFFFFF00FFFFFF00CC999900FFFFFF00FFFFFF00FFFFFF006633
+      3300FFFFFF000000000000000000000000000000000000000000A86DC9CE74AD
       FFFF72ABFFFF85B4FFFF4273FFFF0335FFFF0638FFFF0A3CFFFF0F40FFFF1344
       FFFF1748FFFF1B4CFEFF2A53F8FD8863DBE4A365ADB062476263131213140000
       00000000000000000000000000000000000002020203B267A8BC854F0FFF4BAB
@@ -1634,10 +2185,10 @@ inherited AgentMainForm: TAgentMainForm
       8C8F7D537D7E473747480000000000000000FFE5BF00FDC36400FFE3B500FFE3
       B400FFE3B500FFE4B700FFE4B900FFE5BB00FFE6BC00FEE6BE00FEE6C000FEE7
       C100FDE7C300FDE7C500FCE7C600FCE6C800FCE6CA00F8C98300F6BE7700FFFB
-      F700000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000E4BD5B00F7D52900EDD67F009CABB2006595C5005795C8005D91
-      BD005C799B002B2E3C0060465F00000000000000000000000000A86EC9CE77B0
+      F700000000000000000000000000000000000000000000000000000000006633
+      3300663333006633330066333300663333006633330066333300663333006633
+      3300663333006633330066333300663333006633330066333300663333006633
+      3300FFFFFF000000000000000000000000000000000000000000A86EC9CE77B0
       FFFF75AFFFFF82B0FFFF0A3DFFFF0031FFFF0234FFFF0638FFFF0A3CFFFF0E40
       FEFF1845FBFE685AE5EDA767BFC37B527B7C1D1A1D1E00000000000000000000
       000000000000000000000000000000000000000000000F0F0F10B866A6CB8948
@@ -1646,10 +2197,10 @@ inherited AgentMainForm: TAgentMainForm
       000000000000000000000000000000000000FFFBF700FDD9A100FCC47100FBC8
       7D00FBD09200FCDCAD00FDE7C500FDE7C600FDE8C800FDE8C900FDE8CB00FCE8
       CC00FCE8CE00FCE9CF00FCE9D000FBE9D200FBE9D400F8DEC100F2B66900F1AE
-      6000F8DBBF00FFF8F100FFFEFD00000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      00000000000000000000E0B98000C2C48A00B7D9EB009CCDF4007FC0E90073B9
-      E90073A2D000444C52002B2E3C00000000000000000000000000A86EC9CE81B3
+      6000F8DBBF00FFF8F100FFFEFD00000000000000000000000000000000006633
+      3300C0C0C000C0C0C000C0C0C00066333300C0C0C000C0C0C000C0C0C0006633
+      3300C0C0C000C0C0C000C0C0C00066333300C0C0C000C0C0C000C0C0C0006633
+      3300FFFFFF000000000000000000000000000000000000000000A86EC9CE81B3
       FFFF84B4FFFF4A80FFFF002BFFFF002DFFFF0031FFFF0235FEFF0D3CFCFE3F4B
       F1F69D65CED3905C929431293132000000000000000000000000000000000000
       00000000000000000000000000000000000000000000000000000E0E0E0F8557
@@ -1658,10 +2209,10 @@ inherited AgentMainForm: TAgentMainForm
       00000000000000000000000000000000000000000000FFFFFE00FFFAF700FFF7
       ED00FCEAD200FBD8A800F7BC6F00FCE9D000FCE9D100FCEAD300FCEAD500FCEA
       D600FCEBD700FBEBD800FBEBDA00FAE7D400EFB47900F4C69700F6D3B000F1B9
-      8000EC9F5300E58A3B00E9AD8100FFFAF5000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000C0AFB800ABCDE100C5ECF900C1EBFF0092C4
-      E10076979B002B2E3C00CA95AA00000000000000000000000000A96FC9CE84B6
+      8000EC9F5300E58A3B00E9AD8100FFFAF5000000000000000000000000006633
+      3300C0C0C000C0C0C000C0C0C00066333300C0C0C000C0C0C000C0C0C0006633
+      3300C0C0C000C0C0C000C0C0C00066333300C0C0C000C0C0C000C0C0C0006633
+      3300FFFFFF000000000000000000000000000000000000000000A96FC9CE84B6
       FFFF84B1FFFF0D3FFFFF002BFFFF002BFFFF0232FDFE2740F5F9875DD8DFA163
       ABAE473747480404040500000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1670,10 +2221,10 @@ inherited AgentMainForm: TAgentMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000FFFEFD00F6C79100FAE5CD00FCECDB00FCECDC00FCEDDD00FCED
       DE00FBEDDF00FBEEE100FBEEE200EFC09600FBE3CB00FFFEFD0000000000FFFB
-      F700F0C6A300EAB99700D8753700F2D1BA000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000009CA9CC00BFD8E000D8E7EA00B1B7
-      BD002B2E3C00DCABC50000000000000000000000000000000000A96FC9CE88B9
+      F700F0C6A300EAB99700D8753700F2D1BA000000000000000000000000006633
+      3300C0C0C000C0C0C000C0C0C00066333300C0C0C000C0C0C000C0C0C0006633
+      3300C0C0C000C0C0C000C0C0C00066333300C0C0C000C0C0C000C0C0C0006633
+      3300FFFFFF000000000000000000000000000000000000000000A96FC9CE88B9
       FFFF5085FFFF002BFFFF002AFEFF0E35FAFC6650E5EAA465BDC1604660610707
       0708000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1682,10 +2233,10 @@ inherited AgentMainForm: TAgentMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000F9DDC100F6D5B700FCEFE300FCEFE400FCF0E500F6DC
       C600EEBC9200F6DCC700FCF1E900F0C6A300FAE8D70000000000000000000000
-      0000FFFBF900EEC2A500E0997200FBEFE5000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      00000000000000000000000000000000000000000000C8AEB200ABA178002B2E
-      3C00E1B2D1000000000000000000000000000000000000000000AA6FC9CE82B2
+      0000FFFBF900EEC2A500E0997200FBEFE5000000000000000000000000006633
+      3300663333006633330066333300663333006633330066333300663333006633
+      3300663333006633330066333300663333006633330066333300663333006633
+      3300000000000000000000000000000000000000000000000000AA6FC9CE82B2
       FFFF1243FEFF002EFDFE4144F0F3945ED1D77C537C7D14131415000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1696,8 +2247,8 @@ inherited AgentMainForm: TAgentMainForm
       8F00F8DEC700EFBE9500F0CBB100FAECE200EDBB9600FFFEFD00000000000000
       000000000000FFFEFD00FFFEFC00000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000D3A2AF00E7B2
-      CC00000000000000000000000000000000000000000000000000AA6FC9CE5280
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000AA6FC9CE5280
       FDFE283EF6F87355E0E6935D9698231F23240000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1739,14 +2290,14 @@ inherited AgentMainForm: TAgentMainForm
       0000000000000000FFFE0F000000000000000000FFFFFF000000000000000000
       FFFFFF000000000000000000FFFFFF000000000000000000FFFFFF0000000000
       00000000FFFFFF000000000000000000FFFFE1FFFFFFC7FFFFFFFFFFFFFFC1FF
-      FFFFC3FFFFFFFFFFFFFFC1C1FFFFC0FFFFFFFFFFFF0383E03FFFC03FFFFFFFFF
-      FC0007E01FFFC00FFFFFFFFFF0000FE00FFFC003FFE03FFFC0001FF007FFC001
-      FFC01FFF80001FF003FFC0007F800FFF80001FF801FFC0001F000001C0000FFC
-      00FFC00007000000C0000FFE007FC00001000000C00007FF003FC00001000000
-      C00007FF801FC0000100000080000FFFC00FC0000100000000000FFFE007C000
-      0700000000001FFFF003C0001F00000300000FFFF801C0007F800FFF000001FF
-      FC01C001FFC01FFF800000FFFE01C003FFF07FFFF80020FFFF03C00FFFFFFFFF
-      FC0070FFFF87C03FFFFFFFFFFC0039FFFFCFC0FFFFFFFFFFFC083FFFFFFFC3FF
+      FFFFC3FFFFFFFFFFFFFFC1FFFFFFC0FFFFFFFFFFFF0383F00007C03FFFFFFFFF
+      FC0007E00007C00FFFFFFFFFF0000FE00007C003FFE03FFFC0001FE00007C001
+      FFC01FFF80001FE00007C0007F800FFF80001FE00007C0001F000001C0000FE0
+      0007C00007000000C0000FE00007C00001000000C00007E00007C00001000000
+      C00007E00007C0000100000080000FE00007C0000100000000000FE00007C000
+      0700000000001FE00007C0001F00000300000FE00007C0007F800FFF000001E0
+      0007C001FFC01FFF800000E00007C003FFF07FFFF80020E00007C00FFFFFFFFF
+      FC0070E0000FC03FFFFFFFFFFC0039FFFFFFC0FFFFFFFFFFFC083FFFFFFFC3FF
       FFFFFFFFFE3C3FFFFFFFC7FFFFFFFFFF00000000000000000000000000000000
       000000000000}
   end
@@ -1756,13 +2307,20 @@ inherited AgentMainForm: TAgentMainForm
     Top = 544
     object AgentTestAction: TAction
       Caption = '    Test    '
-      Hint = 'Just a test'
+      Hint = 'Tests the suource and target connection strings'
       ImageIndex = 0
       OnExecute = AgentTestActionExecute
     end
+    object AgentResultAction: TAction
+      AutoCheck = True
+      Caption = 'Result'
+      Hint = 'Run current agent'#39's query and display the result in a table'
+      ImageIndex = 1
+      OnExecute = AgentResultActionExecute
+    end
     object AgentRunAction: TAction
       Caption = 'Run'
-      Hint = 'Execute the current Agent'
+      Hint = 'Execute the current agent'
       ImageIndex = 2
       OnExecute = AgentRunActionExecute
     end
@@ -1791,5 +2349,124 @@ inherited AgentMainForm: TAgentMainForm
     DataSet = AgentActiveClientDataSet
     Left = 207
     Top = 487
+  end
+  object ResultDataSource: TDataSource
+    Left = 960
+    Top = 488
+  end
+  object ResultADOQuery: TADOQuery
+    Connection = ResultADOConnection
+    Parameters = <>
+    Left = 856
+    Top = 488
+  end
+  object ResultADOConnection: TADOConnection
+    LoginPrompt = False
+    Left = 736
+    Top = 488
+  end
+  object ResultFDConnection: TFDConnection
+    Params.Strings = (
+      'DriverID=MSSQL')
+    FetchOptions.AssignedValues = [evMode, evUnidirectional]
+    LoginPrompt = False
+    Left = 736
+    Top = 544
+  end
+  object ResultFDQuery: TFDQuery
+    Connection = ResultFDConnection
+    Left = 856
+    Top = 544
+  end
+  object SynEditDataPopup: TPopupMenu
+    Left = 480
+    Top = 544
+    object SynEditDataJsonBaseTemplate: TMenuItem
+      Caption = 'Insert JSON Template'
+      OnClick = SynEditDataJsonBaseTemplateClick
+    end
+    object JsonDivPopup: TMenuItem
+      Caption = '-'
+    end
+    object SynEditDataJsonDatasourceBlock: TMenuItem
+      Caption = 'Insert JSON <DataSource> block'
+      OnClick = SynEditDataJsonDatasourceBlockClick
+    end
+    object SynEditDataJsonDatatargetBlock: TMenuItem
+      Caption = 'Insert JSON <DataTarget> block'
+      OnClick = SynEditDataJsonDatatargetBlockClick
+    end
+    object SynEditDataJsonEtlBlock: TMenuItem
+      Caption = 'Insert JSON <Etl> block'
+      OnClick = SynEditDataJsonEtlBlockClick
+    end
+    object SynEditDataJsonTimeframeBlock: TMenuItem
+      Caption = 'Insert JSON <TimeFrame> block'
+      Enabled = False
+      OnClick = SynEditDataJsonTimeframeBlockClick
+    end
+    object SynEditDataJsonSaveBlock: TMenuItem
+      Caption = 'Insert JSON <Save> block'
+      Enabled = False
+      OnClick = SynEditDataJsonSaveBlockClick
+    end
+    object SynEditDataJsonEmailBlock: TMenuItem
+      Caption = 'Insert JSON <Email> block'
+      Enabled = False
+      OnClick = SynEditDataJsonEmailBlockClick
+    end
+    object SynEditDataJsonOptionBlock: TMenuItem
+      Caption = 'Insert JSON <Option> block'
+      Enabled = False
+      OnClick = SynEditDataJsonOptionBlockClick
+    end
+    object SynEditDataJsonParamsBlock: TMenuItem
+      Caption = 'Insert JSON <Params> block'
+      Enabled = False
+      OnClick = SynEditDataJsonParamsBlockClick
+    end
+    object SynEditDataJsonRunAtBlock: TMenuItem
+      Caption = 'Insert JSON <RunAt> block'
+      Enabled = False
+      OnClick = SynEditDataJsonRunAtBlockClick
+    end
+    object JsonDiv2Popup: TMenuItem
+      Caption = '-'
+    end
+    object SynEditDataJsonAdoMsSqlCsPopup: TMenuItem
+      Caption = 'Insert ADO Sql Server connection string'
+      OnClick = SynEditDataJsonAdoMsSqlCsPopupClick
+    end
+    object SynEditDataJsonAdoMsMdbCsPopup: TMenuItem
+      Caption = 'Insert ADO Access (.mdb) connection string'
+      OnClick = SynEditDataJsonAdoMsMdbCsPopupClick
+    end
+    object SynEditDataJsonAdoMsAccdbCsPopup: TMenuItem
+      Caption = 'Insert ADO Access (.accdb) connection string'
+      OnClick = SynEditDataJsonAdoMsAccdbCsPopupClick
+    end
+    object SynEditDataJsonAdoMsXlsCsPopup: TMenuItem
+      Caption = 'Insert ADO Excel (.xls) connection string'
+      OnClick = SynEditDataJsonAdoMsXlsCsPopupClick
+    end
+    object SynEditDataJsonAdoMsXlsxCsPopup: TMenuItem
+      Caption = 'Insert ADO Excel (.xlsx) connection string'
+      OnClick = SynEditDataJsonAdoMsXlsxCsPopupClick
+    end
+    object JsonDiv3Popup: TMenuItem
+      Caption = '-'
+    end
+    object SynEditDataJsonFdMsSqlCsPopup: TMenuItem
+      Caption = 'Insert FD Sql Server connection string'
+      OnClick = SynEditDataJsonFdMsSqlCsPopupClick
+    end
+    object SynEditDataJsonFdOracleCsPopup: TMenuItem
+      Caption = 'Insert FD Oracle connection string'
+      OnClick = SynEditDataJsonFdOracleCsPopupClick
+    end
+    object SynEditDataJsonFdMongodbCsPopup: TMenuItem
+      Caption = 'Insert FD MongoDb connection string'
+      OnClick = SynEditDataJsonFdMongodbCsPopupClick
+    end
   end
 end

@@ -7182,7 +7182,7 @@ CREATE TABLE [DbaSystem].[dbo].[TblState](
   , [FldBgColor]                                [varchar](32)                   NULL
   , [FldFgColor]                                [varchar](32)                   NULL
   , [FldBorderColor]                            [varchar](32)                   NULL
-  , [FldW3Color]                                [varchar](32)                   NULL
+  , [FldW3ColorClass]                           [varchar](32)                   NULL
   , [FldWho]                                    [varchar](16)                   NULL
   , [FldWhen]                                   [datetime]                      NULL
 ) ON [PRIMARY]

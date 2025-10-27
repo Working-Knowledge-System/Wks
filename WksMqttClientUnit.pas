@@ -38,9 +38,9 @@ type
 //    FOnTcpClientDisjoined: TNotifyEvent;
 
     // broker events
-//    FOnBrokerConnected: TNotifyEvent{TOnMQTTClientConnect};
-//    FOnBrokerDisconnected: TNotifyEvent{TOnMQTTClientDisconnect};
-    FOnBrokerMessage: TOnMQTTMessage; {FOnBrokerIncomingMessage}
+//    FBrokerOnConnected: TNotifyEvent{TMQTTClientOnConnect};
+//    FBrokerOnDisconnected: TNotifyEvent{TMQTTClientOnDisconnect};
+    FBrokerOnMessage: TMQTTOnMessage; {FOnBrokerIncomingMessage}
 
     // tcpipclient events handlers
     procedure OnServerJoinedHandler(Sender: TObject);
@@ -71,9 +71,9 @@ type
     procedure DisconnectPacketSend;
     procedure KeepAlivePingTimerReset;
 
-//  property OnBrokerConnected   : TNotifyEvent   read FOnBrokerConnected    write FOnBrokerConnected;
-//  property OnBrokerDisconnected: TNotifyEvent   read FOnBrokerDisconnected write FOnBrokerDisconnected;
-    property OnBrokerMessage     : TOnMQTTMessage read FOnBrokerMessage      write FOnBrokerMessage;
+//  property BrokerOnConnected   : TNotifyEvent   read FBrokerOnConnected    write FBrokerOnConnected;
+//  property BrokerOnDisconnected: TNotifyEvent   read FBrokerOnDisconnected write FBrokerOnDisconnected;
+    property BrokerOnMessage     : TMQTTOnMessage read FBrokerOnMessage      write FBrokerOnMessage;
 
     property ObjectKind          : string         read FObjectKind           write FObjectKind;
     property ObjectId            : integer        read FObjectId             write FObjectId;
@@ -415,7 +415,7 @@ procedure TMqttClientClass.DisconnectPacketSend;
   | 1110 0000 | 0000 0000 |
   |       224 |         0 |
   |        E0 |        00 |
-  |         à |         . |
+  |         Ã |         . |
    -----------------------
 }
   {$ENDREGION}
@@ -600,7 +600,7 @@ procedure TMqttClientClass.PublishPacketSend(APacketIdentifier: word; ATopicName
   It MUST set the RETAIN flag to 0 when a PUBLISH Packet is sent to a Client because it matches an established subscription regardless of how the flag was set in the message it received.
   A PUBLISH Packet with a RETAIN flag set to 1 and a payload containing zero bytes will be processed as normal by the Server and sent to Clients with a subscription matching the topic name.
   Additionally any existing retained message with the same topic name MUST be removed and any future subscribers for the topic will not receive a retained message.
-  “As normal” means that the RETAIN flag is not set in the message received by existing Clients.
+  "As normal" means that the RETAIN flag is not set in the message received by existing Clients.
   A zero byte retained message MUST NOT be stored as a retained message on the Server.
   If the RETAIN flag is 0, in a PUBLISH Packet sent by a Client to a Server, the Server MUST NOT store the message and MUST NOT remove or replace any existing retained message.
 
@@ -638,7 +638,7 @@ procedure TMqttClientClass.PublishPacketSend(APacketIdentifier: word; ATopicName
   The Topic Name MUST be present as the first field in the PUBLISH Packet Variable header.
   It MUST be a UTF-8 encoded string.
   The Topic Name in the PUBLISH Packet MUST NOT contain wildcard characters.
-  The Topic Name in a PUBLISH Packet sent by a Server to a subscribing Client MUST match the Subscription’s Topic Filter according to the matching process.
+  The Topic Name in a PUBLISH Packet sent by a Server to a subscribing Client MUST match the Subscription's Topic Filter according to the matching process.
   However, since the Server is permitted to override the Topic Name, it might not be the same as the Topic Name in the original PUBLISH Packet.
 
   The Packet Identifier field is only present in PUBLISH Packets where the QoS level is 1 or 2.
@@ -662,9 +662,9 @@ procedure TMqttClientClass.PublishPacketSend(APacketIdentifier: word; ATopicName
   The Client uses a PUBLISH Packet to send an Application Message to the Server, for distribution to Clients with matching subscriptions.
   The Server uses a PUBLISH Packet to send an Application Message to each Client which has a matching subscription.
 
-  When Clients make subscriptions with Topic Filters that include wildcards, it is possible for a Client’s subscriptions to overlap so that a published message might match multiple filters.
+  When Clients make subscriptions with Topic Filters that include wildcards, it is possible for a Client's subscriptions to overlap so that a published message might match multiple filters.
   In this case the Server MUST deliver the message to the Client respecting the maximum QoS of all the matching subscriptions.
-  In addition, the Server MAY deliver further copies of the message, one for each additional matching subscription and respecting the subscription’s QoS in each case.
+  In addition, the Server MAY deliver further copies of the message, one for each additional matching subscription and respecting the subscription's QoS in each case.
 
   The action of the recipient when it receives a PUBLISH Packet depends on the QoS level.
   If a Server implementation does not authorize a PUBLISH to be performed by a Client; it has no way of informing that Client.

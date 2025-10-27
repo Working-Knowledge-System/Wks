@@ -304,7 +304,7 @@ begin
     end;
 
     // test
-  //mem.LoadFromFile('C:\$Org\W\Wks\WksLogo.png');
+  //mem.LoadFromFile('C:\$\Organization\W\Wks\WksLogo.png');
 
     // contentstreamset
     mem.Position := 0;

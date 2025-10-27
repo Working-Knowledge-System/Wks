@@ -220,7 +220,7 @@ begin
   DataSet.FieldByName('FldPerson'  ).Value := TNamRec.Username(nam, sur);
   DataSet.FieldByName('FldPicture' ).Value := null;
 //pic := TPicture.Create;
-//pic.LoadFromFile('C:\$Img\P\Person\Person_200x200.png'); // *** AGG CREATE ***
+//pic.LoadFromFile('C:\$\Image\P\Person\Person_200x200.png'); // *** AGG CREATE ***
 //bfl := TBlobField(DataSet.FieldByName('FldPicture'));
 //TGraRec.ToBlobField(pic.Graphic, bfl);
 //pic.Free;
@@ -288,7 +288,7 @@ begin
   DataSet.FieldByName('FldPassword').Value := TPwdRec.PwdRnd;
   DataSet.FieldByName('FldState'   ).Value := TStaRec.ACTIVE.Name;
 //ava := TPicture.Create;
-//ava.LoadFromFile('C:\$Img\U\User\Avatar_200x200.png');
+//ava.LoadFromFile('C:\$\Image\U\User\Avatar_200x200.png');
 //bfl := TBlobField(DataSet.FieldByName('FldAvatar'));
 //TGraRec.ToBlobField(ava.Graphic, bfl);
 //ava.Free;

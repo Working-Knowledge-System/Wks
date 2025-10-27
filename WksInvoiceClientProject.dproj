@@ -1,4 +1,4 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{2A50B405-BF48-4007-AEE8-CB7B03904A7A}</ProjectGuid>
         <MainSource>WksInvoiceClientProject.dpr</MainSource>
@@ -102,13 +102,13 @@
         <RcCompile Include="Wks000Res.rc">
             <Form>Wks000Res.res</Form>
         </RcCompile>
+        <DCCReference Include="WksInvoiceUnit.pas"/>
         <DCCReference Include="WksBaseClientMainFormUnit.pas">
             <Form>BaseMainForm</Form>
         </DCCReference>
         <DCCReference Include="WksInvoiceClientMainFormUnit.pas">
             <Form>InvoiceMainForm</Form>
         </DCCReference>
-        <DCCReference Include="WksInvoiceUnit.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

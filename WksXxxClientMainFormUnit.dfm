@@ -1,7 +1,6 @@
 inherited XxxMainForm: TXxxMainForm
   Caption = 'XxxMainForm'
   StyleElements = [seFont, seClient, seBorder]
-  ExplicitLeft = -22
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
     ExplicitHeight = 605
@@ -159,6 +158,7 @@ inherited XxxMainForm: TXxxMainForm
     inherited LeftPageControl: TPageControl
       inherited ObjectTreeTabSheet: TTabSheet
         inherited ObjectNodeInfoLabel: TLabel
+          Width = 292
           StyleElements = [seFont, seClient, seBorder]
         end
         inherited ObjectDBNavigator: TDBNavigator
@@ -239,8 +239,6 @@ inherited XxxMainForm: TXxxMainForm
   inherited RightPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited RightPageControl: TPageControl
-      ExplicitLeft = 6
-      ExplicitTop = 51
       inherited PropertyTabSheet: TTabSheet
         inherited ObjectJvScrollMax: TJvScrollMax
           StyleElements = [seFont, seClient, seBorder]
@@ -393,6 +391,9 @@ inherited XxxMainForm: TXxxMainForm
             inherited ObjectImageClearLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectImageDBImage: TDBImage
+              Height = 0
+            end
           end
           inherited ObjectTypeJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectContentKindLabel: TLabel
@@ -447,7 +448,7 @@ inherited XxxMainForm: TXxxMainForm
             end
           end
           object XxxJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'Xxx'
@@ -463,7 +464,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 16
               Top = 53
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -475,7 +476,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 16
               Top = 153
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -487,7 +488,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 16
               Top = 103
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -499,7 +500,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 16
               Top = 203
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -511,7 +512,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 16
               Top = 253
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -523,7 +524,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 16
               Top = 303
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -535,7 +536,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 16
               Top = 353
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -547,7 +548,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 16
               Top = 403
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -559,7 +560,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 16
               Top = 503
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -571,7 +572,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 16
               Top = 74
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -588,7 +589,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 16
               Top = 174
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -601,7 +602,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 16
               Top = 124
-              Width = 249
+              Width = 247
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -617,7 +618,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 16
               Top = 224
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -630,7 +631,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 16
               Top = 274
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -643,7 +644,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 3
               Top = 22
-              Width = 275
+              Width = 273
               Height = 25
               DataSource = XxxDataSource
               VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
@@ -655,7 +656,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 16
               Top = 324
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -668,7 +669,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 16
               Top = 374
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -681,7 +682,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 16
               Top = 424
-              Width = 249
+              Width = 247
               Height = 73
               Margins.Left = 16
               Margins.Right = 16
@@ -703,7 +704,7 @@ inherited XxxMainForm: TXxxMainForm
               AlignWithMargins = True
               Left = 16
               Top = 524
-              Width = 249
+              Width = 247
               Height = 73
               Margins.Left = 16
               Margins.Right = 16
@@ -720,7 +721,6 @@ inherited XxxMainForm: TXxxMainForm
               TabOrder = 9
               WantTabs = True
               WordWrap = False
-              ExplicitTop = 603
             end
           end
         end
@@ -781,6 +781,9 @@ inherited XxxMainForm: TXxxMainForm
             inherited OptionFontSizeLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited OptionTextRightEdgeLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited OptionTabWidthJvSpinEdit: TJvSpinEdit
               StyleElements = [seFont, seClient, seBorder]
             end
@@ -788,6 +791,9 @@ inherited XxxMainForm: TXxxMainForm
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited OptionFontSizeJvSpinEdit: TJvSpinEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTextRightEdgeComboBox: TComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -851,13 +857,6 @@ inherited XxxMainForm: TXxxMainForm
   inherited MainPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited MainPageControl: TPageControl
-      inherited ObjectContentPrevTabSheet: TTabSheet
-        inherited ObjectContentPrevTopPanel: TPanel
-          inherited ObjectContentPrevCharCountLabel: TLabel
-            Height = 22
-          end
-        end
-      end
       inherited ObjectContentTabSheet: TTabSheet
         inherited ObjectContentSplitter: TSplitter
           ExplicitHeight = 536
@@ -867,23 +866,13 @@ inherited XxxMainForm: TXxxMainForm
         end
       end
       inherited ObjectDataTabSheet: TTabSheet
+        inherited ObjectDataDBSynEdit: TDBSynEdit
+          ExplicitLeft = 0
+          ExplicitTop = 28
+        end
         inherited ObjectDataTopPanel: TPanel
           inherited ObjectDataCharCountLabel: TLabel
             Height = 22
-          end
-        end
-      end
-      inherited ObjectNoteTabSheet: TTabSheet
-        inherited ObjectNoteTopPanel: TPanel
-          inherited ObjectNoteCharCountLabel: TLabel
-            Height = 22
-          end
-        end
-      end
-      inherited FilesRioTabSheet: TTabSheet
-        inherited FilesRioTopPanel: TPanel
-          inherited FilesRioInfoLabel: TLabel
-            Height = 31
           end
         end
       end

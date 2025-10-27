@@ -3,6 +3,7 @@ program WksOrganizationClientProject;
 {$R 'Wks000Res.res' 'Wks000Res.rc'}
 
 uses
+  MidasLib,
   Vcl.Forms,
   WksBaseClientMainFormUnit in 'WksBaseClientMainFormUnit.pas' {BaseMainForm},
   WksOrganizationClientMainFormUnit in 'WksOrganizationClientMainFormUnit.pas' {OrganizationMainForm};

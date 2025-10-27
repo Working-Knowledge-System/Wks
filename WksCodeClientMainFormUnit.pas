@@ -580,7 +580,7 @@ begin
     TMesRec.I('Unable to delete %s detail data from remote server', [FObj])
   else begin
     CodeClientDataSet.Refresh; // IMPORTAN
-    LogFrame.Log('%s detail data deleted from remote server', ['Object']);
+    LogFrame.Log('%s detail data deleted from remote server', [FObj]);
   end;
   {$ENDREGION}
 

@@ -3,6 +3,7 @@ program WksDocumentClientProject;
 {$R 'Wks000Res.res' 'Wks000Res.rc'}
 
 uses
+  MidasLib,
   Vcl.Forms,
   WksBaseClientMainFormUnit in 'WksBaseClientMainFormUnit.pas' {BaseMainForm},
   WksDocumentClientMainFormUnit in 'WksDocumentClientMainFormUnit.pas' {DocumentMainForm};

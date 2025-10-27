@@ -131,7 +131,7 @@ end;
 function  TMemberRoleLevelGradeForm.IdxFromRole(IvRole: string): integer;
 begin
        if IvRole = 'User'          then Result := 0
-  else if IvRole = 'Menber'        then Result := 1
+  else if IvRole = 'Member'        then Result := 1
   else if IvRole = 'Supervisor'    then Result := 2
   else if IvRole = 'Manager'       then Result := 3
   else if IvRole = 'Director'      then Result := 4
@@ -157,7 +157,7 @@ function  TMemberRoleLevelGradeForm.RoleFromIdx(IvRoleIdx: integer): string;
 begin
   case IvRoleIdx of
   0:   Result := 'User'         ;
-  1:   Result := 'Menber'       ;
+  1:   Result := 'Member'       ;
   2:   Result := 'Supervisor'   ;
   3:   Result := 'Manager'      ;
   4:   Result := 'Director'     ;

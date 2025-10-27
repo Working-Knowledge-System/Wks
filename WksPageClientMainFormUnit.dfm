@@ -17,8 +17,6 @@ inherited PageMainForm: TPageMainForm
   inherited TopPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited TopPageControl: TPageControl
-      ExplicitLeft = 0
-      ExplicitTop = 0
       inherited TopSearchTabSheet: TTabSheet
         inherited SearchReplaceOutLabel: TLabel
           StyleElements = [seFont, seClient, seBorder]
@@ -218,6 +216,7 @@ inherited PageMainForm: TPageMainForm
   inherited RightPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited RightPageControl: TPageControl
+      ExplicitTop = 51
       inherited PropertyTabSheet: TTabSheet
         inherited ObjectJvScrollMax: TJvScrollMax
           StyleElements = [seFont, seClient, seBorder]
@@ -427,11 +426,11 @@ inherited PageMainForm: TPageMainForm
             end
           end
           object PageJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'Page'
-            ExpandedHeight = 394
+            ExpandedHeight = 372
             ButtonFont.Charset = ANSI_CHARSET
             ButtonFont.Color = clWindowText
             ButtonFont.Height = -11
@@ -443,7 +442,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 53
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -455,7 +454,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 153
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -467,7 +466,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 103
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -479,7 +478,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 203
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -491,7 +490,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 253
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -503,20 +502,19 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 303
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Style'
-              ExplicitTop = 331
               ExplicitWidth = 25
             end
             object PageObjectIdDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
               Top = 74
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -533,7 +531,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 174
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -546,7 +544,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 124
-              Width = 249
+              Width = 247
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -562,7 +560,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 224
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -575,7 +573,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 3
               Top = 22
-              Width = 275
+              Width = 273
               Height = 25
               DataSource = PageDataSource
               VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
@@ -583,57 +581,39 @@ inherited PageMainForm: TPageMainForm
               Flat = True
               TabOrder = 4
             end
-            object PageAuthenticationNeededDBCheckBox: TDBCheckBox
-              AlignWithMargins = True
-              Left = 16
-              Top = 358
-              Width = 249
-              Height = 17
-              Margins.Left = 16
-              Margins.Top = 8
-              Margins.Right = 16
-              Align = alTop
-              Caption = 'Authentication Needed'
-              DataField = 'FldAuthenticationNeeded'
-              DataSource = PageDataSource
-              TabOrder = 5
-              ExplicitTop = 374
-            end
             object PageClassDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
               Top = 274
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               DataField = 'FldClass'
               DataSource = PageDataSource
-              TabOrder = 6
-              ExplicitTop = 302
+              TabOrder = 5
             end
             object PageStyleDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
               Top = 324
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               DataField = 'FldStyle'
               DataSource = PageDataSource
-              TabOrder = 7
-              ExplicitTop = 352
+              TabOrder = 6
             end
           end
           object PageFlagsJvScrollMaxBand1: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'Flags'
-            ExpandedHeight = 245
+            ExpandedHeight = 284
             ButtonFont.Charset = ANSI_CHARSET
             ButtonFont.Color = clWindowText
             ButtonFont.Height = -11
@@ -644,38 +624,39 @@ inherited PageMainForm: TPageMainForm
             object PageContainerOnDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 35
-              Width = 249
+              Top = 68
+              Width = 247
               Height = 17
               Margins.Left = 16
-              Margins.Top = 16
+              Margins.Top = 13
               Margins.Right = 16
               Align = alTop
               Caption = 'Container On'
               DataField = 'FldContainerOn'
               DataSource = PageDataSource
               TabOrder = 0
+              ExplicitTop = 35
             end
             object PageContentFixedDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 63
-              Width = 249
+              Top = 91
+              Width = 247
               Height = 17
               Margins.Left = 16
-              Margins.Top = 8
               Margins.Right = 16
               Align = alTop
               Caption = 'Content Fixed Width'
               DataField = 'FldContentFixed'
               DataSource = PageDataSource
               TabOrder = 1
+              ExplicitTop = 63
             end
             object PageCenteredDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 86
-              Width = 249
+              Top = 114
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -684,27 +665,29 @@ inherited PageMainForm: TPageMainForm
               DataField = 'FldCentered'
               DataSource = PageDataSource
               TabOrder = 2
+              ExplicitTop = 86
             end
             object PageTitleShowDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 114
-              Width = 249
+              Top = 146
+              Width = 247
               Height = 17
               Margins.Left = 16
-              Margins.Top = 8
+              Margins.Top = 12
               Margins.Right = 16
               Align = alTop
               Caption = 'Title Show'
               DataField = 'FldTitleShow'
               DataSource = PageDataSource
               TabOrder = 3
+              ExplicitTop = 114
             end
             object PageSubtitleShowDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 137
-              Width = 249
+              Top = 169
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -713,28 +696,29 @@ inherited PageMainForm: TPageMainForm
               DataField = 'FldSubtitleShow'
               DataSource = PageDataSource
               TabOrder = 4
-              ExplicitLeft = 15
+              ExplicitTop = 137
             end
             object PageTopNavOffDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 188
-              Width = 249
+              Top = 224
+              Width = 247
               Height = 17
               Margins.Left = 16
-              Margins.Top = 8
+              Margins.Top = 12
               Margins.Right = 16
               Align = alTop
               Caption = 'TopNav Hide'
               DataField = 'FldTopNavOff'
               DataSource = PageDataSource
               TabOrder = 5
+              ExplicitTop = 188
             end
             object PageSystemInfoOffDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 211
-              Width = 249
+              Top = 247
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -743,12 +727,13 @@ inherited PageMainForm: TPageMainForm
               DataField = 'FldSystemInfoOff'
               DataSource = PageDataSource
               TabOrder = 6
+              ExplicitTop = 211
             end
             object PageImageShowDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
-              Top = 160
-              Width = 249
+              Top = 192
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -757,11 +742,27 @@ inherited PageMainForm: TPageMainForm
               DataField = 'FldImageShow'
               DataSource = PageDataSource
               TabOrder = 7
-              ExplicitTop = 137
+              ExplicitTop = 160
+            end
+            object PageAuthenticationNeededDBCheckBox: TDBCheckBox
+              AlignWithMargins = True
+              Left = 16
+              Top = 35
+              Width = 247
+              Height = 17
+              Margins.Left = 16
+              Margins.Top = 16
+              Margins.Right = 16
+              Align = alTop
+              Caption = 'Authentication Needed'
+              DataField = 'FldAuthenticationNeeded'
+              DataSource = PageDataSource
+              TabOrder = 8
+              ExplicitTop = 27
             end
           end
           object PageMarginJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'Margins'
@@ -777,7 +778,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 22
-              Width = 249
+              Width = 247
               Height = 13
               Margins.Left = 16
               Margins.Right = 16
@@ -921,6 +922,9 @@ inherited PageMainForm: TPageMainForm
             inherited OptionFontSizeLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited OptionTextRightEdgeLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited OptionTabWidthJvSpinEdit: TJvSpinEdit
               StyleElements = [seFont, seClient, seBorder]
             end
@@ -928,6 +932,9 @@ inherited PageMainForm: TPageMainForm
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited OptionFontSizeJvSpinEdit: TJvSpinEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTextRightEdgeComboBox: TComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -1042,7 +1049,7 @@ inherited PageMainForm: TPageMainForm
         object PageHeaderDBSynEdit: TDBSynEdit
           Left = 0
           Top = 28
-          Width = 942
+          Width = 899
           Height = 538
           Cursor = crIBeam
           DataField = 'FldHeader'
@@ -1091,7 +1098,7 @@ inherited PageMainForm: TPageMainForm
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 941
+          Width = 898
           Height = 28
           Margins.Left = 0
           Margins.Top = 0
@@ -1111,7 +1118,7 @@ inherited PageMainForm: TPageMainForm
         object PageFooterDBSynEdit: TDBSynEdit
           Left = 0
           Top = 28
-          Width = 942
+          Width = 899
           Height = 538
           Cursor = crIBeam
           DataField = 'FldFooter'
@@ -1160,7 +1167,7 @@ inherited PageMainForm: TPageMainForm
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 941
+          Width = 898
           Height = 28
           Margins.Left = 0
           Margins.Top = 0
@@ -1180,7 +1187,7 @@ inherited PageMainForm: TPageMainForm
         object PageHeadDBSynEdit: TDBSynEdit
           Left = 0
           Top = 28
-          Width = 942
+          Width = 899
           Height = 538
           Cursor = crIBeam
           DataField = 'FldHead'
@@ -1229,7 +1236,7 @@ inherited PageMainForm: TPageMainForm
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 941
+          Width = 898
           Height = 28
           Margins.Left = 0
           Margins.Top = 0
@@ -1249,7 +1256,7 @@ inherited PageMainForm: TPageMainForm
         object PageCssDBSynEdit: TDBSynEdit
           Left = 0
           Top = 28
-          Width = 942
+          Width = 899
           Height = 538
           Cursor = crIBeam
           DataField = 'FldCss'
@@ -1298,7 +1305,7 @@ inherited PageMainForm: TPageMainForm
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 941
+          Width = 898
           Height = 28
           Margins.Left = 0
           Margins.Top = 0
@@ -1318,7 +1325,7 @@ inherited PageMainForm: TPageMainForm
         object PageJsDBSynEdit: TDBSynEdit
           Left = 0
           Top = 28
-          Width = 942
+          Width = 899
           Height = 538
           Cursor = crIBeam
           DataField = 'FldJs'
@@ -1367,7 +1374,7 @@ inherited PageMainForm: TPageMainForm
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 941
+          Width = 898
           Height = 28
           Margins.Left = 0
           Margins.Top = 0
@@ -1380,7 +1387,7 @@ inherited PageMainForm: TPageMainForm
           ShowCaption = False
           TabOrder = 1
           object PageJsLabel: TLabel
-            Left = 782
+            Left = 739
             Top = 0
             Width = 159
             Height = 28
@@ -1388,6 +1395,7 @@ inherited PageMainForm: TPageMainForm
             Alignment = taCenter
             Caption = 'javascript before page loading'
             Layout = tlCenter
+            ExplicitLeft = 782
             ExplicitHeight = 15
           end
         end
@@ -1399,7 +1407,7 @@ inherited PageMainForm: TPageMainForm
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 941
+          Width = 898
           Height = 28
           Margins.Left = 0
           Margins.Top = 0
@@ -1412,7 +1420,7 @@ inherited PageMainForm: TPageMainForm
           ShowCaption = False
           TabOrder = 0
           object PageJsAfterLabel: TLabel
-            Left = 792
+            Left = 749
             Top = 0
             Width = 149
             Height = 28
@@ -1420,13 +1428,14 @@ inherited PageMainForm: TPageMainForm
             Alignment = taCenter
             Caption = 'javascript after page loading'
             Layout = tlCenter
+            ExplicitLeft = 792
             ExplicitHeight = 15
           end
         end
         object PageJsAfterDBSynEdit: TDBSynEdit
           Left = 0
           Top = 28
-          Width = 942
+          Width = 899
           Height = 538
           Cursor = crIBeam
           DataField = 'FldJsAfter'

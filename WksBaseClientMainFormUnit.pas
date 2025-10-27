@@ -88,9 +88,10 @@ uses
   , Vcl.Menus
   , Vcl.Edge                 // edge webview
   , Vcl.WinXCtrls            // win 10 ctrls
+  , Vcl.PythonGUIInputOutput // python i/o
   , Data.DB
   , Datasnap.DBClient
-  , Midaslib                 // *** without it the client, on a different pc, give a blocching, hard to find error ***
+//, Midaslib                 // *** without it the client, on a different pc, give a blocching, hard to find error, moved in WksBaseClientProject.dpr ***
   , Soap.SOAPConn
   , SynEdit
   , SynDBEdit
@@ -115,7 +116,6 @@ uses
   , DTDBTreeView
   , PythonEngine
   , PythonVersions
-  , Vcl.PythonGUIInputOutput
   , Wks000Unit
   , WksLogFrameUnit
   , WksWordFrameUnit
@@ -471,13 +471,13 @@ type
     SearchWholeWordCheckBox: TCheckBox;
     StatusBar: TStatusBar;
     SynEditInsertRegionPopup: TMenuItem;
-    SynEditPopup: TPopupMenu;
-    SynEditRegionCollapseAction: TAction;
-    SynEditRegionExpandAction: TAction;
-    SynEditRegionInsertAction: TAction;
+    SynEditContentPopup: TPopupMenu;
+    SynEditContentRegionCollapseAction: TAction;
+    SynEditContentRegionExpandAction: TAction;
+    SynEditContentRegionInsertAction: TAction;
     SynEditRegionInsertPopup: TMenuItem;
-    SysEditAction: TActionList;
-    SysEditImageList24: TImageList;
+    SysEditContentAction: TActionList;
+    SysEditContentImageList24: TImageList;
     TextAction: TActionList;
     TextCommentAction: TAction;
     TextCommentToolButton: TToolButton;
@@ -545,6 +545,11 @@ type
     WeekdayLabel: TLabel;
     WordTabSheet: TTabSheet;
     YearLabel: TLabel;
+    SynEditHeaderInsertPopup: TMenuItem;
+    SynEditContentHeaderInsertAction: TAction;
+    SynEditContentTemplateInsertPopup: TMenuItem;
+    SynEditContentTemplateInsertAction: TAction;
+    SynEditDataJsonTemplateInsertAction: TAction;
     procedure ActionBrowseActionExecute(Sender: TObject);
     procedure ActionEditActionExecute(Sender: TObject);
     procedure ActionFitActionExecute(Sender: TObject);
@@ -677,9 +682,9 @@ type
     procedure SearchReplaceSwapLabel2Click(Sender: TObject);
     procedure SearchReplaceSwapLabelClick(Sender: TObject);
     procedure SearchResultListBoxClick(Sender: TObject);
-    procedure SynEditRegionCollapseActionExecute(Sender: TObject);
-    procedure SynEditRegionExpandActionExecute(Sender: TObject);
-    procedure SynEditRegionInsertActionExecute(Sender: TObject);
+    procedure SynEditContentRegionCollapseActionExecute(Sender: TObject);
+    procedure SynEditContentRegionExpandActionExecute(Sender: TObject);
+    procedure SynEditContentRegionInsertActionExecute(Sender: TObject);
     procedure TextCommentActionExecute(Sender: TObject);
     procedure TextCompareActionExecute(Sender: TObject);
     procedure TextFoldActionExecute(Sender: TObject);
@@ -702,6 +707,9 @@ type
     procedure WeekLabelClick(Sender: TObject);
     procedure WordTabSheetHide(Sender: TObject);
     procedure WordTabSheetShow(Sender: TObject);
+    procedure SynEditContentHeaderInsertActionExecute(Sender: TObject);
+    procedure SynEditContentTemplateInsertPopupClick(Sender: TObject);
+    procedure ObjectDataKindDBComboBoxChange(Sender: TObject);
   private
     { Private declarations }
     // chache
@@ -783,6 +791,9 @@ type
     FYear, FQuarter, FMonth    , FWeekIso   , FWeekWork   , FWeekDay, FDay    , FHour, FMinute, FSecond, FMilliSecond: word;
                      FMonthStr , FWeekIsoStr, FWeekWorkStr          , FDayStr                                        : string;
                      FMonthStr3                                     , FDayStr3                                       : string;
+    // content and data(json)
+    procedure ContentInsert(IvMessage, IvTextToInsert: string);
+    procedure DataJsonInsert(IvMessage, IvTextToInsert: string);
   end;
 {$ENDREGION}
 
@@ -804,6 +815,7 @@ uses
   , System.Rtti
   , System.UITypes
   , System.Diagnostics
+  , System.Math
 //, System.UITypes // vkcodes
   , Vcl.RecError // reconcileerrors
   , Vcl.DBGrids
@@ -1095,7 +1107,7 @@ begin
   if not ObjectClientDataSet.Active then
     Exit;
 
-  // codekind
+  // contentkind
   idx := ObjectContentKindDBComboBox.ItemIndex - 1;
   if idx < 0 then
     cke := ckTxt
@@ -1279,6 +1291,44 @@ begin
 end;
   {$ENDREGION}
 
+  {$REGION 'Content and Data'}
+procedure TBaseMainForm.ContentInsert(IvMessage, IvTextToInsert: string);
+var
+  a: TBufferCoord;
+begin
+  if not IvMessage.IsEmpty then
+    if TAskRec.No(IvMessage) then
+      Exit;
+
+  a := ObjectContentDBSynEdit.CaretXY;
+  ObjectClientDataSet.Edit;
+  gsyn.InsertTextAtCaret(ObjectContentDBSynEdit, IvTextToInsert);
+//ObjectClientDataSet.Post;
+  ObjectDBNavigator.BtnClick(nbPost);
+//ObjectContentDBSynEdit.SelStart  := gui.SelLength;
+//ObjectContentDBSynEdit.SelLength := 0;
+  ObjectContentDBSynEdit.CaretXY := a;
+end;
+
+procedure TBaseMainForm.DataJsonInsert(IvMessage, IvTextToInsert: string);
+var
+  a: TBufferCoord;
+begin
+  if not IvMessage.IsEmpty then
+    if TAskRec.No(IvMessage) then
+      Exit;
+
+  a := ObjectDataDBSynEdit.CaretXY;
+  ObjectClientDataSet.Edit;
+  gsyn.InsertTextAtCaret(ObjectDataDBSynEdit, IvTextToInsert);
+//ObjectClientDataSet.Post;
+  ObjectDBNavigator.BtnClick(nbPost);
+//ObjectDataDBSynEdit.SelStart  := gui.SelLength;
+//ObjectDataDBSynEdit.SelLength := 0;
+  ObjectDataDBSynEdit.CaretXY := a;
+end;
+  {$ENDREGION}
+
 {$ENDREGION}
 
 {$REGION 'Form'}
@@ -1340,6 +1390,7 @@ begin
 //ActionMarkdownAction.Checked                 := true;
   SearchReplaceOutEdit.Clear;
   SearchReplaceInEdit.Clear;
+  ObjectDataDBSynEdit.Tag                      := 11;
   {$ENDREGION}
 
   {$REGION 'zzz'}
@@ -2599,6 +2650,40 @@ begin
 end;
   {$ENDREGION}
 
+  {$REGION 'Content Popup'}
+procedure TBaseMainForm.ObjectContentSynEditTimerTimer(Sender: TObject);
+begin
+  // user has paused typing more then this timer interval, so trigger the desired edge browser update
+  ObjectContentSynEditTimer.Enabled := false;
+  ObjectContentEdgeBrowserUpdate;
+end;
+
+procedure TBaseMainForm.SynEditContentHeaderInsertActionExecute(Sender: TObject);
+begin
+  gsyn.InsertHeader(gsyn.Focused);
+end;
+
+procedure TBaseMainForm.SynEditContentRegionInsertActionExecute(Sender: TObject);
+begin
+  gsyn.InsertRegion(gsyn.Focused);
+end;
+
+procedure TBaseMainForm.SynEditContentRegionCollapseActionExecute(Sender: TObject);
+begin
+  gsyn.RegionCollapse(ObjectContentDBSynEdit);
+end;
+
+procedure TBaseMainForm.SynEditContentRegionExpandActionExecute(Sender: TObject);
+begin
+  gsyn.RegionExpand(ObjectContentDBSynEdit);
+end;
+
+procedure TBaseMainForm.SynEditContentTemplateInsertPopupClick(Sender: TObject);
+begin
+  gsyn.InsertContentTemplate(ObjectContentDBSynEdit);
+end;
+  {$ENDREGION}
+
   {$REGION 'Data'}
 procedure TBaseMainForm.ObjectDataDBSynEditChange(Sender: TObject);
 begin
@@ -2607,7 +2692,7 @@ begin
 
   // notempty
   if ObjectDataDBSynEdit.Text.IsEmpty then
-    ObjectDataTabSheet.Caption := TStrRec.StrCapitalize(ObjectDataTabSheet.Caption)
+    ObjectDataTabSheet.Caption := ' ' + TStrRec.StrCapitalize(ObjectDataTabSheet.Caption)
   else
     ObjectDataTabSheet.Caption := UpperCase(ObjectDataTabSheet.Caption);
 end;
@@ -2784,7 +2869,7 @@ procedure TBaseMainForm.ObjectContentKindDBComboBoxChange(Sender: TObject);
 var
   idx: integer;
 begin
-  // codekindidx
+  // contentkindidx
   idx := ObjectContentKindDBComboBox.ItemIndex - 1;
   ObjectContentDBSynEdit.Tag := idx;
 
@@ -2797,6 +2882,15 @@ begin
     ObjectContentSplitter.Visible := TCodKindEnum(ObjectContentDBSynEdit.Tag) = ckMd;
     ObjectContentSplitView.Opened := ObjectContentSplitter.Visible;
   end;
+end;
+
+procedure TBaseMainForm.ObjectDataKindDBComboBoxChange(Sender: TObject);
+var
+  idx: integer;
+begin
+  // datakindidx
+  idx := ObjectDataKindDBComboBox.ItemIndex - 1;
+  ObjectDataDBSynEdit.Tag := idx;
 end;
     {$ENDREGION}
 
@@ -3254,7 +3348,10 @@ begin
   FObject           := DataSet.FieldByName('FldObject'          ).AsString;
 
   // info
-  ObjectNodeInfoLabel.Caption := Format('total %d  childs %d', [{FId, DataSet.RecNo,} DataSet.RecordCount, ObjectDTClientTree.FocusedNode.ChildCount]);
+  try
+  ObjectNodeInfoLabel.Caption := Format('total %d  childs %d', [DataSet.RecordCount, ObjectDTClientTree.FocusedNode.ChildCount]);
+  except
+  end;
   ObjectIdDBText.Hint         := Format('Parent id: %d', [FPId]);
 
   // unfreeze
@@ -3571,30 +3668,6 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION 'SynEdit'}
-procedure TBaseMainForm.SynEditRegionInsertActionExecute(Sender: TObject);
-begin
-  gsyn.InsertRegion(gsyn.Focused);
-end;
-
-procedure TBaseMainForm.SynEditRegionCollapseActionExecute(Sender: TObject);
-begin
-  gsyn.RegionCollapse(ObjectContentDBSynEdit);
-end;
-
-procedure TBaseMainForm.SynEditRegionExpandActionExecute(Sender: TObject);
-begin
-  gsyn.RegionExpand(ObjectContentDBSynEdit);
-end;
-
-procedure TBaseMainForm.ObjectContentSynEditTimerTimer(Sender: TObject);
-begin
-  // user has paused typing more then this timer interval, so trigger the desired edge browser update
-  ObjectContentSynEditTimer.Enabled := false;
-  ObjectContentEdgeBrowserUpdate;
-end;
-{$ENDREGION}
-
 {$REGION 'Files'}
 
   {$REGION 'options'}
@@ -3640,7 +3713,7 @@ begin
 
   // workingfoldercheck
 //if not TFsyRec.DirExists(OptionFilesWorkingFolderSelectButtonedEdit.Text, fbk) then begin
-//  TMesRec.W('Path is empty, use default C:\$Fil, please check the local "Working Folder" or the remote file "Path" property');
+//  TMesRec.W('Path is empty, use default C:\$\Filer, please check the local "Working Folder" or the remote file "Path" property');
 //  TFsyRec.DirForce(OptionFilesWorkingFolderSelectButtonedEdit.Text, fbk);
 //end;
 
@@ -3648,7 +3721,7 @@ begin
   pha := ifthen(OptionFilesWorkingFolderUseCheckBox.Checked, OptionFilesWorkingFolderSelectButtonedEdit.Text, IvFilePathOriginal);
   if not giis.Ex(pha) then begin
     TMesRec.W('Local path is empty, please check the local "Working Folder" or the remote file "Path" property');
-    pha := 'C:\$Fil';
+    pha := 'C:\$\Filer';
   end;
 
   // pathforce
