@@ -22,10 +22,10 @@ type
   private
     FRefName    : string;   // i.e. the agent name
     FOutStrings : TStrings; // output
-    FRepStrings : TStrings; // report
+    FLogStrings : TStrings; // report
   //FJmpInstance: TJmp;     // jmp
   public
-    constructor Create(IvRefName: string; IvOutStrings, IvRepStrings: TStrings);
+    constructor Create(IvRefName: string; IvOutStrings, IvLogStrings: TStrings);
     destructor  Destroy; override;
     function  BinaryDir(IvArch: string = 'x64' {| x32}): string;
     function  CodeIsValid(IvScript: string; var IvFbk: string): boolean;
@@ -49,12 +49,12 @@ uses
 {$ENDREGION}
 
 {$REGION 'TJslEngineCls'}
-constructor TJslEngineCls.Create(IvRefName: string; IvOutStrings, IvRepStrings: TStrings);
+constructor TJslEngineCls.Create(IvRefName: string; IvOutStrings, IvLogStrings: TStrings);
 begin
   // init
   FRefName    := IvRefName; if FRefName = '' then FRefName := TNamRec.Rnd;
   FOutStrings := IvOutStrings; // no create? no destroy?
-  FRepStrings := IvRepStrings; // no create? no destroy?
+  FLogStrings := IvLogStrings; // no create? no destroy?
 
   // create JMP instance
   //FJmpInstance ...
@@ -110,15 +110,15 @@ begin
   //Result := win.WinNewProcess(c, true, true);
 
     // ii launchandgetoutput
-    FRepStrings.Add(Format('Running %s', [IvFileIn]));
+    FLogStrings.Add(Format('Running %s', [IvFileIn]));
     Result := TDosRec.Exec(c, o, w);
     FOutStrings.Add(o);
-    FRepStrings.Add('JSL file script executed succesfully');
+    FLogStrings.Add('JSL file script executed succesfully');
 
     Result := true;
   except
     on e: Exception do begin
-      FRepStrings.Add(Format('%s', [e.Message]));
+      FLogStrings.Add(Format('%s', [e.Message]));
       Result := false;
     end;
   end;
@@ -161,7 +161,7 @@ var
 //  fis: string; // filespec
 begin
   // init
-  FRepStrings.Add('Running JSL code ...');
+  FLogStrings.Add('Running JSL code ...');
   Result := false;
 
   // init
@@ -173,7 +173,7 @@ begin
   // exit
   Result := not b.IsEmpty;
   if not Result then begin
-    FRepStrings.Add('JMP installation path is empy');
+    FLogStrings.Add('JMP installation path is empy');
     raise Exception.Create('JMP installation path is empy');
   end;
   // exit
@@ -193,15 +193,15 @@ begin
       c := Format(JSLJMP_EXE_WITH_OPT_IO, [b, f]);
 
       // launchandgetoutput
-      FRepStrings.Add(Format('Running %s', [f]));
+      FLogStrings.Add(Format('Running %s', [f]));
       Result := TDosRec.Exec(c, o, w);
       FOutStrings.Add(o);
-      FRepStrings.Add('JSL code executed succesfully');
+      FLogStrings.Add('JSL code executed succesfully');
 
       Result := true;
     except
       on e: Exception do begin
-        FRepStrings.Add(Format('%s', [e.Message]));
+        FLogStrings.Add(Format('%s', [e.Message]));
         Result := false;
       end;
     end;

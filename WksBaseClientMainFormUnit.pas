@@ -550,6 +550,10 @@ type
     SynEditContentTemplateInsertPopup: TMenuItem;
     SynEditContentTemplateInsertAction: TAction;
     SynEditDataJsonTemplateInsertAction: TAction;
+    ActionDeleteToolButton: TToolButton;
+    ActionDeleteAction: TAction;
+    ActionDestroyAction: TAction;
+    ActionDestroyToolButton: TToolButton;
     procedure ActionBrowseActionExecute(Sender: TObject);
     procedure ActionEditActionExecute(Sender: TObject);
     procedure ActionFitActionExecute(Sender: TObject);
@@ -710,6 +714,8 @@ type
     procedure SynEditContentHeaderInsertActionExecute(Sender: TObject);
     procedure SynEditContentTemplateInsertPopupClick(Sender: TObject);
     procedure ObjectDataKindDBComboBoxChange(Sender: TObject);
+    procedure ActionDeleteActionExecute(Sender: TObject);
+    procedure ActionDestroyActionExecute(Sender: TObject);
   private
     { Private declarations }
     // chache
@@ -1396,7 +1402,9 @@ begin
   {$REGION 'zzz'}
   ActionBrowseAction.Visible       := false;
 //ActionEditAction.Visible         := false;
-  ActionZzzAction.Visible          := false;
+//ActionZzzAction.Visible          := false;
+  ActionDeleteAction.Visible       := false;
+  ActionDestroyAction.Visible      := false;
   ActionLoadFromFileAction.Visible := false;
   ActionSaveToFileAction.Visible   := false;
 //ActionMarkdownAction.Visible     := false;
@@ -1960,8 +1968,116 @@ begin
 end;
 
 procedure TBaseMainForm.ActionZzzActionExecute(Sender: TObject);
+var
+  mbr: string; // member
+  vnp: PVirtualNode;
+  oid, pid: integer;
 begin
-  TMesRec.NI;
+  // ownercheck
+  mbr := ObjectClientDataSet.FieldByName('FldFromMember').AsString;
+  if mbr <> gusr.Username then begin
+    TMesRec.I('Not allowed!  only %s can recycle this item !', [mbr]);
+    Exit;
+  end;
+
+  // childscheck
+  vnp := ObjectDTClientTree.FocusedNode;
+  if vnp.ChildCount > 0 then begin
+    TMesRec.I('This item has childs, please remove all childs first');
+    Exit;
+  end;
+
+  // ask
+  if not TAskRec.Yes('Move the current item to the Zzz recycle folder ?'
+      + sLineBreak + 'Fields values will remain unchanged, only the State field will be set to Recycled') then
+    Exit;
+
+  // remember
+  oid := ObjectClientDataSet.FieldByName('FldId').AsInteger;
+  pid := ObjectClientDataSet.FieldByName('FldPId').AsInteger;
+
+  // zzzMOVE
+  ObjectDTClientTree.DataSource := nil; // IMPORTANT
+//ObjectClientDataSet.Edit;
+  TDstRec.RecordRecycleSoft(ObjectClientDataSet);
+//ObjectClientDataSet.Post;           // post already done!
+//ObjectDBNavigator.BtnClick(nbPost); // post already done!
+//ObjectRefreshAction.Execute;
+  ObjectDTClientTree.DataSource := ObjectDataSource; // IMPORTANT
+  ObjectNodeLocateAndExpand(pid);
+  //ObjectDTClientTree.Expanded[ObjectDTClientTree.FocusedNode] := true;
+
+  // log
+  LogFrame.LogOne('Item %d moved to the Zzz recycle folder', [oid]);
+end;
+
+procedure TBaseMainForm.ActionDeleteActionExecute(Sender: TObject);
+var
+  mbr: string;
+  vnp: PVirtualNode;
+  oid, pid: integer;
+begin
+  // ownercheck
+  mbr := ObjectClientDataSet.FieldByName('FldFromMember').AsString;
+  if mbr <> gusr.Username then begin
+    TMesRec.I('Not allowed!  only %s can recycle this item !', [mbr]);
+    Exit;
+  end;
+
+  // childscheck
+  vnp := ObjectDTClientTree.FocusedNode;
+  if vnp.ChildCount > 0 then begin
+    TMesRec.I('This item has childs, please remove all childs first');
+    Exit;
+  end;
+
+
+  // ask
+  if not TAskRec.Yes('Soft delete the current item and move it to the Zzz recycle folder ?'
+      + sLineBreak + 'Fields values will be set to NULL, name will be set to Available and state will be set to Deleted') then
+    Exit;
+
+  // remember
+  oid := ObjectClientDataSet.FieldByName('FldId').AsInteger;
+  pid := ObjectClientDataSet.FieldByName('FldPId').AsInteger;
+
+  // zzzDELETE
+  ObjectDTClientTree.DataSource := nil; // IMPORTANT
+//ObjectClientDataSet.Edit;
+  TDstRec.RecordDeleteSoft(ObjectClientDataSet, 'FldObject');
+//ObjectClientDataSet.Post;           // post already done!
+//ObjectDBNavigator.BtnClick(nbPost); // post already done!
+//ObjectRefreshAction.Execute;
+  ObjectDTClientTree.DataSource := ObjectDataSource; // IMPORTANT
+  ObjectNodeLocate{AndExpand}(pid);
+
+  // log
+  LogFrame.LogOne('Item %d soft deleted and moved to the Zzz recycle folder', [oid]);
+end;
+
+procedure TBaseMainForm.ActionDestroyActionExecute(Sender: TObject);
+begin
+  // DESTROY
+{ if DlgYesConfirm('Destroy', 'You are about to destroy all your Xxxs (Accounts) stored locally and remotely in the Cloud.'#13#13'CONTINUE ?') then
+    if DlgYesConfirm('DESTROY LOCALLY', 'PLEASE CONFIRM TO DESTROY ALL OBJECTS STORED "LOCALLY".'#13#13'THE OPERATION IS REVERSIBLE'#13#13'CONTINUE ?') then begin
+      //XxxCds.DisableControls;
+      //try
+        //XxxCds.EmptyDataSet; // seemsnotworking
+          XxxCds.First;
+          while XxxCds.RecordCount > 1 do begin
+            if XxxCds.FieldByName('FldPId').AsInteger = FUserRootPId then begin // rootidskip
+              XxxCds.Next;
+              Continue;
+            end;
+            XxxCds.Delete;
+            Application.ProcessMessages;
+          end;
+      //finally
+      //  XxxCds.EnableControls;
+      //end;
+      if DlgYesConfirm('DESTROY ON CLOUD', 'PLEASE CONFIRM ALSO TO DESTROY ALL OBJECTS STORED "REMOTELY IN THE CLOUD".'#13#13'THE OPERATION IS NOT REVERSIBLE, YOU CAN RESTORE DATA ONLY FROM A BACKUP'#13#13'CONTINUE ?') then
+        SoapApplyUpdates;
+    end; }
 end;
 
 procedure TBaseMainForm.ActionLoadFromFileActionExecute(Sender: TObject);

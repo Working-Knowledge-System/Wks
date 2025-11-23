@@ -18,7 +18,7 @@
 //                                                                            //
 // MIT License                                                                //
 //                                                                            //
-// Copyright © 2007-present, WKS                                              //
+// Copyright (c) 2007-present, WKS                                            //
 //                                                                            //
 // Permission is hereby granted, free of charge, to any person obtaining a    //
 // copy of this software and associated documentation files (the "Software"), //
@@ -111,6 +111,12 @@ interface
   -----------------------------
   array of const is represented by array of TVarRec
   each element in array of const corresponds to a TVarRec structure that holds information about the type and value of the element
+*)
+{$ENDREGION}
+
+{$REGION 'ToDo'}
+(*
+  - delete all FldFrom* fields and replace them with FldOwner, all From* values will have to be deduced from FldOwner itself
 *)
 {$ENDREGION}
 
@@ -261,17 +267,17 @@ const
   {$ENDREGION}
 
   {$REGION 'Dba'}
-//DBA_PROVIDER               = 'SQLNCLI11.1'    ; // Microsoft ...
+//DBA_PROVIDER               = 'SQLNCLI11.1'    ; // Microsoft legacy SQL Server Native Client
 //DBA_PROVIDER               = 'SQLOLEDB.1'     ; // Microsoft classic OLE DB Provider for SQL Server (present on Windows Server 2025)
   DBA_PROVIDER               = 'MSOLEDBSQL.1'   ; // Microsoft new OLE DB Driver (need to be installed on Windows Server 2025 but only x64 bit is allowed)
 //DBA_PROVIDER               = 'OraOLEDB.Oracle'; // Oracle new OLE DB Driver (installed with Oracle Client, not Oracle Instant Client)
 
   // mssql
-//DBA_CONNECTION_STR         = 'Provider='+DBA_PROVIDER+';Integrated Security=SSPI  ;User ID=WINUSER;Data Source=LOCALHOST;Initial Catalog=DbaXxx';                // windows authentication (integrated security)
-  DBA_CONNECTION_STR         = 'Provider='+DBA_PROVIDER+';Persist Security Info=True;User ID=sa;Data Source=LOCALHOST;Password=secret@123;Initial Catalog=DbaXxx'; // sql server authentication wks
+//DBA_CONNECTION_STR         = 'Provider='+DBA_PROVIDER+';Integrated Security=SSPI  ;Data Source=LOCALHOST;User ID=WINLOGINUSER;Initial Catalog=DbaXxx';           // windows authentication (integrated security)
+  DBA_CONNECTION_STR         = 'Provider='+DBA_PROVIDER+';Persist Security Info=True;Data Source=LOCALHOST;User ID=sa;Password=secret@123;Initial Catalog=DbaXxx'; // sql server authentication wks
 
   // oracle
-//  DBA_CONNECTION_STR_FD_ORA = '''
+//DBA_CONNECTION_STR_FD_ORA  = '''
 //DriverID=Ora
 //Database=servername:1521/service
 //User_Name=user
@@ -308,7 +314,7 @@ const
   {$REGION 'License'}
   LICENSE_MIT             = 'MIT License'
              + sLineBreak + ''
-             + sLineBreak + 'Copyright © 2010-[RvDatNowYear()] [RvWks()]'
+             + sLineBreak + 'Copyright (c) 2010-[RvDatNowYear()] [RvWks()]'
              + sLineBreak + ''
              + sLineBreak + 'Permission is hereby granted, free of charge, to any person obtaining a copy'
              + sLineBreak + 'of this software and associated documentation files (the "Software"), to deal'
@@ -1061,13 +1067,15 @@ type
     {
     TChartRec
       |
-      |_TXChartAxisRec
+      |_TChartAxisRec   X
       |
-      |_TYChartAxisRec
+      |_TChartAxisRec   Y
       |
-      |_TChartSerieRecVector
+      |_[TChartSerieRecVector]
           |
-          |_TChartPointRecVector
+          |_[TChartPointRecVector]
+             |
+             |__[TChartPointRec]
     }
     {$ENDREGION}
 
@@ -1153,9 +1161,10 @@ type
     PanelClosed   : boolean;
     XAxisRec      : TChartAxisRec;
     YAxisRec      : TChartAxisRec;
-    SerieRecVector: TChartSerieRecVector;
+    SerieRecVector: TChartSerieRecVector; // one or more series of points
   public
-    procedure Init(IvDs: TDataSet; IvChart, IvWidth, IvHeight, IvTitle, IvXCaption, IvYCaption, IvXLabelAngleDeg, IvYLabelAngleDeg: string; IvSerieRecVector: TChartSerieRecVector);
+  //procedure Init(IvChart, IvWidth, IvHeight, IvTitle, IvXCaption, IvYCaption, IvXLabelAngleDeg, IvYLabelAngleDeg: string; IvSerieRecVector: TChartSerieRecVector});
+    procedure PointsSetFromDs(IvDs: TDataSet);
   //function  ToJson: string;
     function  ToCanvasJs: string;
     function  ToPlotly: string;
@@ -1237,7 +1246,8 @@ type
   end;
 
   TCnvRec = record // canvas
-    class function  CnvTextWidth(IvString: string; IvFont: TFont): integer; static;
+    class function  CnvTextWidth(IvString: string; IvFont: TFont): integer; static; // measure
+    class function  CnvTextSize(IvString: string; IvFontSize: integer; IvFont: string = ''): TSize; static;
     class procedure CnvFontSet(IvCanvas: TCanvas; IvFontName: string; IvFontSize: integer = 8; IvFontColor: TColor = clBlack; IvFontStyleSet: TFontStyles = []); static;
     class procedure CnvBrushSet(IvCanvas: TCanvas; IvBrushColor: TColor; IvBrushStyle: TBrushStyle); static;
     class procedure CnvPenSet(IvCanvas: TCanvas; IvPenColor: TColor; IvPenStyle: TPenStyle; IvPenWidth: integer); static;
@@ -1436,7 +1446,7 @@ type
              + sLineBreak  + '~~ '
              + sLineBreak  + '~~ author     :  [RvUsername()]'
              + sLineBreak  + '~~ created    :  [RvDatNow()]'
-             + sLineBreak  + '~~ copyright  :  © [RvOrganization()] [RvDatNowYear()]'
+             + sLineBreak  + '~~ copyright  :  (c) [RvOrganization()] [RvDatNowYear()]'
              + sLineBreak  + '~~ licence    :  BDS'
              + sLineBreak  + '~~ -----------------------------------------------------------------------------'
              + sLineBreak  + '~~[ENDREGION]'
@@ -1850,20 +1860,23 @@ type
   const
     DBA_CONN_STR = DBA_CONNECTION_STR;
   public
-    // general
+    // general (for internal use only)
     class function  CmdExec  (const IvSql: string;  var IvAffected: integer; var IvFbk: string; IvTimeoutSec: integer = DBA_COMMAND_TIMEOUT_SEC): boolean; static;
     class function  ScalarVar(const IvSql: string;  var IvValue   : variant; const IvDefault: variant; var IvFbk: string; IvTimeOutSec: integer = DBA_COMMAND_TIMEOUT_SEC): boolean; overload; static;
     class function  ScalarInt(const IvSql: string;  var IvValue   : integer; const IvDefault: integer; var IvFbk: string; IvTimeOutSec: integer = DBA_COMMAND_TIMEOUT_SEC): boolean; overload; static;
     class function  ScalarStr(const IvSql: string;  var IvValue   : string ; const IvDefault: string ; var IvFbk: string; IvTimeOutSec: integer = DBA_COMMAND_TIMEOUT_SEC): boolean; overload; static;
     class function  Scalar   (const IvSql: string                          ; const IvDefault: variant                   ; IvTimeOutSec: integer = DBA_COMMAND_TIMEOUT_SEC): variant; overload; static;
-    // ds
-    class function  DsFromSql(const IvSql: string; out IvDs: TDataset; var IvAffected: integer; var IvFbk: string; IvFalseIfDsIsEmpty: boolean = true): boolean; overload; static;
-    class function  DsFromSql(const IvSql: string; out IvDs: TDataset                         ; var IvFbk: string; IvFalseIfDsIsEmpty: boolean = true): boolean; overload; static;
-    class function  DsFromSql(const IvSql: string; out IvDs: TDataset                                            ; IvFalseIfDsIsEmpty: boolean = true): boolean; overload; static;
-
-    class function  DsFromSql2(const IvConnLib, IvConnStr, IvSql: string; out IvDs: TDataset                     ; IvFalseIfDsIsEmpty: boolean = true): boolean; overload; static;
+    // dst (general)
+    class function  DstFromSql(const IvSql: string; out IvDs: TDataset; const IvConnLib, IvConnStr: string        ; IvFalseIfDsIsEmpty: boolean = true): boolean          ; static;
+    // dst (for internal use only)
+    class function  DsFromSql (const IvSql: string; out IvDs: TDataset; var IvAffected: integer; var IvFbk: string; IvFalseIfDsIsEmpty: boolean = true): boolean; overload; static;
+    class function  DsFromSql (const IvSql: string; out IvDs: TDataset                         ; var IvFbk: string; IvFalseIfDsIsEmpty: boolean = true): boolean; overload; static;
+    class function  DsFromSql (const IvSql: string; out IvDs: TDataset                                            ; IvFalseIfDsIsEmpty: boolean = true): boolean; overload; static;
     // csv
     class function  CsvFromSql(IvSql: string; IvHeaderOn: boolean = true): string; static;
+    // vec
+  //class function  VecFromSql(const IvSql: string  ; IvFieldIdx: integer = 0{; IvVecDef: TArray<string>}): TArray<string>; static;
+    class function  VecFromDst(var IvDst: TDataset; IvFieldIdx: integer = 0{; IvVecDef: TArray<string>}): TArray<string>; static;
     // table
     class function  TblExists            (const IvTbl: string): boolean; static;
     class function  TblExistsRio         (const IvTbl: string): boolean; static;
@@ -2034,6 +2047,8 @@ type
     // record
   //class procedure RecordToJson     (IvDst: TDataSet; var IvSuperObject: superobject.ISuperObject; IvNoFld: boolean = false; IvRowNoAdd: boolean = false); overload;
     class function  RecordToJson     (IvDst: TDataSet; IvNoFld: boolean = false; IvRowNoAdd: boolean = false): string; overload; static;
+    class procedure RecordRecycleSoft(IvDs: TDataSet); static;
+    class procedure RecordDeleteSoft (IvDs: TDataSet; IvFieldToSetAvailable: string); static;
     // json *** change to procedure and add IvAffected: integer ***
     class procedure DstToJsonKeyValue(IvDst: TDataSet; var IvJson: string; IvNoFld: boolean = false); static;                                       // used in <select><option> {"key1":"aaa","key2":"bbb",...} only field[0] and field[1] are considered
     class function  DstToJson        (IvDst: TDataSet; var IvJson: string; IvNoFld: boolean = false; IvRowNoAdd: boolean = false): integer; static; // {"Fld1":"aa1","Fld2":"bb1",...},{"Fld1":"aa2","Fld2":"bb2",...}, ..., will returns the number of affected elements
@@ -3690,62 +3705,62 @@ type
   const
     MKD_ITEM_VEC: array [0..41] of TMkdItemRec = (
     // unichars
-  //  (Itm: 'Newlines'          ; Exa: ' '                             ; Rex: '^([ ]{1,12})$'                          ; Reo: [roMultiLine] ; New: '<br>'                                            )
-      (Itm: 'Spaces'            ; Exa: ' ___ '                         ; Rex: '( [_]{1,12} )'                          ; Reo: [roMultiLine] ; New: '&nbsp;&nbsp;&nbsp;'                              )
-    , (Itm: 'Horizontal rule'   ; Exa: '*** or ---'                    ; Rex: '^([*-]{3})$'                            ; Reo: [roMultiLine] ; New: '<hr style="width:x%">'                           )
+    //(Itm: 'Newlines'          ; Exa: ' '                               ; Rex: '^([ ]{1,12})$'                          ; Reo: [roMultiLine] ; New: '<br>'                                            )
+      (Itm: 'Spaces'            ; Exa: ' ___ '                           ; Rex: '( [_]{1,12} )'                          ; Reo: [roMultiLine] ; New: '&nbsp;&nbsp;&nbsp;'                              )
+    , (Itm: 'Horizontal rule'   ; Exa: '*** or ---'                      ; Rex: '^([*-]{3})$'                            ; Reo: [roMultiLine] ; New: '<hr style="width:x%">'                           )
     // headed
-    , (Itm: 'Header 1'          ; Exa: '# Header 1'                    ; Rex: '^[ \t]*(#{1}\s)(.*)$'                   ; Reo: [roMultiLine] ; New: '<h1>%s</h1>'                                     )
-    , (Itm: 'Header 2'          ; Exa: '## Header 2'                   ; Rex: '^[ \t]*(#{2}\s)(.*)$'                   ; Reo: [roMultiLine] ; New: '<h2>%s</h2>'                                     )
-    , (Itm: 'Header 3'          ; Exa: '### Header 3'                  ; Rex: '^[ \t]*(#{3}\s)(.*)$'                   ; Reo: [roMultiLine] ; New: '<h3>%s</h3>'                                     )
-    , (Itm: 'Header 4'          ; Exa: '#### Header 4'                 ; Rex: '^[ \t]*(#{4}\s)(.*)$'                   ; Reo: [roMultiLine] ; New: '<h4>%s</h4>'                                     )
-    , (Itm: 'Header 5'          ; Exa: '##### Header 5'                ; Rex: '^[ \t]*(#{5}\s)(.*)$'                   ; Reo: [roMultiLine] ; New: '<h5>%s</h5>'                                     )
-    , (Itm: 'Header 6'          ; Exa: '###### Header 6'               ; Rex: '^[ \t]*(#{6}\s)(.*)$'                   ; Reo: [roMultiLine] ; New: '<h6>%s</h6>'                                     )
+    , (Itm: 'Header 1'          ; Exa: '# Header 1'                      ; Rex: '^[ \t]*(#{1}\s)(.*)$'                   ; Reo: [roMultiLine] ; New: '<h1>%s</h1>'                                     )
+    , (Itm: 'Header 2'          ; Exa: '## Header 2'                     ; Rex: '^[ \t]*(#{2}\s)(.*)$'                   ; Reo: [roMultiLine] ; New: '<h2>%s</h2>'                                     )
+    , (Itm: 'Header 3'          ; Exa: '### Header 3'                    ; Rex: '^[ \t]*(#{3}\s)(.*)$'                   ; Reo: [roMultiLine] ; New: '<h3>%s</h3>'                                     )
+    , (Itm: 'Header 4'          ; Exa: '#### Header 4'                   ; Rex: '^[ \t]*(#{4}\s)(.*)$'                   ; Reo: [roMultiLine] ; New: '<h4>%s</h4>'                                     )
+    , (Itm: 'Header 5'          ; Exa: '##### Header 5'                  ; Rex: '^[ \t]*(#{5}\s)(.*)$'                   ; Reo: [roMultiLine] ; New: '<h5>%s</h5>'                                     )
+    , (Itm: 'Header 6'          ; Exa: '###### Header 6'                 ; Rex: '^[ \t]*(#{6}\s)(.*)$'                   ; Reo: [roMultiLine] ; New: '<h6>%s</h6>'                                     )
     // shelled1
-    , (Itm: 'Superscript'       ; Exa: '^text superscript^'            ; Rex: '(\^{1})(.*?)(\^{1})'                    ; Reo: [roMultiLine] ; New: '<sup>%s</sup>'                                   )
-    , (Itm: 'Subscript'         ; Exa: '~text subscript~'              ; Rex: '(\~{1})(\w+?)(\~{1})'                   ; Reo: [roMultiLine] ; New: '<sub>%s</sub>'                                   )
+    , (Itm: 'Superscript'       ; Exa: '^text superscript^'              ; Rex: '(\^{1})(.*?)(\^{1})'                    ; Reo: [roMultiLine] ; New: '<sup>%s</sup>'                                   )
+    , (Itm: 'Subscript'         ; Exa: '~text subscript~'                ; Rex: '(\~{1})(\w+?)(\~{1})'                   ; Reo: [roMultiLine] ; New: '<sub>%s</sub>'                                   )
     // shelled2
-    , (Itm: 'Text bold'         ; Exa: '**text bold**'                 ; Rex: '(\*{2})((\S)*([ \t]+\S+)*?)(\*{2})'     ; Reo: [roMultiLine] ; New: '<b>%s</b>'                                       )
-    , (Itm: 'Text italic'       ; Exa: '//text italic//'               ; Rex: '(\/{2})((\S)*([ \t]+\S+)*?)(\/{2})'     ; Reo: [roMultiLine] ; New: '<i>%s</i>'                                       )
-    , (Itm: 'Text underline'    ; Exa: '__text underline__'            ; Rex: '(\_{2})((\S)*([ \t]+\S+)*?)(\_{2})'     ; Reo: [roMultiLine] ; New: '<u>%s</u>'                                       )
-    , (Itm: 'Text strikethrough'; Exa: '~~text strikethrough~~'        ; Rex: '(\~{2})((\S)*([ \t]+\S+)*?)(\~{2})'     ; Reo: [roMultiLine] ; New: '<s>%s</s>'                                       )
+    , (Itm: 'Text bold'         ; Exa: '**text bold**'                   ; Rex: '(\*{2})((?:(?!\*{2})[\s\S])*?)(\*{2})'  ; Reo: [roSingleLine]; New: '<b>%s</b>'                                       )
+    , (Itm: 'Text italic'       ; Exa: '//text italic//'                 ; Rex: '(\/{2})((\S)*([ \t]+\S+)*?)(\/{2})'     ; Reo: [roMultiLine] ; New: '<i>%s</i>'                                       )
+    , (Itm: 'Text underline'    ; Exa: '__text underline__'              ; Rex: '(\_{2})((\S)*([ \t]+\S+)*?)(\_{2})'     ; Reo: [roMultiLine] ; New: '<u>%s</u>'                                       )
+    , (Itm: 'Text strikethrough'; Exa: '~~text strikethrough~~'          ; Rex: '(\~{2})((\S)*([ \t]+\S+)*?)(\~{2})'     ; Reo: [roMultiLine] ; New: '<s>%s</s>'                                       )
     // corrections
-    , (Itm: 'Text highlight'    ; Exa: '!!text highlight!!'            ; Rex: '(\!{2})((\S)*([ \t]+\S+)*?)(\!{2})'     ; Reo: [roMultiLine] ; New: '<mark>%s</mark>'                                 )
-    , (Itm: 'Text removed'      ; Exa: '--text removed--'              ; Rex: '(\-{2})([^ ][^:\-|]+?[^ \n])(\-{2})'    ; Reo: [roMultiLine] ; New: '<del>%s</del>'                                   )
-    , (Itm: 'Text added'        ; Exa: '++text added++'                ; Rex: '(\+{2})((\S)*([ \t]+\S+)*?)(\+{2})'     ; Reo: [roMultiLine] ; New: '<ins>%s</ins>'                                   )
+    , (Itm: 'Text highlight'    ; Exa: '!!text highlight!!'              ; Rex: '(\!{2})((\S)*([ \t]+\S+)*?)(\!{2})'     ; Reo: [roMultiLine] ; New: '<mark>%s</mark>'                                 )
+    , (Itm: 'Text removed'      ; Exa: '--text removed--'                ; Rex: '(\-{2})([^ ][^:\-|]+?[^ \n])(\-{2})'    ; Reo: [roMultiLine] ; New: '<del>%s</del>'                                   )
+    , (Itm: 'Text added'        ; Exa: '++text added++'                  ; Rex: '(\+{2})((\S)*([ \t]+\S+)*?)(\+{2})'     ; Reo: [roMultiLine] ; New: '<ins>%s</ins>'                                   )
     // bootstrap
-    , (Itm: 'Text info'         ; Exa: '==text info=='                 ; Rex: '(\={2})((\S)*([ \t]+\S+)*?)(\={2})'     ; Reo: [roMultiLine] ; New: '<em class="w3-info">%s</em>'                     )
-    , (Itm: 'Text success'      ; Exa: '$$text success$$'              ; Rex: '(\${2})((\S)*([ \t]+\S+)*?)(\${2})'     ; Reo: [roMultiLine] ; New: '<em class="w3-success">%s</em>'                  )
-    , (Itm: 'Text warning'      ; Exa: '%%text warning%%'              ; Rex: '(\%{2})((\S)*([ \t]+\S+)*?)(\%{2})'     ; Reo: [roMultiLine] ; New: '<em class="w3-warning">%s</em>'                  )
-    , (Itm: 'Text critical'     ; Exa: '&&text critical&&'             ; Rex: '(\&{2})((\S)*([ \t]+\S+)*?)(\&{2})'     ; Reo: [roMultiLine] ; New: '<em class="w3-critical">%s</em>'                 )
-    , (Itm: 'Text danger'       ; Exa: '??text danger??'               ; Rex: '(\?{2})((\S)*([ \t]+\S+)*?)(\?{2})'     ; Reo: [roMultiLine] ; New: '<em class="w3-danger">%s</em>'                   )
+    , (Itm: 'Text info'         ; Exa: '==text info=='                   ; Rex: '(={2})([\s\S]*?)(={2})'                 ; Reo: [roMultiLine] ; New: '<em class="w3-info">%s</em>'                     )
+    , (Itm: 'Text success'      ; Exa: '$$text success$$'                ; Rex: '(\${2})([\s\S]*?)(\${2})'               ; Reo: [roMultiLine] ; New: '<em class="w3-success">%s</em>'                  )
+    , (Itm: 'Text warning'      ; Exa: '%%text warning%%'                ; Rex: '(%{2})([\s\S]*?)(%{2})'                 ; Reo: [roMultiLine] ; New: '<em class="w3-warning">%s</em>'                  )
+    , (Itm: 'Text critical'     ; Exa: '&&text critical&&'               ; Rex: '(&{2})([\s\S]*?)(&{2})'                 ; Reo: [roMultiLine] ; New: '<em class="w3-critical">%s</em>'                 )
+    , (Itm: 'Text danger'       ; Exa: '??text danger??'                 ; Rex: '(\?{2})([\s\S]*?)(\?{2})'               ; Reo: [roMultiLine] ; New: '<em class="w3-danger">%s</em>'                   )
     // inline
-    , (Itm: 'Inline quote'      ; Exa: '""inline quote""'              ; Rex: '(\"{2})((\S)*([ \t]+\S+)*?)(\"{2})'     ; Reo: [roMultiLine] ; New: '<q>%s</q>'                                       )
-    , (Itm: 'Inline code'       ; Exa: '``inline code``'               ; Rex: '(\`{2})((\S)*([ \t]+\S+)*?)(\`{2})'     ; Reo: [roMultiLine] ; New: '<code>%s</code>'                                 )
-    , (Itm: 'Inline keybord'    ; Exa: '@@text keybord@@'              ; Rex: '(\@{2})((\S)*([^ \t]+\S+)*?)(\@{2})'    ; Reo: [roMultiLine] ; New: '<kbd>%s</kbd>'                                   )
+    , (Itm: 'Inline quote'      ; Exa: '""inline quote""'                ; Rex: '(\"{2})((\S)*([ \t]+\S+)*?)(\"{2})'     ; Reo: [roMultiLine] ; New: '<q>%s</q>'                                       )
+    , (Itm: 'Inline code'       ; Exa: '``inline code``'                 ; Rex: '(`{2})((?:(?!\*{2})[\s\S])*?)(`{2})'    ; Reo: [roMultiLine] ; New: '<code>%s</code>'                                 )
+    , (Itm: 'Inline keybord'    ; Exa: '@@text keybord@@'                ; Rex: '(\@{2})((\S)*([^ \t]+\S+)*?)(\@{2})'    ; Reo: [roMultiLine] ; New: '<kbd>%s</kbd>'                                   )
     // others
-    , (Itm: 'Citation'          ; Exa: ',,citation,, by Puppadrillo'   ; Rex: '(\,{2})(.*?)(\,{2})'                    ; Reo: [roMultiLine] ; New: '<cite>%s</cite>'                                 )
-    , (Itm: 'Abbreviation'      ; Exa: '..abbreviation..'              ; Rex: '(\.{2})(\w*?)(\.{2})'                   ; Reo: [roMultiLine] ; New: '<abbr>%s</abbr>'                                 )
-    , (Itm: 'Abbr with descr'   ; Exa: '..abbr:description..'          ; Rex: '(\.{2})(\w*?) : ([ \w]*?)(\.{2})'       ; Reo: [roMultiLine] ; New: '<abbr title="%s">%s</abbr>'                      ) // <acronym>
-    , (Itm: 'Font Awesome'      ; Exa: '::home:: ::arrow-top::'        ; Rex: '(\:{2})(\w*?[-\w]*?)(\:{2})'            ; Reo: [roMultiLine] ; New: '<i class="fa fa-%s"></i>'                        )
-    , (Itm: 'Progress bar'      ; Exa: '##60%##'                       ; Rex: '(\#{2})(\d{1,3})%(\#{2})'               ; Reo: [roMultiLine] ; New: '<progress value="%s" max="100">%s%%</progress>'  ) // 0..100
-    , (Itm: 'Meter bar'         ; Exa: '##60,0,20,50,80,100##'         ; Rex: '(\#{2})(\d+(,\d+){5})(\#{2})'           ; Reo: [roMultiLine] ; New: '<meter value="%f" min="%f" low="%f" optimum="%f" high="%f" max="%f">%s</meter>') // value, min, low, optimum, high, max
+    , (Itm: 'Citation'          ; Exa: ',,citation,, by Puppadrillo'     ; Rex: '(\,{2})(.*?)(\,{2})'                    ; Reo: [roMultiLine] ; New: '<cite>%s</cite>'                                 )
+    , (Itm: 'Abbreviation'      ; Exa: '..abbreviation..'                ; Rex: '(\.{2})(\w*?)(\.{2})'                   ; Reo: [roMultiLine] ; New: '<abbr>%s</abbr>'                                 )
+    , (Itm: 'Abbr with descr'   ; Exa: '..abbr:description..'            ; Rex: '(\.{2})(\w*?) : ([ \w]*?)(\.{2})'       ; Reo: [roMultiLine] ; New: '<abbr title="%s">%s</abbr>'                      ) // <acronym>
+    , (Itm: 'Font Awesome'      ; Exa: '::home:: ::arrow-top::'          ; Rex: '(\:{2})(\w*?[-\w]*?)(\:{2})'            ; Reo: [roMultiLine] ; New: '<i class="fa fa-%s"></i>'                        )
+    , (Itm: 'Progress bar'      ; Exa: '##60%##'                         ; Rex: '(\#{2})(\d{1,3})%(\#{2})'               ; Reo: [roMultiLine] ; New: '<progress value="%s" max="100">%s%%</progress>'  ) // 0..100
+    , (Itm: 'Meter bar'         ; Exa: '##60,0,20,50,80,100##'           ; Rex: '(\#{2})(\d+(,\d+){5})(\#{2})'           ; Reo: [roMultiLine] ; New: '<meter value="%f" min="%f" low="%f" optimum="%f" high="%f" max="%f">%s</meter>') // value, min, low, optimum, high, max
     // mixed
-    , (Itm: 'Center'            ; Exa: '>>centered<<'                  ; Rex: '^[ \t]*>>(.*)<<[ \t]*$'                 ; Reo: [roMultiLine] ; New: '<center>%s</center>'                             )
-    , (Itm: 'Left'              ; Exa: '<<left aligned<<'              ; Rex: '^[ \t]*<<(.*)<<[ \t]*$'                 ; Reo: [roMultiLine] ; New: '<div class="w3-left-align">%s</div>'             )
-    , (Itm: 'Right'             ; Exa: '>>right aligned>>'             ; Rex: '^[ \t]*>>(.*)>>[ \t]*$'                 ; Reo: [roMultiLine] ; New: '<div class="w3-right-align">%s</div>'            )
+    , (Itm: 'Center'            ; Exa: '>>centered<<'                    ; Rex: '^[ \t]*>>(.*)<<[ \t]*$'                 ; Reo: [roMultiLine] ; New: '<center>%s</center>'                             )
+    , (Itm: 'Left'              ; Exa: '<<left aligned<<'                ; Rex: '^[ \t]*<<(.*)<<[ \t]*$'                 ; Reo: [roMultiLine] ; New: '<div class="w3-left-align">%s</div>'             )
+    , (Itm: 'Right'             ; Exa: '>>right aligned>>'               ; Rex: '^[ \t]*>>(.*)>>[ \t]*$'                 ; Reo: [roMultiLine] ; New: '<div class="w3-right-align">%s</div>'            )
     // zoned
-    , (Itm: 'Block quote'       ; Exa: '>\n> blockquote\n>\n>'         ; Rex: '((?:^(?:>|<br>>) ?.*?$\n)+)'            ; Reo: [roMultiLine, roSingleLine]; New: '<blockquote>%s</blockquote>'        )
-    , (Itm: 'List (unordered)'  ; Exa: '- item\n- item>'               ; Rex: '((?:^(?:[ \t]*[-\*•]) +.*?$\n)+)'       ; Reo: [roMultiLine, roSingleLine]; New: '<ul>%s</ul>'                        ) // CHAR_CONTENT_CHANGED (dot)
+    , (Itm: 'Block quote'       ; Exa: '>\n> blockquote\n>\n>'           ; Rex: '((?:^(?:>|<br>>) ?.*?$\n)+)'            ; Reo: [roMultiLine, roSingleLine]; New: '<blockquote>%s</blockquote>'        )
+    , (Itm: 'List (unordered)'  ; Exa: '- item\n- item>'                 ; Rex: '((?:^(?:[ \t]*[-\*•]) +.*?$\n)+)'       ; Reo: [roMultiLine, roSingleLine]; New: '<ul>%s</ul>'                        ) // CHAR_CONTENT_CHANGED (dot)
     // notable
-    , (Itm: 'Url'               ; Exa: 'http://www.wks.cloud'          ; Rex: '(^| )((http:|https:)\S+)( |$)' {|www\.} ; Reo: [roMultiLine] ; New: '%s<a href="%s" target="_blank">%s</a>%s'         ) // warning: canreintroduceitself
-    , (Itm: 'Email'             ; Exa: 'email@wks.cloud'               ; Rex: '([-\w\.]+@[-\w]+\.[-\w]{2,4})'          ; Reo: []            ; New: '<a href="mailto:%s">%s</a>'                      ) // warning: canreintroduceitself
+    , (Itm: 'Url'               ; Exa: 'http://www.wks.cloud'            ; Rex: '(^| )((http:|https:)\S+)( |$)'          ; Reo: [roMultiLine] ; New: '%s<a href="%s" target="_blank">%s</a>%s'         )
+    , (Itm: 'Email'             ; Exa: 'email@wks.cloud'                 ; Rex: '(^| )([-\w\.]+@[-\w]+\.[-\w]{2,5})( |$)'; Reo: [roMultiLine] ; New: '%s<a href="mailto:%s">%s</a>%s'                  )
     // special
-    , (Itm: 'Link (classic)'    ; Exa: '[Go](www.go.it "Title")'       ; Rex: '(\[.*\])(\(.*\))'                       ; Reo: [roMultiLine] ; New: '<a href="%s" title="%s">%s</a>'                  ) // %s can have   http://wks.cloud/def   or   /def
-    , (Itm: 'Link'              ; Exa: '(www.go.it|Go|Title|*)'        ; Rex: '\((http|www|\/)(.+?)\)'                 ; Reo: [roMultiLine] ; New: '<a href="%s" title="%s" target="%s">%s</a>'      )
-    , (Itm: 'Image (classic)'   ; Exa: '![Img](www.go.it/x.png)'       ; Rex: '!(\[.*\])(\(.*\))'                      ; Reo: [roMultiLine] ; New: '<img src="%s" alt="%s">'                         ) // %s can have   http://wks.cloud/def   or   /def
-    , (Itm: 'Image'             ; Exa: '[/img/a.png|alt|w|h|card|torn]'; Rex: '\[(http|www|\/)(.+?)\]'                 ; Reo: [roMultiLine] ; New: '<img src="%s" alt="%s">'                         )
+    , (Itm: 'Link (classic)'    ; Exa: '[Go](www.go.it "Title")'         ; Rex: '(\[.*\])(\(.*\))'                       ; Reo: [roMultiLine] ; New: '<a href="%s" title="%s">%s</a>'                  ) // %s can have  http://wks.cloud/def  or  /def
+    , (Itm: 'Link'              ; Exa: '(www.go.it|Go|Title|*)'          ; Rex: '\((http|www|\/)(.+?)\)'                 ; Reo: [roMultiLine] ; New: '<a href="%s" title="%s" target="%s">%s</a>'      )
+    , (Itm: 'Image (classic)'   ; Exa: '![Img](www.go.it/x.png)'         ; Rex: '!(\[.*\])(\(.*\))'                      ; Reo: [roMultiLine] ; New: '<img src="%s" alt="%s">'                         ) // %s can have  http://wks.cloud/def  or  /def
+    , (Itm: 'Image'             ; Exa: '[/img/a.png|alt|w|h|^|card|torn]'; Rex: '\[(http|www|\/)(.+?)\]'                 ; Reo: [roMultiLine] ; New: '<img src="%s" alt="%s">'                         )
     // fenced
-  //, (Itm: 'Code block (fence)'; Exa: '```\n code block \n```'        ;Rex: '^```[ \t]*(\w*)\r\n([\s\S]*?)```$'       ;Reo: [roMultiLine] ; New: '<pre><code class="%s">%s</code></pre>'            )
+  //, (Itm: 'Code block (fence)'; Exa: '```\n code block \n```'          ; Rex: '^```[ \t]*(\w*)\r\n([\s\S]*?)```$'      ; Reo: [roMultiLine] ; New: '<pre><code class="%s">%s</code></pre>'           )
     );
   public
     class function  Process(IvContent: string; IvUrlAbsolute: boolean = false; IvNewlineProcess: boolean = false): string; static;
@@ -4238,6 +4253,7 @@ type
     class procedure PicFromUrl(IvUrl: string; var IvPicture: TPicture); static; // scrape, http://www.benibela.de/sources_en.html#internettools
   //class function  PicFromBmp(const IvBmp: TBitmap): TPicture; static;
   //class function  PicFromPng(const IvPng: TPngImage): TPicture; static;
+    class function  PicWithText(IvText: string; IvBgColor, IvTextColor: TColor; IvFontSize: integer = 12; IvFont: string = 'Arial'): TPicture; static;
   end;
 
   TPngRec = record // png
@@ -4583,6 +4599,7 @@ type
     {$ENDREGION}
 
   private
+    procedure RvaSymbol(var s: string); // [ ] --> &nbsp; [v] --> &#9989; ...
     procedure RvaIf(var s: string);
     procedure RvaIfElse(var s: string);
     function  RvaFunction(f, a: TArray<string>): string;
@@ -4713,6 +4730,11 @@ type
     class function  SqlSelectFromTblObjectById(IvObject: string; IvId: integer): string; static; // select * from DbaXxx.dbo.TblObject where FldId = 123
     class function  SqlSelectFromTblDetailById(IvObject: string; IvId: integer): string; static; // select * from DbaXxx.dbo.TblXxx where FldObjectId = 123
     class function  ADOCommandSqlExpandedGet(IvCommand: TADOCommand): string; static;            // expand the sql that contains parameters
+    class function  IsSelect(IvStr: string): boolean; static;
+    class function  IsInsert(IvStr: string): boolean; static;
+    class function  IsUpdate(IvStr: string): boolean; static;
+    class function  IsDelete(IvStr: string): boolean; static;
+    class function  IsValid(IvStr: string) : boolean; static;
   end;
 
   {$REGION 'TStkEnum'}
@@ -4720,56 +4742,78 @@ type
     skActive
   , skCancelled
   , skCompleted
+  , skDeleteable
+  , skDeleted
   , skDone
   , skInactive
+  , skLocked
   , skNew
+  , skNo
+  , skOk
   , skOngoing
-  , skOnhold
+  , skOnHold
   , skPlanned
+  , skRecoverable
+  , skRecycled
   , skTesting
-  , slUnderconstruction
+  , skSystem
+  , skUnderconstruction
+  , skUnfeasible
   , skUnknown
-  , skValidating
   , skValidated
+  , skValidating
+  , skWaiting
+  , skYes
   );
   {$ENDREGION}
 
   TStiRec = record //  stateitem
     Name: string;
-    Color: string;
-    ColorT: TColor;
+    ColorT: TColor;    // delphicolor
+    //
+    ColorBgCss: string; // background      60%
+    ColorFgCss: string; // foreground      30%
+    BorderCss: string;  // 2px solid gray  10%
   end;
 
   TStiRecVec = TArray<TStiRec>;
 
-  TStaRec = record // state *** add any new entry also in TStkEnum and Vector function ***
-  const                                                           // w3-color            delphi-color
-    ACTIVE           : TStiRec = (Name: 'Active'           ; Color: 'green'    ; ColorT: clGreen    );
-    CANCELLED        : TStiRec = (Name: 'Cancelled'        ; Color: 'darkgray' ; ColorT: clGrayText );
-    COMPLETED        : TStiRec = (Name: 'Completed'        ; Color: 'green'    ; ColorT: clGreen    );
-    DONE             : TStiRec = (Name: 'Done'             ; Color: 'green'    ; ColorT: clGreen    );
-    DELETEABLE       : TStiRec = (Name: 'Deleteable'       ; Color: 'gray'     ; ColorT: clGray     );
-    INACTIVE         : TStiRec = (Name: 'Inactive'         ; Color: 'gray'     ; ColorT: clGray     );
-    LOCKED           : TStiRec = (Name: 'Locked'           ; Color: 'red'      ; ColorT: clRed      );
-    NEW              : TStiRec = (Name: 'New'              ; Color: 'black'    ; ColorT: clBlack    );
-    NO               : TStiRec = (Name: 'No'               ; Color: 'red'      ; ColorT: clRed      );
-    OK               : TStiRec = (Name: 'Ok'               ; Color: 'green'    ; ColorT: clGreen    );
-    ONGOING          : TStiRec = (Name: 'Ongoing'          ; Color: 'orange'   ; ColorT: clWebOrange);
-    ONHOLD           : TStiRec = (Name: 'OnHold'           ; Color: 'gray'     ; ColorT: clGray     );
-    PLANNED          : TStiRec = (Name: 'Planned'          ; Color: 'yellow'   ; ColorT: clYellow   );
-    RECOVERABLE      : TStiRec = (Name: 'Recoverable'      ; Color: 'orange'   ; ColorT: clWebOrange);
-    TESTING          : TStiRec = (Name: 'Testing'          ; Color: 'purple'   ; ColorT: clPurple   );
-    &SYSTEM          : TStiRec = (Name: 'System'           ; Color: 'asphalt'  ; ColorT: clGrayText ); // #343a40
-    UNDERCONSTRUCTION: TStiRec = (Name: 'Underconstruction'; Color: 'orange'   ; ColorT: clWebOrange);
-    UNKNOWN          : TStiRec = (Name: 'Unknown'          ; Color: 'red'      ; ColorT: clRed      );
-    VALIDATED        : TStiRec = (Name: 'Validated'        ; Color: 'green'    ; ColorT: clGreen    );
-    VALIDATING       : TStiRec = (Name: 'Validating'       ; Color: 'orangered'; ColorT: clTeal     );
-    YES              : TStiRec = (Name: 'Yes'              ; Color: 'green'    ; ColorT: clGreen    );
+  TStaRec = record // state *** ADD ANY NEW ENTRY also in TStkEnum and Vector function ***
+  const                                                   // delphi-color         w3-color                 css-color
+    ACTIVE           : TStiRec = (Name: 'Active'           ; ColorT: clGreen    ; ColorBgCss: 'green'    ; ColorFgCss: 'white'; BorderCss: ''               );
+    CANCELLED        : TStiRec = (Name: 'Cancelled'        ; ColorT: clGrayText ; ColorBgCss: 'darkgray' ; ColorFgCss: 'white'; BorderCss: ''               ); //  'Cancelled'    color: white;     background-color: black           border: 0px solid black
+    COMPLETED        : TStiRec = (Name: 'Completed'        ; ColorT: clGreen    ; ColorBgCss: 'green'    ; ColorFgCss: 'white'; BorderCss: ''               ); //  'Completed'    color: white;     background-color: green           border: 0px solid black
+                                                                                                                                                               //  'Critical'     color: white;     background-color: red             border: 0px solid black
+                                                                                                                                                               //  'Delay'        color: white;     background-color: orange          border: 0px solid black
+    DELETEABLE       : TStiRec = (Name: 'Deleteable'       ; ColorT: clGray     ; ColorBgCss: 'gray'     ; ColorFgCss: 'white'; BorderCss: ''               );
+    DELETED          : TStiRec = (Name: 'Deleted'          ; ColorT: clBlack    ; ColorBgCss: 'black'    ; ColorFgCss: 'white'; BorderCss: ''               );
+    DONE             : TStiRec = (Name: 'Done'             ; ColorT: clGreen    ; ColorBgCss: 'green'    ; ColorFgCss: 'white'; BorderCss: '0px solid black');
+    INACTIVE         : TStiRec = (Name: 'Inactive'         ; ColorT: clGray     ; ColorBgCss: 'gray'     ; ColorFgCss: 'white'; BorderCss: ''               );
+    LOCKED           : TStiRec = (Name: 'Locked'           ; ColorT: clRed      ; ColorBgCss: 'red'      ; ColorFgCss: 'white'; BorderCss: ''               );
+    NEW              : TStiRec = (Name: 'New'              ; ColorT: clBlack    ; ColorBgCss: 'gray'     ; ColorFgCss: 'gray' ; BorderCss: '2px solid gray' );
+    NO               : TStiRec = (Name: 'No'               ; ColorT: clRed      ; ColorBgCss: 'red'      ; ColorFgCss: 'white'; BorderCss: ''               );
+    OK               : TStiRec = (Name: 'Ok'               ; ColorT: clGreen    ; ColorBgCss: 'green'    ; ColorFgCss: 'white'; BorderCss: '0px solid black');
+    ONGOING          : TStiRec = (Name: 'Ongoing'          ; ColorT: clWebOrange; ColorBgCss: 'orange'   ; ColorFgCss: 'white'; BorderCss: '0px solid black');
+    ONHOLD           : TStiRec = (Name: 'OnHold'           ; ColorT: clGray     ; ColorBgCss: 'gray'     ; ColorFgCss: 'lime' ; BorderCss: '0px solid gray' );
+    PLANNED          : TStiRec = (Name: 'Planned'          ; ColorT: clBlue     ; ColorBgCss: 'blue'     ; ColorFgCss: 'white'; BorderCss: '2px solid blue' );
+    RECOVERABLE      : TStiRec = (Name: 'Recoverable'      ; ColorT: clWebOrange; ColorBgCss: 'orange'   ; ColorFgCss: 'white'; BorderCss: ''               );
+    RECYCLED         : TStiRec = (Name: 'Recycled'         ; ColorT: clWebMaroon; ColorBgCss: 'brown'    ; ColorFgCss: 'white'; BorderCss: ''               );
+    &SYSTEM          : TStiRec = (Name: 'System'           ; ColorT: clGrayText ; ColorBgCss: 'asphalt'  ; ColorFgCss: 'white'; BorderCss: ''               ); // #343a40
+    TESTING          : TStiRec = (Name: 'Testing'          ; ColorT: clPurple   ; ColorBgCss: 'purple'   ; ColorFgCss: 'white'; BorderCss: ''               );
+    UNDERCONSTRUCTION: TStiRec = (Name: 'Underconstruction'; ColorT: clWebOrange; ColorBgCss: 'orange'   ; ColorFgCss: 'white'; BorderCss: ''               );
+    UNFEASIBLE       : TStiRec = (Name: 'Unfeasiblen'      ; ColorT: clWebOrange; ColorBgCss: 'black'    ; ColorFgCss: 'white'; BorderCss: '1px solid white');
+    UNKNOWN          : TStiRec = (Name: 'Unknown'          ; ColorT: clRed      ; ColorBgCss: 'red'      ; ColorFgCss: 'white'; BorderCss: ''               );
+    VALIDATED        : TStiRec = (Name: 'Validated'        ; ColorT: clGreen    ; ColorBgCss: 'green'    ; ColorFgCss: 'white'; BorderCss: ''               );
+    VALIDATING       : TStiRec = (Name: 'Validating'       ; ColorT: clTeal     ; ColorBgCss: 'orangered'; ColorFgCss: 'white'; BorderCss: ''               );
+    WAITING          : TStiRec = (Name: 'Waiting'          ; ColorT: clWebOrange; ColorBgCss: 'orangered'; ColorFgCss: 'white'; BorderCss: ''               );
+    YES              : TStiRec = (Name: 'Yes'              ; ColorT: clGreen    ; ColorBgCss: 'green'    ; ColorFgCss: 'white'; BorderCss: ''               );
   public
     class function  Vector: TStiRecVec; static;
     class function  IsActive(IvState: string): boolean; static;
     class function  ColorFromState(IvState: string): TColor; static;
-    class function  ColorW3FromState(IvState: string): string; static;
+    class function  ColorBgCssFromState(IvState: string): string; static; // w3.css
+    class function  ColorFgCssFromState(IvState: string): string; static; // w3.css
+    class function  BorderCssFromState(IvState: string): string; static;
   end;
 
   TStdRec = record // standardstuff
@@ -4799,6 +4843,8 @@ type
   end;
 
   TStrRec = record // string (see TVecRec)
+    class function  StrIsWhite(const IvString: string): boolean; static;                                                    // empty or spaces or tabs
+    class function  StrIsBold(const IvString: string): boolean; static;                                                     // not white
     class function  StrIs09(const IvString: string): boolean; static;                                                       // 01 only
     class function  StrIsInteger(IvStr: string): boolean; static;                                                           // str is like 123
     class function  StrIsFloat(const IvString: string): boolean; static;                                                    // str is like 0.123
@@ -4954,7 +5000,7 @@ type
     PREFIX                 = 'Wks'; // all dll files will be prefixed with this like WksPageIsapiProject.dll
     NAME                   = 'Working Knowledge System';
     DESCRIPTION            = 'Cloud integrated and unified knowledge management system';
-  //COPYRIGHT              = '© 2010-present WKS';
+  //COPYRIGHT              = '(c) 2010-present WKS';
     SLOGAN                 = 'Programmed for progress';
     WWW                    = 'www.wks.cloud';
     PHONE                  = '+39 351 3320036';
@@ -4971,8 +5017,8 @@ type
     LOGO_LONG_URL          = '/Organization/W/Wks/WksLogoLong.png';                                    // use LogoLongGraphic
     ICON_URL               = '/Organization/W/Wks/WksIcon.ico';
     // files
-  //FILE_VEC: array [0..2] of string = ('C:\$\Include\W\wks\wks.js' , 'C:\$Include\W\wks\wks.css' , 'C:\$\X\Win32\Debug\Default.htm');
-    FILE_VEC:         TArray<string> = ['C:\$\Include\W\wks\wks.js'{, 'C:\$Include\W\wks\wks.css'}, 'C:\$\X\Win32\Debug\Default.htm'];
+  //FILE_VEC: array [0..2] of string = ('C:\$\Include\W\wks\js\wks.js' , 'C:\$Include\W\wks\css\wks.css' , 'C:\$\X\Win32\Debug\Default.htm');
+    FILE_VEC:         TArray<string> = ['C:\$\Include\W\wks\js\wks.js'{, 'C:\$Include\W\wks\css\wks.css'}, 'C:\$\X\Win32\Debug\Default.htm'];
     // ids
     HELP_PAGE_HOME_ID      = 5;
     // options&settings
@@ -4982,7 +5028,7 @@ type
     WebPoweredByOff        : boolean = true;
   public
     class function  Info: string; static;                                                                // returns 'WKS www.wks.cloud'
-    class function  Copyright: string; static;                                                           // returns '© 2010-present WKS www.wks.cloud'
+    class function  Copyright: string; static;                                                           // returns '(c) 2010-present WKS www.wks.cloud'
     class procedure WksWebFilesGenerate(IvUseSpin: boolean = true); static;                              // generate wks.js (not wks.css) from DbaCode + Default.htm directly
     class function  InitDba(var IvFbk: string): boolean; static;                                         // *** not implemented but used in LoginForm ***
     class function  InitRio(var IvFbk: string): boolean; static;                                         // *** not implemented but used in LoginForm ***
@@ -5270,7 +5316,7 @@ end;
     class function  VecEx(IvStringVec: array of string): boolean; static;                                                                // is existent    = not empty
     class function  VecHas(const IvString: string; IvStringVector: TStringVector; IvCaseSensitive: boolean = false): boolean; static;    //
     class function  VecFromStr(IvStr: string; IvDelimChars: string = ','; IvTrim: boolean = true): TArray<string>; overload; static;     // 'This, is,A  ,Test'                   --> ['This', 'Is', 'A', 'Test']
-    class function  VecIntFromStr(IvStr: string; IvDelimChars: string = ','): TArray<integer>; overload; static;                         // '1, 2,3  ,4'                          --> [1, 2, 3, 4]
+    class function  VecIntFromStr(IvStr: string; IvDelimChars: string = ','): TArray<integer>; static;                                   // '1, 2,3  ,4'                          --> [1, 2, 3, 4]
     class function  VecFromStrCamel(IvStr: string; IvCase: TCaseEnum = cAsIs): TArray<string>; static;                                   // ThisIsATest                           --> ['This', 'Is', 'A', 'Test']
     class function  VecToList(IvStrVec: TArray<string>; IvDelimiter: string = ','; IvQuoted: boolean = false): string; overload; static; // ['Aaa', 'Bbb', ...]                   --> 'Aaa,Bbb,...'
     class function  VecToList(IvIntVec: TArray<integer>; IvDelimiter: string = ','; IvQuoted: boolean = false): string; overload; static;// [1, 2, ...]                           --> '1,2,...'
@@ -5285,9 +5331,10 @@ end;
   end;
 
   TVntRec = record
-    class function  VntIsNull(const IvVariant: variant): boolean; static;
-    class function  VntIsEmpty(const IvVariant: variant): boolean; static;
+  //class function  VntIsNull(const IvVariant: variant): boolean; static;
+  //class function  VntIsEmpty(const IvVariant: variant): boolean; static;
     class function  VntIsWhite(const IvVariant: variant): boolean; static; // isclear(isunassigned or interfacesettonil or customvariantreturningtruefromitsIsClearmethod) or isempty or isnull
+    class function  VntIsBold(const IvVariant: variant): boolean; static;
     class function  VntToInt(const IvVariant: variant; IvDefault: integer = 0): integer; static;
     class function  VntToStr(IvVariant: variant; IvDefault: string = ''): string; static;
     class function  VntValueDef(IvVariant, IvDefault: variant): variant; static;
@@ -5494,7 +5541,7 @@ var
   glo_i: byte;                     // count
 
   // global
-//gdbg : TDbgRec;                  // outputdebugstring
+  gdbg : TDbgRec;                  // outputdebugstring
 
   // globaljachlogobjects
   gjlog : TjachLog;                // jachlog          *** probably not used ***
@@ -7246,230 +7293,172 @@ end;
   {$ENDREGION}
 
   {$REGION 'TChartRec'}
-procedure TChartRec.Init(IvDs: TDataSet; IvChart, IvWidth, IvHeight, IvTitle, IvXCaption, IvYCaption, IvXLabelAngleDeg, IvYLabelAngleDeg: string; IvSerieRecVector: TChartSerieRecVector);
+procedure TChartRec.PointsSetFromDs(IvDs: TDataSet);
 var
   i, j: integer;
 begin
-  // chart
-  if IvChart  = '' then Chart  := TNamRec.CoNameRnd('Chart') else Chart := IvChart;
-  if IvWidth  = '' then Width  := '800px'   else Width  := IvWidth;
-  if IvHeight = '' then Height := '400px'   else Height := IvHeight;
-  if IvTitle  = '' then Title  := 'Title'   else Title  := IvTitle;
-
-  // axis
-  if IvXCaption    <> '' then XAxisRec.TitleRec.Caption := IvXCaption;
-  if IvYCaption    <> '' then YAxisRec.TitleRec.Caption := IvYCaption;
-  XAxisRec.LabelRec.AngleDeg := IvXLabelAngleDeg;
-  YAxisRec.LabelRec.AngleDeg := IvYLabelAngleDeg;
-
   // series
-  SetLength(SerieRecVector, Length(IvSerieRecVector));
-  for i := Low(IvSerieRecVector) to High(IvSerieRecVector) do begin
-
-    // serie
-    SerieRecVector[i].Serie         := Format('%s%s', [Chart, IvSerieRecVector[i].Serie]);
-    SerieRecVector[i].Title         := Format('%s'  , [IvSerieRecVector[i].Title]);
-    SerieRecVector[i].Kind          := IvSerieRecVector[i].Kind;
-    SerieRecVector[i].Legend        := IvSerieRecVector[i].Legend; // Format('S%d', [i]);
-    SerieRecVector[i].LegendOn      := IvSerieRecVector[i].LegendOn;
-    SerieRecVector[i].ToolTip       := IvSerieRecVector[i].ToolTip;
-    SerieRecVector[i].ToolTipShared := IvSerieRecVector[i].ToolTipShared;
-
-    // dataset-points
+  for i := Low({Iv}SerieRecVector) to High({Iv}SerieRecVector) do begin
+    // serie points
     SetLength(SerieRecVector[i].PointRecVector, IvDs.RecordCount);
     IvDs.First;
     for j := 0 to IvDs.RecordCount - 1 do begin
-
-      if IvSerieRecVector[i].XLabelField = '' then
-        SerieRecVector[i].PointRecVector[j].XLabel  := ''
-      else
-        SerieRecVector[i].PointRecVector[j].XLabel  := IvDs.FieldByName(IvSerieRecVector[i].XLabelField).AsString;
-
-      if IvSerieRecVector[i].XField = '' then
-        SerieRecVector[i].PointRecVector[j].X       := Null
-      else
-        SerieRecVector[i].PointRecVector[j].X       := IvDs.FieldByName(IvSerieRecVector[i].XField).AsVariant;
-
-      if IvSerieRecVector[i].YField = '' then
-        SerieRecVector[i].PointRecVector[j].Y       := Null
-      else
-        SerieRecVector[i].PointRecVector[j].Y       := IvDs.FieldByName(IvSerieRecVector[i].YField).AsVariant;
-
-      if IvSerieRecVector[i].ZField = '' then
-        SerieRecVector[i].PointRecVector[j].Z       := Null
-      else
-        SerieRecVector[i].PointRecVector[j].Z       := IvDs.FieldByName(IvSerieRecVector[i].ZField).AsVariant;
-
-      if IvSerieRecVector[i].ColorField = '' then
-        SerieRecVector[i].PointRecVector[j].Color   := Null
-      else
-        SerieRecVector[i].PointRecVector[j].Color   := IvDs.FieldByName(IvSerieRecVector[i].ColorField).AsVariant;
-
-      if IvSerieRecVector[i].ShapeField = '' then
-        SerieRecVector[i].PointRecVector[j].Shape   := ''
-      else
-        SerieRecVector[i].PointRecVector[j].Shape   := IvDs.FieldByName(IvSerieRecVector[i].ShapeField).AsString;
-
-      if IvSerieRecVector[i].SizeField = '' then
-        SerieRecVector[i].PointRecVector[j].Size    := ''
-      else
-        SerieRecVector[i].PointRecVector[j].Size    := IvDs.FieldByName(IvSerieRecVector[i].SizeField).AsString;
-
-      if IvSerieRecVector[i].ToolTipField = '' then
-        SerieRecVector[i].PointRecVector[j].ToolTip := ''
-      else
-        SerieRecVector[i].PointRecVector[j].ToolTip := IvDs.FieldByName(IvSerieRecVector[i].ToolTipField).AsString;
-
-      // next
+      if not SerieRecVector[i].XLabelField.IsEmpty  then SerieRecVector[i].PointRecVector[j].XLabel  := IvDs.FieldByName(SerieRecVector[i].XLabelField ).AsString ;
+      if not SerieRecVector[i].XField.IsEmpty       then SerieRecVector[i].PointRecVector[j].X       := IvDs.FieldByName(SerieRecVector[i].XField      ).AsVariant;
+      if not SerieRecVector[i].YField.IsEmpty       then SerieRecVector[i].PointRecVector[j].Y       := IvDs.FieldByName(SerieRecVector[i].YField      ).AsVariant;
+      if not SerieRecVector[i].ZField.IsEmpty       then SerieRecVector[i].PointRecVector[j].Z       := IvDs.FieldByName(SerieRecVector[i].ZField      ).AsVariant;
+      if not SerieRecVector[i].ColorField.IsEmpty   then SerieRecVector[i].PointRecVector[j].Color   := IvDs.FieldByName(SerieRecVector[i].ColorField  ).AsVariant;
+      if not SerieRecVector[i].ShapeField.IsEmpty   then SerieRecVector[i].PointRecVector[j].Shape   := IvDs.FieldByName(SerieRecVector[i].ShapeField  ).AsString ;
+      if not SerieRecVector[i].SizeField.IsEmpty    then SerieRecVector[i].PointRecVector[j].Size    := IvDs.FieldByName(SerieRecVector[i].SizeField   ).AsString ;
+      if not SerieRecVector[i].ToolTipField.IsEmpty then SerieRecVector[i].PointRecVector[j].ToolTip := IvDs.FieldByName(SerieRecVector[i].ToolTipField).AsString ;
       IvDs.Next;
     end;
-
   end;
 end;
 
 function  TChartRec.ToCanvasJs: string;
 var
   i, j: integer; // serie, point
-  n, w, h, s, p{, c, l, x, y, z}: string; // chart name, width, heigt, seriesstr, pointstr, color, legend, x, y, z
+  chb, seb, ptb: TSbuRec; // chart, series, points stringbuilder
 begin
-  // zip
-  n := Chart;
-  w := Width;
-  h := Height;
-
-  // dataseries
-  s := '';
+  // series
+  seb.Clr;
   for i := Low(SerieRecVector) to High(SerieRecVector) do begin
 
-    // points level (indexLabel: "C1CC", color: "blue", color: "rgba(105,15,105,.6)")
-    p := '';
-    for j := Low(SerieRecVector[i].PointRecVector) to High(SerieRecVector[i].PointRecVector) do
+    // points
+    ptb.Clr;
+    for j := Low(SerieRecVector[i].PointRecVector) to High(SerieRecVector[i].PointRecVector) do begin
       // zip
-      p := p + sLineBreak
-      + '        ' + ifthen(j = 0, ' ', ',') + ' {'
-      +                                                                    'label: "'         + SerieRecVector[i].PointRecVector[j].XLabel + '"'       // if present override the x
-      + ifthen(VarIsNull(SerieRecVector[i].PointRecVector[j].X)      , '', ', x: "'           + VarToStr(SerieRecVector[i].PointRecVector[j].X) + '"')
-      + ifthen(VarIsNull(SerieRecVector[i].PointRecVector[j].Y)      , '', ', y: '            + VarToStr(SerieRecVector[i].PointRecVector[j].Y))
-      + ifthen(VarIsNull(SerieRecVector[i].PointRecVector[j].Z)      , '', ', z: '            + VarToStr(SerieRecVector[i].PointRecVector[j].Z))
-      + ifthen(VarIsNull(SerieRecVector[i].PointRecVector[j].Color)  , '', ', markerColor: "' + SerieRecVector[i].PointRecVector[j].Color   + '"')
-      + ifthen(VarIsNull(SerieRecVector[i].PointRecVector[j].Shape)  , '', ', markerType: "'  + SerieRecVector[i].PointRecVector[j].Shape   + '"')     // circle, triangle, square, cross, line, none
-      + ifthen(VarIsNull(SerieRecVector[i].PointRecVector[j].Size)   , '', ', markerSize: "'  + SerieRecVector[i].PointRecVector[j].Size    + '"')
-      + ifthen(VarIsNull(SerieRecVector[i].PointRecVector[j].ToolTip), '', ', toolTip: "'     + SerieRecVector[i].PointRecVector[j].ToolTip + '"')
-    //+ ifthen(VarIsNull(SerieRecVector[i].PointRecVector[j].Title)  , '', ', legendText: "'  + VarToStr(SerieRecVector[i].PointRecVector[j].Title + '"'))
-      + '}';
-    Delete(p, 1, 2);
+
+//    + ifthen(VarIsNull(SerieRecVector[i].PointRecVector[j].ToolTip), '', ', toolTip: "'     + SerieRecVector[i].PointRecVector[j].ToolTip     + '"')
+//  //+ ifthen(VarIsNull(SerieRecVector[i].PointRecVector[j].Title)  , '', ', legendText: "'  + VarToStr(SerieRecVector[i].PointRecVector[j].Title + '"'))
+//    + '}';
+
+      // zip
+      ptb.Add(',{'                                                                                                     , true                                                             , 1);
+      ptb.Add(  'y: %s'                                      , [SerieRecVector[i].PointRecVector[j].Y                 ], true                                                             , 0);
+      ptb.Add(', x: "%s"'                                    , [SerieRecVector[i].PointRecVector[j].X                 ], TVntRec.VntIsBold(SerieRecVector[i].PointRecVector[j].X)         , 0);
+      ptb.Add(', z: "%s"'                                    , [SerieRecVector[i].PointRecVector[j].Z                 ], TVntRec.VntIsBold(SerieRecVector[i].PointRecVector[j].Z)         , 0);
+      ptb.Add(', label: "%s"'                                , [SerieRecVector[i].PointRecVector[j].XLabel            ], TStrRec.StrIsBold(SerieRecVector[i].PointRecVector[j].XLabel)    , 0);
+      ptb.Add(', markerColor: "%s"'                          , [SerieRecVector[i].PointRecVector[j].Color             ], TStrRec.StrIsBold(SerieRecVector[i].PointRecVector[j].Color)     , 0);
+      ptb.Add(', markerType: "%s"'                           , [SerieRecVector[i].PointRecVector[j].Shape             ], TStrRec.StrIsBold(SerieRecVector[i].PointRecVector[j].Shape)     , 0); // circle, triangle, square, cross, line, none
+      ptb.Add(', markerSize: "%s"'                           , [SerieRecVector[i].PointRecVector[j].Size              ], TStrRec.StrIsBold(SerieRecVector[i].PointRecVector[j].Size )     , 0);
+      ptb.Add(', toolTipContent: "%s"'                       , [SerieRecVector[i].PointRecVector[j].ToolTip           ], TVntRec.VntIsBold(SerieRecVector[i].PointRecVector[j].ToolTip)   , 0);
+    //ptb.Add(', legendText: "%s"'                           , [SerieRecVector[i].PointRecVector[j].LegendText        ], TVntRec.VntIsBold(SerieRecVector[i].PointRecVector[j].LegendText), 0);
+      ptb.Add('}'                                                                                                      , true                                                             , 0);
+    end;
+    ptb.Text[3] := ' ';
+    //Delete(ptb.Text, 1, 1);
 
     // fix$
-    p := StringReplace(p, 'x: $', 'x: ', [rfReplaceAll]);
-    p := StringReplace(p, 'y: $', 'y: ', [rfReplaceAll]);
-    p := StringReplace(p, 'z: $', 'z: ', [rfReplaceAll]);
+  //ptb.Text := StringReplace(ptb.Text, 'x: $', 'x: ', [rfReplaceAll]);
+  //ptb.Text := StringReplace(ptb.Text, 'y: $', 'y: ', [rfReplaceAll]);
+  //ptb.Text := StringReplace(ptb.Text, 'z: $', 'z: ', [rfReplaceAll]);
 
-    // series level
-    s := s              + '    , { // dataseries-'    + IntToStr(i);
-    s := s + sLineBreak + '        name: "'           + SerieRecVector[i].Serie + '"';
-    s := s + sLineBreak + '      , type: "'           + TStrRec.StrCamelCaseFromVec([SerieRecVector[i].Kind]) + '"';
-  //s := s + sLineBreak + '      , markerType: "'     + 'circle' + '"';
-  //s := s + sLineBreak + '      , markerColor: "'    + ColorNameRnd + '"';
-  //s := s + sLineBreak + '      , markerSize: "'     + '4' + '"';
-    s := s + sLineBreak + '      , legendText: "'     + SerieRecVector[i].Legend + '"';
-    s := s + sLineBreak + '      , showInLegend: '    + BoolToStr(SerieRecVector[i].LegendOn, true); // true, false;
-    s := s + sLineBreak + '      , toolTipContent: "' + SerieRecVector[i].ToolTip + '"';
-    s := s + sLineBreak + '      , dataPoints: [';
-    s := s + sLineBreak +          p;
-    s := s + sLineBreak + '        ]';
-    s := s + sLineBreak + '      }';
+    // serie
+    seb.Add('    ,{ // series-%s'                            , [IntToStr(i)                                            ], true                                                            , 0);
+    seb.Add('      name: "%s"'                               , [SerieRecVector[i].Serie                                ]                                                                     );
+    seb.Add('    , type: "%s"'                               , [TStrRec.StrCamelCaseFromVec([SerieRecVector[i].Kind])  ]                                                                     );
+  //seb.Add('    , markerType: "%s"'                         , ['circle'                                               ]                                                                     );
+  //seb.Add('    , markerColor: "%s"'                        , [ColorNameRnd                                           ]                                                                     );
+  //seb.Add('    , markerSize: "%s"'                         , ['4'                                                    ]                                                                     );
+    seb.Add('    , legendText: "%s"'                         , [SerieRecVector[i].Legend                               ]                                                                     );
+    seb.Add('    , showInLegend: %s'                         , [BoolToStr(SerieRecVector[i].LegendOn, true).ToLower    ]                                                                     ); // true, false;
+    seb.Add('    , toolTipContent: "%s"'                     , [SerieRecVector[i].ToolTip                              ]                                                                     );
+    seb.Add('    , dataPoints: ['                                                                                                                                                            );
+    seb.Add(       ptb.Text, true, 0);
+    seb.Add('      ]');
+    seb.Add('    }');
   end;
-  s[5] := ' ';
+  seb.Text[5] := ' ';
+  Delete(seb.Text, 1, 1);
 
-  // html chart level
-  Result := ''
-//+ sLineBreak + '<script src="/Include/canvasjs/1.8.0/canvasjs.min.js"></script>'
-  + sLineBreak + '<div id="' + n + '" style="width:' + w + '; height:' + h + '; margin-left:auto; margin-right:auto;"></div>'
-  + sLineBreak + '<script>'
-  + sLineBreak + 'window.onload = function  () {'
-  + sLineBreak + '  var chart = new CanvasJS.Chart("' + n + '", {'
+  // chart
+  chb.Add('<div id="%s" style="width:%s; height:%s; margin-left:auto; margin-right:auto;"></div>', [Chart, Width, Height  ]                                                                  );
+  chb.Add('<script>'                                                                                                                                                                         );
+  chb.Add('window.onload = function() {'                                                                                                                                                     );
+  chb.Add('  var chart = new CanvasJS.Chart("%s", {'        , [Chart                                                   ]                                                                     );
+  // options'
+//chb.Add('    theme: "%s"'                                 , ['theme4'                                                ]                                                                     ); // theme1, theme2, theme3, theme4
+//chb.Add('  , exportEnabled: %s'                           , ['true'                                                  ]                                                                     );
+//chb.Add('  , exportFileName: "%s"'                        , [Chart                                                   ]                                                                     );
+  chb.Add('    interactivityEnabled: %s'                    , ['true'                                                  ]                                                                     );
+  chb.Add('  , animationEnabled: %s'                        , ['true'                                                  ]                                                                     );
+  chb.Add('  , animationDuration: %s'                       , ['1000'                                                  ]                                                                     );
+  chb.Add('  , zoomEnabled: %s'                             , ['true'                                                  ]                                                                     );
+  chb.Add('  , zoomType: "%s"'                              , ['xy'                                                    ]                                                                     );
+  // title'
+  chb.Add('  , title: {'                                                                                                                                                                     );
+  chb.Add('      text: "%s"'                                , [Title                                                   ]                                                                     );
+  chb.Add('    , fontFamily: "%s"'                          , ['consolas'                                              ]                                                                     ); // gthe.FontFamily
+  chb.Add('    , fontWeight: "%s"'                          , ['normal'                                                ]                                                                     ); // gthe.FontWeight
+  chb.Add('    , fontSize: %s'                              , ['18'                                                    ]                                                                     ); // px
+  chb.Add('    }'                                                                                                                                                                            );
+  // subtitle'
+//chb.Add('  , subtitle: [{'                                                                                                                                                                 );
+//chb.Add('      text: "%s"'                                , [Description                                             ]                                                                     );
+//chb.Add('    , fontFamily: "%s"'                          , ['consolas'                                              ]                                                                     ); // gthe.FontFamily
+//chb.Add('    , fontWeight: "%s"'                          , ['normal'                                                ]                                                                     ); // gthe.FontWeight
+//chb.Add('    , fontSize: %s'                              , ['10'                                                    ]                                                                     ); // px
+//chb.Add('    }]'                                                                                                                                                                           );
+  // legend'
+  chb.Add('  , legend:{'                                                                                                                                                                     );
+  chb.Add('      fontSize: %s'                              , ['12'                                                    ]                                                                     ); // px
+  chb.Add('    , fontFamily: "%s"'                          , ['tahoma'                                                ]                                                                     ); // gthe.FontFamily
+  chb.Add('    , fontColor: "%s"'                           , ['gray'                                                  ]                                                                     );
+  chb.Add('    }'                                                                                                                                                                            );
+  // tooltip'
+//chb.Add('  , toolTip: {';                                                                                                                                                                  );
+//chb.Add('      content: "%s"'                                                           , [SerieRecVector[i].ToolTip]                                                                      );
+//chb.Add('    , shared: %s'                                , [BoolToStr(SerieRecVector[i].TooltipShared, true).ToLower]                                                                     ); // true, false
+//chb.Add('    }'                                                                                                                                                                            );
+  // axisx'
+  chb.Add('  , axisX: {'                                                                                                                                                                     );
+  chb.Add('      title: "%s"'                               , [XAxisRec.TitleRec.Caption                               ], not XAxisRec.TitleRec.Caption.IsEmpty                              );
+  chb.Add('    , titleFontSize: %s'                         , ['16'                                                    ]                                                                     ); // px
+  chb.Add('    , titleFontFamily: "%s"'                     , ['tahoma'                                                ]                                                                     ); // gthe.FontFamily
+  chb.Add('    , titleFontColor: "%s"'                      , ['gray'                                                  ]                                                                     );
+  chb.Add('    , lineColor: "%s"'                           , ['silver'                                                ]                                                                     );
+  chb.Add('    , labelFontSize: %s'                         , ['11'                                                    ]                                                                     );
+  chb.Add('    , labelFontColor: "%s"'                      , ['dimgray'                                               ]                                                                     );
+  chb.Add('    , gridThickness: %s'                         , ['0'                                                     ]                                                                     );
+//chb.Add('    , gridColor: "%s"'                           , ['eee'                                                   ]                                                                     );
+//chb.Add('    , includeZero: %s'                           , ['false'                                                 ]                                                                     );
+  chb.Add('    , prefix: "%s"'                              , [XAxisRec.LabelRec.Prefix                                ], not XAxisRec.LabelRec.Prefix.IsEmpty                               );
+  chb.Add('    , suffix: "%s"'                              , [XAxisRec.LabelRec.Suffix                                ], not XAxisRec.LabelRec.Suffix.IsEmpty                               );
+  chb.Add('    , labelAngle: %s'                            , [XAxisRec.LabelRec.AngleDeg                              ], not XAxisRec.LabelRec.AngleDeg.IsEmpty                             );
+  chb.Add('    }'                                                                                                                                                                            );
+  // axisy'
+  chb.Add('  , axisY: {'                                                                                                                                                                     );
+  chb.Add('      title: "%s"'                               , [YAxisRec.TitleRec.Caption                               ], not YAxisRec.TitleRec.Caption.IsEmpty                              );
+  chb.Add('    , titleFontSize: %s'                         , ['16'                                                    ]                                                                     ); // px
+  chb.Add('    , titleFontFamily: "%s"'                     , ['tahoma'                                                ]                                                                     ); // gthe.FontFamily
+  chb.Add('    , titleFontColor: "%s"'                      , ['gray'                                                  ]                                                                     );
+  chb.Add('    , lineColor: "%s"'                           , ['silver'                                                ]                                                                     );
+  chb.Add('    , labelFontSize: %s'                         , ['11'                                                    ]                                                                     );
+  chb.Add('    , labelFontColor: "%s"'                      , ['dimgray'                                               ]                                                                     );
+  chb.Add('    , gridThickness: %s'                         , ['1'                                                     ]                                                                     );
+  chb.Add('    , gridColor: "%s"'                           , ['#ddd'                                                  ]                                                                     );
+//chb.Add('    , includeZero: %s'                           , ['false'                                                 ]                                                                     );
+  chb.Add('    , prefix: "%s"'                              , [YAxisRec.LabelRec.Prefix                                ], not YAxisRec.LabelRec.Prefix.IsEmpty                               );
+  chb.Add('    , suffix: "%s"'                              , [YAxisRec.LabelRec.Suffix                                ], not YAxisRec.LabelRec.Suffix.IsEmpty                               );
+  chb.Add('    , labelAngle: %s'                            , [YAxisRec.LabelRec.AngleDeg                              ], not YAxisRec.LabelRec.AngleDeg.IsEmpty                             );
+//chb.Add('    , minimum: %s'                               , [YAxisRec.                                               ]                                                                     );
+//chb.Add('    , maximum: %s'                               , [YAxisRec.                                               ]                                                                     );
+//chb.Add('    , interlacedColor: "%s"'                     , ['#F0F8FF'                                               ]                                                                     );
+  chb.Add('    }'                                                                                                                                                                            );
+  // series'
+  chb.Add('  , data: ['      );
+  chb.Add(         seb.Text  );
+  chb.Add('    ]'            );
+  chb.Add('  });'            );
+  // rendering'
+  chb.Add('  chart.render();');
+  chb.Add('};'               );
+  chb.Add('</script>'        );
 
-//+ sLineBreak + '    // options'
-//+ sLineBreak + '  , theme: "theme4"' // theme1, theme2, theme3, theme4
-  + sLineBreak + '    exportEnabled: true'
-  + sLineBreak + '  , exportFileName: "' + Chart + '"'
-  + sLineBreak + '  , interactivityEnabled: true'
-  + sLineBreak + '  , animationEnabled: true'
-  + sLineBreak + '  , animationDuration: 1000'
-  + sLineBreak + '  , zoomEnabled: true'
-  + sLineBreak + '  , zoomType: "xy"'
-
-//+ sLineBreak + '    // title'
-  + sLineBreak + '  , title: {'
-  + sLineBreak + '      text: "' + Title + '"'
-  + sLineBreak + '    , fontFamily: "consolas"' // gthe.FontFamily
-  + sLineBreak + '    , fontWeight: "normal"'   // gthe.FontWeight
-  + sLineBreak + '    , fontSize: 18' // px
-  + sLineBreak + '    }'
-
-//+ sLineBreak + '    // subtitle'
-//+ sLineBreak + '  , subtitle: [{'
-//+ sLineBreak + '      text: "' + Description + '"'
-//+ sLineBreak + '    , fontFamily: "consolas"' // gthe.FontFamily
-//+ sLineBreak + '    , fontWeight: "normal"'   // gthe.FontWeight
-//+ sLineBreak + '    , fontSize: 10' // px
-//+ sLineBreak + '    }]'
-
-//+ sLineBreak + '    // legend'
-  + sLineBreak + '  , legend:{'
-  + sLineBreak + '      fontSize: 12' // px
-  + sLineBreak + '    , fontFamily: "tahoma"' // gthe.FontFamily
-  + sLineBreak + '    , fontColor: "gray"'
-  + sLineBreak + '    }'
-
-//+ sLineBreak + '    // tooltip'
-//+ sLineBreak + '  , toolTip: {';
-//+ sLineBreak + '      content: "'      + SerieRecVector[i].ToolTip + '"';
-//+ sLineBreak + '    , shared: '        + WksBoolUnit.BoolToStr(SerieRecVector[i].TooltipShared, true) + ''; // true, false
-//+ sLineBreak + '    }';
-
-//+ sLineBreak + '    // axisx'
-  + sLineBreak + '  , axisX: {'
-  + sLineBreak + '      titleFontSize: 16' // px
-  + sLineBreak + '    , titleFontFamily: "tahoma"' // gthe.FontFamily
-  + sLineBreak + '    , titleFontColor: "gray"'
-  + sLineBreak + '    , labelFontSize: 12'
-  + sLineBreak + '    , gridThickness: 1'
-//  + sLineBreak + '    , includeZero: false'
-  + sLineBreak + '    , title: "'          + XAxisRec.TitleRec.Caption  + '"'
-  + sLineBreak + '    , prefix: "'         + XAxisRec.LabelRec.Prefix   + '"'
-  + sLineBreak + '    , suffix: "'         + XAxisRec.LabelRec.Suffix   + '"'
-  + sLineBreak + '    , labelAngle: '      + XAxisRec.LabelRec.AngleDeg + ''
-  + sLineBreak + '    }'
-
-//+ sLineBreak + '    // axisy'
-  + sLineBreak + '  , axisY: {'
-  + sLineBreak + '      titleFontSize: 16' // px
-  + sLineBreak + '    , titleFontFamily: "tahoma"' // gthe.FontFamily
-  + sLineBreak + '    , titleFontColor: "gray"'
-  + sLineBreak + '    , labelFontSize: 12'
-  + sLineBreak + '    , gridThickness: 1'
-  + sLineBreak + '    , includeZero: false'
-  + sLineBreak + '    , title: "'          + YAxisRec.TitleRec.Caption  + '"'
-  + sLineBreak + '    , prefix: "'         + YAxisRec.LabelRec.Prefix   + '"'
-  + sLineBreak + '    , suffix: "'         + YAxisRec.LabelRec.Suffix   + '"'
-  + sLineBreak + '    , labelAngle: '      + YAxisRec.LabelRec.AngleDeg + ''
-//+ sLineBreak + '    , minimum: '         + YAxisRec.LabelRec.AngleDeg + ''
-//+ sLineBreak + '    , maximum: '         + YAxisRec.LabelRec.AngleDeg + ''
-//+ sLineBreak + '    , interlacedColor: "#F0F8FF"'
-  + sLineBreak + '    }'
-
-//+ sLineBreak + '    // dataseries'
-  + sLineBreak + '  , data: ['
-  + sLineBreak +        s
-  + sLineBreak + '    ]'
-  + sLineBreak + '  });'
-
-//+ sLineBreak + '  // rendering'
-  + sLineBreak + '  chart.render();'
-  + sLineBreak + '};'
-  + sLineBreak + '</script>'
-  ;
+  // end
+  Result := chb.Text;
 end;
 
 function  TChartRec.ToPlotly: string;
@@ -8019,15 +8008,33 @@ end;
 
   {$REGION 'TCnvRec'}
 class function  TCnvRec.CnvTextWidth(IvString: string; IvFont: TFont): integer;
-var
-  bmp: TBitmap;
+//var
+//  bmp: TBitmap;
 begin
-  bmp := TBitmap.Create;
+  var bmp := TBitmap.Create;
   try
     bmp.Canvas.Font.Assign(IvFont);
     Result := bmp.Canvas.TextWidth(IvString {+ 'W'});
   finally
     bmp.Free;
+  end;
+end;
+
+class function  TCnvRec.CnvTextSize(IvString: string; IvFontSize: integer; IvFont: string): TSize;
+begin
+  var cnv := TCanvas.Create;
+  try
+    cnv.Handle := GetDC(0);
+    try
+      cnv.Font.Name := IvFont;
+      cnv.Font.Size := IvFontSize;
+      Result := Size.Create(cnv.TextWidth(IvString), cnv.TextHeight(IvString)); // rough measured text size
+    finally
+      ReleaseDC(0, cnv.Handle);
+      cnv.Handle := 0;
+    end;
+  finally
+    cnv.Free;
   end;
 end;
 
@@ -9529,6 +9536,129 @@ end;
     {$ENDREGION}
 
     {$REGION 'ds'}
+class function  TDbaRec.DstFromSql(const IvSql: string; out IvDs: TDataset; const IvConnLib, IvConnStr: string; IvFalseIfDsIsEmpty: boolean): boolean;
+
+  {$REGION 'var'}
+var
+  // general
+  sql, fbk: string;
+//  aff{, i}: integer;
+  cst: string;             // connection string
+//  rix: integer;            // sub-recordset count
+//  con: string;             // co-name
+//  tcp: string;             // table caption
+
+  // datates
+//dsr: string;             // dataset result
+
+  // ado
+//aco: TADOConnection;     // conn
+  aqy: TADOQuery;          // query
+//  dst: TADODataSet;        // dataset, datasetnext
+
+  // fd
+  fco: TFDConnection;      // conn
+  fqy: TFDQuery;           // query
+//fm1: TFDMemTable;        // memtable
+  {$ENDREGION}
+
+begin
+try
+  // init
+  sql := grva.Rva(IvSql);
+
+  {$REGION 'FD'}
+  if SameText(IvConnLib, 'FD') then begin
+
+    gpro.TimerByName['DstFromSql.TFDQuery'].Start;
+  // CoInitialize(nil);
+
+    // connstrresolve
+    if IsNumeric(IvConnStr) then begin
+      if not TDbaRec.ScalarStr('select FldConnStrFD from DbaSystem.dbo.TblSource where FldId = ' + IvConnStr, cst, '', fbk) then begin
+      //IvFbk := 'Datasource, Unable to resolve the FD connection string from the source id';
+        Result := false;
+        Exit;
+      end;
+    end else
+      cst := IvConnStr;
+
+    // fdconn
+    fco := TFDConnection.Create(nil);
+  //fco.ConnectionString := cst;
+    fco.Params.Text := cst;
+
+    // fdquery
+    fqy := TFDQuery.Create(nil);
+  //fqy.FetchOptions.Mode              := fmAll;                    // fmOnDemand
+    fqy.FetchOptions.RowsetSize        := {IvMaxRecords} 10000;     // limit
+  //fqy.FetchOptions.CursorKind        := ckForwardOnly;            // fast forward-only, read-only options
+  //fqy.FetchOptions.Unidirectional    := true;                     //
+    fqy.ResourceOptions.CmdExecTimeout := {IvTimeoutSec} 10 * 1000; // milliseconds !
+    fqy.FetchOptions.AutoClose         := false;                    // necessary to have multiple subrecordset
+    fqy.Connection                     := fco;                      // conn pooled?
+    fqy.SQL.Text                       := sql;                      // multiple queries-ds: 'select * from Tbl1; select * from Tbl2';
+  //fqy.Prepared                       := true;
+
+    // do
+//    try
+      fqy.Open;
+      fqy.FetchAll; // execute all the queries-ds at once
+
+      // assign
+      IvDs := fqy;
+//    finally
+//      fqy.Free; // AndNil?
+//      fco.Free; // AndNil?
+    //CoUninitialize;
+//    end;
+    gpro.TimerByName['DstFromSql.TFDQuery'].Stop;
+  {$ENDREGION}
+
+  {$REGION 'ADO'}
+  end else begin
+
+    gpro.TimerByName['DstFromSql.TADOQuery'].Start;
+
+    // connstrresolve
+    if IvConnStr.Trim.IsEmpty then
+      cst := TDbaRec.DBA_CONN_STR
+    else if IsNumeric(IvConnStr) then begin
+      if not TDbaRec.ScalarStr('select FldConnStrADO from DbaSystem.dbo.TblSource where FldId = ' + IvConnStr, cst, '', fbk) then begin
+      //IvFbk := 'Datasource, Unable to resolve the ADO connection string from the source id';
+        Result := false;
+        Exit;
+      end;
+    end else
+      cst := IvConnStr;
+
+    // adoquery
+    aqy := TADOQuery.Create(nil);
+//    try
+      // init
+      aqy.ConnectionString := cst;
+      aqy.SQL.Text := sql;
+
+      // executes then move to the first recordset
+      aqy.Open;
+
+      // assign
+      IvDs := aqy;
+//    finally
+//      aqy.Free;
+//    end;
+    gpro.TimerByName['DstFromSql.TADOQuery'].Stop;
+  end;
+  {$ENDREGION}
+
+except
+  on e: Exception do begin
+    glog.Log('DstFromSql', e, sql);
+    Result := false;
+  end;
+end;
+end;
+
 class function  TDbaRec.DsFromSql(const IvSql: string; out IvDs: TDataset; var IvAffected: integer; var IvFbk: string; IvFalseIfDsIsEmpty: boolean): boolean;
 var
   sql: string;
@@ -9603,129 +9733,6 @@ begin
 *)
   Result := DsFromSql(IvSql, IvDs, aff, fbk, IvFalseIfDsIsEmpty);
 end;
-
-class function TDbaRec.DsFromSql2(const IvConnLib, IvConnStr, IvSql: string; out IvDs: TDataset; IvFalseIfDsIsEmpty: boolean): boolean;
-
-  {$REGION 'var'}
-var
-  // general
-  sql, fbk: string;
-//  aff{, i}: integer;
-  cst: string;             // connection string
-//  rix: integer;            // sub-recordset count
-//  con: string;             // co-name
-//  tcp: string;             // table caption
-
-  // datates
-//dsr: string;             // dataset result
-
-  // ado
-//aco: TADOConnection;     // conn
-  aqy: TADOQuery;          // query
-//  dst: TADODataSet;        // dataset, datasetnext
-
-  // fd
-  fco: TFDConnection;      // conn
-  fqy: TFDQuery;           // query
-//fm1: TFDMemTable;        // memtable
-  {$ENDREGION}
-
-begin
-try
-  // init
-  sql := grva.Rva(IvSql);
-
-  {$REGION 'FD'}
-  if SameText(IvConnLib, 'FD') then begin
-
-    gpro.TimerByName['DsFromSql2.TFDQuery'].Start;
-  // CoInitialize(nil);
-
-    // connstrresolve
-    if IsNumeric(IvConnStr) then begin
-      if not TDbaRec.ScalarStr('select FldConnStrFD from DbaSystem.dbo.TblSource where FldId = ' + IvConnStr, cst, '', fbk) then begin
-      //IvFbk := 'Datasource, Unable to resolve the FD connection string from the source id';
-        Result := false;
-        Exit;
-      end;
-    end else
-      cst := IvConnStr;
-
-    // fdconn
-    fco := TFDConnection.Create(nil);
-  //fco.ConnectionString := cst;
-    fco.Params.Text := cst;
-
-    // fdquery
-    fqy := TFDQuery.Create(nil);
-  //fqy.FetchOptions.Mode              := fmAll;                    // fmOnDemand
-    fqy.FetchOptions.RowsetSize        := {IvMaxRecords} 10000;     // limit
-  //fqy.FetchOptions.CursorKind        := ckForwardOnly;            // fast forward-only, read-only options
-  //fqy.FetchOptions.Unidirectional    := true;                     //
-    fqy.ResourceOptions.CmdExecTimeout := {IvTimeoutSec} 10 * 1000; // milliseconds !
-    fqy.FetchOptions.AutoClose         := false;                    // necessary to have multiple subrecordset
-    fqy.Connection                     := fco;                      // conn pooled?
-    fqy.SQL.Text                       := sql;                      // multiple queries-ds: 'select * from Tbl1; select * from Tbl2';
-  //fqy.Prepared                       := true;
-
-    // do
-//    try
-      fqy.Open;
-      fqy.FetchAll; // execute all the queries-ds at once
-
-      // assign
-      IvDs := fqy;
-//    finally
-//      fqy.Free; // AndNil?
-//      fco.Free; // AndNil?
-    //CoUninitialize;
-//    end;
-    gpro.TimerByName['DsFromSql2.TFDQuery'].Stop;
-  {$ENDREGION}
-
-  {$REGION 'ADO'}
-  end else begin
-
-    gpro.TimerByName['DsFromSql2.TADOQuery'].Start;
-
-    // connstrresolve
-    if IvConnStr.Trim.IsEmpty then
-      cst := TDbaRec.DBA_CONN_STR
-    else if IsNumeric(IvConnStr) then begin
-      if not TDbaRec.ScalarStr('select FldConnStrADO from DbaSystem.dbo.TblSource where FldId = ' + IvConnStr, cst, '', fbk) then begin
-      //IvFbk := 'Datasource, Unable to resolve the ADO connection string from the source id';
-        Result := false;
-        Exit;
-      end;
-    end else
-      cst := IvConnStr;
-
-    // adoquery
-    aqy := TADOQuery.Create(nil);
-//    try
-      // init
-      aqy.ConnectionString := cst;
-      aqy.SQL.Text := sql;
-
-      // executes then move to the first recordset
-      aqy.Open;
-
-      // assign
-      IvDs := aqy;
-//    finally
-//      aqy.Free;
-//    end;
-    gpro.TimerByName['DsFromSql2.TADOQuery'].Stop;
-  end;
-  {$ENDREGION}
-
-except
-  on e: Exception do begin
-    glog.Log('DsFromSql', e, sql);
-    Result := false;
-  end;
-end;
-end;
     {$ENDREGION}
 
     {$REGION 'csv'}
@@ -9762,6 +9769,73 @@ begin
   finally
     dst.Free;
   end;
+end;
+    {$ENDREGION}
+
+    {$REGION 'vector'}
+{class function TDbaRec.VecFromSql(IvSql: string; IvFieldIdx: integer): TArray<string>;
+var
+  i, aff: integer;
+  dst: TDataset;
+  val, fbk: string;
+begin
+  // exit
+  if IvSql.Trim.IsEmpty then begin
+    Result := []; // default here?
+    Exit;
+  end else
+    Result := [];
+
+  // failed
+  if DsFromSql(IvSql, dst, aff, fbk) then ***
+    Result := [fbk]
+
+  // load
+  else try
+    SetLength(Result, dst.RecordCount);
+    for i := 0 to dst.RecordCount - 1 do begin
+      val := dst.Fields[IvFieldIdx].AsString;
+      if val.Trim.IsEmpty then
+        Result[i] := '' // default here?
+      else
+        Result[i] := val;
+
+      // next
+      dst.Next;
+    end;
+  finally
+    dst.Free;
+  end;
+end;}
+
+class function TDbaRec.VecFromDst(var IvDst: TDataset; IvFieldIdx: integer): TArray<string>;
+var
+  i, aff: integer;
+  val, fbk: string;
+begin
+  // exit
+  if (not Assigned(IvDst)) or IvDst.IsEmpty then begin
+    Result := []; // default here?
+    Exit;
+  end else
+    Result := [];
+
+  // load
+//try
+    SetLength(Result, IvDst.RecordCount);
+    for i := 0 to IvDst.RecordCount - 1 do begin
+      val := IvDst.Fields[IvFieldIdx].AsString;
+      if val.Trim.IsEmpty then
+        Result[i] := '' // default here?
+      else
+        Result[i] := val;
+
+      // next
+      IvDst.Next;
+    end;
+//finally
+//  IvDst.Free;
+//end;
 end;
     {$ENDREGION}
 
@@ -9856,7 +9930,7 @@ class function  TDbaRec.TblIdNextRio(const IvTbl: string; IvUseIdAvailable: bool
 begin
   Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemTblIdNextSoap(IvTbl, IvUseIdAvailable);
 end;
-  {$ENDREGION}
+    {$ENDREGION}
 
     {$REGION 'record'}
 class function  TDbaRec.RecExists(const IvTbl, IvWhere: string; var IvFbk: string; IvCaseSensitive: boolean): boolean;
@@ -10730,7 +10804,7 @@ var
   dfl: TArray<TField>;     // dbfields
   flx, rwx, rwz: integer;  // fieldidx, rowidx, rowcount
 begin
-  ret := false;  // ****************************** DA RIFARE ******************************
+  ret := false; // ****************************** DA RIFARE ******************************
 
   repeat
     try
@@ -11348,6 +11422,36 @@ end;
     {$ENDREGION}
 
     {$REGION 'record'}
+class procedure TDstRec.RecordRecycleSoft(IvDs: TDataSet);
+var
+  i: integer;
+begin
+  IvDs.Edit;
+  IvDs.FieldByName('FldPId'  ).Value := OBJ_ROOT_ZZZ_ID;
+  IvDs.FieldByName('FldState').Value := TStaRec.RECYCLED.Name;
+  IvDs.Post;
+end;
+
+class procedure TDstRec.RecordDeleteSoft(IvDs: TDataSet; IvFieldToSetAvailable: string);
+var
+  i: integer;
+begin
+  IvDs.Edit;
+  for i := 0 to IvDs.FieldCount - 1 do begin
+    if      SameText(IvDs.FieldDefs[i].Name, 'FldId') then
+      continue
+    else if SameText(IvDs.FieldDefs[i].Name, 'FldPId') then
+      IvDs.Fields[i].Value := OBJ_ROOT_ZZZ_ID
+    else if SameText(IvDs.FieldDefs[i].Name, 'FldState') then
+      IvDs.Fields[i].Value := TStaRec.DELETEABLE.Name
+    else if SameText(IvDs.FieldDefs[i].Name, IvFieldToSetAvailable) then
+      IvDs.Fields[i].Value := 'Available'
+    else
+      IvDs.Fields[i].Value := null;
+  end;
+  IvDs.Post;
+end;
+
 class function  TDstRec.RecordToJson(IvDst: TDataSet; IvNoFld, IvRowNoAdd: boolean): string;
 var
   i: integer;
@@ -11431,6 +11535,9 @@ begin
 
   //strip1stcomma
   Delete(IvJson, 1, 1);
+
+  // end
+  IvJson := '[' + IvJson + ']';
 end;
     {$ENDREGION}
 
@@ -13165,19 +13272,19 @@ begin
     SetRoundMode(rmNearest);
     Size := FileSize(fby);
 
-    // para archivos que tienen un tamaño a partir de un GB
+    // for archives that hold a size starting from one GB
     if (Size > 1073741824) or (Size < -1073741824) then
       Result := FloatToStr(RoundTo(Abs(Size/1073741824), -2))+' Gb'
 
-    // si el archivo es superior a un megabyte
+    // if the archive is larger than one megabyte
     else if (Size > 1048576) or (Size < -1048576)then
       Result := FloatToStr(RoundTo(Abs(Size/1048576), -2))+' Mb'
 
-    // si el archivo es superior a un kilobyte
+    // if the archive is larger than one kilobyte
     else if (Size > 1024) or (Size < -1024) then
       Result := FloatToStr(RoundTo(Abs(Size/1024), -2))+' Kb'
 
-    // si el archivo tiene unos pocos bytes
+    // if the archive holds a few bytes
     else if (Size = 0) then
       Result := '1 byte'
 
@@ -14324,7 +14431,7 @@ begin
     oid := Format('%s%d'     , [IvCoName, i]);
     oik := Format('id="%s"'  , [oid]);
     oca := IvOptCaptionVec[i];
-    ova := IvOptValueVec[i];
+    ova := grva.Rva(IvOptValueVec[i]);
     dis := giif.Str(TArray.Contains<string>(IvDisabledVec, ova), 'disabled', '');
     sek := giif.Str(TArray.Contains<string>(IvValueVec   , ova), 'checked' , ''); // no: checked="checked" nut w3.org use it
 
@@ -14783,7 +14890,7 @@ var
   // spare
 //okc: boolean;         // oktocontinue
 //str: string;          // buffer
-  sbu, sbu2: TSbuRec;   // txtbuilder
+  sbu{, sbu2}: TSbuRec;   // txtbuilder
   fbk: string;          // feedback
   nus: string;          // nullstr
   ems: string;          // emptystr
@@ -14908,6 +15015,44 @@ var
   //else
       Result := TStrRec.StrExpand(Result);
   end;
+
+  procedure cell_add;
+  begin
+    if fld.IsNull then
+      sbu.Add('<td><span class="w3-theme-text-muted">%s</span></td>', [nus])
+
+    else if fld.AsString.IsEmpty then
+      sbu.Add('<td><span class="w3-theme-text-muted">%s</span></td>', [ems])
+
+    else if fld.FieldName = 'FldNo' then
+      sbu.Add('<td><span id="Co' + fld.AsString + '">' + fld.AsString + '</span></td>') // add handle for hook <a href=#CoNo></a> for example with No = P1, P2, ...
+
+    else if TStrRec.StrIsLike(fld.FieldName, 'Fld*Color') then
+    //sbu.Add('<span class="badge" style="background-color: ' + fld.AsString + '">&#9679</span>')
+      sbu.Add('<td><div title="' + fld.AsString + '" style="display: inline-block; width: 1em; aspect-ratio: 1 / 1; vertical-align: middle; background-color: ' + fld.AsString + ';"></div></td>')
+
+    else if fld.FieldName = 'FldState' then
+      sbu.Add(
+        '<td style="padding:6px 8px">'
+      + '<span class="w3-tag w3-round-xxlarge w3-%s" style="padding-top: 1.0px;padding-bottom: 1.5px;color: %s;border: %s">%s</span>'
+      + '</td>'
+      , [TStaRec.ColorBgCssFromState(fld.AsString), TStaRec.ColorFgCssFromState(fld.AsString), TStaRec.BorderCssFromState(fld.AsString), fld.AsString]{, not fld.AsString.IsEmpty})
+
+    else if 'FldFromMember,FldMember,FldOwner'.Contains(fld.FieldName) then
+      sbu.Add('<td><span class="w3-text-green" style="font-style: italic;">%s</span></td>', [fld.AsString])
+
+    else if fld.FieldName.EndsWith('Md') then
+      sbu.Add('<td>%s</td>', [TMkdRec.Process(fld.AsString)])
+
+    else begin
+    //cva := StringReplace(cva, 'Dollar', '$', []);
+    //cva := StringReplace(cva, 'Euro'  , '€', []);
+    //cva := Strip(cva, false); // htmltagsstrip
+    //cva := Encode(cva);       // charsescape
+    //if cva.Contains(sLineBreak) then cva := StringReplace(cva, sLineBreak, HBR);
+      sbu.Add('<td>%s</td>', [fld.AsString]);
+    end;
+  end;
   {$ENDREGION}
 
   {$REGION 'html'}
@@ -14942,21 +15087,57 @@ var
 
   {$REGION 'help'}
 (*
+  Dataset [h2]                                                        <-- 1 query can have multiple selects, DatasetTitleOn, DatasetPanelOn, DatasetPanelClosed
+
    --------------------------------------------------------------
   | aaa bbb ccc                                                  |    <-- local header html
    --------------------------------------------------------------
 
-   2 row(s)                                           (+) (-) (x)      <-- toolbar = rowcount + menu(+)(-)(x) = add, deleteselected, cloneselected
-   --------------------------------------------------------------    \
-  |  Aaa  |     Bbb     | Ccc |   Ddd   |   Eee   |     Fff      |    |
-  |==============================================================|    |                     0,0
-  |  111  | bbbb        | ccc | ddddddd | eeee    | fffff        |    |-- table/datasets     +----> i    cols/rows reference
-  |--------------------------------------------------------------|    |                      |
-  |  222  | bbb         | ccc | ddddddd | eeee    | fffff        |    |                      |
-   --------------------------------------------------------------    /                       V j
-    _____________________________________________________________
-  ( snackbar                                                     )    <-- local feedback (normally hidden)
-   ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+  Charts [h3]                                                         <-- ChartTitleOn, ChartPanelOn, ChartPanelClosed
+  · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·     <-- the chart grid template is by dataset
+  ·                               ·                              ·
+  · Y|                        C0  ·                          C1  ·
+  ·  |        * * *               ·                              ·
+  ·  |      *      * * *          ·                              ·
+  ·  |    *  .--.       * * S0    ·                              ·    <-- row 0 has two cols, cols in a row are indipendent, BS allows that
+  ·  |  ----'    \_________ S1    ·                              ·
+  ·  |__________________________  ·                              ·
+  ·                            X  ·                              ·
+  · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
+  ·                    ·                    ·                    ·
+  ·                C3  ·                C2  ·                C4  ·    <-- each chart has a row-col index that target the right cell
+  ·                    ·                    ·                    ·
+  ·                    ·                    ·                    ·
+  ·                    ·                    ·                    ·    <-- row 1 has three cols
+  ·                    ·                    ·                    ·
+  ·                    ·                    ·                    ·
+  ·                    ·                    ·                    ·
+  · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
+
+   3 row(s)                                           (+) (-) (x)     <-- toolbar = rowcount + menu(+)(-)(x) = add, deleteselected, cloneselected
+   --------------------------------------------------------------     \
+  |  Aaa  |     Bbb     | Ccc |   Ddd   |   Eee   |     Fff      |     |
+  |==============================================================|     |
+  |  ...  | ...         | ... | ...     | ...     | ...          |     |                                     0,0
+  |--------------------------------------------------------------|     |-- 1st subselect/recordset/table      +----> i    cols/rows reference
+  |  ...  | ...         | ... | ...     | ...     | ...          |     |                                      |
+  |--------------------------------------------------------------|     |                                      |
+  |  ...  | ...         | ... | ...     | ...     | ...          |     |                                      V j
+   --------------------------------------------------------------     /
+
+   2 row(s)                                                           \
+   --------------------------------------------------------------      |
+  |  Ggg  |      Hhh     |                 Iii                   |     |
+  |==============================================================|     |
+  |  ...  | ...          | ...                                   |     |-- 2nd subselect/recordset/table
+  |--------------------------------------------------------------|     |
+  |  ...  | ...          | ...                                   |     |
+   --------------------------------------------------------------     /
+
+   ······························································
+  | snackbar                                                     |    <-- local feedback (normally hidden)
+   ······························································
+
    --------------------------------------------------------------
   | ddd eee fff                                                  |    <-- local footer html
    --------------------------------------------------------------
@@ -14999,16 +15180,6 @@ var
   <script>
   </script>
 
-  class
-  -----
-  table table-extra-condensed
-  table table-condensed
-  table table-bordered
-  table table-striped
-  table table-hover
-  table table-responsive
-  table table-nonfluid
-
   style
   -----
   margin:auto; // centered
@@ -15017,428 +15188,373 @@ var
   {$ENDREGION}
 
 begin
-try
+  try
 
-  {$REGION 'exit'}
-  if not Assigned(IvDs) then begin
-  //Result := '<p>Dataset is not assigned</p>';
-    Result := AlertW('Dataset', NOT_ASSIGNED_STR);
-    Exit
-  end;
+    {$REGION 'exit'}
+    if not Assigned(IvDs) then begin
+    //Result := '<p>Dataset is not assigned</p>';
+      Result := AlertW('Dataset', NOT_ASSIGNED_STR);
+      Exit
+    end;
 
-  if IvDs.IsEmpty then begin
-  //Result := giif.NxD(IvHtmlDefault, Format('<p>%s</p>', [NO_DATA_STR]));
-    Result := AlertI('Dataset', giif.NxD(IvHtmlDefault, NO_DATA_STR));
-    Exit;
-  end;
+    if IvDs.IsEmpty then begin
+    //Result := giif.NxD(IvHtmlDefault, Format('<p>%s</p>', [NO_DATA_STR]));
+      Result := AlertI('Dataset', giif.NxD(IvHtmlDefault, NO_DATA_STR));
+      Exit;
+    end;
 
-  if not (IvDir in [hvHorizontal, hvVertical]) then begin
-  //Result := '<div class="w3-margin">Please set the table Mode as Horiz or Vert</div>';
-    Result := AlertW('Table mode', 'Please set the table Mode as Horiz or Vert');
-    Exit;
-  end;
-  {$ENDREGION}
-
-  {$REGION 'names'}
-  if IvCoName.IsEmpty then
-    nam := TNamRec.Co // conamernd
-  else
-    nam := IvCoName + ifthen(IvCtxId.IsEmpty, TNamRec.RndInt, IvCtxId);
-  cpn := nam + 'Collapse';
-  tna := nam + 'Table';
-  fkn := nam + 'Feedback';
-  ena := nam + 'Editor';
-  xna := nam + 'Textarea';
-  kna := nam + 'Ok';
-  cbn := nam + 'Cancel';
-  ina := nam + 'Inline';
-  {$ENDREGION}
-
-  {$REGION 'zip'}
-  nus := {giif.Str(swb.IsOn('CTnh'), '' ,} NULL_STR.ToLower{)};
-  ems := {giif.Str(swb.IsOn('CTes'), '-',} EMPTY_STR{)};
-  foz := IvDs.FieldCount;  // colscount
-  roz := IvDs.RecordCount; // rowscount
-  tcl := IvClass;
-  tsy := IvStyle;
-  {$ENDREGION}
-
-  {$REGION 'consider deleting the special columns in the dataset'}
-  {
-  if col is ghost or is ifadmin then delete the col
-  }
-  {$ENDREGION}
-
-  {$REGION 'horizontal'}
-if IvDir = hvHorizontal then begin
-
-    {$REGION 'pre'}
-  sbu.Add('<!-- tablehorizontal -->', true, 0);             // class = w3-table w3--striped w3-hoverable w3--border w3-bordered w3--card-4 w3--small w3-margin-bottom
-  sbu.Add('<div class="w3-section">');                      // style = width:auto;margin-left:auto;margin-right:auto;
-  sbu.Add('<span class="w3-small" style="cursor:pointer;" onclick="w3.toggleShow(''#%s'')">%d row(s)</span>', [cpn, roz], not IvDsRecordCountOff);
-  sbu.Add('<div class="w3-responsive" id="%s">', [cpn]);
-  sbu.Add('<table class="%s" style="%s" %s>', [tcl, tsy, THtmRec.IdName(tna)]);
+    if not (IvDir in [hvHorizontal, hvVertical]) then begin
+    //Result := '<div class="w3-margin">Please set the table Mode as Horiz or Vert</div>';
+      Result := AlertW('Table mode', 'Please set the table Mode as Horiz or Vert');
+      Exit;
+    end;
     {$ENDREGION}
 
-    {$REGION 'toolbar'}
+    {$REGION 'names'}
+    if IvCoName.IsEmpty then
+      nam := TNamRec.Co // conamernd
+    else
+      nam := IvCoName + ifthen(IvCtxId.IsEmpty, TNamRec.RndInt, IvCtxId);
+    cpn := nam + 'Collapse';
+    tna := nam + 'Table';
+    fkn := nam + 'Feedback';
+    ena := nam + 'Editor';
+    xna := nam + 'Textarea';
+    kna := nam + 'Ok';
+    cbn := nam + 'Cancel';
+    ina := nam + 'Inline';
+    {$ENDREGION}
 
-      {$REGION 'caption'}
-//    if tcl.Contains('no-caption') then
-//      tca := ''
-//    else begin
-//    //tca := Format('<caption class="wks-cursor-pointer w3-left-align" onclick="w3.toggleShow(''#%s'')">%d Record(s)', [tna, roz]);<br> // scompare insieme alla tabella
-//    //tca := Format('<button class="w3-button w3-small" onclick="w3.toggleShow(''#%s'')">%s%d Record(s)</button>', [tna, iif.ExA(IvCaption, ' - '), roz]);
-//      tca := Format('<div class="w3-text-gray w3small w3-center" onclick="w3.toggleShow(''#%s'')" style="cursor:pointer;">%s%d Record(s)</div>', [tna, giif.ExA(IvCaption, ' - '), roz]);
-//    end;
-  //sbu.Add('<caption>');
+    {$REGION 'zip'}
+    nus := {giif.Str(swb.IsOn('CTnh'), '' ,} NULL_STR.ToLower{)};
+    ems := {giif.Str(swb.IsOn('CTes'), '-',} EMPTY_STR{)};
+    foz := IvDs.FieldCount;  // colscount
+    roz := IvDs.RecordCount; // rowscount
+    tcl := IvClass;
+    tsy := IvStyle;
+    {$ENDREGION}
+
+    {$REGION 'consider deleting the special columns in the dataset'}
+    {
+    if field is ghost or is ifadmin then delete the fielld or flags it and skip later
+    }
+    {$ENDREGION}
+
+    {$REGION 'horizontal'}
+  if IvDir = hvHorizontal then begin
+
+      {$REGION 'pre'}
+    sbu.Add('<!-- tablehorizontal -->', true, 0);             // class = w3-table w3--striped w3-hoverable w3--border w3-bordered w3--card-4 w3--small w3-margin-bottom
+    sbu.Add('<div class="w3-section">');                      // style = width:auto;margin-left:auto;margin-right:auto;
+    sbu.Add('<span class="w3-small" style="cursor:pointer;" onclick="w3.toggleShow(''#%s'')">%d row(s)</span>', [cpn, roz], not IvDsRecordCountOff);
+    sbu.Add('<div class="w3-responsive" id="%s">', [cpn]);
+    sbu.Add('<table class="%s" style="%s" %s>', [tcl, tsy, THtmRec.IdName(tna)]);
       {$ENDREGION}
 
-      {$REGION 'editbuttons'}
+      {$REGION 'toolbar'}
+
+        {$REGION 'caption'}
+  //    if tcl.Contains('no-caption') then
+  //      tca := ''
+  //    else begin
+  //    //tca := Format('<caption class="wks-cursor-pointer w3-left-align" onclick="w3.toggleShow(''#%s'')">%d Record(s)', [tna, roz]);<br> // scompare insieme alla tabella
+  //    //tca := Format('<button class="w3-button w3-small" onclick="w3.toggleShow(''#%s'')">%s%d Record(s)</button>', [tna, iif.ExA(IvCaption, ' - '), roz]);
+  //      tca := Format('<div class="w3-text-gray w3small w3-center" onclick="w3.toggleShow(''#%s'')" style="cursor:pointer;">%s%d Record(s)</div>', [tna, giif.ExA(IvCaption, ' - '), roz]);
+  //    end;
+    //sbu.Add('<caption>');
+        {$ENDREGION}
+
+        {$REGION 'editbuttons'}
+        {$ENDREGION}
+
       {$ENDREGION}
 
-    {$ENDREGION}
+      {$REGION 'colgroup(styling)'}
+  //sbu.Add('<colgroup>');
+  //cyl := IvDs.FieldByName('FldEditIni').AsString; // *** leggere da FldEditJson da cambiare in FldConfigJson ***
+  //if not cyl.IsEmpty then begin
+  //  cyv := SplitString(cyl, '|');
+  //  for str in cyv do begin
+  //    if str.Trim.IsEmpty then
+  //sbu.Add('<col />')
+  //    else
+  //sbu.Add('<col style="%s" />', [str.Trim]);
+  //  end;
+  //end;
+  //sbu.Add('</colgroup>');
+      {$ENDREGION}
 
-    {$REGION 'colgroup(styling)'}
-//sbu.Add('<colgroup>');
-//cyl := IvDs.FieldByName('FldEditIni').AsString; // *** leggere da FldEditJson da cambiare in FldConfigJson ***
-//if not cyl.IsEmpty then begin
-//  cyv := SplitString(cyl, '|');
-//  for str in cyv do begin
-//    if str.Trim.IsEmpty then
-//sbu.Add('<col />')
-//    else
-//sbu.Add('<col style="%s" />', [str.Trim]);
-//  end;
-//end;
-//sbu.Add('</colgroup>');
-    {$ENDREGION}
+      {$REGION 'header'}
+    gpro.TimerByName['TableFromDs.Horizontal.Header'].Start;
+  //sbu.Add('<thead>');
+    if not IvDsHeaderOff then begin
 
-    {$REGION 'header'}
-  gpro.TimerByName['TableFromDs.Horizontal.Header'].Start;
-//sbu.Add('<thead>');
-  if not IvDsHeaderOff then begin
+      {$REGION 'row'}
+  //  sbu.Aif('<tr style="visibility: hidden">', '<tr>', IvDsHeaderOff);
+      sbu.Add('<tr class="w3-%s">', [gthe.Accent10Color]);
 
-    {$REGION 'row'}
-//  sbu.Aif('<tr style="visibility: hidden">', '<tr>', IvDsHeaderOff);
-    sbu.Add('<tr class="w3-%s">', [gthe.Accent10Color]);
+      // numberingcell
+  //    if false then
+  //      row := Th('#', '', '', 'CoNo', 'No')
+  //    else
+        row := '';
 
-    // numberingcell
-//    if false then
-//      row := Th('#', '', '', 'CoNo', 'No')
-//    else
-      row := '';
+      // otherscells
+  //  for fld in IvDs.Fields do begin
+      for coi := 0 to foz - 1 do begin
 
-    // otherscells
-//  for fld in IvDs.Fields do begin
-    for coi := 0 to foz - 1 do begin
-
-      {$REGION 'zzz'}
-      {
-      if      IvDs.Fields[i].Lookup then
-        ods(IvDs.Fields[i].FieldName + ' is a lookup field')
-      else if IvDs.Fields[i].Calculated then
-        ods(IvDs.Fields[i].FieldName + ' is a calculated field')
-      else begin // FieldKind should be ftData here, but might be ftAggregate or ftInternalCalc
-        if IvDs.Fields[i].FieldKind = ftAggregate then begin
-          ods(IvDs.Fields[i].FieldName + ' is an Aggregate field')
-        end else if IvDs.Fields[i].FieldKind = ftInternalCalc then begin
-          ods(IvDs.Fields[i].FieldName + ' is an InternalCalc field')
-        end else if IvDs.Fields[i].FieldKind = ftData then begin
-          case IvDs.Fields[i].FieldType of
-            ftString : ods(IvDs.Fields[i].FieldName + ' is a string field');
-            ftInteger: ods(IvDs.Fields[i].FieldName + ' is an integer field');
-            ftFloat  : ods(IvDs.Fields[i].FieldName + ' is a float field');
-            ftDate   : ods(IvDs.Fields[i].FieldName + ' is a date field');
-            ftBoolean: ods(IvDs.Fields[i].FieldName + ' is a boolean field');
-         // other possible FieldType values ...
+        {$REGION 'zzz'}
+        {
+        if      IvDs.Fields[i].Lookup then
+          ods(IvDs.Fields[i].FieldName + ' is a lookup field')
+        else if IvDs.Fields[i].Calculated then
+          ods(IvDs.Fields[i].FieldName + ' is a calculated field')
+        else begin // FieldKind should be ftData here, but might be ftAggregate or ftInternalCalc
+          if IvDs.Fields[i].FieldKind = ftAggregate then begin
+            ods(IvDs.Fields[i].FieldName + ' is an Aggregate field')
+          end else if IvDs.Fields[i].FieldKind = ftInternalCalc then begin
+            ods(IvDs.Fields[i].FieldName + ' is an InternalCalc field')
+          end else if IvDs.Fields[i].FieldKind = ftData then begin
+            case IvDs.Fields[i].FieldType of
+              ftString : ods(IvDs.Fields[i].FieldName + ' is a string field');
+              ftInteger: ods(IvDs.Fields[i].FieldName + ' is an integer field');
+              ftFloat  : ods(IvDs.Fields[i].FieldName + ' is a float field');
+              ftDate   : ods(IvDs.Fields[i].FieldName + ' is a date field');
+              ftBoolean: ods(IvDs.Fields[i].FieldName + ' is a boolean field');
+           // other possible FieldType values ...
+            end;
           end;
         end;
+        }
+        {$ENDREGION}
+
+        // fieldname
+        fna := IvDs.Fields[coi].FieldName{DisplayName};
+
+        // ghostskip
+        if field_is_ghost(fna) then                          // *** consider deleting the entire column in the dataset ***
+          Continue;
+
+        // ifadmin
+        if fna.EndsWith('IfAdmin') and not gmbr.IsAdmin then // *** consider deleting the entire column in the dataset ***
+          Continue;
+
+        // colname
+        cna := column_name(fna);
+        // colnameexpanded
+        cna := column_name_expanded(cna);
+
+        // coid
+        ccn := Format('Co%s', [fna]);
+
+        // cell
+        sbu.Add('<th id="%s" title="%s">%s</th>', [ccn, fna, cna]);
       end;
-      }
+      sbu.Add('</tr>');
       {$ENDREGION}
 
-      // fieldname
-      fna := IvDs.Fields[coi].FieldName{DisplayName};
-
-      // ghostskip
-      if field_is_ghost(fna) then                          // *** consider deleting the entire column in the dataset ***
-        Continue;
-
-      // ifadmin
-      if fna.EndsWith('IfAdmin') and not gmbr.IsAdmin then // *** consider deleting the entire column in the dataset ***
-        Continue;
-
-      // colname
-      cna := column_name(fna);
-      // colnameexpanded
-      cna := column_name_expanded(cna);
-
-      // coid
-      ccn := Format('Co%s', [fna]);
-
-      // cell
-      sbu.Add('<th id="%s" title="%s">%s</th>', [ccn, fna, cna]);
     end;
-    sbu.Add('</tr>');
-    {$ENDREGION}
-
-  end;
-//sbu.Add('</thead>');
-  gpro.TimerByName['TableFromDs.Horizontal.Header'].Stop;
-    {$ENDREGION}
-
-    {$REGION 'footer'}
-//sbu.Add('<tfoot>');
-//  if          {swb.IsOn('CTfo')} false then begin
-//    row := '';
-//    for coi := 0 to foz - 1 do begin
-//      fna := IvDs.Fields[coi].FieldName{DisplayName};
-//      fcn := ''; // Format('Co%sFooter', [sna]); // coid
-//      if fna <> FLDROWBGCOLOR then
-//        row := row + Td('-', '', '', fcn);
-//    end;
-//    row := Tr(row);
-//    foo := Elem('tfoot', '', '', '', row);
-//
-//  end else if {swb.IsOn('CTft')} false then begin // need to be adjusted due to: FLDROWBGCOLOR
-//    row := '<td colspan="' + (foz + StrToInt(giif.Str({swb.Has('+CT#*')}false, '1', '0'))).ToString + '">' + BadgeI(Format('%d rows', [roz])) + '</td>';
-//    row := Tr(row);
-//    foo := Elem('tfoot', '', '', '', row);
-//
-//  end else
-//    foo := '';
-//sbu.Add('</tfoot>');
-    {$ENDREGION}
-
-    {$REGION 'body'}
-  gpro.TimerByName['TableFromDs.Horizontal.Body'].Start;
-//sbu.Add('<tbody>');
-
-  // rows
-  ros := '';
-  roj := -1;
-  IvDs.First;
-  while not IvDs.Eof do begin
-    // rowinc
-    Inc(roj);
-
-    {$REGION 'row'}
-    sbu.Add('<tr>');
-    coi := -1;
-
-    // cellnumbering
-    if      {swb.Has('+CT#num')} false then begin
-      Inc(coi);
-      if {swb.Has('+CT#desc')}{IvDessc} false then
-        seq := roz-roj+1
-      else
-        seq := roj+1;
-      row := Th(seq.ToString, '', '', Format('CoR%dC%d', [roj, coi]));
-    end else
-      row := '';
-
-    // cellsothers
-    for fld in IvDs.Fields do begin
-
-      {$REGION 'zip'}
-      fna := fld.FieldName;                  // fieldname
-    //flv := fld.AsString;                   // ?
-      cna := column_name(fna);               // celltext
+  //sbu.Add('</thead>');
+    gpro.TimerByName['TableFromDs.Horizontal.Header'].Stop;
       {$ENDREGION}
 
-      // colghostskip
-      if field_is_ghost(cna) then
-        Continue;
+      {$REGION 'footer'}
+  //sbu.Add('<tfoot>');
+  //  if          {swb.IsOn('CTfo')} false then begin
+  //    row := '';
+  //    for coi := 0 to foz - 1 do begin
+  //      fna := IvDs.Fields[coi].FieldName{DisplayName};
+  //      fcn := ''; // Format('Co%sFooter', [sna]); // coid
+  //      if fna <> FLDROWBGCOLOR then
+  //        row := row + Td('-', '', '', fcn);
+  //    end;
+  //    row := Tr(row);
+  //    foo := Elem('tfoot', '', '', '', row);
+  //
+  //  end else if {swb.IsOn('CTft')} false then begin // need to be adjusted due to: FLDROWBGCOLOR
+  //    row := '<td colspan="' + (foz + StrToInt(giif.Str({swb.Has('+CT#*')}false, '1', '0'))).ToString + '">' + BadgeI(Format('%d rows', [roz])) + '</td>';
+  //    row := Tr(row);
+  //    foo := Elem('tfoot', '', '', '', row);
+  //
+  //  end else
+  //    foo := '';
+  //sbu.Add('</tfoot>');
+      {$ENDREGION}
 
-      // ifadmin
-      if fna.EndsWith('IfAdmin') and not gmbr.IsAdmin then
-        Continue;
+      {$REGION 'body'}
+    gpro.TimerByName['TableFromDs.Horizontal.Body'].Start;
+  //sbu.Add('<tbody>');
 
-      // colinc
-      Inc(coi);
+    // rows
+    ros := '';
+    roj := -1;
+    IvDs.First;
+    while not IvDs.Eof do begin
+      // rowinc
+      Inc(roj);
 
-      // cellcoid
-      ccn := Format('CoR%dC%d', [roj, coi]);
+      {$REGION 'row'}
+      sbu.Add('<tr>');
+      coi := -1;
 
-      // cell *** DUPLICATED ***
-      if fld.IsNull then
-        sbu.Add('<td><span class="w3-theme-text-muted">%s</span></td>', [nus])
+      // cellnumbering
+      if      {swb.Has('+CT#num')} false then begin
+        Inc(coi);
+        if {swb.Has('+CT#desc')}{IvDessc} false then
+          seq := roz-roj+1
+        else
+          seq := roj+1;
+        row := Th(seq.ToString, '', '', Format('CoR%dC%d', [roj, coi]));
+      end else
+        row := '';
 
-      else if fld.AsString.IsEmpty then
-        sbu.Add('<td><span class="w3-theme-text-muted">%s</span></td>', [ems])
+      // cellsothers
+      for fld in IvDs.Fields do begin
 
-      else if fld.FieldName = 'FldNo' then
-        sbu.Add('<td><span id="Co' + fld.AsString + '">' + fld.AsString + '</span></td>') // add handle for hook <a href=#CoNo></a> for example with No = P1, P2, ...
+        {$REGION 'zip'}
+        fna := fld.FieldName;                  // fieldname
+      //flv := fld.AsString;                   // ?
+        cna := column_name(fna);               // celltext
+        {$ENDREGION}
 
-      else if TStrRec.StrIsLike(fld.FieldName, 'Fld*Color') then
-      //sbu.Add('<span class="badge" style="background-color: ' + fld.AsString + '">&#9679</span>')
-        sbu.Add('<td><div title="' + fld.AsString + '" style="display: inline-block; width: 1em; aspect-ratio: 1 / 1; vertical-align: middle; background-color: ' + fld.AsString + ';"></div></td>')
+        // colghostskip
+        if field_is_ghost(cna) then
+          Continue;
 
-      else if fld.FieldName = 'FldState' then
-        sbu.Add('<td style="padding:6px 8px"><span class="w3-tag w3-round-xxlarge w3-%s" style="padding-top: 1.0px;padding-bottom: 1.5px;color: white;">%s</span></td>', [TStaRec.ColorW3FromState(fld.AsString), fld.AsString]{, not fld.AsString.IsEmpty})
+        // ifadmin
+        if fna.EndsWith('IfAdmin') and not gmbr.IsAdmin then
+          Continue;
 
-      else if 'FldFromMember,FldMember,FldOwner'.Contains(fld.FieldName) then
-        sbu.Add('<td><span class="w3-text-green" style="font-style: italic;">%s</span></td>', [fld.AsString])
+        // colinc
+        Inc(coi);
 
-      else if fld.FieldName.EndsWith('Md') then
-        sbu.Add('<td>%s</td>', [TMkdRec.Process(fld.AsString)])
+        // cellcoid
+        ccn := Format('CoR%dC%d', [roj, coi]);
 
-      else begin
-      //cva := StringReplace(cva, 'Dollar', '$', []);
-      //cva := StringReplace(cva, 'Euro'  , '€', []);
-      //cva := Strip(cva, false); // htmltagsstrip
-      //cva := Encode(cva);       // charsescape
-      //if cva.Contains(sLineBreak) then cva := StringReplace(cva, sLineBreak, HBR);
-        sbu.Add('<td>%s</td>', [fld.AsString]);
+        // cell (eventually decorate it)
+        cell_add;
       end;
+      sbu.Add('</tr>');
+      {$ENDREGION}
+
+      // rownext
+      IvDs.Next;
     end;
-    sbu.Add('</tr>');
+  //sbu.Add('</tbody>');
+    gpro.TimerByName['TableFromDs.Horizontal.Body'].Stop;
+      {$ENDREGION}
+
+      {$REGION 'post'}
+    sbu.Add('</table>');
+    sbu.Add('</div>');
+    sbu.Add('</div>');
+      {$ENDREGION}
+
     {$ENDREGION}
 
-    // rownext
-    IvDs.Next;
-  end;
-//sbu.Add('</tbody>');
-  gpro.TimerByName['TableFromDs.Horizontal.Body'].Stop;
-    {$ENDREGION}
+    {$REGION 'vertical'}
+  end else if IvDir = hvVertical then begin
+    IvDs.First;
 
-    {$REGION 'post'}
-  sbu.Add('</table>');
-  sbu.Add('</div>');
-  sbu.Add('</div>');
-    {$ENDREGION}
+      {$REGION 'pre'}
+  //sbu.Add('<!-- tablesvertical -->', true, 0);
+  //sbu.Add('<span class="w3-small">%d record(s)</span>', [roz], not IvDsRecordCountOff);
+      {$ENDREGION}
 
-  {$ENDREGION}
+      {$REGION 'tables *** MAY CALL ITSELF HORIZONTAL? ***'}
+    while not IvDs.Eof do begin
+      // reset
+      sbu{2}.Clr;
 
-  {$REGION 'vertical'}
-end else if IvDir = hvVertical then begin
-  IvDs.First;
+      {$REGION 'pre'}
+      sbu{2}.Add('<!-- tablevertical%d -->', [IvDs.RecNo], true, 0);
+      sbu{2}.Add('<div class="w3-section">');
+      sbu{2}.Add('<div class="w3-responsive">', true);
+      sbu{2}.Add('<table class="%s" style="%s" %s>', [IvClass, IvStyle, THtmRec.IdName(Format('%s%d', [tna, IvDs.RecNo]))]);
+      {$ENDREGION}
 
-    {$REGION 'pre'}
-//sbu.Add('<!-- tablesvertical -->', true, 0);
-//sbu.Add('<span class="w3-small">%d record(s)</span>', [roz], not IvDsRecordCountOff);
-    {$ENDREGION}
+      {$REGION 'header'}
+      //hea := ''
+      {$ENDREGION}
 
-    {$REGION 'tables *** MAY CALL ITSELF HORIZONTAL? ***'}
-  while not IvDs.Eof do begin
-    // reset
-    sbu2.Clr;
+      {$REGION 'rows'}
+      for fld in IvDs.Fields do begin
+        sbu{2}.Add('<tr>');
 
-    {$REGION 'pre'}
-    sbu2.Add('<!-- tablevertical%d -->', [IvDs.RecNo], true, 0);
-    sbu2.Add('<div class="w3-section">');
-    sbu2.Add('<div class="w3-responsive">', true);
-    sbu2.Add('<table class="%s" style="%s" %s>', [IvClass, IvStyle, THtmRec.IdName(Format('%s%d', [tna, IvDs.RecNo]))]);
-    {$ENDREGION}
+        // cellheaderkey
+        sbu{2}.Add('<th class="w3-left-align w3-%s w3-padding-medium" style="width: 0">%s</th>', [gthe.Theme, column_name(fld.FieldName)], not IvDsHeaderOff);
 
-    {$REGION 'header'}
-    //hea := ''
-    {$ENDREGION}
+        // cell (eventually decorate it)
+        cell_add;
 
-    {$REGION 'rows'}
-    for fld in IvDs.Fields do begin
-      sbu2.Add('<tr>');
-
-      // cellheaderkey
-      sbu2.Add('<th class="w3-left-align w3-%s w3-padding-medium" style="width: 0">%s</th>', [gthe.Theme, column_name(fld.FieldName)], not IvDsHeaderOff);
-
-      // cell *** DUPLICATED ***
-      if fld.IsNull then
-        sbu2.Add('<td><span class="w3-theme-text-muted">%s</span></td>', [nus])
-
-      else if fld.AsString.IsEmpty then
-        sbu2.Add('<td><span class="w3-theme-text-muted">%s</span></td>', [ems])
-
-      else if fld.FieldName = 'FldNo' then
-        sbu2.Add('<td><span id="Co' + fld.AsString + '">' + fld.AsString + '</span></td>') // add handle for hook <a href=#CoNo></a> for example with No = P1, P2, ...
-
-      else if TStrRec.StrIsLike(fld.FieldName, 'Fld*Color') then
-      //sbu2.Add('<span class="badge" style="background-color: ' + fld.AsString + '">&#9679</span>')
-        sbu2.Add('<td><div title="' + fld.AsString + '" style="display: inline-block; width: 1em; aspect-ratio: 1 / 1; vertical-align: middle; background-color: ' + fld.AsString + ';"></div></td>')
-
-      else if fld.FieldName = 'FldState' then
-        sbu2.Add('<td style="padding:6px 8px"><span class="w3-tag w3-round-xxlarge w3-%s" style="padding-top: 1.0px;padding-bottom: 1.5px;color: white;">%s</span></td>', [TStaRec.ColorW3FromState(fld.AsString), fld.AsString]{, not fld.AsString.IsEmpty})
-
-      else if 'FldMember,FldOwner'.Contains(fld.FieldName) then
-        sbu2.Add('<td><span class="w3-green" style="font-style: italic;">%s</span></td>', [fld.FieldName])
-
-      else if fld.FieldName.EndsWith('Md') then
-        sbu2.Add('<td>%s</td>', [TMkdRec.Process(fld.AsString)])
-
-      else begin
-      //cva := StringReplace(cva, 'Dollar', '$', []);
-      //cva := StringReplace(cva, 'Euro'  , '€', []);
-      //cva := Strip(cva, false); // htmltagsstrip
-      //cva := Encode(cva);       // charsescape
-      //if cva.Contains(sLineBreak) then cva := StringReplace(cva, sLineBreak, HBR);
-        sbu2.Add('<td>%s</td>', [fld.AsString]);
+        sbu{2}.Add('</tr>');
       end;
+      {$ENDREGION}
 
-      sbu2.Add('</tr>');
+      {$REGION 'post'}
+      sbu{2}.Add('</table>');
+      sbu{2}.Add('</div>');
+      sbu{2}.Add('</div>');
+      {$ENDREGION}
+
+      // add
+      sbu.Add(Collapse(
+        {IvDs.FieldByName(IvVertTitleField=FldObject).AsString} ''      // title
+      , Format('Record %d of %d', [IvDs.RecNo, IvDs.RecordCount])       // subtitle
+      , {IvDs.FieldByName(IvVertDescrField=FldDescription).AsString} '' // description
+      , sbu{2}.Text                                                       // body
+      , 6                                                               // hlevel
+      , ''                                                              // coname
+      , 'Left'                                                          // alignment
+      , false                                                           // panelon
+      , false                                                           // panelclosed
+      ));
+
+      IvDs.Next;
     end;
-    {$ENDREGION}
+      {$ENDREGION}
 
-    {$REGION 'post'}
-    sbu2.Add('</table>');
-    sbu2.Add('</div>');
-    sbu2.Add('</div>');
-    {$ENDREGION}
-
-    // add
-    sbu.Add(Collapse(
-      {IvDs.FieldByName(IvVertTitleField=FldObject).AsString} ''      // title
-    , Format('Record %d of %d', [IvDs.RecNo, IvDs.RecordCount])       // subtitle
-    , {IvDs.FieldByName(IvVertDescrField=FldDescription).AsString} '' // description
-    , sbu2.Text                                                       // body
-    , 6                                                               // hlevel
-    , ''                                                              // coname
-    , 'Left'                                                          // alignment
-    , false                                                           // panelon
-    , false                                                           // panelclosed
-    ));
-
-    IvDs.Next;
   end;
     {$ENDREGION}
 
-end;
-  {$ENDREGION}
+    {$REGION 'editable'}
+  if IvEditable then begin
 
-  {$REGION 'editable'}
-if IvEditable then begin
+      {$REGION 'gui searcsuggestions and modaleditor *** DUPLICATED *** already available as a standard .Page()'}
+    sbu.Add('<!-- searchsuggestions -->'                                                                                                                                           );
+    sbu.Add('<div id="CoSearchSuggestionsDiv"></div>'                                                                                                                              );
 
-    {$REGION 'gui modaleditor *** DUPLICATED *** already available as a standard in the .Page()'}
-  sbu.Add('<!-- modalmemoeditor -->'                                                                                                                                             );
-  sbu.Add('<div class="w3-modal w3-animate-opacity" %s>'                                                                                                  , [THtmRec.IdName(ena)]);
-  sbu.Add(  '<div class="w3-modal-content w3-card-4">' {w3-animate-zoom}                                                                                                         );
-//sbu.Add(    '<header class="w3-container w3-%s">'                                                                                                               , [the.BgColor]);
-  sbu.Add(    '<header class="w3-container">'                                                                                                                                    );
-//sbu.Add(      '<span class="w3-button w3-%s w3-xlarge w3-display-topright" onclick="document.getElementById(''%s'').style.display=''none''">&times;</span>', [the.BgColor, ena]);
-  sbu.Add(      '<span class="w3-button w3-xlarge w3-display-topright" onclick="document.getElementById(''%s'').style.display=''none''">&times;</span>'                   , [ena]);
-  sbu.Add(      '<h2>Field Editor</h2>'                                                                                                                                          );
-  sbu.Add(    '</header>'                                                                                                                                                        );
-  sbu.Add(    '<div class="w3-container">'                                                                                                                                       );
-//sbu.Add(      '<h1>Editing field</h1>'                                                                                                                                         );
-  sbu.Add(      '<textarea class="w3-input w3-border w3-round-large w3-margin-bottom" style="resize:none" rows="16" %s autofocus></textarea>'             , [THtmRec.IdName(xna)]);
-  sbu.Add(    '</div>'                                                                                                                                                           );
-  sbu.Add(    '<div class="w3-container w3-light-grey w3-padding">'                                                                                                              );
-  sbu.Add(      '<button class="w3-button w3-left w3-blue w3-border" onclick="document.getElementById(''%s'').value=''''">Clear</button>'                                 , [xna]);
-  sbu.Add(      '<button class="w3-button w3-right w3-green w3-border" %s>Ok</button>'                                                                    , [THtmRec.IdName(kna)]);
-  sbu.Add(      '<button class="w3-button w3-right w3-white w3-border w3-margin-right" %s>Cancel</button>'                                                , [THtmRec.IdName(cbn)]);
-  sbu.Add(    '</div>'                                                                                                                                                           );
-  sbu.Add(  '</div>'                                                                                                                                                             );
-  sbu.Add('</div>'                                                                                                                                                               );
-    {$ENDREGION}
+    sbu.Add('<!-- modalmemoeditor -->'                                                                                                                                             );
+    sbu.Add('<div class="w3-modal w3-animate-opacity" %s>'                                                                                                  , [THtmRec.IdName(ena)]);
+    sbu.Add(  '<div class="w3-modal-content w3-card-4">' {w3-animate-zoom}                                                                                                         );
+  //sbu.Add(    '<header class="w3-container w3-%s">'                                                                                                               , [the.BgColor]);
+    sbu.Add(    '<header class="w3-container">'                                                                                                                                    );
+  //sbu.Add(      '<span class="w3-button w3-%s w3-xlarge w3-display-topright" onclick="document.getElementById(''%s'').style.display=''none''">&times;</span>', [the.BgColor, ena]);
+    sbu.Add(      '<span class="w3-button w3-xlarge w3-display-topright" onclick="document.getElementById(''%s'').style.display=''none''">&times;</span>'                   , [ena]);
+    sbu.Add(      '<h2>Field Editor</h2>'                                                                                                                                          );
+    sbu.Add(    '</header>'                                                                                                                                                        );
+    sbu.Add(    '<div class="w3-container">'                                                                                                                                       );
+  //sbu.Add(      '<h1>Editing field</h1>'                                                                                                                                         );
+    sbu.Add(      '<textarea class="w3-input w3-border w3-round-large w3-margin-bottom" style="resize:none" rows="16" %s autofocus></textarea>'             , [THtmRec.IdName(xna)]);
+    sbu.Add(    '</div>'                                                                                                                                                           );
+    sbu.Add(    '<div class="w3-container w3-light-grey w3-padding">'                                                                                                              );
+    sbu.Add(      '<button class="w3-button w3-left w3-blue w3-border" onclick="document.getElementById(''%s'').value=''''">Clear</button>'                                 , [xna]);
+    sbu.Add(      '<button class="w3-button w3-right w3-green w3-border" %s>Ok</button>'                                                                    , [THtmRec.IdName(kna)]);
+    sbu.Add(      '<button class="w3-button w3-right w3-white w3-border w3-margin-right" %s>Cancel</button>'                                                , [THtmRec.IdName(cbn)]);
+    sbu.Add(    '</div>'                                                                                                                                                           );
+    sbu.Add(  '</div>'                                                                                                                                                             );
+    sbu.Add('</div>'                                                                                                                                                               );
+      {$ENDREGION}
 
-    {$REGION 'gui fbklocal'}
-  if USE_LOCAL_SNACKBAR then begin
-  sbu.Add('<!-- tablefeedbacksnackbar %s -->'                                                                             , [fkn]);
-  sbu.Add('<span id="%sEditFeedback"></span>'                                                                        , [IvCoName]); // *** OR ***
-  sbu.Add('<div class="w3-panel w3-padding-16 w3-card-4 w3-center w3-blue" style="display:none" %s></div>', [THtmRec.IdName(fkn)]); // *** OR ***
-  end;
-    {$ENDREGION}
+      {$REGION 'gui fbklocal'}
+    if USE_LOCAL_SNACKBAR then begin
+    sbu.Add('<!-- tablefeedbacksnackbar %s -->'                                                                             , [fkn]);
+    sbu.Add('<span id="%sEditFeedback"></span>'                                                                        , [IvCoName]); // *** OR ***
+    sbu.Add('<div class="w3-panel w3-padding-16 w3-card-4 w3-center w3-blue" style="display:none" %s></div>', [THtmRec.IdName(fkn)]); // *** OR ***
+    end;
+      {$ENDREGION}
 
-    {$REGION 'editjson'}
+      {$REGION 'editjson'}
 (*
 {
   "EditMenu": {
@@ -15452,365 +15568,504 @@ if IvEditable then begin
   , "Table"            : "DbaXxx.dbo.TblXxx"           -- ok
   , "KeyFieldList"     : ["FldObjectId", "FldLocalId"] -- to make unique the record, one or more fields, cant be empty
   , "FieldList": [                                     -- list of editable fields (should not contains the key fields))
-      {"Field": "FldLocalId" , "Ctrl": "Text"}         -- inline input text
-    , {"Field": "FldLocalPId", "Ctrl": "Text"}
-    , {"Field": "FldState"   , "Ctrl": "Text"}
-    , {"Field": "FldOwner"   , "Ctrl": "Text"}
-    , {"Field": "FldText"    , "Ctrl": "Text"}
-    , {"Field": "FldSelect1" , "Ctrl": "Select", "ItemsCsv": "*,1,2"}                                        -- inline input dropdownlist pre-loaded with items from csv
-    , {"Field": "FldSelect2" , "Ctrl": "Select", "ItemsSql": "select '*' union select '1' union select '2'"} -- inline input dropdownlist pre-loaded with items query
-    , {"Field": "FldSelect3" , "Ctrl": "Select", "ItemsGet": "/WksCodeIsapiProject.dll/Code?CoId=123"}       -- inline input dropdownlist pre-loaded with items from a API
-    , {"Field": "FldMemo"    , "Ctrl": "Editor"}                                                             -- modal text editor
-    , {"Field": "FldSql"     , "Ctrl": "Editor", "Type": "Sql"}                                              -- modal text editor with sql highlight
-  --, {"Field": "FldDate"    , "Ctrl": "Date"}                                                               -- inline date selector
-  --, {"Field": "FldTime"    , "Ctrl": "Time"}                                                               -- inline time selector
-  --, {"Field": "FldDatetime", "Ctrl": "FldDatetime"}                                                        -- inline datetime selector
-  --, {"Field": "FldBit"     , "Ctrl": "Boolean", "Type": "Checkbox"}                                        -- inline true/false input (checkbox, onoffcursor)
+      {"Field": "FldLocalId"  , "Ctrl": "Text"}         -- inline input text
+    , {"Field": "FldLocalPId" , "Ctrl": "Text"}
+    , {"Field": "FldState"    , "Ctrl": "Select", "ItemsCsv": ",Active,Inactive"}
+    , {"Field": "FldOwner"    , "Ctrl": "Search", "ApiUrl": "//..."}                                          -- expected json: [{FldItem:"...", FldDescription:"..."}, ...]
+    , {"Field": "FldText"     , "Ctrl": "Text"}
+    , {"Field": "FldSearch"   , "Ctrl": "Search", "ApiUrl": "https://..."}
+    , {"Field": "FldSelect1"  , "Ctrl": "Select", "ItemsCsv": "*,Select1,Select2,Select3"}                    -- inline dropdownlist pre-loaded with items from csv
+    , {"Field": "FldSelect2"  , "Ctrl": "Select", "ItemsJson": "[*,Select1,Select2,Select3]"}                 -- inline dropdownlist pre-loaded with items from json
+    , {"Field": "FldSelect3"  , "Ctrl": "Select", "ItemsGet": "/WksCodeIsapiProject.dll/Code?CoCodeId=135"}   -- inline dropdownlist pre-loaded with items from a API
+  --, {"Field": "FldRadios"   , "Ctrl": "Radios", "ItemsCsv": "*,Radio1,Radio2,Radio3"}                       -- inline like a select
+  --, {"Field": "FldChecks"   , "Ctrl": "Checks", "ItemsCsv": "*,Check1,Check2,Check3"}                       -- inline like a select with multiselect option
+    , {"Field": "FldDatetime" , "Ctrl": "Datetime"}                                                           -- inline datetime selector
+    , {"Field": "FldDate"     , "Ctrl": "Date"}                                                               -- inline date selector
+    , {"Field": "FldTime"     , "Ctrl": "Time"}                                                               -- inline time selector
+    , {"Field": "FldBit"      , "Ctrl": "Boolean", "Type": "Checkbox"}                                        -- inline checkbox (true/false)
+  --, {"Field": "FldBit"      , "Ctrl": "Bit"    , "Type": "Toggle"}                                          -- inline toggle (true/false)
+  --, {"Field": "FldBit"      , "Ctrl": "Bit"    , "Type": "Tristate"}                                        -- inline tritoggle (true/false/null)
+    , {"Field": "FldMemo"     , "Ctrl": "Editor"}                                                             -- modal text editor
+    , {"Field": "FldSql"      , "Ctrl": "Editor", "Type": "Sql"}                                              -- modal text editor with sql highlight
     ]
-  , "OwnerField" : "FldOwner"             -- the record will be editable only if the logged user match this field
-  , "OneWayField": "FldState"             -- a field that, upon change, will not editable anymore
+  , "OwnerField" : "FldOwner"             -- the record will be editable only if the logged user match this field, the column must to be present
+  , "OneWayField": "FldState"             -- the record is editable only if it is Active.  Once changed to Inactive the entire record will not be editable anymore
   , "OneWayList" : ["Active", "Inactive"] -- usually just two, to toggle (i.e. if the record is Active and you change it, it become inactive and not editable anymore))
   , "WhenField"  : "FldWhen"              -- FldWhen, if present, is update by default, add/set this key only if you need to update a different field
   , "WhoField"   : "FldWho"               -- FldWho, if present, is update by default, add/set this key only if you need to update a different field
   }
 }
 *)
-
-  jso := TJSONObject.Create;
-  try
+    jso := TJSONObject.Create;
     try
-      // rv&nocomments
-      ejs := grva.Rva(IvEditJson, true); // TStrRec.StrCommentRemove(IvEditJson);
+      try
+        // rv&nocomments
+        ejs := grva.Rva(IvEditJson, true); // TStrRec.StrCommentRemove(IvEditJson);
 
-      // notvalid
-      if not TJsoRec.IsValid(ejs, fbk) then
-  sbu.Add('<script>wks.fbkFail("Table not editable, please check the EditJson definition, %s");</script>', [fbk])
+        // notvalid
+        if not TJsoRec.IsValid(ejs, fbk) then
+    sbu.Add('<script>wks.fbkFail("Table not editable, please check the EditJson definition, %s");</script>', [fbk])
 
-      // valid
-      else begin
-        // parse
-        jso.Parse(BytesOf(ejs), 0);
+        // valid
+        else begin
+          // parse
+          jso.Parse(BytesOf(ejs), 0);
 
-        // edittable
-        tbl := jso.GetValue<string>('EditData.Table');                          // 'DbaXxx.dbo.TblXxx'
+          // edittable
+          tbl := jso.GetValue<string>('EditData.Table');                          // 'DbaXxx.dbo.TblXxx'
 
-        // keyfieldlist jsonarray
-        fkv := jso.GetValue<TJSONArray>('EditData.KeyFieldList');               // ["FldObjectId", "FldLocalId"]
+          // keyfieldlist jsonarray
+          fkv := jso.GetValue<TJSONArray>('EditData.KeyFieldList');               // ["FldObjectId", "FldLocalId"]
 
-        // keyfieldlist jsstring
-        fky := '[';
-        for jva in fkv do
-          fky := fky + jva.GetValue<string>.QuotedString('"') + ',';
-        fky := fky.Remove(fky.Length - 1) + ']';                                // '["FldObjectId", "FldLocalId"]'
+          // keyfieldlist jsstring
+          fky := '[';
+          for jva in fkv do
+            fky := fky + jva.GetValue<string>.QuotedString('"') + ',';
+          fky := fky.Remove(fky.Length - 1) + ']';                                // '["FldObjectId", "FldLocalId"]'
 
-        // fieldeditablelist jsonarray
-        fev := jso.GetValue<TJSONArray>('EditData.FieldList');                  // [{"Field": "FldValue1", "Ctrl": "Text"}, {"Field": "FldValue2", "Ctrl": "Select", "ItemsCsv": "0,1,2"}, ...]
-        fes := fev.ToJSON;                                                      // '[{}, {}, ...]'
-        fes := fev.ToString;
+          // fieldeditablelist jsonarray
+          fev := jso.GetValue<TJSONArray>('EditData.FieldList');                  // [{"Field": "FldValue1", "Ctrl": "Text"}, {"Field": "FldValue2", "Ctrl": "Select", "ItemsCsv": "0,1,2"}, ...]
+          fes := fev.ToJSON;                                                      // '[{}, {}, ...]'
+          fes := fev.ToString;
 
-        // ownerfield
-        owf := jso.GetValue<string>('EditData.OwnerField');                     // 'FldOwner'
+          // ownerfield
+          owf := jso.GetValue<string>('EditData.OwnerField');                     // 'FldOwner'
 
-        // onewayfield
-        oyf := jso.GetValue<string>('EditData.OneWayField');                    // 'FldState'
+          // onewayfield
+          oyf := jso.GetValue<string>('EditData.OneWayField');                    // 'FldState'
 
-        // onewaylist jsonarray
-        oyv := jso.GetValue<TJSONArray>('EditData.OneWayList');                 // ["Active", "Inactive"]
+          // onewaylist jsonarray
+          oyv := jso.GetValue<TJSONArray>('EditData.OneWayList');                 // ["Active", "Inactive"]
 
-        // onewaylist jsstring
-        oyl := '[';
-        for jva in oyv do
-          oyl := oyl + jva.GetValue<string>.QuotedString('"') + ',';
-        oyl := oyl.Remove(oyl.Length - 1) + ']';                                // '["Active", "Inactive"]'
+          // onewaylist jsstring
+          oyl := '[';
+          for jva in oyv do
+            oyl := oyl + jva.GetValue<string>.QuotedString('"') + ',';
+          oyl := oyl.Remove(oyl.Length - 1) + ']';                                // '["Active", "Inactive"]'
 
-        // whenfield
-        wef := jso.GetValue<string>('EditData.WhenField');                      // 'FldLastUpdateDatetime'
+          // whenfield
+          wef := jso.GetValue<string>('EditData.WhenField');                      // 'FldLastUpdateDatetime'
 
-        // whofield
-        wof := jso.GetValue<string>('EditData.WhoField');                       // 'FldLastUpdateBy'
+          // whofield
+          wof := jso.GetValue<string>('EditData.WhoField');                       // 'FldLastUpdateBy'
+        end;
+      except
+        on e: Exception do
+    sbu.Add('<script>wks.fbkFail("Table not editable, %s");</script>', [e.Message]);
       end;
-    except
-      on e: Exception do
-  sbu.Add('<script>wks.fbkFail("Table not editable, %s");</script>', [e.Message]);
+    finally
+    //fkv.Free; nop!
+    //oyv.Free; nop!
+      jso.Free;
     end;
-  finally
-  //fkv.Free; nop!
-  //oyv.Free; nop!
-    jso.Free;
-  end;
-    {$ENDREGION}
-
-    {$REGION 'js *** REPLACE ALL JQUERY WITH STANDARD JS  ***'}
-
-      {$REGION 'js begin'}
-  sbu.Add('<!-- tablefieldeditorscript %s -->'                                                                , [fkn]);
-  sbu.Add('<script>'                                                                                                 );
       {$ENDREGION}
 
-      {$REGION 'globalconsts'}
-  sbu.Add('var kfv = %s;'                                                                                     , [fky]); // ["FldObjectId", "FldLocalId"] keyfieldvector
-  sbu.Add('var oyf = "%s";'                                                                                   , [oyf]); // onewayfield
-  sbu.Add('var efvn= %s'                                                                                      , [fes]); // editfieldvectornested
-  sbu.Add('var efv = efvn.map(function(x){return x.Field;});'                                                        ); // editfieldvector   [] | ["FldA", "FldB"]
-      {$ENDREGION}
+      {$REGION 'js'}
 
-      {$REGION 'globalvars'}
-  sbu.Add('var $tb /*, $th*/, $td, $tr;'                                                                             ); // tableobj, thobj, tdobj, trobj
-  sbu.Add('var ci, rj, fn, cn, ov, nv;'                                                                              ); // coli, rowj, fldname, columnname, oldvalue, newvalue
-  sbu.Add('var kvv=[];'                                                                                              ); // ["aaaa", "bbbb"] keyvaluevector, corresponding to keyfieldvector, used later
-      {$ENDREGION}
+        // *** REPLACE ALL JQUERY WITH STANDARD JS  ***
 
-      {$REGION 'globalfuncs'}
-  sbu.Add('function AjaxPost(fn, ov, nv, kfv, kvv) {'                                                                );
-  sbu.Add('    if (nv.trim() == ov.trim()) {'                                                                        ); // sametooldvalue
-  sbu.Add('        $td.text(ov);'                                                                                    ); // tablecellreset
-if USE_LOCAL_SNACKBAR then begin
-  sbu.Add('        $("#%s").show();'                                                                          , [fkn]); // fbksnackbarshow
-  sbu.Add('        $("#%s").text("nothing has been changed");'                                                , [fkn]); // fbksnackbarset
-end else
-  sbu.Add('        wks.fbkInfo("nothing has been changed");'                                                         );
-  sbu.Add('    } else {'                                                                                             );
-  sbu.Add('        $("html,body").css("cursor", "progress");'                                                        ); // cursor, pure: document.body.style.cursor = 'progress';
-  sbu.Add('        var pl = {'                                                                                       ); // payloadprepare
-  sbu.Add('            tblName: "%s"'                                                                         , [tbl]); // table to update   DbaXxx.dbo.TblXxx *** REMOVE, system already know it ***
-  sbu.Add('          , fldName: fn'                                                                                  ); // field to set      FldAaa
-  sbu.Add('          , fldValue: nv'                                                                                 ); // newvalue
-  sbu.Add('          , fldKeys: kfv'                                                                                 ); // wherefields
-  sbu.Add('          , fldValues: kvv'                                                                               ); // wherevalues
-  sbu.Add('        };'                                                                                               );
-  sbu.Add('        $.ajax({'                                                                                         ); // ajaxpost
-  sbu.Add('            type: "POST"'                                                                                 ); // mode
-  sbu.Add('          , url: "/%sDbaIsapiProject.dll/Update"'                                       , [TSysRec.PREFIX]); // urlrest  // *** Wks have to be replaced by TSysRec.PREFIX --> DONE, need to do all the others! ***
-//sbu.Add('          , data: pl'                                                                                     ); // setpayload i
-  sbu.Add('          , data: JSON.stringify(pl)'                                                                     ); // setpayload ii
-  sbu.Add('          , contentType: "application/json; charset=utf-8"'                                               ); // ct
-  sbu.Add('          , dataType: "json"'                                                                             ); // dt
-  sbu.Add('          , success: function(data) {'                                                                    ); // SUCCESS
-//sbu.Add('                console.log(data);'                                                                       ); // dbg
-//sbu.Add('                console.log(data.message);'                                                               ); // logmore
-//sbu.Add('                console.log(data.feedback);'                                                              ); // logmore
-  sbu.Add('                if (data.ok) {'                                                                           );
-  sbu.Add('                    $td.text((nv == "") ? "null" : nv);'                                                  ); // tablecellset
-  sbu.Add('                    fbk = "{0}: <b>{1}</b> changed to: <b>{2}</b> in {3} ms";'                            ); // fbkprepare
-  sbu.Add('                    fbk = fbk.format(data.state.toUpperCase(), ov, (nv == "") ? "null" : nv, data.elapsedMs);'); // fbkcompile
-  sbu.Add('                } else {'                                                                                 );
-  sbu.Add('                    fbk = "{0}: <b>{1}</b>";'                                                             ); // fbkprepare
-  sbu.Add('                    fbk = fbk.format(data.state.toUpperCase(), data.message);'                            ); // fbkcompile
-  sbu.Add('                }'                                                                                        );
+        {$REGION 'js begin'}
+    sbu.Add('<!-- tablefieldeditorscript %s -->'                                                                , [fkn]);
+    sbu.Add('<script>'                                                                                                 );
+        {$ENDREGION}
+
+        {$REGION 'globalconsts'}
+    sbu.Add('var kfv = %s;'                                                                                     , [fky]); // ["FldObjectId", "FldLocalId"] keyfieldvector
+    sbu.Add('var oyf = "%s";'                                                                                   , [oyf]); // onewayfield
+    sbu.Add('var efvn= %s'                                                                                      , [fes]); // editfieldvectornested
+    sbu.Add('var efv = efvn.map(function(x){return x.Field;});'                                                        ); // editfieldvector   [] | ["FldA", "FldB"]
+        {$ENDREGION}
+
+        {$REGION 'globalvars'}
+    sbu.Add('var $tb /*, $th*/, $td, $tr;'                                                                             ); // tableobj, thobj, tdobj, trobj
+    sbu.Add('var ci, rj, fn, cn, ov, nv;'                                                                              ); // coli, rowj, fldname, columnname, oldvalue, newvalue
+    sbu.Add('var kvv=[];'                                                                                              ); // ["aaaa", "bbbb"] keyvaluevector, corresponding to keyfieldvector, used later
+        {$ENDREGION}
+
+        {$REGION 'globalfuncs'}
+    sbu.Add('function AjaxPost(fn, ov, nv, kfv, kvv) {'                                                                );
+    sbu.Add('    if ((nv == null) || (nv.trim() == ov.trim())) {'                                                                        ); // sametooldvalue
+    sbu.Add('        $td.text(ov);'                                                                                    ); // tablecellreset
   if USE_LOCAL_SNACKBAR then begin
-  sbu.Add('                $("#%s").show();'                                                                  , [fkn]); // fbksnackbarshow
-  sbu.Add('                $("#%s").html(fbk);'                                                               , [fkn]); // fbksnackbarset
+    sbu.Add('        $("#%s").show();'                                                                          , [fkn]); // fbksnackbarshow
+    sbu.Add('        $("#%s").text("nothing has been changed");'                                                , [fkn]); // fbksnackbarset
   end else
-  sbu.Add('                wks.fbkOkWarn(fbk, data.ok);'                                                             );
-  sbu.Add('            }'                                                                                            );
-  sbu.Add('          , error: function(err, ajaxOptions, thrownError) {'                                             ); // FAIL
-//sbu.Add('                console.log(err);'                                                                        ); // dbg
-//sbu.Add('                console.log(err.responseText);'                                                           ); // dbg *** BAD REQUEST ***
-  sbu.Add('                fbk = "<b>{0}</b>";'                                                                      ); // fbkprepare
-  sbu.Add('                fbk = fbk.format(err.responseText);'                                                      ); // fbkcompile
+    sbu.Add('        wks.fbkInfo("nothing has been changed");'                                                         );
+    sbu.Add('    } else {'                                                                                             );
+    sbu.Add('        $("html,body").css("cursor", "progress");'                                                        ); // cursor, pure: document.body.style.cursor = 'progress';
+    sbu.Add('        var pl = {'                                                                                       ); // payloadprepare
+    sbu.Add('            tblName: "%s"'                                                                         , [tbl]); // table to update   DbaXxx.dbo.TblXxx *** REMOVE, system already know it ***
+    sbu.Add('          , fldName: fn'                                                                                  ); // field to set      FldAaa
+    sbu.Add('          , fldValue: nv'                                                                                 ); // newvalue
+    sbu.Add('          , fldKeys: kfv'                                                                                 ); // wherefields
+    sbu.Add('          , fldValues: kvv'                                                                               ); // wherevalues
+    sbu.Add('        };'                                                                                               );
+    sbu.Add('        $.ajax({'                                                                                         ); // ajaxpost
+    sbu.Add('            type: "POST"'                                                                                 ); // mode
+    sbu.Add('          , url: "/%sDbaIsapiProject.dll/Update"'                                       , [TSysRec.PREFIX]); // urlrest  // *** Wks have to be replaced by TSysRec.PREFIX --> DONE, need to do all the others! ***
+  //sbu.Add('          , data: pl'                                                                                     ); // setpayload i
+    sbu.Add('          , data: JSON.stringify(pl)'                                                                     ); // setpayload ii
+    sbu.Add('          , contentType: "application/json; charset=utf-8"'                                               ); // ct
+    sbu.Add('          , dataType: "json"'                                                                             ); // dt
+    sbu.Add('          , success: function(data) {'                                                                    ); // SUCCESS
+  //sbu.Add('                console.log(data);'                                                                       ); // dbg
+  //sbu.Add('                console.log(data.message);'                                                               ); // logmore
+  //sbu.Add('                console.log(data.feedback);'                                                              ); // logmore
+    sbu.Add('                if (data.ok) {'                                                                           );
+    sbu.Add('                    $td.text((nv == "") ? "null" : nv);'                                                  ); // tablecellset
+    sbu.Add('                    fbk = "{0}: <b>{1}</b> changed to: <b>{2}</b> in {3} ms";'                            ); // fbkprepare
+    sbu.Add('                    fbk = fbk.format(data.state.toUpperCase(), ov, (nv == "") ? "null" : nv, data.elapsedMs);'); // fbkcompile
+    sbu.Add('                } else {'                                                                                 );
+    sbu.Add('                    fbk = "{0}: <b>{1}</b>";'                                                             ); // fbkprepare
+    sbu.Add('                    fbk = fbk.format(data.state.toUpperCase(), data.message);'                            ); // fbkcompile
+    sbu.Add('                }'                                                                                        );
+    if USE_LOCAL_SNACKBAR then begin
+    sbu.Add('                $("#%s").show();'                                                                  , [fkn]); // fbksnackbarshow
+    sbu.Add('                $("#%s").html(fbk);'                                                               , [fkn]); // fbksnackbarset
+    end else
+    sbu.Add('                wks.fbkOkWarn(fbk, data.ok);'                                                             );
+    sbu.Add('            }'                                                                                            );
+    sbu.Add('          , error: function(err, ajaxOptions, thrownError) {'                                             ); // FAIL
+  //sbu.Add('                console.log(err);'                                                                        ); // dbg
+  //sbu.Add('                console.log(err.responseText);'                                                           ); // dbg *** BAD REQUEST ***
+    sbu.Add('                fbk = "<b>{0}</b>";'                                                                      ); // fbkprepare
+    sbu.Add('                fbk = fbk.format(err.responseText);'                                                      ); // fbkcompile
+    if USE_LOCAL_SNACKBAR then begin
+    sbu.Add('                $("#%s").show();'                                                                  , [fkn]); // fbksnackbarshow
+    sbu.Add('                $("#%s").html(fbk);'                                                               , [fkn]); // snackbarset
+    end else
+    sbu.Add('                wks.fbkFail(fbk);'                                                                        );
+    sbu.Add('            }'                                                                                            );
+    sbu.Add('          , complete: function(data) {'                                                                   ); // finally
+  //sbu.Add('          , always: function(data) {'                                                                     ); // finally
+    sbu.Add('                $("html,body").css("cursor", "default");'                                                 ); // cursor, pure: document.body.style.cursor = 'default';
+    sbu.Add('            }'                                                                                            );
+    sbu.Add('        })'                                                                                               );
+    sbu.Add('    }'                                                                                                    );
+    sbu.Add('}'                                                                                                        );
+        {$ENDREGION}
+
+        {$REGION 'ON DBLCLICK'}
+    sbu.Add('$("#%s tr td").dblclick(function(tgt) {'                                                           , [tna]); // tblclick
+
+    // exit
+  //sbu.Add('    if (!(tgt.shiftKey||tgt.ctrlKey||tgt.altKey))'                                                        ); // ctrl was not held down during the click in the tbl
+  //sbu.Add('    if (!window.event.ctrlKey)'                                                                           ); // alt
+  //sbu.Add('        return;'                                                                                          );
+
+    // reset fbklocal
+    if USE_LOCAL_SNACKBAR then begin
+    sbu.Add('    $("#%s").html("");'                                                                            , [fkn]); // fbksnackbarreset
+    sbu.Add('    $("#%s").hide();'                                                                              , [fkn]); // fbksnackbarhide
+    end;
+
+    // cellobjects
+    sbu.Add('    $tb=$(tgt.target).closest("table");'                                                                  ); // TABLE                table
+  //sbu.Add('    $th=$(tgt.target).closest("tr th");'                                                                  ); // HEADER               tr           *** not needed ***
+    sbu.Add('    $tr=$(tgt.target).closest("tr");'                                                                     ); // ROW                  tr
+    sbu.Add('    $td=$(tgt.target).closest("td");'                                                                     ); // CELL                 td
+  //sbu.Add('    $tr=$td.closest("tr");'                                                                               ); // ROW                  tr
+
+    // col-i, row-j
+    sbu.Add('    ci=$td.index();'                                                                                      ); // COL[i]               0, 1, ...
+    sbu.Add('    rj=$tr.index();'                                                                                      ); // ROW[j]               0, 1, ...    *** not needed ***
+
+    // fldname & columnname
+    sbu.Add('    fn = $td.closest("table").find("th").eq($td.index()).attr("title");'                                  ); // COL[i]FLDNAME        FldAaa
+    sbu.Add('    cn = $tb[0].rows[0].cells[ci].innerText;'                                                             ); // COLNAME              Aaa          *** not needed ***
+
+    // field is not editable -> exit
+    sbu.Add('    if (efv.indexOf(fn) < 0) {'                                                                           );
+    sbu.Add('      alert("WARNING:   " + cn + "   column is not editable!\n\nEditable columns are:\n- " + efv.toString().replace(/Fld/g, "").replace(/,/g, "\n- "));');
+    sbu.Add('      return;'                                                                                            );
+    sbu.Add('    }'                                                                                                    );
+
+    // field is the onewayfield -> warning the user that might -> exit
+    sbu.Add('    if (oyf == fn) {'                                                                                     );
+    sbu.Add('        var go = confirm("WARNING:   "+fn+"   is a one-way field!\n\nIf you continue and change it the entire record will be no longer editable!");');
+    sbu.Add('        if (!go) {'                                                                                       );
   if USE_LOCAL_SNACKBAR then begin
-  sbu.Add('                $("#%s").show();'                                                                  , [fkn]); // fbksnackbarshow
-  sbu.Add('                $("#%s").html(fbk);'                                                               , [fkn]); // snackbarset
+    sbu.Add('            $("#%s").show();'                                                                      , [fkn]); // fbksnackbarlocalshow
+    sbu.Add('            $("#%s").text("user cancelled the action");'                                           , [fkn]); // fbksnackbarlocalset
   end else
-  sbu.Add('                wks.fbkFail(fbk);'                                                                        );
-  sbu.Add('            }'                                                                                            );
-  sbu.Add('          , complete: function(data) {'                                                                   ); // finally
-//sbu.Add('          , always: function(data) {'                                                                     ); // finally
-  sbu.Add('                $("html,body").css("cursor", "default");'                                                 ); // cursor, pure: document.body.style.cursor = 'default';
-  sbu.Add('            }'                                                                                            );
-  sbu.Add('        })'                                                                                               );
-  sbu.Add('    }'                                                                                                    );
-  sbu.Add('}'                                                                                                        );
-      {$ENDREGION}
-
-      {$REGION 'ON DBLCLICK'}
-  sbu.Add('$("#%s tr td").dblclick(function(tgt) {'                                                           , [tna]); // tblclick
-
-  // exit
-//sbu.Add('    if (!(tgt.shiftKey||tgt.ctrlKey||tgt.altKey))'                                                        ); // ctrl was not held down during the click in the tbl
-//sbu.Add('    if (!window.event.ctrlKey)'                                                                           ); // alt
-//sbu.Add('        return;'                                                                                          );
-
-  // reset fbklocal
-  if USE_LOCAL_SNACKBAR then begin
-  sbu.Add('    $("#%s").html("");'                                                                            , [fkn]); // fbksnackbarreset
-  sbu.Add('    $("#%s").hide();'                                                                              , [fkn]); // fbksnackbarhide
-  end;
-
-  // cellobjects
-  sbu.Add('    $tb=$(tgt.target).closest("table");'                                                                  ); // TABLE                table
-//sbu.Add('    $th=$(tgt.target).closest("tr th");'                                                                  ); // HEADER               tr           *** not needed ***
-  sbu.Add('    $tr=$(tgt.target).closest("tr");'                                                                     ); // ROW                  tr
-  sbu.Add('    $td=$(tgt.target).closest("td");'                                                                     ); // CELL                 td
-//sbu.Add('    $tr=$td.closest("tr");'                                                                               ); // ROW                  tr
-
-  // col-i, row-j
-  sbu.Add('    ci=$td.index();'                                                                                      ); // COL[i]               0, 1, ...
-  sbu.Add('    rj=$tr.index();'                                                                                      ); // ROW[j]               0, 1, ...    *** not needed ***
-
-  // fldname & columnname
-  sbu.Add('    fn = $td.closest("table").find("th").eq($td.index()).attr("title");'                                  ); // COL[i]FLDNAME        FldAaa
-  sbu.Add('    cn = $tb[0].rows[0].cells[ci].innerText;'                                                             ); // COLNAME              Aaa          *** not needed ***
-
-  // field is not editable -> exit
-  sbu.Add('    if (efv.indexOf(fn) < 0) {'                                                                           );
-  sbu.Add('      alert("WARNING:   " + cn + "   column is not editable!\n\nEditable columns are:\n— " + efv.toString().replace(/Fld/g, "").replace(/,/g, "\n— "));');
-  sbu.Add('      return;'                                                                                            );
-  sbu.Add('    }'                                                                                                    );
-
-  // field is the onewayfield -> warning the user that might -> exit
-  sbu.Add('    if (oyf == fn) {'                                                                                     );
-  sbu.Add('        var go = confirm("WARNING:   "+fn+"   is a one-way field!\n\nIf you continue and change it the entire record will be no longer editable!");');
-  sbu.Add('        if (!go) {'                                                                                       );
-if USE_LOCAL_SNACKBAR then begin
-  sbu.Add('            $("#%s").show();'                                                                      , [fkn]); // fbksnackbarlocalshow
-  sbu.Add('            $("#%s").text("user cancelled the action");'                                           , [fkn]); // fbksnackbarlocalset
-end else
-  sbu.Add('            wks.fbkInfo("user cancelled the action");'                                                    ); // fbksnackbarglobalset (will close autonomously)
-  sbu.Add('            return;'                                                                                      );
-  sbu.Add('        };'                                                                                               );
-  sbu.Add('    };'                                                                                                   );
+    sbu.Add('            wks.fbkInfo("user cancelled the action");'                                                    ); // fbksnackbarglobalset (will close autonomously)
+    sbu.Add('            return;'                                                                                      );
+    sbu.Add('        };'                                                                                               );
+    sbu.Add('    };'                                                                                                   );
                     
-  // row-j key-values
-  sbu.Add('    kvv = [];'                                                                                            ); // ["aaaa", "bbbb"] keyvaluevector, corresponding to keyfieldvector, used later
-  sbu.Add('    for (i = 0; i < kfv.length; i++) {'                                                                   );
-//sbu.Add('        kvv.push($tr.find("td").eq(i).text());'                                                           );
-  sbu.Add('        var ii = $td.closest("table").find("th#Co"+kfv[i]).index();'                                      ); // col-i index              0, 1, ...
-  sbu.Add('        if (ii == -1) {'                                                                                  );
-  sbu.Add('            alert("Unable to find key field " + kfv[i] + " please check your JsonEdit.EditIni");'         );
-  sbu.Add('            return;'                                                                                      );
-  sbu.Add('        };'                                                                                               );
-  sbu.Add('        var kft = $tr.find("td").eq(ii).text();'                                                          ); // cell key text            1234
-  sbu.Add('        kvv.push(kft);'                                                                                   ); // keyvaluevector           ["1234", "Abcd"]
-  sbu.Add('    };'                                                                                                   );
+    // row-j key-values
+    sbu.Add('    kvv = [];'                                                                                            ); // ["aaaa", "bbbb"] keyvaluevector, corresponding to keyfieldvector, used later
+    sbu.Add('    for (i = 0; i < kfv.length; i++) {'                                                                   );
+  //sbu.Add('        kvv.push($tr.find("td").eq(i).text());'                                                           );
+    sbu.Add('        var ii = $td.closest("table").find("th#Co"+kfv[i]).index();'                                      ); // col-i index              0, 1, ...
+    sbu.Add('        if (ii == -1) {'                                                                                  );
+    sbu.Add('            alert("Unable to find key field " + kfv[i] + " please check your JsonEdit.EditIni");'         );
+    sbu.Add('            return;'                                                                                      );
+    sbu.Add('        };'                                                                                               );
+    sbu.Add('        var kft = $tr.find("td").eq(ii).text();'                                                          ); // cell key text            1234
+    sbu.Add('        kvv.push(kft);'                                                                                   ); // keyvaluevector           ["1234", "Abcd"]
+    sbu.Add('    };'                                                                                                   );
 
-  // current field jsonspec, ctrltype, etc.
-  sbu.Add('    var fldj = efvn.filter(function(x){return x.Field == fn})[0];'                                        ); // current field json spec  {"Field": "FldAaa", "Ctrl": "Select", "ItemCsv": "1,2,3", ...}
-  sbu.Add('    var ctr = fldj.Ctrl;'                                                                                 ); // ctrltype                 Select
-  // celloldvalue(text or html)
-  sbu.Add('    ov = $td[0].innerText;'                                                                               ); // CELLTEXT i               Aaa
-//sbu.Add('    ov = $td.text();'                                                                                     ); // CELLTEXT ii
-//sbu.Add('    ov = $td[0].innerHTML;'                                                                               ); // CELLHTML i
-//sbu.Add('    ov = $td.html();'                                                                                     ); // CELLHTML ii
+    // current field jsonspec, ctrltype, etc.
+    sbu.Add('    var fldj = efvn.filter(function(x){return x.Field == fn})[0];'                                        ); // current field json spec  {"Field": "FldAaa", "Ctrl": "Select", "ItemCsv": "1,2,3", ...}
+    sbu.Add('    var ctr = fldj.Ctrl;'                                                                                 ); // ctrltype                 Select
+    // celloldvalue(text or html)
+    sbu.Add('    ov = $td[0].innerText;'                                                                               ); // CELLTEXT i               Aaa
+  //sbu.Add('    ov = $td.text();'                                                                                     ); // CELLTEXT ii
+  //sbu.Add('    ov = $td[0].innerHTML;'                                                                               ); // CELLHTML i
+  //sbu.Add('    ov = $td.html();'                                                                                     ); // CELLHTML ii
 
-  // guessnewvalueusingoldvalue
-  sbu.Add('    var gv = ov;'                                                                                         ); // guessedvaluenew
-  sbu.Add('    if ("Active" == ov) {gv = "Inactive"} else if ("Inactive" == ov) {gv = "Active"};'                    );
-  sbu.Add('    if ("True"   == ov) {gv = "False"   } else if ("False"    == ov) {gv = "True"  };'                    );
+    // guess new value using old value
+    sbu.Add('    var gv = ov;'                                                                                         ); // guessedvaluenew
+    sbu.Add('    if ("Active" == ov) {gv = "Inactive"} else if ("Inactive" == ov) {gv = "Active"};'                    );
+    sbu.Add('    if ("True"   == ov) {gv = "False"   } else if ("False"    == ov) {gv = "True"  };'                    );
 
-  // tempgui text ctrl
-  sbu.Add('           if (ctr == "Text") {'                                                                          );
-  sbu.Add('        var gui = ''<input type="text" class="w3-input w3-small w3-round" id="%s" style="padding:4px" />'';', [ina]);
-  sbu.Add('        $(this).html(gui);'                                                                               ); // inject temp gui ctrl and
-  sbu.Add('        var xx = $(this).children().first();'                                                             ); // refer to it
-  sbu.Add('        xx.val(gv).change();'                                                                             ); // if ctrl loses focus without any change in the content, the event is not triggered, to trigger the event manually, apply .change()
-  sbu.Add('        xx.attr("size", gv.length+4);'                                                                    );
-  sbu.Add('        xx.focus();'                                                                                      );
-  sbu.Add('        xx.select();'                                                                                     );
-//sbu.Add('        xx.keypress(function(ky) {'                                                                       ); // enter key press
-//sbu.Add('            if (ky.which == 13) {'                                                                        );
-//sbu.Add('                nv = xx.val();'                                                                           );
-//sbu.Add('                AjaxPost(fn, ov, nv, kfv, kvv);'                                                          );
-//sbu.Add('                xx.blur();'                                                                               );
-//sbu.Add('            }'                                                                                            );
-//sbu.Add('        })'                                                                                               );
-  sbu.Add('        xx.on(''keyup blur'', function(e){'                                                               ); // esc|enterkey|blur - xx.on() has event delegation, xx.blur() does not
-  sbu.Add('            if (e.keyCode == ''27'') {'                                                                   );
-  sbu.Add('                xx.parent().text(ov);'                                                                    ); // reset
-  sbu.Add('            } else if (e.keyCode == ''13'') {'                                                            );
-  sbu.Add('                xx.blur();'                                                                               );
-  sbu.Add('            } else if (e.type == ''blur'') {'                                                             );
-  sbu.Add('                nv = xx.val();'                                                                           );
-  sbu.Add('                AjaxPost(fn, ov, nv, kfv, kvv);'                                                          );
-  sbu.Add('            }'                                                                                            );
-  sbu.Add('        })'                                                                                               );
+    // gui text ctrl create
+    sbu.Add('           if (ctr == "Text") {'                                                                          );
+    sbu.Add('        var gui = ''<input type="text" class="w3-input w3-small w3-round" id="%s" style="padding:4px" />'';', [ina]);
+    sbu.Add('        $(this).html(gui);'                                                                               ); // inject temp gui ctrl and
+    sbu.Add('        var xx = $(this).children().first();'                                                             ); // refer to it
+    sbu.Add('        xx.val(gv).change();'                                                                             ); // if ctrl loses focus without any change in the content, the event is not triggered, to trigger the event manually, apply .change()
+    sbu.Add('        xx.attr("size", gv.length+4);'                                                                    ); // *** use style width ***
+    sbu.Add('        xx.focus();'                                                                                      ); // focus it
+    sbu.Add('        xx.select();'                                                                                     ); // select content in it
+  //sbu.Add('        xx.keypress(function(ky) {'                                                                       ); // enter key press
+  //sbu.Add('            if (ky.which == 13) {'                                                                        );
+  //sbu.Add('                nv = xx.val();'                                                                           );
+  //sbu.Add('                AjaxPost(fn, ov, nv, kfv, kvv);'                                                          );
+  //sbu.Add('                xx.blur();'                                                                               );
+  //sbu.Add('            }'                                                                                            );
+  //sbu.Add('        })'                                                                                               );
+    sbu.Add('        xx.on(''keyup blur'', function(e){'                                                               ); // esc|enterkey|blur - xx.on() has event delegation, xx.blur() does not
+    sbu.Add('            if (e.keyCode == ''27'') {'                                                                   );
+    sbu.Add('                xx.parent().text(ov);'                                                                    ); // reset
+    sbu.Add('            } else if (e.keyCode == ''13'') {'                                                            );
+    sbu.Add('                xx.blur();'                                                                               );
+    sbu.Add('            } else if (e.type == ''blur'') {'                                                             );
+    sbu.Add('                nv = xx.val();'                                                                           );
+    sbu.Add('                AjaxPost(fn, ov, nv, kfv, kvv);'                                                          );
+    sbu.Add('            }'                                                                                            );
+    sbu.Add('        })'                                                                                               );
 
-  // tempgui select ctrl
-  sbu.Add('    } else if (ctr == "Select") {'                                                                        );
-  sbu.Add('        alert("Select ctrl not implemented");'                                                            );
-(*sbu.Add('        var gui = ''<select class="w3-select" id="%s"><option value="Select11">Option 1</option><option value="Select12">Option 2</option><option value="Select31">Option 3</option></select>'';'                                , [ina]);
-  sbu.Add('        $(this).html(gui);'                                                                               );
-  sbu.Add('        var xx = $(this).children().first();'                                                             );
-  sbu.Add('        xx.val(gv).change();'                                                                             );
-  sbu.Add('        xx.focus();'                                                                                      );
-//sbu.Add('        xx.select();'                                                                                     );
-//sbu.Add('        xx.on(''select2:close'','); // this works for select2 but will complicate the code to much!
-  sbu.Add('        xx.on(''keyup blur'', function(e){'                                                               );
-  sbu.Add('            if (e.keyCode == ''27'') {'                                                                   );
-  sbu.Add('                xx.parent().text(ov);'                                                                    );
-  sbu.Add('            } else if (e.keyCode == ''13'') {'                                                            );
-  sbu.Add('                xx.blur();'                                                                               );
-  sbu.Add('            } else if (e.type == ''blur'') {'                                                             );
-  sbu.Add('                nv = xx.val();'                                                                           );
-  sbu.Add('                AjaxPost(fn, ov, nv, kfv, kvv);'                                                          );
-  sbu.Add('            }'                                                                                            );
-  sbu.Add('        })'                                                                                               );
-*)
-  sbu.Add('    } else if (ctr == "Date") {'                                                                          );
-  sbu.Add('        alert("Date ctrl not implemented");'                                                              );
-//sbu.Add('        var gui = ''<input type="text" class="form-control input-sm" id="%s" data-provide="datepicker" />'';', [ina]);
+    // gui search+suggestions ctrl create
+    sbu.Add('    } else if (ctr == "Search") {'                                                                        );
+  //sbu.Add('        // gui'                                                                                           );
+    sbu.Add('        const sugg = document.getElementById("CoSearchSuggestionsDiv");'                                  );
+    sbu.Add('        var box = ''<input type="text" class="w3-input w3-small w3-round" id="%s" style="padding:4px" />'';', [ina]);
+    sbu.Add('        $(this).html(box);'                                                                               );
+    sbu.Add('        var xx = $(this).children().first();'                                                             );
+    sbu.Add('        xx.val(gv).change();'                                                                             );
+    sbu.Add('        xx[0].style.width = "240px";'                                                                     );
+    sbu.Add('        xx.focus();'                                                                                      );
+    sbu.Add('        xx.select();'                                                                                     );
+    sbu.Add('        xx.on(''keyup'', function(e){'                                                               ); // esc|enterkey|blur - xx.on() has event delegation, xx.blur() does not
+    sbu.Add('            if (e.keyCode == ''27'') {'                                                                   );
+    sbu.Add('                xx.parent().text(ov);'                                                                    );
+    sbu.Add('                sugg.innerHTML = "";'                                                                     );
+    sbu.Add('                sugg.style.display = "none";'                                                             );
+  //sbu.Add('            } else if (e.keyCode == ''13'') {'                                                            );
+  //sbu.Add('                xx.blur();'                                                                               );
+  //sbu.Add('            } else if (e.type == ''blur'') {'                                                             );
+  //sbu.Add('                nv = xx.val();'                                                                           );
+  //sbu.Add('                AjaxPost(fn, ov, nv, kfv, kvv);'                                                          );
+    sbu.Add('            }'                                                                                            );
+    sbu.Add('        })'                                                                                               );
+  //sbu.Add('        // apiurl'                                                                                        );
+  //sbu.Add('        const API_URL = "https://www.wks.cloud/WksCodeIsapiProject.dll/Code?CoCodeId=132&CoLike=";'       );
+    sbu.Add('        const API_URL = fldj.ApiUrl;'                                                                     );
+  //sbu.Add('        // callserverafter3chars'                                                                         );
+    sbu.Add('        xx[0].addEventListener("input", async () => {'                                                    );
+  //sbu.Add('             // suggestiondivposition'                                                                    );
+    sbu.Add('             const rect = xx[0].getBoundingClientRect();'                                                 );
+    sbu.Add('             sugg.style.left = rect.left + "px";'                                                         );
+    sbu.Add('             sugg.style.top = (rect.bottom + window.scrollY) + "px";'                                     );
+  //sbu.Add('             // go'                                                                                       );
+    sbu.Add('             const text = xx[0].value.trim();'                                                            );
+    sbu.Add('             if (text.length < 3) {'                                                                      );
+    sbu.Add('                 sugg.style.display = "none";'                                                            );
+    sbu.Add('                 return;'                                                                                 );
+    sbu.Add('             }'                                                                                           );
+  //sbu.Add('             searchSuggestionsPosition();'                                                                );
+    sbu.Add('             try {'                                                                                       );
+    sbu.Add('                 const response = await fetch(API_URL + encodeURIComponent(text));'                       );
+    sbu.Add('                 const json = await response.json();'                                                     ); // expected json: [{FldItem:"...", FldDescription:"..."}, ...]
+    sbu.Add('                 // build the suggestion list'                                                            );
+    sbu.Add('                 sugg.innerHTML = "";'                                                                    );
+  //sbu.Add('                 // --- header row ---'                                                                   );
+    sbu.Add('                 const header = document.createElement("div");'                                           );
+    sbu.Add('                 header.className = "w3-row CoSearchSuggestionsDiv-row";'                                 );
+    sbu.Add('                 header.id = "CoSearchSuggestionsDiv-header";'                                            );
+    sbu.Add('                 header.innerHTML = `'                                                                    );
+    sbu.Add('                     <div class="w3-third">Item</div>'                                                    );
+    sbu.Add('                     <div class="w3-third">Description</div>'                                             );
+    sbu.Add('                 `;'                                                                                      );
+    sbu.Add('                 sugg.appendChild(header);'                                                               );
+  //sbu.Add('                 // --- null row ---'                                                                     );
+    sbu.Add('                 const nullr = document.createElement("div");'                                            );
+    sbu.Add('                 nullr.className = "w3-row CoSearchSuggestionsDiv-row";'                                  );
+    sbu.Add('                 nullr.innerHTML = `'                                                                     );
+    sbu.Add('                     <div class="w3-third">null</div>'                                                    );
+    sbu.Add('                     <div class="w3-third">empty value</div>'                                             );
+    sbu.Add('                 `;'                                                                                      );
+  //sbu.Add('                 // when clicking a row fill the input with null'                                         );
+    sbu.Add('                 nullr.addEventListener("click", () => {'                                                 );
+    sbu.Add('                     xx[0].value = "null";'                                                               );
+    sbu.Add('                     sugg.innerHTML = "";'                                                                );
+    sbu.Add('                     sugg.style.display = "none";'                                                        ); // maybe create and delete here the div
+    sbu.Add('                     nv = xx.val();'                                                                      );
+    sbu.Add('                     AjaxPost(fn, ov, nv, kfv, kvv);'                                                     );
+    sbu.Add('                 });'                                                                                     );
+    sbu.Add('                 sugg.appendChild(nullr);'                                                                );
+  //sbu.Add('                 // --- data rows ---'                                                                    );
+    sbu.Add('                 json.forEach(row => {'                                                                   );
+    sbu.Add('                     const r = document.createElement("div");'                                            );
+    sbu.Add('                     r.className = "w3-row CoSearchSuggestionsDiv-row";'                                  );
+    sbu.Add('                     r.innerHTML = `'                                                                     );
+    sbu.Add('                         <div class="w3-third">${row.FldItem}</div>'                                      );
+    sbu.Add('                         <div class="w3-third">${row.FldDescription}</div>'                               );
+    sbu.Add('                     `;'                                                                                  );
+  //sbu.Add('                     // when clicking a row fill the input with FldItem'                                  );
+    sbu.Add('                     r.addEventListener("click", () => {'                                                 );
+    sbu.Add('                         xx[0].value = row.FldItem;'                                                      );
+    sbu.Add('                         sugg.innerHTML = "";'                                                            );
+    sbu.Add('                         sugg.style.display = "none";'                                                    ); // maybe create and delete here the div
+    sbu.Add('                         nv = xx.val();'                                                                  );
+    sbu.Add('                         AjaxPost(fn, ov, nv, kfv, kvv);'                                                 );
+    sbu.Add('                     });'                                                                                 );
+    sbu.Add('                     sugg.appendChild(r);'                                                                );
+    sbu.Add('                 });'                                                                                     );
+    sbu.Add('                 sugg.style.display = json.length > 0 ? "block" : "none";'                                );
+    sbu.Add('             } catch (e) {'                                                                               );
+    sbu.Add('                 console.error("Error fetching suggestions", e);'                                         );
+    sbu.Add('                 sugg.style.display = "none";'                                                            );
+    sbu.Add('             }'                                                                                           );
+    sbu.Add('        });'                                                                                              );
+    sbu.Add('        // hide suggestions if clicking outside'                                                          );
+    sbu.Add('        document.addEventListener("click", (e) => {'                                                      );
+    sbu.Add('            if (!sugg.contains(e.target) && e.target !== xx[0]) {'                                        );
+    sbu.Add('                xx.parent().text(ov);'                                                                    );
+    sbu.Add('                sugg.innerHTML = "";'                                                                     );
+    sbu.Add('                sugg.style.display = "none";'                                                             );
+    sbu.Add('            }'                                                                                            );
+    sbu.Add('        });'                                                                                              );
 
-  sbu.Add('    } else if (ctr == "Time") {'                                                                          );
-  sbu.Add('        alert("Time ctrl not implemented");'                                                              );
-//sbu.Add('        var gui = ''<input type="text" class="form-control input-sm" id="%s" />'';'                , [ina]);
+    // gui select ctrl create
+    sbu.Add('    } else if (ctr == "Select") {'                                                                        );
+  //sbu.Add('        alert("Select ctrl not implemented");'                                                            );
+    sbu.Add('        var gui = ''<select class="w3-select" id="%s" style="width:auto;"></select>'';'            , [ina]); // <option value="Select11">Option 1</option><option value="Select12">Option 2</option><option value="Select31">Option 3</option>
+    sbu.Add('        $(this).html(gui);'                                                                               );
+    sbu.Add('        var xx = $(this).children().first();'                                                             );
+    sbu.Add('        var uqr=[];');
+    sbu.Add('        $td.closest("table").find("th").each(function(i){uqr.push($(this).attr("id").replace("CoFld", "Co") + "=" + $tr.find("td").eq(i).text());})');
+    sbu.Add('        var ocu = fldj.ItemsCsv;'                                                                         );
+    sbu.Add('        var oju = fldj.ItemsJson ? fldj.ItemsJson+"&"+uqr.join("&") : fldj.ItemsJson;'                    );
+  //sbu.Add('        var oqu = fldj.ItemsSql;'                                                                         ); // no sense, use itemget and there use csv, json or sqlselect
+    sbu.Add('        var ogu = fldj.ItemsGet;'                                                                         );
+  //sbu.Add('        document.body.style.cursor = "progress";'                                                         ); // does not work, moved in the ajax call
+  //sbu.Add('        $("html,body").css("cursor", "progress");'                                                        );
+    sbu.Add('        selectLoadAjx(xx, ov, ocu, oju, ogu);'                                                            );
+    sbu.Add('        xx.val(gv).change();'                                                                             );
+    sbu.Add('        xx.focus();'                                                                                      );
+  //sbu.Add('        document.body.style.cursor = "default";'                                                          );
+  //sbu.Add('        $("html,body").css("cursor", "default");'                                                         );
+  //sbu.Add('        xx.select();'                                                                                     );
+  //sbu.Add('        xx.on(''select2:close'','); // this works for select2 but will complicate the code to much!
+    sbu.Add('        xx.on(''keyup blur'', function(e){'                                                               );
+    sbu.Add('            if (e.keyCode == ''27'') {'                                                                   );
+    sbu.Add('                xx.parent().text(ov);'                                                                    );
+    sbu.Add('            } else if (e.keyCode == ''13'') {'                                                            );
+    sbu.Add('                xx.blur();'                                                                               );
+    sbu.Add('            } else if (e.type == ''blur'') {'                                                             );
+    sbu.Add('                nv = xx.val();'                                                                           );
+    sbu.Add('                AjaxPost(fn, ov, nv, kfv, kvv);'                                                          );
+    sbu.Add('            }'                                                                                            );
+    sbu.Add('        })'                                                                                               );
 
-  sbu.Add('    } else if (ctr == "DateTime") {'                                                                      );
-  sbu.Add('        alert("DateTime ctrl not implemented");'                                                          );
-//sbu.Add('        var gui = ''<input type="text" class="form-control input-sm" id="%s" />'';'                , [ina]);
+    // gui date ctrl create
+    sbu.Add('    } else if (ctr == "Date") {'                                                                          );
+    sbu.Add('        const [mm, dd, yyyy] = ov.split("/");'                                                            ); // ov format is mm/dd/yyyy
+    sbu.Add('        const ov2 = `${yyyy}-${mm}-${dd}`;'                                                               ); // ov2 format is yyyy-mm-dd suitable for the date ctrl
+    sbu.Add('        var gui = ''<input type="date" class="w3-input" id="%s" value = "'' + ov2 + ''" />'';'     , [ina]);
+    sbu.Add('        $(this).html(gui);'                                                                               );
+    sbu.Add('        var xx = $(this).children().first();'                                                             );
+  //sbu.Add('        xx.value = ov;'                                                                                   );
+  //sbu.Add('        xx.defaultValue = "1960-07-19";'                                                                  );
+  //sbu.Add('        xx.val(gv).change();'                                                                             );
+    sbu.Add('        xx.focus();'                                                                                      );
+    sbu.Add('        xx.on(''keyup blur'', function(e){'                                                               );
+    sbu.Add('            if (e.keyCode == ''27'') {'                                                                   );
+    sbu.Add('                xx.parent().text(ov);'                                                                    );
+    sbu.Add('            } else if (e.keyCode == ''13'') {'                                                            );
+    sbu.Add('                xx.blur();'                                                                               );
+    sbu.Add('            } else if (e.type == ''blur'') {'                                                             );
+    sbu.Add('                nv = xx.val();'                                                                           );
+    sbu.Add('                const [yyyy, mm, dd] = nv.split("-");'                                                    ); // nv format is yyyy-mm-dd
+    sbu.Add('                const nv2 = `${mm}/${dd}/${yyyy}`;'                                                       ); // nv2 format is mm/dd/yyyy
+    sbu.Add('                AjaxPost(fn, ov, nv2, kfv, kvv);'                                                         );
+    sbu.Add('            }'                                                                                            );
+    sbu.Add('        })'                                                                                               );
+    sbu.Add('    } else if (ctr == "Time") {'                                                                          );
+    sbu.Add('        alert("Time ctrl not implemented");'                                                              );
+  //sbu.Add('        var gui = ''<input type="text" class="form-control input-sm" id="%s" />'';'                , [ina]);
 
-  // tempgui editormodal ctrl
-  sbu.Add('    } else if (ctr == "Editor") {'                                                                        );
-//sbu.Add('        var gui = ''<input type="text" class="form-control input-sm" id="%s">'';'                  , [ina]); // altern
-  sbu.Add('        $("#%s").val((gv == "null") ? "" : gv);'                                                   , [xna]); // textarea set with gessed value
-  sbu.Add('        $("#%s").show();'                                                                          , [ena]); // modal editor show
-//sbu.Add('        $("#%s").focus();'                                                                         , [ena]); // modal editor focus *** not working ***
-  // editormodal cancel button click
-  sbu.Add('        $("#%s").click(function() {'                                                               , [cbn]); // cancelbtnclick
-if USE_LOCAL_SNACKBAR then begin
-  sbu.Add('            $("#%s").show();'                                                                      , [fkn]); // fbksnackbarlocalshow
-  sbu.Add('            $("#%s").text("nothing has been changed");'                                            , [fkn]); // fbksnackbarlocalset
-end else
-  sbu.Add('            wks.fbkInfo("nothing has been changed");'                                                     ); // fbksnackbarglobalset (will close autonomously)
-  sbu.Add('            $("#%s").hide();'                                                                      , [ena]); // modaleditorhide
-  sbu.Add('        });'                                                                                              );
-  // editormodal ok button click
-  sbu.Add('        $("#%s").click(function() {'                                                               , [kna]); // okbtnclick
-  sbu.Add('            nv = $("#%s").val();'                                                                  , [xna]); // newvalueget
-  sbu.Add('            $("#%s").hide();'                                                                      , [ena]); // modaleditorhide
-  sbu.Add('            AjaxPost(fn, ov, nv, kfv, kvv);'                                                              );
-  sbu.Add('        });'                                                                                              );
+    // gui datetime ctrl create
+    sbu.Add('    } else if (ctr == "DateTime") {'                                                                      );
+    sbu.Add('        alert("DateTime ctrl not implemented");'                                                          );
+  //sbu.Add('        var gui = ''<input type="text" class="form-control input-sm" id="%s" />'';'                , [ina]);
 
-  // tempgui prompt panel (default)
-  sbu.Add('    } else {'                                                                                             );
-  sbu.Add('        var nv = prompt("New Value", gv);'                                                                );
-  sbu.Add('        if (nv === null) {'                                                                               );
-  sbu.Add('            wks.fbkInfo("nothing has been changed");'                                                     );
-  sbu.Add('            return;'                                                                                      );
-  sbu.Add('        } else {'                                                                                         );
-  sbu.Add('            AjaxPost(fn, ov, nv, kfv, kvv);'                                                              );
-  sbu.Add('        }'                                                                                                );
-  sbu.Add('    }'                                                                                                    );
-  sbu.Add('});'                                                                                                      );
+    // gui textareamodal ctrl create
+    sbu.Add('    } else if (ctr == "Editor") {'                                                                        );
+  //sbu.Add('        var gui = ''<input type="text" class="form-control input-sm" id="%s">'';'                  , [ina]); // altern
+    sbu.Add('        $("#%s").val((gv == "null") ? "" : gv);'                                                   , [xna]); // textarea set with gessed value
+    sbu.Add('        $("#%s").show();'                                                                          , [ena]); // modal editor show
+  //sbu.Add('        $("#%s").focus();'                                                                         , [ena]); // modal editor focus *** not working ***
+    // cancel button click
+    sbu.Add('        $("#%s").click(function() {'                                                               , [cbn]); // cancelbtnclick
+  if USE_LOCAL_SNACKBAR then begin
+    sbu.Add('            $("#%s").show();'                                                                      , [fkn]); // fbksnackbarlocalshow
+    sbu.Add('            $("#%s").text("nothing has been changed");'                                            , [fkn]); // fbksnackbarlocalset
+  end else
+    sbu.Add('            wks.fbkInfo("nothing has been changed");'                                                     ); // fbksnackbarglobalset (will close autonomously)
+    sbu.Add('            $("#%s").hide();'                                                                      , [ena]); // modaleditorhide
+    sbu.Add('        });'                                                                                              );
+    // ok button click
+    sbu.Add('        $("#%s").click(function() {'                                                               , [kna]); // okbtnclick
+    sbu.Add('            nv = $("#%s").val();'                                                                  , [xna]); // newvalueget
+    sbu.Add('            $("#%s").hide();'                                                                      , [ena]); // modaleditorhide
+    sbu.Add('            AjaxPost(fn, ov, nv, kfv, kvv);'                                                              );
+    sbu.Add('        });'                                                                                              );
+
+    // gui prompt panel (default)
+    sbu.Add('    } else {'                                                                                             );
+    sbu.Add('        var nv = prompt("New Value", gv);'                                                                );
+    sbu.Add('        if (nv === null) {'                                                                               );
+    sbu.Add('            wks.fbkInfo("nothing has been changed");'                                                     );
+    sbu.Add('            return;'                                                                                      );
+    sbu.Add('        } else {'                                                                                         );
+    sbu.Add('            AjaxPost(fn, ov, nv, kfv, kvv);'                                                              );
+    sbu.Add('        }'                                                                                                );
+    sbu.Add('    }'                                                                                                    );
+    sbu.Add('});'                                                                                                      );
+        {$ENDREGION}
+
+        {$REGION 'js end'}
+    sbu.Add('</script>'                                                                                                );
+        {$ENDREGION}
+
       {$ENDREGION}
 
-      {$REGION 'js end'}
-  sbu.Add('</script>'                                                                                                );
-      {$ENDREGION}
-
+  end;
     {$ENDREGION}
 
-end;
-  {$ENDREGION}
+    {$REGION 'end'}
+    Result := sbu.Text;
+    {$ENDREGION}
 
-  {$REGION 'end'}
-  Result := sbu.Text;
-  {$ENDREGION}
-
-except
-  on e: Exception do begin
-    Result := THtmRec.AlertW('Warning', e.message);
+  except
+    on e: Exception do begin
+      Result := THtmRec.AlertW('Warning', e.message);
+    end;
   end;
-end;
 end;
 
 class function  THtmRec.TableFromSql(IvCtxId: integer; IvSql, IvConnStr, IvConnLib, IvHtmlDefault, IvCoName, IvClass, IvStyle: string; IvEditable: boolean; IvEditJson: string; IvDir: THvDirEnum; IvDsRecordCountOff, IvDsHeaderOff: boolean): string;
@@ -15844,176 +16099,150 @@ var
 //fm1: TFDMemTable;        // memtable
   {$ENDREGION}
 
-  {$REGION 'help'}
-(*
-
-  Dataset0                                                            <-- 1 select (can have multiple selects)
-  """"""""
-
-     2 row(s)                                                         <-- 1st subselect   \
-     --------------------------------------------------------------                        |
-    |  Aaa  |     Bbb     | Ccc |   Ddd   |   Eee   |     Fff      |                       |
-    |==============================================================|                       |__1st table/recordset
-    |  111  | bbbb        | ccc | ddddddd | eeee    | fffff        |                       |
-    |--------------------------------------------------------------|                       |
-    |  222  | bbb         | ccc | ddddddd | eeee    | fffff        |                       |
-     --------------------------------------------------------------                       /
-
-     1 row(s)                                                         <-- 2nd subselect   \
-     --------------------------------------------------------------                        |
-    |  Ggg  |      Hhh     |                  Iii                  |                       |__2nd table/recordset
-    |==============================================================|                       |
-    |  333  | hhhh         | iiii                                  |                       |
-     --------------------------------------------------------------                       /
-
-    ...
-*)
-  {$ENDREGION}
-
 begin
-try
-  // init
-  sql := grva.Rva(IvSql);
+  try
+    // init
+    sql := grva.Rva(IvSql);
 
-  // *** REDUCE THE FOLLOWING CONSIDERING TDbaRec.DsFromSql2 A*S*A*P ***
+    // *** REDUCE THE FOLLOWING CONSIDERING TDbaRec.DstFromSql   or ... REMOVE TableFromSql and use only TableFromDst !!!     A*S*A*P ***
 
-  {$REGION 'FD'}
-  if SameText(IvConnLib, 'FD') then begin
+    {$REGION 'FD'}
+    if SameText(IvConnLib, 'FD') then begin
 
-    gpro.TimerByName['TableFromSql.TFDQuery'].Start;
-  // CoInitialize(nil);
+      gpro.TimerByName['TableFromSql.TFDQuery'].Start;
+    // CoInitialize(nil);
 
-    // connstrresolve
-    if IsNumeric(IvConnStr) then begin
-      if not TDbaRec.ScalarStr('select FldConnStrFD from DbaSystem.dbo.TblSource where FldId = ' + IvConnStr, cst, '', fbk) then begin
-        Result := AlertI('Datasource', 'Unable to resolve the FD connection string from the source id');
-        Exit;
-      end;
-    end else
-      cst := IvConnStr;
+      // connstrresolve
+      if IsNumeric(IvConnStr) then begin
+        if not TDbaRec.ScalarStr('select FldConnStrFD from DbaSystem.dbo.TblSource where FldId = ' + IvConnStr, cst, '', fbk) then begin
+          Result := AlertI('Datasource', 'Unable to resolve the FD connection string from the source id');
+          Exit;
+        end;
+      end else
+        cst := IvConnStr;
 
-    // fdconn
-    fco := TFDConnection.Create(nil);
-  //fco.ConnectionString := cst;
-    fco.Params.Text := cst;
+      // fdconn
+      fco := TFDConnection.Create(nil);
+    //fco.ConnectionString := cst;
+      fco.Params.Text := cst;
 
-    // fdquery
-    fqy := TFDQuery.Create(nil);
-  //fqy.FetchOptions.Mode              := fmAll;                    // fmOnDemand
-    fqy.FetchOptions.RowsetSize        := {IvMaxRecords} 10000;     // limit
-  //fqy.FetchOptions.CursorKind        := ckForwardOnly;            // fast forward-only, read-only options
-  //fqy.FetchOptions.Unidirectional    := true;                     //
-    fqy.ResourceOptions.CmdExecTimeout := {IvTimeoutSec} 10 * 1000; // milliseconds !
-    fqy.FetchOptions.AutoClose         := false;                    // necessary to have multiple subrecordset
-    fqy.Connection                     := fco;                      // conn pooled?
-    fqy.SQL.Text                       := sql;                      // multiple queries-ds: 'select * from Tbl1; select * from Tbl2';
-  //fqy.Prepared                       := true;
+      // fdquery
+      fqy := TFDQuery.Create(nil);
+    //fqy.FetchOptions.Mode              := fmAll;                    // fmOnDemand
+      fqy.FetchOptions.RowsetSize        := {IvMaxRecords} 10000;     // limit
+    //fqy.FetchOptions.CursorKind        := ckForwardOnly;            // fast forward-only, read-only options
+    //fqy.FetchOptions.Unidirectional    := true;                     //
+      fqy.ResourceOptions.CmdExecTimeout := {IvTimeoutSec} 10 * 1000; // milliseconds !
+      fqy.FetchOptions.AutoClose         := false;                    // necessary to have multiple subrecordset
+      fqy.Connection                     := fco;                      // conn pooled?
+      fqy.SQL.Text                       := sql;                      // multiple queries-ds: 'select * from Tbl1; select * from Tbl2';
+    //fqy.Prepared                       := true;
 
-    // do
-    try
-      fqy.Open;
-      fqy.FetchAll; // execute all the queries-ds at once
+      // do
+      try
+        fqy.Open;
+        fqy.FetchAll; // execute all the queries-ds at once
 
-      // recordset(s)
-      rix := -1;
-      if fqy.IsEmpty then begin
-        Inc(rix);
-        Result := Result + AlertI('Dataset' + IvCtxId.ToString + ' Recordset' + rix.ToString, 'No data')
-      end else begin
-        while not fqy.IsEmpty do begin
+        // recordset(s)
+        rix := -1;
+        if fqy.IsEmpty then begin
           Inc(rix);
-          con := TNamRec.Co('TableDataset' + IvCtxId.ToString + ' Recordset' + rix.ToString);
-          tcp := Format('Recordset %d.%d', [IvCtxId + 1, rix + 1]);
+          Result := Result + AlertI('Dataset' + IvCtxId.ToString + ' Recordset' + rix.ToString, 'No data')
+        end else begin
+          while not fqy.IsEmpty do begin
+            Inc(rix);
+            con := TNamRec.Co('TableDataset' + IvCtxId.ToString + ' Recordset' + rix.ToString);
+            tcp := Format('Recordset %d.%d', [IvCtxId + 1, rix + 1]);
 
-//        Result := Result + HTableDs(fqy, dsv[i].EditInfoRec, tc, cn, dsv[i].&Class, dsv[i].Style, 3, dsv[i].Switch, dsw.List);
+  //        Result := Result + HTableDs(fqy, dsv[i].EditInfoRec, tc, cn, dsv[i].&Class, dsv[i].Style, 3, dsv[i].Switch, dsw.List);
+
+            // dsttotable
+            Result := Result
+                    + ifthen(rix = 0, '', TABLES_SEPARATOR)
+                  //+ Format('<div>Resultset #%d</div>', [i])
+                    + TableFromDs(rix.ToString, fqy, IvHtmlDefault, IvCoName, IvClass, IvStyle, IvEditable, IvEditJson, IvDir, IvDsRecordCountOff, IvDsHeaderOff);
+
+            // chartonlyfor1strs   *** move to TableFromDs ***
+          //if rix = 0 then
+            //charts_add(i, fqy, rer, dsv[i].ChartRecVector);
+
+            // next
+            fqy.NextRecordSet;
+          end;
+        end;
+      finally
+        fqy.Free; // AndNil?
+        fco.Free; // AndNil?
+      //CoUninitialize;
+      end;
+      gpro.TimerByName['TableFromSql.TFDQuery'].Stop;
+    {$ENDREGION}
+
+    {$REGION 'ADO'}
+    end else begin
+
+      gpro.TimerByName['TableFromSql.TADOQuery'].Start;
+
+      // connstrresolve
+      if IvConnStr.Trim.IsEmpty then
+        cst := TDbaRec.DBA_CONN_STR
+      else if IsNumeric(IvConnStr) then begin
+        if not TDbaRec.ScalarStr('select FldConnStrADO from DbaSystem.dbo.TblSource where FldId = ' + IvConnStr, cst, '', fbk) then begin
+          Result := AlertI('Datasource', 'Unable to resolve the ADO connection string from the source id');
+          Exit;
+        end;
+      end else
+        cst := IvConnStr;
+
+      aqy := TADOQuery.Create(nil);
+      dst := TADODataSet.Create(nil);
+      try
+        // init
+        aqy.ConnectionString := cst;
+        aqy.SQL.Text := sql;
+
+        // executes then move to the first recordset
+        aqy.Open;
+
+        // dstfirst
+        dst.Recordset := aqy.Recordset;
+
+        // rstloop
+        rix := -1;
+        Result := '';
+        repeat
+          Inc(rix);
+
+          // dstscan
+        //while not dst.eof do begin
+          //for i := 0 to dst.Fields.Count - 1 do
+              //FieldValue := dst.Fields[I].Value; // or dst.Fields['Field'].Value
+          //dst.MoveNext;
+        //end;
 
           // dsttotable
           Result := Result
                   + ifthen(rix = 0, '', TABLES_SEPARATOR)
-                //+ Format('<div>Resultset #%d</div>', [i])
-                  + TableFromDs(rix.ToString, fqy, IvHtmlDefault, IvCoName, IvClass, IvStyle, IvEditable, IvEditJson, IvDir, IvDsRecordCountOff, IvDsHeaderOff);
+                //+ Format('<div>Resutlset #%d</div>', [i])
+                  + TableFromDs(rix.ToString, dst, IvHtmlDefault, IvCoName, IvClass, IvStyle, IvEditable, IvEditJson, IvDir, IvDsRecordCountOff, IvDsHeaderOff);
 
-          // chartonlyfor1strs
-        //if rix = 0 then
-          //charts_add(i, fqy, rer, dsv[i].ChartRecVector);
-
-          // next
-          fqy.NextRecordSet;
-        end;
+          // dstnext
+          dst.Recordset := aqy.NextRecordset(aff);
+        until not Assigned(dst.Recordset);
+      finally
+        dst.Free;
+        aqy.Free;
       end;
-    finally
-      fqy.Free; // AndNil?
-      fco.Free; // AndNil?
-    //CoUninitialize;
+      gpro.TimerByName['TableFromSql.TADOQuery'].Stop;
     end;
-    gpro.TimerByName['TableFromSql.TFDQuery'].Stop;
-  {$ENDREGION}
+    {$ENDREGION}
 
-  {$REGION 'ADO'}
-  end else begin
-
-    gpro.TimerByName['TableFromSql.TADOQuery'].Start;
-
-    // connstrresolve
-    if IvConnStr.Trim.IsEmpty then
-      cst := TDbaRec.DBA_CONN_STR
-    else if IsNumeric(IvConnStr) then begin
-      if not TDbaRec.ScalarStr('select FldConnStrADO from DbaSystem.dbo.TblSource where FldId = ' + IvConnStr, cst, '', fbk) then begin
-        Result := AlertI('Datasource', 'Unable to resolve the ADO connection string from the source id');
-        Exit;
-      end;
-    end else
-      cst := IvConnStr;
-
-    aqy := TADOQuery.Create(nil);
-    dst := TADODataSet.Create(nil);
-    try
-      // init
-      aqy.ConnectionString := cst;
-      aqy.SQL.Text := sql;
-
-      // executes then move to the first recordset
-      aqy.Open;
-
-      // dstfirst
-      dst.Recordset := aqy.Recordset;
-
-      // rstloop
-      rix := -1;
-      Result := '';
-      repeat
-        Inc(rix);
-
-        // dstscan
-      //while not dst.eof do begin
-        //for i := 0 to dst.Fields.Count - 1 do
-            //FieldValue := dst.Fields[I].Value; // or dst.Fields['Field'].Value
-        //dst.MoveNext;
-      //end;
-
-        // dsttotable
-        Result := Result
-                + ifthen(rix = 0, '', TABLES_SEPARATOR)
-              //+ Format('<div>Resutlset #%d</div>', [i])
-                + TableFromDs(rix.ToString, dst, IvHtmlDefault, IvCoName, IvClass, IvStyle, IvEditable, IvEditJson, IvDir, IvDsRecordCountOff, IvDsHeaderOff);
-
-        // dstnext
-        dst.Recordset := aqy.NextRecordset(aff);
-      until not Assigned(dst.Recordset);
-    finally
-      dst.Free;
-      aqy.Free;
+  except
+    on e: Exception do begin
+      glog.Log('TableFromSql', e, sql);
+      Result := THtmRec.AlertW('Warning', e.message);
     end;
-    gpro.TimerByName['TableFromSql.TADOQuery'].Stop;
   end;
-  {$ENDREGION}
-
-except
-  on e: Exception do begin
-    glog.Log('TableFromSql', e, sql);
-    Result := THtmRec.AlertW('Warning', e.message);
-  end;
-end;
 end;
 
 class function  THtmRec.RepeatFromDs(IvDs: TDataSet; IvHtmlBody, IvHtmlHeader, IvHtmlFooter, IvHtmlDefault: string): string;
@@ -16061,7 +16290,7 @@ var
   ok: boolean;
   dst: TDataset;
 begin
-  ok := TDbaRec.DsFromSql(IvSql, dst, false);
+  ok := TDbaRec.DsFromSql(IvSql, dst, false); // *** use the general version DstFromSql ! ***
   if not ok then
     Result := Modal(true, 'CoRepeatFromSqlModal', Code(IvSql, 'sql'), H(2, 'Unable to creater a repeater from sql'))
   else try
@@ -16075,90 +16304,65 @@ class function  THtmRec.Report(IvId: integer; IvHtmlDefaultIfAnyDsIsEmpty: strin
 
   {$REGION 'help'}
   {
-                                        n       key
-  -------------------------------------------------------------------------------
-  TReportRec                            1       ReportId
+                                        n  key
+  -------------------------------------------------------------------------
+  TReportRec                            1  ReportId
     |
-    |_TParamRecVector                   n       ReportId, Param
+    |_TParamRecVector                   n  ReportId, Param
     |
-    |_TDataSetRecVector                 n       ReportId, Dataset
+    |_TDataSetRecVector                 n  ReportId, Dataset
         |
-        |_TChartRecVector               n       ReportId, Dataset, Chart
+        |_TChartRecVector               n  ReportId, Dataset, Chart
             |
-            |_TChartSerieRecVector      n       ReportId, Dataset, Chart, Serie
+            |_TChartSerieRecVector      n  ReportId, Dataset, Chart, Serie
                 |
-                |_TChartPointRecVector  n       no-key, builded via sql or json
+                |_TChartPointRecVector  n  no-key, builded via sql or json
 
 
-   ----------------------------------------------------------------------------
-  |                                 topnavbar                                  |
-  |----------------------------------------------------------------------------|
-  |                                                                            |
-  |  Report Title (123) [h1]                                            ^      | ReportTitleOn, ReportPanelOn, ReportPanelClosed
-  |  ----------------------------------------------------------------------    |
-  |    Params (--> Filters) [h2]                                        ^      | ParamsOff, ParamsTitleOn, ParamsPanelOn, ParamsPanelClosed
-  |    --------------------------------------------------------------------    |
-  |                    _________                                               |
-  |     DateTimeStart [_________] [...]                                        |
-  |     DateTimeEnd   [_________] [...]                                        |
-  |     Top           [10_______] [...]                                        |
-  |     OrderBy       [1_desc___] [...]                                        |
-  |     Export        [Csv______] [...]                                        |
-  |                                                                            |
-  |                                  _________                                 |
-  |                                 [ Refresh ]                                |
-  |                                  ¯¯¯¯¯¯¯¯¯                                 |
-  |    Dataset.1 [h2]                                                   ^      | DatasetTitleOn, DatasetPanelOn, DatasetPanelClosed
-  |    --------------------------------------------------------------------    |
-  |      Charts [h3]                                                    ^      | ChartTitleOn, ChartPanelOn, ChartPanelClosed
-  |      ------------------------------------------------------------------    |
-  |       ································································     | <-- the chart grid is 12x12 max [0..b]x[0..b] to match the BS grid system
-  |       · Y|                      C0(00)·                        C1(01)·     |
-  |       ·  |        * * *               ·                              ·     |
-  |       ·  |      *      * * *          ·                              ·     |
-  |       ·  |    *  .--.       * * S0    ·                              ·     | <-- row 0 has two cols, cols in a row are indipendent, BS allows that
-  |       ·  |  ----'    \_________ S1    ·                              ·     |
-  |       ·  |__________________________  ·                              ·     |
-  |       ·                            X  ·                              ·     |
-  |       ································································     |
-  |       ·              C3(10)·              C2(11)·              C4(12)·     | <-- each chart has a row-col index that target the right cell
-  |       ·                    ·                    ·                    ·     |
-  |       ·                    ·                    ·                    ·     |
-  |       ·                    ·                    ·                    ·     | <-- row 1 has three cols
-  |       ·                    ·                    ·                    ·     |
-  |       ·                    ·                    ·                    ·     |
-  |       ·                    ·                    ·                    ·     |
-  |       ································································     |
-  |       Recordset.1.1 [h3]                                           ^       |
-  |      ------------------------------------------------------------------    |
-  |        --------------------------------------------------------------      |
-  |       |  Aaaa  |     Bbbb     | Cc |   Dddd  |   Eee   |    Fffff    |     |
-  |       |--------------------------------------------------------------|     |
-  |       |  111   | aaaa         | aa | ddddddd | eeee    | fffff       |     |
-  |       |--------------------------------------------------------------|     |
-  |       |  222   | aaaa         | aa | ddddddd | eeee    | fffff       |     |
-  |       |--------------------------------------------------------------|     |
-  |       |  333   | aaaa         | aa | ddddddd | eeee    | fffff       |     |
-  |        --------------------------------------------------------------      |
-  |                                                                            |
-  |       Recordset.1.2 [h3]                                           ^       |
-  |      ------------------------------------------------------------------    |
-  |        --------------------------------------------------------------      |
-  |       |  Gggg  |     Hhhh     | Ii |   Jjjj  |   Lll   |    Mmmmm    |     |
-  |       |--------------------------------------------------------------|     |
-  |       |  111   | hhhh         | ii | jjjjjjj | llll    | mmmmm       |     |
-  |       |--------------------------------------------------------------|     |
-  |       |  222   | hhhh         | ii | jjjjjjj | llll    | mmmmm       |     |
-  |        --------------------------------------------------------------      |
-  |                                                                            |
-  |    Dataset.2  [h2]                                                  ^      |
-  |    --------------------------------------------------------------------    |
-  |       Charts  [h3]                                                  v      |
-  |      ------------------------------------------------------------------    |
-  |       Recordset.2.1  [h3]                                           v      |
-  |      ------------------------------------------------------------------    |
-  |                                                                            |
-   ----------------------------------------------------------------------------
+   ---------------------------------------------------------------------------
+  |                                 topnavbar                                 |
+  |---------------------------------------------------------------------------|
+  |                                                                           |
+  |    Report Title (123) [h1]                                                | ReportTitleOn, ReportPanelOn, ReportPanelClosed
+  |    -------------------------------------------------------------------    |
+  |                                                                           |
+  |    Params [h2]                                                            | ParamsOff, ParamsTitleOn, ParamsPanelOn, ParamsPanelClosed   (Params--> Filters)
+  |    -------------------------------------------------------------------    |
+  |                   __________                                              |
+  |    DateTimeStart [_________] [...]                                        |
+  |    DateTimeEnd   [_________] [...]                                        |
+  |    Top           [10_______] [...]                                        |
+  |    OrderBy       [1_desc___] [...]                                        |
+  |    Export        [Csv______] [...]                                        |
+  |                                                                           |
+  |                                  _________                                |
+  |                                 [ Refresh ]                               |
+  |                                  ¯¯¯¯¯¯¯¯¯                                |
+  |    Dataset 1 [h2]                                                         |
+  |    · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·    |
+  |    ·                                                                 ·    |
+  |    ·                             chart(s)                            ·    |
+  |    ·                                                                 ·    |
+  |    ·                           subrecordset                          ·    |
+  |    ·                                                                 ·    |
+  |    ·                           subrecordset                          ·    |
+  |    ·                                                                 ·    |
+  |    · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·    |
+  |                                                                           |
+  |    Dataset 2  [h2]                                                        |
+  |    · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·    |
+  |    ·                                                                 ·    |
+  |    ·                             chart(s)                            ·    |
+  |    ·                                                                 ·    |
+  |    ·                           subrecordset                          ·    |
+  |    ·                                                                 ·    |
+  |    ·                           subrecordset                          ·    |
+  |    ·                                                                 ·    |
+  |    · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·    |
+  |                                                                           |
+  |    [...]                                                                  |
+  |                                                                           |
+   ---------------------------------------------------------------------------
   }
   {$ENDREGION}
 
@@ -16166,7 +16370,7 @@ class function  THtmRec.Report(IvId: integer; IvHtmlDefaultIfAnyDsIsEmpty: strin
 var
   // common
 //okk: boolean;
-  con, ctr, sql, fbk: string;   // coname
+  con, pro, ctr, sql, fbk: string;   // coname, profilername
 
   // report
   rid: integer;                 // id
@@ -16211,9 +16415,10 @@ var
   pvv: TArray<string>;          // values in case a raram is a serie of checkboxes [x] [x] [ ] and more thatn one value has been selected
 
   // options (select,checkbox,radio)
-  ocv: TArray<string>;          // csv ->vec
-  ojv: TArray<string>;          // json->vec
-  oqv: TArray<string>;          // sql ->vec
+  ocv: TArray<string>;          // csv -> vec
+  ojv: TArray<string>;          // json-> vec
+  oqd: TDataset;                // sql -> dst
+  oqv: TArray<string>;          // sql -> vec
   oav: TArray<string>;          // total caption
   ovv: TArray<string>;          // total value
 
@@ -16222,7 +16427,7 @@ var
   dsb: TSbuRec;                 // strbuilder
   dve: TReportDataSetRecVector; // vec
   dsh: string;                  // singlehtml
-  dah: string;                  // allhtml
+  dds: TDataset;                // dataset
   ddi: THvDirEnum;              // mode
   dcs: string;                  // connstr
   dcl: string;                  // connlib
@@ -16232,7 +16437,6 @@ var
   csb: TSbuRec;                 // strbuilder
   cve: TChartRecVector;         // vec
   csh: string;                  // singlehtml
-  cah: string;                  // allhtml
 
   // export
   exp: boolean;                 // export (evauate once)
@@ -16271,12 +16475,13 @@ begin
   end;
   {$ENDREGION}
 
-  {$REGION 'querystringoverrides'}
+  {$REGION 'paramsoff'}
   pof := gwrq.FieldGet('CoParamsOff', false);
   {$ENDREGION}
 
   {$REGION 'report'}
-  gpro.TimerByName['Report.Select'].Start;
+  pro := 'Report.Select';
+  gpro.TimerByName[pro].Start;
 
   rid := IvId;
   rer.Obj.Id := rid;
@@ -16291,11 +16496,12 @@ begin
     Exit;
   end;
 
-  gpro.TimerByName['Report.Select'].Stop;
+  gpro.TimerByName[pro].Stop;
   {$ENDREGION}
 
   {$REGION 'params'}
-  gpro.TimerByName['Report.Params'].Start;
+  pro := 'Report.Params';
+  gpro.TimerByName[pro].Start;
 
   pve := rer.ParamRecVector; // *** should use directly a form ***
   exp := false;              // reset
@@ -16338,12 +16544,29 @@ begin
    {//ToMember      }
    {  Value         }
 
-      //
-      ocv := TCsvRec.CsvToVec(poc); // TVecRec.VecFromStr(poc);
-      ojv := [];
-      oqv := [];
+      // options values csv
+      if poc.Trim.IsEmpty then
+        ocv := []
+      else
+        ocv := TCsvRec.CsvToVec(poc); // TVecRec.VecFromStr(poc);
 
-      // options values *** json and sql not implemented ***
+      // options values json
+      if poj.Trim.IsEmpty then
+        ojv := []
+      else
+        ojv := []; // *** not implemented ***
+
+      // options values sql
+      if poq.Trim.IsEmpty then
+        oqv := []
+      else begin
+        if TDbaRec.DstFromSql(poq, oqd, plb, pcs) then
+          oqv := TDbaRec.VecFromDst(oqd);
+        if Assigned(oqd) then
+          oqd.Free;
+      end;
+
+      // options values total
       ovv := ocv + ojv + oqv;
 
       // option captions *** same as value, json and sql not implemented ***
@@ -16351,6 +16574,7 @@ begin
 
       // value
       pva := gwrq.FieldGet(con, pve[i].Default); // can return: Aaa | "Aaa Bbb" | "Aaa,Bbb" | "Aaa, Bbb"
+      pva := grva.Rva(pva);
 
       // transform(limitcontrol)
       if SameText(con, 'CoTop') then begin
@@ -16362,9 +16586,6 @@ begin
         // inspectorrun and get result (detectscriptinglang py/js)
         // replace pva with result
       end;
-
-      // rv
-    //pva := grva.Rva(pva);
 
       // value(s)
       if not TStrRec.StrIsQuoted(pva) then
@@ -16419,33 +16640,70 @@ begin
   if not rer.ParamsOff then
     rsb.Add(pah);
 
-  gpro.TimerByName['Report.Params'].Stop;
+  gpro.TimerByName[pro].Stop;
   {$ENDREGION}
 
   {$REGION 'datasets'}
+  dsb.Clr;
   dve := rer.DatasetRecVector;
-  if Length(dve) <= 0 then
-    dah := Format('<p>%s</p>', ['No Datasets'])
+  // nodataset(s)
+  if Length(dve) <= 0 then begin
+    dsb.Add('<p>%s</p>', ['No Datasets']);
 
-  else begin
-    // datasets
-    dsb.Clr;
-  //j := 0;
-    dsh := '';
+  // dataset(s) = chart(s) + table
+  end else begin
     for j := Low(dve) to High(dve) do begin
 
-      {$REGION 'dataset'}
-      gpro.TimerByName['Report.Dataset'+dve[j].Dataset].Start;
-
-      // mode
-      ddi :=  TEnuRec.EnumFromStr<THvDirEnum>('hv'+dve[j].Mode, hvHorizontal); // Horiz, Vert
-
-      // sql
-      sql := params_replace(dve[j].Select, pve);
-
+      {$REGION 'common'}
       // connstr
       dcs := dve[j].ConnStr;
       dcl := dve[j].ConnLib;
+
+      // sql
+      sql := params_replace(dve[j].Select, pve);
+      {$ENDREGION}
+
+      {$REGION 'chart(s)'} // *** MOVE TO TableFromDs, see TableFromDs where also there is a macro to inject charts in each sub-recordset ***
+      if Length(dve[j].ChartRecVector) > 0 then begin
+        pro := Format('Report.%s.Chart', [dve[j].Dataset]);
+        gpro.TimerByName[pro].Start;
+
+        // ds
+        TDbaRec.DstFromSql(sql, dds, dcl, dcs);
+
+        csb.Clr;
+        cve := dve[j].ChartRecVector;
+        for k := Low(cve) to High(cve) do begin
+          // label
+          csh := ''; // Format('<div style="width:100%% height:100px border:1ps solid red">Chart %d%d</div>', [j, k]);
+
+          // chart
+          cve[k].PointsSetFromDs(dds);
+          csh := csh + cve[k].ToCanvasJs;
+
+          // collapse
+          if cve[j].TitleOn then
+            csh := Collapse(giif.NxD(cve[j].Title, cve[j].Dataset) + ' Chart', cve[j].Description, '', csh, 4, '', 'Left', cve[j].PanelOn, cve[j].PanelClosed);
+
+          csb.Add(csh);
+        end;
+
+        // free
+        dds.Free;
+
+        // addcharts
+        dsb.Add(csb.Text);
+
+        gpro.TimerByName[pro].Stop;
+      end;
+      {$ENDREGION}
+
+      {$REGION 'table'}
+      pro := Format('Report.%s.Table', [dve[j].Dataset]);
+      gpro.TimerByName[pro].Start;
+
+      // mode
+      ddi :=  TEnuRec.EnumFromStr<THvDirEnum>('hv'+dve[j].Mode, hvHorizontal); // Horiz, Vert
 
       // table
       dsh := TableFromSql(j, sql, dcs, dcl, dve[j].FeedbackIfEmpty, 'Co'+dve[j].Dataset, dve[j].&Class, dve[j].Style, dve[j].Editable, dve[j].Json, ddi, rer.DsRecordCountOff, rer.DsHeaderOff);
@@ -16468,59 +16726,31 @@ begin
       if dve[j].TitleOn then
         dsh := Collapse(giif.NxD(dve[j].Title, dve[j].Dataset), dve[j].Description, '', dsh, 3, '', 'Left', dve[j].PanelOn, dve[j].PanelClosed);
 
+      // addtable
       dsb.Add(dsh);
 
-      gpro.TimerByName['Report.Dataset'+dve[j].Dataset].Stop;
-      {$ENDREGION}
-
-      {$REGION 'chart(s)'}
-
-      // *** see TableFromDs where also there is a macro to inject charts in each sub-recordset ***
-
-      gpro.TimerByName['Report.Chart'+dve[j].Dataset].Start;
-
-      cve := dve[j].ChartRecVector;
-      csb.Clr;
-      if Length(cve) <= 0 then
-        cah := Format('<p>%s</p>', ['No Charts'])
-      else begin
-        for k := Low(cve) to High(cve) do begin
-          // chart
-          csh := Format('<div style="width:100% height:100px border:1ps solid red">Chart %d%d</div>', [j, k]);
-
-          // collapse
-          if cve[j].TitleOn then
-            csh := Collapse(giif.NxD(cve[j].Title, cve[j].Dataset), cve[j].Description, '', csh, 3, '', 'Left', cve[j].PanelOn, cve[j].PanelClosed);
-
-          csb.Add(csh);
-        end;
-        cah := csb.Text;
-      end;
-
-      csb.Add(cah);
-
-      gpro.TimerByName['Report.Chart'+dve[j].Dataset].Stop;
+      gpro.TimerByName[pro].Stop;
       {$ENDREGION}
 
       {$REGION 'export(s)'}
       if exp then begin
-        TDbaRec.DsFromSql2(dcl, dcs, sql, eds);
+        pro := Format('Report.%s.Export', [dve[j].Dataset]);
+        gpro.TimerByName[pro].Start;
+        TDbaRec.DstFromSql(sql, eds, dcl, dcs);
         TDstRec.DstToCsv(eds, etx, false, false, true);
         exx.AppendLine(Format('============== dataset %d', [j])) // add here the real csv from ds
         // .AppendLine('Fld1,Fld2,Fld3')
         // .AppendLine('1111,2222,3333')
            .Append(etx);
+        gpro.TimerByName[pro].Stop;
       end;
       {$ENDREGION}
 
     end;
-
-    // datasetshtml
-    dah := dsb.Text;
   end;
 
-  // reporthtmlblockadd
-  rsb.Add(dah);
+  // reportdatasetshtmladd
+  rsb.Add(dsb.Text);
   {$ENDREGION}
 
   {$REGION 'help->obj.content'}
@@ -16700,10 +16930,12 @@ begin
   ok := TDbaRec.DsFromSql(IvSql, dst, false);
   if not ok then
     Result := Modal(true, 'CoSlidesFromSqlModal', Code(IvSql, 'sql'), H(2, 'Unable to creater a slide show from sql'))
-  else try
-    Result := SlidesFromDs(dst, IvHtmlSlideBody, IvHtmlHeader, IvHtmlFooter, IvHtmlDefault, IvSlideId);
-  finally
-    dst.Free;
+  else begin
+    try
+      Result := SlidesFromDs(dst, IvHtmlSlideBody, IvHtmlHeader, IvHtmlFooter, IvHtmlDefault, IvSlideId);
+    finally
+      dst.Free;
+    end;
   end;
 end;
 
@@ -17110,7 +17342,7 @@ var
   dst: TDataset;
 //mkd: TMarkdownProcessor; // not used
   roi: integer; ror, rok, rot, wpt: string; // refobj id, rev, kind, title, webpagetitle
-  oid: integer; tit, cls, sty, sql, www: string; // page oid, title, class, style
+  oid: integer; tit, cls, sty, con, sql, www: string; // page oid, title, class, style, content
  // pcl, pst: string;
   {$ENDREGION}
 
@@ -17244,7 +17476,7 @@ begin
   sbu.Add('<!-- js -->'                                                                                                      ); // js
 //sbu.Add('<!--script src="https://unpkg.com/htmx.org"></script-->'                                                          ); // htmx
   sbu.Add('<script src="%s/Include/J/jquery/3.7.1/jquery-3.7.1.min.js"></script>'                                     , [www]); // jquery *** ELIMINATE, REPLACE WITH STANDARD JS ***
-//sbu.Add('<script src="%s/Include/C/canvasjs/1.9.6/canvasjs.min.js"></script>'                                       , [www]); // graph (nowatermark)
+  sbu.Add('<script src="%s/Include/C/canvasjs/chart/%s/canvasjs.min.js"></script>'                          , [www, '3.14.6']); // 1.9.6(nowatermark)
   sbu.Add('<script src="%s/Include/H/highlightjs/11.11.1/highlight.min.js"></script>'                                 , [www]); // highlight
   sbu.Add('<script>hljs.highlightAll();</script>'                                                                            ); // highlight
 
@@ -17258,14 +17490,14 @@ case TSysRec.CSS_FRAMEWORK of                                                   
   end;
   wfPicoCss : begin
   sbu.Add('<!-- picocss -->'                                                                                                 ); // pico
-  sbu.Add('<link rel="stylesheet" href="/Include/pico/2.0.6/css/pico.pumpkin.css">'                                          ); // pico theme
-  sbu.Add('<link rel="stylesheet" href="/Include/pico/2.0.6/css/pico.colors.css">'                                           ); // pico colors
+  sbu.Add('<link rel="stylesheet" href="/Include/P/pico/%s/css/pico.pumpkin.css">'                                , ['2.1.1']); // pico theme
+  sbu.Add('<link rel="stylesheet" href="/Include/P/pico/%s/css/pico.colors.css">'                                 , ['2.1.1']); // pico colors
   end;
 end;
 
   sbu.Add('<!-- wks -->'                                                                                                     ); // wks
-  sbu.Add('<link rel="stylesheet" href="%s/Include/W/wks/wks.css">'                                                   , [www]); // wkscss (global stuff like fonts etc.)
-  sbu.Add('<script src="%s/Include/W/wks/wks.js"></script>'                                                           , [www]); // wksjs  (global... import the *ms.js)
+  sbu.Add('<link rel="stylesheet" href="%s/Include/W/wks/css/wks.css">'                                               , [www]); // wkscss
+  sbu.Add('<script src="%s/Include/W/wks/js/wks.js"></script>'                                                        , [www]); // wksjs
 
   // pluginsbefore
   sbu.Add('<!--[RvPluginsBefore]-->'); // this tag will be replaced at the very end (webmodule.afterdispatch) with all plugins scripts needed by the builded page
@@ -17354,10 +17586,12 @@ if IvPage.ContainerOn then begin                                                
   sty := '';
 
   // fixed or fitcontent
-  if IvPage.ContentFixed then begin
-    ClassAdd(cls, 'w3-content');
+  if IvPage.ContentFixed then
+    ClassAdd(cls, 'w3-content')
+
+  // fitcontent
+  else
     sty := 'width:fit-content';
-  end;
 
   // horiz centered/withmargins(ifany)
   if IvPage.Centered then
@@ -17411,8 +17645,9 @@ end;
     {$ENDREGION}
 
     {$REGION 'content'}
+  con := IvPage.Obj.Content;
   sbu.Add('<!-- content -->'                                                                                                         ); // content
-if IvPage.Obj.Content.Trim.IsEmpty then
+if con.Trim.IsEmpty then
   sbu.Add('<div class="w3-panel w3-center w3-padding-64"><p class="w3-xxlarge w3-theme-text-light">Empty Page</p></div>'             )  // empty
 else begin
   if IvPage.Obj.ContentKindIsMarkdown then begin                                                                                        // mkd
@@ -17429,10 +17664,10 @@ else begin
 //      mkd.Free;
 //    end;
 //  end else begin
-      sbu.Add(TMkdRec.Process(IvPage.Obj.Content, IvUrlAbsolute, true)                                                               ); // notempty
+      sbu.Add(TMkdRec.Process(con, IvUrlAbsolute, true)                                                                              ); // notempty
 //  end;
   end else
-    sbu.Add(IvPage.Obj.Content                                                                                                       ); // notempty
+    sbu.Add(con                                                                                                                      ); // notempty
 end;
     {$ENDREGION}
 
@@ -20442,6 +20677,7 @@ var
     gvv: TArray<string>;             // rexgroupvaluevec
     arv: TArray<string>;             // argsvec
     grz: integer;                    // gvvlen
+    ise: boolean;                    // iscentered
     isc: boolean;                    // iscard
     tor: TImgTormEnum;               // imagetorn
     spv: TArray<string>;             // sparevec
@@ -20531,11 +20767,6 @@ var
         end else
           Result := Format(itm.New, [gvv[2]])
 
-(*
-    , (Itm: 'Meter bar'         ; Exa: '##60,0,20,50,80,100##'         ; Rex: '(\#{2})(\d+(,\d+){5})(\#{2})'           ; Reo: [roMultiLine] ; New: '
-
-*)
-
     //else if TStrRec.StrShellThick(gvv[0]) = 3 then begin                                          // shelled 3 fenced  -->   <pre><code>...</code></pre>   *** scodeblock ee preprocessor ***
     //    Result := Format(itm.New, [iif.NxD(gvv[1], 'plaintext'), gvv[2].TrimRight])
     //  else
@@ -20560,21 +20791,32 @@ var
           Result := THtmRec.A(url, arv[1], arv[2], arv[3]);
 
         end else if alf = '[' then begin                                                            // image             -->   <img...>
-          if Length(arv) < 6 then SetLength(arv, 6);
+          // safe
+          if Length(arv) < 7 then SetLength(arv, 7);
+
+          // centered?
+          ise :=  arv[5].Contains('^');
+
           // card?
-          isc :=  TStrRec.StrHas(arv[4].Trim, 'card');
+          isc :=  arv[5].Contains('card');
+
           // torn?
-               if TStrRec.StrHas(arv[5].Trim, 'topbot') then tor := itTopBottom
-          else if TStrRec.StrHas(arv[5].Trim, 'top')    then tor := itTop
-          else if TStrRec.StrHas(arv[5].Trim, 'bot')    then tor := itBottom
+               if arv[6].Contains('topbot') then tor := itTopBottom
+          else if arv[6].Contains('top')    then tor := itTop
+          else if arv[6].Contains('bot')    then tor := itBottom
           else                                               tor := itNone;
 
+          // url
           if IvUrlAbsolute and arv[0].StartsWith('/') then
             url := www + arv[0]
           else
             url := arv[0];
 
+          // img
           Result := THtmRec.Img(url, arv[1], StrToIntDef(arv[2], 0), StrToIntDef(arv[3], 0), isc, tor);
+
+          // center
+          if ise then Result := Result + Format('<center>%s</center>', [Result]); // *** make a general function ***
 
       //end else if alf = '{' then begin                                                            // unused            -->   <movie...>
         //if Length(arv) < 4 then SetLength(arv, 4);
@@ -22502,6 +22744,76 @@ begin
     FreeAndNil(mes);
   end;
 end;
+
+class function  TPicRec.PicWithText(IvText: string; IvBgColor, IvTextColor: TColor; IvFontSize: integer; IvFont: string): TPicture;
+var
+  siz: TSize;
+  smx: integer; // sizemax
+  sqp, sqe: integer; // square padding, edge
+  rec: TRect;
+  bmp: TBitmap;
+  pic: TPicture;
+
+  {Edge,} {MaxBox,} sz{, PAD}: integer;
+  // = 12;        // inner padding (px) around text
+
+  procedure FitFontToBox(Canvas: TCanvas; const S: string; Target: Integer);
+  begin
+    // find largest font size that fits inside Target x Target (tight but safe)
+    Canvas.Font.Size := IvFontSize;
+    // grow if we started too small
+    while (Canvas.TextWidth(S) < Target) and (Canvas.TextHeight(S) < Target) do
+      Canvas.Font.Size := Canvas.Font.Size + 2;
+    // step back once it overflowed
+    while (Canvas.TextWidth(S) > Target) or (Canvas.TextHeight(S) > Target) do
+      Canvas.Font.Size := Canvas.Font.Size - 1;
+  end;
+
+begin
+  // defensive default
+  if IvText = '' then
+    IvText := '?';
+
+  // estimate required square edge (based on text size + padding)
+  siz := TCnvRec.CnvTextSize(IvText, IvFontSize, IvFont);
+  smx := Max(siz.Width, siz.Height);
+  sqp := smx div 7;
+  sqe := sqp + smx + sqp;
+
+  // draw on a bitmap and center the text
+  bmp := TBitmap.Create;
+  try
+    bmp.SetSize(sqe, sqe);
+    bmp.PixelFormat := pf32bit;
+
+    with bmp.Canvas do begin
+      // background
+      Brush.Style := bsSolid;
+      Brush.Color := IvBgColor;
+      FillRect(Rect(0, 0, sqe, sqe));
+
+      // font
+      Font.Name := IvFont;
+      Font.Color := IvTextColor;
+      Font.Quality := fqCleartype;
+
+      // fit font inside padded box
+      FitFontToBox(bmp.Canvas, IvText, smx);
+
+      // draw centered (both axes)
+      rec := Rect(sqp, sqp-1, sqe-sqp, sqe-sqp-1);
+      SetBkMode(Handle, TRANSPARENT);
+      DrawText(Handle, PChar(IvText), Length(IvText), rec, DT_SINGLELINE or DT_CENTER or DT_VCENTER);
+    end;
+
+    // wrap in TPicture
+    pic := TPicture.Create;
+    pic.Bitmap.Assign(bmp);
+    Result := pic;
+  finally
+    bmp.Free;
+  end;
+end;
   {$ENDREGION}
 
   {$REGION 'TPopRec'}
@@ -23113,6 +23425,7 @@ begin
       Store             := dst.FieldByName('FldStore'            ).AsString ;
       Environment       := dst.FieldByName('FldEnvironment'      ).AsString ;
       ValidatorCsv      := dst.FieldByName('FldValidatorCsv'     ).AsString ;
+      ViewerCsv         := dst.FieldByName('FldViewerCsv'        ).AsString ;
       ReportTitleOn     := dst.FieldByName('FldReportTitleOn'    ).AsBoolean;
       ReportPanelOn     := dst.FieldByName('FldReportPanelOn'    ).AsBoolean;
       ReportPanelClosed := dst.FieldByName('FldReportPanelClosed').AsBoolean;
@@ -23384,6 +23697,24 @@ function  TRvaRec.RvaStrIsDirty(const s: string): boolean;
 begin
   //Result := TStrRec.StrHas(ivstr, '[Rv') or TStrRec.StrHas(ivstr, '[--Rv');
     Result := TStrRec.StrHasRex(s, grex.REX_RV_CHECK_PAT, [roSingleLine{, roMultiLine, roIgnoreCase}]);
+end;
+
+procedure TRvaRec.RvaSymbol(var s: string);
+begin                                                                          // THE REPLACEMENT SHOULD TAKE PLACE NOT AFTER JS CODE IS PRESENT
+  //                                              standard utf-8 symbols       // OR REMOVE ANY <script>...</script> BLOCK AND PLACE THEM BACK AFTER REPLACEMENTS
+  if s.Contains('[_]') then s := s.Replace('[_]', '&nbsp;'  , [rfReplaceAll]); // *** DO NOT USE NUMBERS LIKE [0] ... IT WILL KILL JAVASCRIPT CODE ! ***
+  if s.Contains('[v]') then s := s.Replace('[v]', '&#9989;' , [rfReplaceAll]); // this can impact if v is js a variable!
+  if s.Contains('[?]') then s := s.Replace('[?]', '&#10067;', [rfReplaceAll]);
+  if s.Contains('[!]') then s := s.Replace('[!]', '&#10071;', [rfReplaceAll]);
+  if s.Contains('[x]') then s := s.Replace('[x]', '&#10060;', [rfReplaceAll]); // this can impact if x is js a variable!
+  if s.Contains('[*]') then s := s.Replace('[*]', '&#11088;', [rfReplaceAll]);
+  if s.Contains('[o]') then s := s.Replace('[o]', '&#11093;', [rfReplaceAll]); // this can impact if o is js a variable!
+  if s.Contains('[z]') then s := s.Replace('[z]', '&#9889;' , [rfReplaceAll]); // this can impact if z is js a variable!
+  if s.Contains('[#]') then s := s.Replace('[#]', '&#9940;' , [rfReplaceAll]);
+  if s.Contains('[=]') then s := s.Replace('[=]', '&#9776;' , [rfReplaceAll]); //	a list, options, params
+  if s.Contains('[Q]') then s := s.Replace('[Q]', '&#9862;' , [rfReplaceAll]); //	wafer
+  if s.Contains('[O]') then s := s.Replace('[O]', '&#9898;' , [rfReplaceAll]); //	circle big white
+  if s.Contains('[O]') then s := s.Replace('[O]', '&#9899;' , [rfReplaceAll]); //	circle big black
 end;
 
 procedure TRvaRec.RvaIf(var s: string);
@@ -23696,7 +24027,7 @@ var
   function  RvaMacroW3: string;
   begin
     Result := '?';
-         if fun.Equals('W3StateColor')  then Result := TStaRec.ColorW3FromState(a[0]) // [RvColorW3FromState(state)]
+         if fun.Equals('ColorFgCssFromState') then Result := TStaRec.ColorFgCssFromState(a[0]) // [RvColorFgCssFromState(state)]
     ;
   end;
 
@@ -24132,6 +24463,10 @@ begin
     // replace
     Result := TStrRec.StrReplace(Result, rvo, fre);
   end;
+  {$ENDREGION}
+
+  {$REGION 'simple'}
+  RvaSymbol(Result);
   {$ENDREGION}
 
   {$REGION 'clean'}
@@ -24578,6 +24913,9 @@ begin
 //+ sLineBreak + 'and FldOrganization is null'
   + sLineBreak + 'and FldUsername     is null';
 
+  // dbg
+//TFile.WriteAllText('C:\$\Log\Login.txt', sql);
+
   Result := TDbaRec.CmdExec(sql, aff, IvFbk);
   if not Result then
     glog.Log(IvFbk);
@@ -24592,6 +24930,7 @@ begin
   + sLineBreak + 'set'
   + sLineBreak + '    FldDateTimeEnd   = ' + TSqlRec.Val({DateTimeEnd}Now)
   + sLineBreak + '  , FldUsername      = null'
+//+ sLineBreak + '  , FldOrganization  = null' // no?
   + sLineBreak + 'where'
   + sLineBreak + '    FldDateTimeBegin = ' + TSqlRec.Val(DateTimeBegin) // *** now should be a valid date ***
 //+ sLineBreak + 'and FldDateTimeEnd  is ' + 'null' // TSqlRec.Val(DateTimeEnd)
@@ -25038,6 +25377,31 @@ class function TSqlRec.SqlSelectFromTblDetailById(IvObject: string; IvId: intege
 begin
   Result := Format('select * from Dba%s.dbo.Tbl%s where FldObjectId = %d', [IvObject, IvObject, IvId]);
 end;
+
+class function TSqlRec.IsSelect(IvStr: string): boolean;
+begin
+  Result := true;
+end;
+
+class function TSqlRec.IsInsert(IvStr: string): boolean;
+begin
+  Result := true;
+end;
+
+class function TSqlRec.IsUpdate(IvStr: string): boolean;
+begin
+  Result := true;
+end;
+
+class function TSqlRec.IsDelete(IvStr: string): boolean;
+begin
+  Result := true;
+end;
+
+class function TSqlRec.IsValid(IvStr: string): boolean;
+begin
+  Result := IsSelect(IvStr) or IsInsert(IvStr) or IsUpdate(IvStr) or IsDelete(IvStr);
+end;
   {$ENDREGION}
 
   {$REGION 'TStaRec'}
@@ -25047,8 +25411,9 @@ begin
     ACTIVE
   , CANCELLED
   , COMPLETED
-  , DONE
   , DELETEABLE
+  , DELETED
+  , DONE
   , INACTIVE
   , LOCKED
   , NEW
@@ -25058,12 +25423,15 @@ begin
   , ONHOLD
   , PLANNED
   , RECOVERABLE
+  , RECYCLED
   , &SYSTEM
   , TESTING
   , UNDERCONSTRUCTION
+  , UNFEASIBLE
   , UNKNOWN
   , VALIDATED
   , VALIDATING
+  , WAITING
   , YES
   ];
 end;
@@ -25085,15 +25453,38 @@ begin
     end;
 end;
 
-class function TStaRec.ColorW3FromState(IvState: string): string;
+class function TStaRec.ColorBgCssFromState(IvState: string): string;
+var
+  i: TStiRec;
+begin
+  Result := 'white';
+  for i in Vector do
+    if i.Name = IvState then begin
+      Result := i.ColorBgCss;
+      Break;
+    end;
+end;
+
+class function TStaRec.ColorFgCssFromState(IvState: string): string;
 var
   i: TStiRec;
 begin
   Result := 'gray';
   for i in Vector do
     if i.Name = IvState then begin
-    //Result := Format('w3-%s', [i.Color]);
-      Result := i.Color;
+      Result := i.ColorFgCss;
+      Break;
+    end;
+end;
+
+class function TStaRec.BorderCssFromState(IvState: string): string;
+var
+  i: TStiRec;
+begin
+  Result := '';
+  for i in Vector do
+    if i.Name = IvState then begin
+      Result := i.BorderCss;
       Break;
     end;
 end;
@@ -25228,6 +25619,16 @@ end;
   {$ENDREGION}
 
   {$REGION 'TStrRec'}
+class function TStrRec.StrIsWhite(const IvString: string): boolean;
+begin
+  Result := IvString.Trim.IsEmpty;
+end;
+
+class function TStrRec.StrIsBold(const IvString: string): boolean;
+begin
+  Result := not StrIsWhite(IvString);
+end;
+
 class function  TStrRec.StrIs09(const IvString: string): boolean;
 var
   p: PChar;
@@ -26405,6 +26806,21 @@ begin
       ValueAttri.Foreground               := clTeal;       // ipx solod red
     end;
 
+  end else if IvCodeKindEnum = ckCsv  then begin
+    Result := TSynGeneralSyn.Create(IvOwner);
+    with Result as TSynGeneralSyn do begin
+      CommentAttri.Foreground             := clMedGray;    //
+      CommentAttri.Style                  := [fsItalic];   //
+      StringDelim                         := sdDoubleQuote;// strings = quoted fields: "..." (handles doubled quotes inside)
+      KeyWords.Text                       := ',';          // symbols = separators you use (comma/semicolon/tab), tabs show as glyph if eoShowSpecialChars enabled
+      NumberAttri.Foreground              := clNavy;       // Treat everything else as identifiers/space/number
+      StringAttri.Foreground              := clGreen;
+      SymbolAttri.Foreground              := clGrayText;
+      IdentifierAttri.Foreground          := clWindowText;
+      SpaceAttri.Foreground               := clWindowText;
+      SpaceAttri.Style                    := [];           //
+    end;
+
   end else if IvCodeKindEnum = ckDws  then begin
     Result := TSynDwsSyn.Create(IvOwner);
     with Result as TSynDwsSyn do begin
@@ -26934,7 +27350,7 @@ end;
 
 class function  TSysRec.Copyright: string;
 begin
-  Result := Format('© 2010-present %s %s', [ACRONYM, WWW]);
+  Result := Format('(c) 2010-present %s %s', [ACRONYM, WWW]);
 end;
 
 class procedure TSysRec.WksWebFilesGenerate(IvUseSpin: boolean = true);
@@ -26947,49 +27363,79 @@ begin
     TDirectory.CreateDirectory(TSysRec.INC_PATH + '\wks');
 
   // wks.js (hierarchical)
-  TDbaRec.ObjTreeContentDba('Code', 'Root/Organization/W/Wks/Website/wks.js', true, {IvDescriptionBlockAdd}false, {IvHeaderAndFooterOff}false, {IvCommentRemove}false, {IvLinesEmptyRemove}false, aff, nam, txt, fbk);
+  TDbaRec.ObjTreeContentDba('Code', 'Root/Organization/W/Wks/js/wks.js', true, {IvDescriptionBlockAdd}false, {IvHeaderAndFooterOff}false, {IvCommentRemove}false, {IvLinesEmptyRemove}false, aff, nam, txt, fbk);
   sbu.Text := txt;
-  sbu.SaveToFile(TSysRec.INC_PATH + '\wks\wks.js');
+  sbu.SaveToFile(TSysRec.INC_PATH + '\wks\js\wks.js');
 
   // wks.css (hierarchical) *** nop, use w3.css ***
-//TDbaRec.ObjTreeContentDba('Code', 'Root/Organization/W/Wks/Website/wks.css', true, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, aff, nam, txt, fbk);
+//TDbaRec.ObjTreeContentDba('Code', 'Root/Organization/W/Wks/css/wks.css', true, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, aff, nam, txt, fbk);
 //sbu.Text := txt;
-//sbu.SaveToFile(TSysRec.INC_PATH + '\wks\wks.css');
+//sbu.SaveToFile(TSysRec.INC_PATH + '\wks\css\wks.css');
 
   // Default.htm
   sbu.Clr;
-  sbu.Add('<!DOCTYPE html>'                                                     , true , 0);
-  sbu.Add('<html lang="en">'                                                              );
-  sbu.Add('<head>'                                                                        );
-  sbu.Add('  <title>%s Default Page</title>'                          , [gorg.Obj.&Object]); // TSysRec.ACRONYM // gorg.Organization
-  sbu.Add('  <meta charset="utf-8">'                                                      );
-  sbu.Add('  <meta http-equiv="refresh" content="0; url=/WksPageIsapiProject.dll/">'      ); // *** Wks have to be replaced by TSysRec.PREFIX ***
-  sbu.Add('  <meta name="author" content="%s" />'                       , [TSysRec.AUTHOR]);
-  sbu.Add('  <meta name="description" content="%s" />'                    , [TSysRec.NAME]); // gorg.Name
-  sbu.Add('  <link rel="icon" type="image/x-icon" href="%s" />'       , [TSysRec.ICON_URL]); // gorg.LogoIconUrl   option: rel="shortcut icon"
+  sbu.Add('<!DOCTYPE html>'                                                       , true , 0);
+  sbu.Add('<html lang="en">'                                                                );
+  sbu.Add('<head>'                                                                          );
+  sbu.Add('  <title>%s Default Page</title>'                            , [gorg.Obj.&Object]); // TSysRec.ACRONYM // gorg.Organization
+  sbu.Add(''                                                                                );
+  sbu.Add('  <!-- META -->'                                                                 );
+  sbu.Add('  <meta charset="utf-8">'                                                        );
+  sbu.Add('  <meta http-equiv="refresh" content="0; url=/WksPageIsapiProject.dll/">'        ); // *** Wks have to be replaced by TSysRec.PREFIX ***
+  sbu.Add('  <meta name="description" content="%s" />'                      , [TSysRec.NAME]); // gorg.Name
+  sbu.Add('  <meta name="author" content="%s" />'                         , [TSysRec.AUTHOR]);
+  sbu.Add('  <link rel="icon" type="image/x-icon" href="%s" />'         , [TSysRec.ICON_URL]); // gorg.LogoIconUrl   option: rel="shortcut icon"
   if IvUseSpin then begin
-  sbu.Add('  <link rel="stylesheet" href="/Include/W/w3/4.0/w3-theme-%s.css" />', ['grey']); // gthe.Theme
-  sbu.Add('  <link rel="stylesheet" href="/Include/W/w3/4.0/w3.css" />'                   );
-  sbu.Add('  <script src="/Include/W/wks/wks.js"></script>'                               );
+  sbu.Add(''                                                                                );
+  sbu.Add('  <!-- EXTERNAL -->'                                                             );
+  sbu.Add('  <!--script language="javascript" src= "/Include/J/jquery/3.2.1/jquery.min.js"></script-->'                       );
+  sbu.Add('  <!--link   rel="stylesheet"      href="/Include/H/highslide/4.1.13/highslide/highslide.css" /-->'                );
+  sbu.Add('  <!--script language="javascript" src= "/Include/H/highslide/4.1.13/highslide/highslide-full.js"></script-->'     );
+  sbu.Add('  <!--script language="javascript" src= "/Include/H/highslide/4.1.13/highslide/highslide-with-html.js"></script-->');
+  sbu.Add('  <link rel="stylesheet" href="/Include/W/w3/4.0/w3-theme-%s.css" />'  , ['grey']); // gthe.Theme
+  sbu.Add('  <link rel="stylesheet" href="/Include/W/w3/4.0/w3.css" />'                     );
+  sbu.Add(''                                                                                );
+  sbu.Add('  <!-- INTERNAL -->'                                                             );
+  sbu.Add('  <link rel="icon" type="image/x-icon" href="/Organization/W/Wks/WksIcon.ico" />');
+  sbu.Add('  <link rel="stylesheet" type="text/css" href="/Include/W/wks/css/wks.css" />'   );
+  sbu.Add('  <script src="/Include/W/wks/js/wks.js"></script>'                              );
   end;
-  sbu.Add('</head>'                                                                       );
-  sbu.Add('<body>'                                                                        ); // oncontextmenu="return false";
+  sbu.Add('</head>'                                                                         );
+  sbu.Add('<body>'                                                                          ); // oncontextmenu="return false";
   if IvUseSpin then begin
-  sbu.Add('  <div class="w3-waitloader-spin"></div>'                                      );
-  sbu.Add('  <div class="w3-waitloader-number"</div>'                                     );
-  sbu.Add('  <script>'                                                                    );
-  sbu.Add('  var waitloadernumber = document.querySelector(".w3-waitloader-number");'     );
-  sbu.Add('  var count = 0;'                                                              );
-  sbu.Add('  setInterval('                                                                );
-  sbu.Add('    () => {'                                                                   );
-  sbu.Add('      count++;'                                                                );
-  sbu.Add('      if (count > 0) waitloadernumber.textContent = count;'                    );
-  sbu.Add('    }'                                                                         );
-  sbu.Add('  , 1000);'                                                                    );
-  sbu.Add('  </script>'                                                                   );
+  sbu.Add('  <!--br>'                                                                       );
+  sbu.Add('  <center>'                                                                      );
+  sbu.Add('  Wks Application Web Server'                                                    );
+  sbu.Add('  </center>'                                                                     );
+  sbu.Add('  <pre>'                                                                         );
+  sbu.Add('- host: www.wks.cloud'                                                           );
+  sbu.Add('- hw  : 1 Virtual Server'                                                        );
+  sbu.Add('- cpu : 1 Intel Xeon X5670 @2.93GHz'                                             );
+  sbu.Add('- ram : 8 GB'                                                                    );
+  sbu.Add('- net : unknown'                                                                 );
+  sbu.Add('- hd  : 80 Gb'                                                                   );
+  sbu.Add('- os  : 1 Windows Server 2012 Standard 64 bit'                                   );
+  sbu.Add('- adm : wks@wks.cloud'                                                           );
+  sbu.Add('- iis : iis8'                                                                    );
+  sbu.Add('- why : wks development'                                                         );
+  sbu.Add('  </pre-->'                                                                      );
+  sbu.Add(''                                                                                );
+  sbu.Add('  <div class="w3-waitloader-spin"></div>'                                        );
+  sbu.Add('  <div class="w3-waitloader-number"</div>'                                       );
+  sbu.Add(''                                                                                );
+  sbu.Add('  <script>'                                                                      );
+  sbu.Add('  var waitloadernumber = document.querySelector(".w3-waitloader-number");'       );
+  sbu.Add('  var count = 0;'                                                                );
+  sbu.Add('  setInterval('                                                                  );
+  sbu.Add('    () => {'                                                                     );
+  sbu.Add('      count++;'                                                                  );
+  sbu.Add('      if (count > 0) waitloadernumber.textContent = count;'                      );
+  sbu.Add('    }'                                                                           );
+  sbu.Add('  , 1000);'                                                                      );
+  sbu.Add('  </script>'                                                                     );
   end;
-  sbu.Add('</body>'                                                                       );
-  sbu.Add('</html>'                                                                       );
+  sbu.Add('</body>'                                                                         );
+  sbu.Add('</html>'                                                                         );
   sbu.SaveToFile(TSysRec.HOME_PATH + '\Default.htm');
 end;
 
@@ -27968,36 +28414,41 @@ end;
   {$ENDREGION}
 
   {$REGION 'TVntRec'}
-class function  TVntRec.VntIsNull(const IvVariant: variant): boolean;
-begin
-  Result := VarIsNull(IvVariant);
-end;
-
-class function  TVntRec.VntIsEmpty(const IvVariant: variant): boolean;
-var
-  dat: PVarData; // data
-begin
-  dat := FindVarData(IvVariant);
-  case dat^.VType of
-    varOleStr:
-      Result := (dat^.VOleStr^ = #0);
-    varString:
-      Result := (dat^.VString = nil);
-    varUString:
-      Result := (dat^.VUString = nil);
-    else
-      Result := false;
-  end;
-end;
+//class function  TVntRec.VntIsNull(const IvVariant: variant): boolean;
+//begin
+//  Result := VarIsNull(IvVariant);
+//end;
+//
+//class function  TVntRec.VntIsEmpty(const IvVariant: variant): boolean;
+//var
+//  dat: PVarData; // data
+//begin
+//  dat := FindVarData(IvVariant);
+//  case dat^.VType of
+//    varOleStr:
+//      Result := (dat^.VOleStr^ = #0);
+//    varString:
+//      Result := (dat^.VString = nil);
+//    varUString:
+//      Result := (dat^.VUString = nil);
+//    else
+//      Result := false;
+//  end;
+//end;
 
 class function  TVntRec.VntIsWhite(const IvVariant: variant): boolean;
 begin
   Result := ( VarIsStr(IvVariant) and (Length(VarToStr(IvVariant)) = 0) )
          or VarIsEmpty(IvVariant)             // never assigned
        //or VarIsType (IvVariant, Unassigned) // idem
-         or VarIsClear(IvVariant)             // is set to null, checks the varNull type inside the variant
-       //or VarIsNull (IvVariant)             // idem but Delphi wording style
+         or VarIsClear(IvVariant)             // is undefined, is set to null (it checks the varNull type inside the variant)
+         or VarIsNull (IvVariant)             // idem but Delphi wording style
   ;
+end;
+
+class function  TVntRec.VntIsBold(const IvVariant: variant): boolean;
+begin
+  Result := not VntIsWhite(IvVariant);
 end;
 
 class function  TVntRec.VntToInt(const IvVariant: variant; IvDefault: integer): integer;
@@ -28066,7 +28517,7 @@ begin
   end;
 end;
 
-class function TVntRec.VntVecToTVarRecVec(IvVariantVec: TArray<variant>): TArray<TVarRec>;
+class function  TVntRec.VntVecToTVarRecVec(IvVariantVec: TArray<variant>): TArray<TVarRec>;
 var
   i: Integer;
 begin
@@ -28204,7 +28655,7 @@ try
 
     // others
     IvPId          := ndp.Param[1];            {1 pid          }
-  if TVntRec.VntIsEmpty(ndp.Param[2]) then
+  if TVntRec.VntIsWhite(ndp.Param[2]) then
     IvOrder := 0
   else
     IvOrder        := ndp.Param[2];            {2 order        }
@@ -28390,20 +28841,23 @@ begin
   else if giis.Same([obk, obj] , 'User'                ) then ImageIndex :=  22
   else if giis.Same([obk, obj] , 'Organization'        ) then ImageIndex :=  23
   else if giis.Same([obk, obj] ,   'Department'        ) then ImageIndex :=  24
-  else if giis.Same([obk, obj] ,   'Area'              ) then ImageIndex :=  25
-  else if giis.Same([obk, obj] ,   'Team'              ) then ImageIndex :=  26
-  else if giis.Same([obk, obj] ,   'Member'            ) then ImageIndex :=  27 // male
-  else if giis.Same([obk, obj] ,   'Member'            ) then ImageIndex :=  28 // female
+  else if giis.Same([obk, obj] ,     'Area'            ) then ImageIndex :=  25
+  else if giis.Same([obk, obj] ,       'Team'          ) then ImageIndex :=  26
+  else if giis.Same([obk, obj] ,         'Member'      ) then ImageIndex :=  27 // male
+  else if giis.Same([obk, obj] ,         'Member'      ) then ImageIndex :=  28 // female *** nop, given by Person ***
   else if giis.Same([obk, obj] , 'Account'             ) then ImageIndex :=  22
   else if giis.Same([obk, obj] , 'Agent'               ) then ImageIndex :=  68
   else if giis.Same([obk, obj] , 'Code'                ) then ImageIndex :=  69
   else if giis.Same([obk, obj] , 'Document'            ) then ImageIndex :=  29
   else if giis.Same([obk, obj] , 'Report'              ) then ImageIndex :=  70
   else if giis.Same([obk, obj] , 'Page'                ) then ImageIndex :=  71
-  else if giis.Same([obk, obj] , 'System'              ) then ImageIndex :=   9
-
-  // task
-  else if giis.Same([obk, obj] , 'Task'                ) then begin
+  else if giis.Same([obk, obj] , 'Portfolio'           ) then ImageIndex :=  50
+  else if giis.Same([obk, obj] ,   'Program'           ) then ImageIndex :=  51
+  else if giis.Same([obk, obj] ,     'Package'         ) then ImageIndex :=  52
+  else if giis.Same([obk, obj] ,       'Project'       ) then ImageIndex :=  53
+  else if giis.Same([obk, obj] ,         'Phase'       ) then ImageIndex :=  54
+  else if giis.Same([obk, obj] ,           'Group'     ) then ImageIndex :=  55
+  else if giis.Same([obk, obj] ,             'Task'    ) then begin
     if      sta = TStaRec.NEW.Name                       then ImageIndex :=  56 // unplanned
     else if sta = TStaRec.ACTIVE.Name                    then ImageIndex :=  57 // planned
     else if sta = TStaRec.ONGOING.Name                   then ImageIndex :=  58 // focused
@@ -28411,14 +28865,7 @@ begin
     else if sta = TStaRec.DONE.Name                      then ImageIndex :=  60 // completed
     else                                                      ImageIndex :=   0
   end
-
-  // task's structure
-  else if giis.Same([obk, obj] ,   'Portfolio'         ) then ImageIndex :=  50
-  else if giis.Same([obk, obj] ,   'Program'           ) then ImageIndex :=  51
-  else if giis.Same([obk, obj] ,   'Package'           ) then ImageIndex :=  52
-  else if giis.Same([obk, obj] ,   'Project'           ) then ImageIndex :=  53
-  else if giis.Same([obk, obj] ,   'Phase'             ) then ImageIndex :=  54
-  else if giis.Same([obk, obj] ,   'Group'             ) then ImageIndex :=  55
+  else if giis.Same([obk, obj] , 'System'              ) then ImageIndex :=   9
   {$ENDREGION}
 
   {$REGION 'unknown'}
@@ -29790,11 +30237,11 @@ begin
   // this part will replace the <!--[RvPluginsBefore]--> tag with all pugins scripts needed by the builded page
   sbu.Clr;
      if IvWebResponse.Content.Contains('new Two(') then
-  sbu.Add('<script src="%s/include/two/two.js"></script>', [www])
+  sbu.Add('<script src="%s/Include/T/two/two.js"></script>', [www])
 else if IvWebResponse.Content.Contains('alpine') then
-  sbu.Add('<script src="%s/include/alpinejs/alpine.js" defer></script>', [www])
+  sbu.Add('<script src="%s/Include/A/alpinejs/alpine.js" defer></script>', [www])
 else if IvWebResponse.Content.Contains(' hx-') then                    // readable : <script src="https://unpkg.com/htmx.org@2.0.0/dist/htmx.js" integrity="sha384-Xh+GLLi0SMFPwtHQjT72aPG19QvKB8grnyRbYBNIdHWc2NkCrz65jlU7YrzO6qRp" crossorigin="anonymous"></script>
-  sbu.Add('<script src="%s/include/H/htmx/htmx.js"></script>', [www]); // minimized: <script src="https://unpkg.com/htmx.org@2.0.0" integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw" crossorigin="anonymous"></script>
+  sbu.Add('<script src="%s/Include/H/htmx/htmx.js"></script>', [www]); // minimized: <script src="https://unpkg.com/htmx.org@2.0.0" integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw" crossorigin="anonymous"></script>
 
 if sbu.Text.IsEmpty then
   IvWebResponse.Content := StringReplace(IvWebResponse.Content, '<!--[RvPluginsBefore]-->', '', [])

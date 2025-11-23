@@ -76,8 +76,8 @@ type
     XxxToolBar: TToolBar;
     XxxTextDBEdit: TDBEdit;
     XxxTextLabel: TLabel;
-    XxxSelect1DBEdit: TDBEdit;
-    XxxSelect1Label: TLabel;
+    XxxSelectDBEdit: TDBEdit;
+    XxxSelectLabel: TLabel;
     XxxSelect2Label: TLabel;
     XxxSelect2DBEdit: TDBEdit;
     XxxSelect3Label: TLabel;

@@ -17,9 +17,9 @@ type
   private
     FRefName    : string;   // i.e. the agent name
     FOutStrings : TStrings; // output
-    FRepStrings : TStrings; // report
+    FLogStrings : TStrings; // report
   public
-    constructor Create(IvRefName: string; IvOutStrings, IvRepStrings: TStrings);
+    constructor Create(IvRefName: string; IvOutStrings, IvLogStrings: TStrings);
     destructor  Destroy; override;
     function  CodeIsValid(IvScript: string; var IvFbk: string): boolean;
     function  CodeRun(const IvCode, IvConnectionStr, IvConnectionLib: string; out IvMsg: string; out IvAffected: integer; IvQueryTimeoutSec: integer = DBA_COMMAND_TIMEOUT_SEC): boolean;
@@ -72,12 +72,12 @@ uses
 {$ENDREGION}
 
 {$REGION 'TSqlEngineCls'}
-constructor TSqlEngineCls.Create(IvRefName: string; IvOutStrings, IvRepStrings: TStrings);
+constructor TSqlEngineCls.Create(IvRefName: string; IvOutStrings, IvLogStrings: TStrings);
 begin
   // init
   FRefName    := IvRefName; if FRefName = '' then FRefName := TNamRec.Rnd;
   FOutStrings := IvOutStrings; // no create? no destroy?
-  FRepStrings := IvRepStrings; // no create? no destroy?
+  FLogStrings := IvLogStrings; // no create? no destroy?
 end;
 
 destructor TSqlEngineCls.Destroy;
@@ -172,29 +172,29 @@ begin
         else
           IvAffected := fqu.RecordCount; // select
         IvMsg := 'FD query executed';
-        FRepStrings.Add(IvMsg);
+        FLogStrings.Add(IvMsg);
         Result := true;
 
       //TDstRec.DstToCsv(que, IvOutput);
       except
         // FDO specific error handling
         on e: EFDException do begin
-          FRepStrings.Add(e.StackTrace);
+          FLogStrings.Add(e.StackTrace);
           IvMsg := e.Message;
-          FRepStrings.Add(IvMsg);
+          FLogStrings.Add(IvMsg);
           Result := false;
         end;
         // generic database error handling
         on e: EDatabaseError do begin
-          FRepStrings.Add(e.StackTrace);
+          FLogStrings.Add(e.StackTrace);
           IvMsg := e.Message;
-          FRepStrings.Add(IvMsg);
+          FLogStrings.Add(IvMsg);
           Result := false;
         end;
         // other exceptions (non-FD related)
         on e: Exception do begin
           IvMsg := e.Message;
-          FRepStrings.Add(IvMsg);
+          FLogStrings.Add(IvMsg);
           Result := false;
         end;
       end;
@@ -234,29 +234,29 @@ begin
         else
           IvAffected := que.RecordCount; // select
         IvMsg := 'ADO query executed';
-        FRepStrings.Add(IvMsg);
+        FLogStrings.Add(IvMsg);
         Result := true;
 
       //TDstRec.DstToCsv(que, IvOutput);
       except
         // ADO specific error handling
         on e: EAdoError do begin
-          FRepStrings.Add(e.StackTrace);
+          FLogStrings.Add(e.StackTrace);
           IvMsg := e.Message;
-          FRepStrings.Add(IvMsg);
+          FLogStrings.Add(IvMsg);
           Result := false;
         end;
         // generic database error handling
         on e: EDatabaseError do begin
-          FRepStrings.Add(e.StackTrace);
+          FLogStrings.Add(e.StackTrace);
           IvMsg := e.Message;
-          FRepStrings.Add(IvMsg);
+          FLogStrings.Add(IvMsg);
           Result := false;
         end;
         // other exceptions (non-DB-ADO related)
         on e: Exception do begin
           IvMsg := e.Message;
-          FRepStrings.Add(IvMsg);
+          FLogStrings.Add(IvMsg);
           Result := false;
         end;
       end;

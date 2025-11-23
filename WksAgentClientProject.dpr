@@ -5,12 +5,12 @@ program WksAgentClientProject;
 uses
   MidasLib,
   Vcl.Forms,
-  WksBaseClientMainFormUnit in 'WksBaseClientMainFormUnit.pas' {BaseMainForm},
-  WksAgentClientMainFormUnit in 'WksAgentClientMainFormUnit.pas' {AgentMainForm},
   WksAgentUnit in 'WksAgentUnit.pas',
   WksPythonUnit in 'WksPythonUnit.pas',
+  WksJslUnit in 'WksJslUnit.pas',
   WksSqlUnit in 'WksSqlUnit.pas',
-  WksJslUnit in 'WksJslUnit.pas';
+  WksBaseClientMainFormUnit in 'WksBaseClientMainFormUnit.pas' {BaseMainForm},
+  WksAgentClientMainFormUnit in 'WksAgentClientMainFormUnit.pas' {AgentMainForm};
 
 {$R *.res}
 

@@ -117,6 +117,11 @@ type
     SystemSourceConnStrFdDBSynEdit: TDBSynEdit;
     SourceClientDataSet: TClientDataSet;
     SourceDataSource: TDataSource;
+    SystemSourceSourceLabel: TLabel;
+    SystemSourceConnStrAdoPanel: TPanel;
+    SystemSourceConnStrFdPanel: TPanel;
+    SystemSourceConnStrFdTestLabel: TLabel;
+    SystemSourceConnStrAdoTestLabel: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ActionPostActionExecute(Sender: TObject);
@@ -148,6 +153,8 @@ type
     procedure BinariesServiceDeployActionExecute(Sender: TObject);
     procedure BinariesClientDataSetAfterRefresh(DataSet: TDataSet);
     procedure MainPanelClick(Sender: TObject);
+    procedure SystemSourceConnStrAdoTestLabelClick(Sender: TObject);
+    procedure SystemSourceConnStrFdTestLabelClick(Sender: TObject);
   private
     { Private declarations }
     FSyslogCount: integer;
@@ -594,7 +601,7 @@ begin
   + sLineBreak + 'order by'
   + sLineBreak + '    FldBinary'
   ;
-  TDbaRec.DsFromSql(sql, dst);
+  TDbaRec.DsFromSql(sql, dst); // *** WORKS ONLY IF THE CLIENT SEE THE DB SERVER ***
 
   // targetdelete
   if DirectoryExists(ZIP_TARGET_PATH) then
@@ -855,6 +862,28 @@ begin
 end;
   {$ENDREGION}
 
+{$ENDREGION}
+
+{$REGION 'Sources'}
+procedure TSystemMainForm.SystemSourceConnStrAdoTestLabelClick(Sender: TObject);
+var
+  fbk: string;
+begin
+  inherited;
+
+  gcns.CsAdoTest(SystemSourceConnStrAdoDBSynEdit.Text, fbk);
+  TMesRec.I(fbk);
+end;
+
+procedure TSystemMainForm.SystemSourceConnStrFdTestLabelClick(Sender: TObject);
+var
+  fbk: string;
+begin
+  inherited;
+
+  gcns.CsFdTest(SystemSourceConnStrAdoDBSynEdit.Text, fbk);
+  TMesRec.I(fbk);
+end;
 {$ENDREGION}
 
 end.

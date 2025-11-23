@@ -256,7 +256,7 @@ begin
   // set
   DataSet.Edit;
 //DataSet.FieldByName('FldObjectId').Value := FId; // automatic
-  DataSet.FieldByName('FldEmail'   ).Value := TNamRec.RndInt('Account');
+//DataSet.FieldByName('FldEmail'   ).Value := TNamRec.RndInt('Account');
   DataSet.FieldByName('FldUsername').Value := TNamRec.RndInt('username');
   DataSet.FieldByName('FldPassword').Value := TNamRec.RndInt('password');
   DataSet.Post;

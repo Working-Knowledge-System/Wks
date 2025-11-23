@@ -73,7 +73,30 @@ uses
   , Data.DB
   , Data.Win.ADODB
   , Datasnap.DBClient
-  , FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.VCLUI.Wait, FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client
+  , FireDAC.Stan.Intf
+  , FireDAC.Stan.Option
+  , FireDAC.Stan.Error
+  , FireDAC.Stan.Def
+  , FireDAC.Stan.Pool
+  , FireDAC.Stan.Async
+  , FireDAC.Stan.Param
+  , FireDAC.Stan.ExprFuncs
+  , FireDAC.UI.Intf
+  , FireDAC.VCLUI.Wait
+  , FireDAC.Phys.Intf
+  , FireDAC.DatS
+  , FireDAC.DApt
+  , FireDAC.DApt.Intf
+  , FireDAC.Moni.Base
+  , FireDAC.Comp.DataSet
+  , FireDAC.Comp.Client
+  , FireDAC.Phys
+  , FireDAC.Phys.MSAccDef , FireDAC.Phys.MSAcc
+  , FireDAC.Phys.MySQLDef , FireDAC.Phys.MySQL
+//, FireDAC.Phys.MSSQLDef , FireDAC.Phys.MSSQL
+//, FireDAC.Phys.OracleDef, FireDAC.Phys.Oracle
+//, FireDAC.Phys.ODBCDef  , FireDAC.Phys.ODBC  , FireDAC.Phys.ODBCBase
+  , FireDAC.Phys.SQLiteDef, FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteWrapper.Stat
   , Soap.SOAPConn
   , SynDBEdit
   , SynEdit
@@ -180,7 +203,7 @@ type
     RunInfoElapsedValueLabel: TLabel;
     RunInfoAffectedLabel: TLabel;
     RunInfoAffectedValueLabel: TLabel;
-    RunInfoListClearLabel: TLabel;
+    RunListClearLabel: TLabel;
     AgentResultToolButton: TToolButton;
     AgentResultAction: TAction;
     ResultDataSource: TDataSource;
@@ -212,6 +235,16 @@ type
     SynEditDataJsonFdMsSqlCsPopup: TMenuItem;
     SynEditDataJsonFdOracleCsPopup: TMenuItem;
     SynEditDataJsonFdMongodbCsPopup: TMenuItem;
+    AgentCsAdoTestToolButton: TToolButton;
+    ToolButton2: TToolButton;
+    AgentCsFdTestAction: TAction;
+    AgentCsAdoTestAction: TAction;
+    RunningTabSheet: TTabSheet;
+    RunningPanel: TPanel;
+    RunningPauseLabel: TLabel;
+    RunningListBox: TListBox;
+    RunningStopLabel: TLabel;
+    RunningContinueLabel: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
     procedure AgentActiveActionExecute(Sender: TObject);
@@ -235,7 +268,7 @@ type
     procedure AgentActiveTabSheetShow(Sender: TObject);
     procedure RunListBoxClick(Sender: TObject);
     procedure RunInfoTabSheetShow(Sender: TObject);
-    procedure RunInfoListClearLabelClick(Sender: TObject);
+    procedure RunListClearLabelClick(Sender: TObject);
     procedure AgentResultActionExecute(Sender: TObject);
     procedure SynEditDataJsonBaseTemplateClick(Sender: TObject);
     procedure SynEditDataJsonOptionBlockClick(Sender: TObject);
@@ -255,6 +288,11 @@ type
     procedure SynEditDataJsonFdMsSqlCsPopupClick(Sender: TObject);
     procedure SynEditDataJsonFdOracleCsPopupClick(Sender: TObject);
     procedure SynEditDataJsonFdMongodbCsPopupClick(Sender: TObject);
+    procedure AgentCsAdoTestActionExecute(Sender: TObject);
+    procedure AgentCsFdTestActionExecute(Sender: TObject);
+    procedure RunningStopLabelClick(Sender: TObject);
+    procedure RunningPauseLabelClick(Sender: TObject);
+    procedure RunningContinueLabelClick(Sender: TObject);
   private
     { Private declarations }
     // winmessages
@@ -275,6 +313,9 @@ type
     // running
     procedure AgentRunningInc;
     procedure AgentRunningDec;
+    function  AgentRunningSelected: TAgentThread;
+    function  AgentRunningIdFindByThread(const IvAgentThread: TAgentThread): integer;
+    procedure AgentRunningUiUpdate(const IvRunningId: Integer; const IvString: string);
     // thread
     procedure AgentThreadStart(IvAgentRec: TAgentRec; IvCtxTag: string = '');
     procedure AgentThreadOnTerminate(Sender: TObject);
@@ -429,12 +470,48 @@ begin
   AgentRunningCountLabel.Caption := IntToStr(AgentRunningCountLabel.Tag);
   Application.ProcessMessages;
 end;
+
+function TAgentMainForm.AgentRunningSelected: TAgentThread;
+var
+  idx: Integer;
+begin
+  Result := nil;
+  idx := RunningListBox.ItemIndex;
+  if idx >= 0 then
+    Result := TAgentThread(RunningListBox.Items.Objects[idx]);
+end;
+
+function TAgentMainForm.AgentRunningIdFindByThread(const IvAgentThread: TAgentThread): integer;
+begin
+  for Result := 0 to RunningListBox.Items.Count - 1 do
+    if TObject(RunningListBox.Items.Objects[Result]) = IvAgentThread then
+      Exit;
+  Result := -1;
+end;
+
+procedure TAgentMainForm.AgentRunningUiUpdate(const IvRunningId: Integer; const IvString: string);
+var
+  i: integer;
+  ath: TAgentThread;
+begin
+  for i := 0 to RunningListBox.Items.Count - 1 do begin
+    ath := TAgentThread(RunningListBox.Items.Objects[i]);
+    if Assigned(ath) and (ath.RunningId = IvRunningId) then begin
+      RunningListBox.Items[i] := Format('%3d "%s" — %s', [ath.AgentRec.Id, ath.AgentRec.Agent, IvString]);
+      Application.ProcessMessages;
+      Break;
+    end;
+  end;
+end;
   {$ENDREGION}
 
   {$REGION 'Thread'}
 procedure TAgentMainForm.AgentThreadStart(IvAgentRec: TAgentRec; IvCtxTag: string);
+const
+  SLEEP_MS = 500;
 var
   okk: boolean;
+  ath: TAgentThread;
 begin
 
   {$REGION 'exits'}
@@ -468,42 +545,102 @@ begin
 
   // BAT
   if          IvAgentRec.ContentKind = TCodRec.BAT.Kind then begin
-    with TAgentDosThread.Create(IvAgentRec, true) do begin
-      OnTerminate := AgentThreadOnTerminate;
-      Start; // now the execute method is called, Resume is deprecated
-    end;
+    //with TAgentDosThread.Create(IvAgentRec{, true}, ) do begin
+    //  OnTerminate := AgentThreadOnTerminate;
+    //  Start; // now the execute method is called, Resume is deprecated
+    //end;
+    ath := TAgentDosThread.Create(IvAgentRec{, true}
+    , procedure(AId: Integer; AString: string)
+      begin
+        AgentRunningUiUpdate(AId, AString);
+      end
+    );
+    ath.RunningId := RunningListBox.Items.Count;
+    ath.OnTerminate := AgentThreadOnTerminate;
+    RunningListBox.Items.AddObject(Format('%3d "%s" — %s', [IvAgentRec.Id, IvAgentRec.Agent, 'starting...']), ath); // the caption will be updated later from inside the thread as necessary
+    Application.ProcessMessages;
+    sleep(SLEEP_MS);
+    ath.Start;
 
   // JSL
   end else if IvAgentRec.ContentKind = TCodRec.JSL.Kind then begin
-    with TAgentJslThread.Create(IvAgentRec, true) do begin
-      OnTerminate := AgentThreadOnTerminate;
-      Start;
-    end;
+    //with TAgentJslThread.Create(IvAgentRec{, true}, AgentRunningUiUpdate) do begin
+    //  OnTerminate := AgentThreadOnTerminate;
+    //  Start;
+    //end;
+    ath := TAgentJslThread.Create(IvAgentRec{, true}
+    , procedure(AId: Integer; AString: string)
+      begin
+        AgentRunningUiUpdate(AId, AString);
+      end
+    );
+    ath.RunningId := RunningListBox.Items.Count;
+    ath.OnTerminate := AgentThreadOnTerminate;
+    RunningListBox.Items.AddObject(Format('%3d "%s" — %s', [IvAgentRec.Id, IvAgentRec.Agent, 'starting...']), ath);
+    Application.ProcessMessages;
+    sleep(SLEEP_MS);
+    ath.Start;
 
   // PY
   end else if IvAgentRec.ContentKind = TCodRec.PY.Kind then begin
-    with TAgentPythonThread.Create(IvAgentRec, true) do begin
-      OnTerminate := AgentThreadOnTerminate;
-      Start;
-    end;
+    //with TAgentPythonThread.Create(IvAgentRec{, true}, AgentRunningUiUpdate) do begin
+    //  OnTerminate := AgentThreadOnTerminate;
+    //  Start;
+    //end;
+    ath := TAgentPythonThread.Create(IvAgentRec{, true}
+    , procedure(AId: Integer; AString: string)
+      begin
+        AgentRunningUiUpdate(AId, AString);
+      end
+    );
+    ath.RunningId := RunningListBox.Items.Count;
+    ath.OnTerminate := AgentThreadOnTerminate;
+    RunningListBox.Items.AddObject(Format('%3d "%s" — %s', [IvAgentRec.Id, IvAgentRec.Agent, 'starting...']), ath);
+    Application.ProcessMessages;
+    sleep(SLEEP_MS);
+    ath.Start;
 
   // SQL
   end else if IvAgentRec.ContentKind = TCodRec.SQL.Kind then begin
-    with TAgentSqlThread.Create(IvAgentRec, true) do begin
-      OnTerminate := AgentThreadOnTerminate;
-      Start;
-    end;
+    //with TAgentSqlThread.Create(IvAgentRec{, true}, ) do begin
+    //  OnTerminate := AgentThreadOnTerminate;
+    //  Start;
+    //end;
+    ath := TAgentSqlThread.Create(IvAgentRec{, true}
+    , procedure(AId: Integer; AString: string)
+      begin
+        AgentRunningUiUpdate(AId, AString);
+      end
+    );
+    ath.RunningId := RunningListBox.Items.Count;
+    ath.OnTerminate := AgentThreadOnTerminate;
+    RunningListBox.Items.AddObject(Format('%3d "%s" — %s', [IvAgentRec.Id, IvAgentRec.Agent, 'starting...']), ath);
+    Application.ProcessMessages;
+    sleep(SLEEP_MS);
+    ath.Start;
 
   // ETL
   end else if IvAgentRec.ContentKind = TCodRec.ETL.Kind then begin
-    with TAgentEtlThread.Create(IvAgentRec, true) do begin
-      OnTerminate := AgentThreadOnTerminate;
-      Start;
-    end;
+    //with TAgentEtlThread2.Create(IvAgentRec{, true}, ) do begin
+    //  OnTerminate := AgentThreadOnTerminate;
+    //  Start;
+    //end;
+    ath := TAgentEtlThread2.Create(IvAgentRec{, true}
+    , procedure(AId: Integer; AString: string)
+      begin
+        AgentRunningUiUpdate(AId, AString);
+      end
+    );
+    ath.RunningId := RunningListBox.Items.Count;
+    ath.OnTerminate := AgentThreadOnTerminate;
+    RunningListBox.Items.AddObject(Format('%3d %s — %s', [IvAgentRec.Id, IvAgentRec.Agent, 'starting...']), ath);
+    Application.ProcessMessages;
+    sleep(SLEEP_MS);
+    ath.Start;
 
   // UNKNOWN
   end else begin
-    TMesRec.W('Unable to start agent %d "%s", content kind "%s" is not implemented', [IvAgentRec.Id, IvAgentRec.Agent, IvAgentRec.ContentKind]);
+    TMesRec.W('Unable to start agent , content kind "%s" is not implemented', [IvAgentRec.Id, IvAgentRec.Agent, IvAgentRec.ContentKind]);
 
     // -1
     AgentRunningDec;
@@ -516,6 +653,7 @@ procedure TAgentMainForm.AgentThreadOnTerminate(Sender: TObject);
 var
   ath: TAgentThread;
   ptr: PAgentThreadInfoRec;
+  rlx: integer; // agentrunninglistindex
 begin
   // receive a terminating thread (before .Destroy)
 
@@ -537,9 +675,6 @@ begin
   // thread
   ath := (Sender as TAgentThread);
 
-  // output
-  LogFrame.Output(ath.InfoRec.Output.Text);
-
   // runinfoadd
   New(ptr);
   ptr.Started   := ath.InfoRec.Started  ;
@@ -553,10 +688,15 @@ begin
 
   // log
   LogFrame.Log('%-16s | %4d "%s" elapsed: %d ms, affected: %d, msg: %s', ['AGENTSTOP', ath.AgentRec.Id, ath.AgentRec.Agent, ptr.ElapsedMs, ptr.Affected, ptr.Message], clBlue);
-  LogFrame.Log(ptr.Output.Text);
 
   // output
   LogFrame.Output(ptr.Output.Text);
+  {$ENDREGION}
+
+  {$REGION 'runninglist'}
+  rlx := AgentRunningIdFindByThread(ath);
+  if rlx >= 0 then
+    RunningListBox.Items.Delete(rlx);
   {$ENDREGION}
 
   {$REGION 'on'}
@@ -567,6 +707,8 @@ begin
   // onempty
   {$ENDREGION}
 
+  // free
+  //ath.Free; // freeze tue UI !
 end;
   {$ENDREGION}
 
@@ -635,7 +777,7 @@ begin
   {$ENDREGION}
 
   {$REGION 'gui'}
-  RunInfoListClearLabelClick(nil);
+  RunListClearLabelClick(nil);
   {$ENDREGION}
 
 end;
@@ -656,6 +798,36 @@ begin
   AgentActiveDBCtrlGridRefresh;
 end;
 
+  {$REGION 'RunningList'}
+procedure TAgentMainForm.RunningPauseLabelClick(Sender: TObject);
+begin
+  inherited;
+
+  var sth := AgentRunningSelected;
+  if Assigned(sth) then
+    sth.PauseRequest;
+end;
+
+procedure TAgentMainForm.RunningContinueLabelClick(Sender: TObject);
+begin
+  inherited;
+
+  var sth := AgentRunningSelected;
+  if Assigned(sth) then
+    sth.ContinueRequest;
+end;
+
+procedure TAgentMainForm.RunningStopLabelClick(Sender: TObject);
+begin
+  inherited;
+
+  var sth := AgentRunningSelected;
+  if Assigned(sth) then
+    sth.StopRequest;
+end;
+  {$ENDREGION}
+
+  {$REGION 'RunList'}
 procedure TAgentMainForm.RunListBoxClick(Sender: TObject);
  var
   ptr: PAgentThreadInfoRec;
@@ -675,7 +847,7 @@ begin
   RunInfoReportRichEdit.Text        := ptr.Report.Text       ;
 end;
 
-procedure TAgentMainForm.RunInfoListClearLabelClick(Sender: TObject);
+procedure TAgentMainForm.RunListClearLabelClick(Sender: TObject);
 var
   i: integer;
 begin
@@ -692,6 +864,8 @@ begin
   // runinfo
   AgentRunInfoClear;
 end;
+  {$ENDREGION}
+
 {$ENDREGION}
 
 {$REGION 'Center'}
@@ -1148,6 +1322,7 @@ begin
       // conn
       ResultFDConnection.Close;
       ResultFDConnection.ConnectionString := s;
+    //ResultADOConnection.Open;
 
       // query
       ResultFDQuery.Close;
@@ -1161,6 +1336,8 @@ begin
         ResultDataSource.DataSet := ResultFDQuery;
         TGriRec.GriFit(ResultDBGrid);
         LogFrame.Log('SUCCESS RESULT( FD) for %s with %d rows in %d ms', [a.Agent, r, e]);
+        LogFrame.Log('FD driver actual: %s', [ResultFDConnection.ActualDriverID]);    // "MSSQL_OLEDB", "MSSQL_ODBC", "MSSQL_SQLNCLI"
+        LogFrame.Log('FD MSSQLDriver: %s', [ResultFDConnection.Params.Values['MSSQLDriver']]);
       except
         on e: Exception do begin
           TMesRec.I(e.Message);
@@ -1174,6 +1351,7 @@ begin
       // conn
       ResultADOConnection.Close;
       ResultADOConnection.ConnectionString := s;
+    //ResultADOConnection.Open;
 
       // query
       ResultADOQuery.Close;
@@ -1187,6 +1365,8 @@ begin
         ResultDataSource.DataSet := ResultADOQuery;
         TGriRec.GriFit(ResultDBGrid);
         LogFrame.Log('SUCCESS RESULT(ADO) for %s with %d rows in %d ms', [a.Agent, r, e]);
+        LogFrame.Log('ADO driver actual: %s', [ResultFDConnection.ActualDriverID]);
+        LogFrame.Log('FD MSSQLDriver: %s', [ResultFDConnection.Params.Values['MSSQLDriver']]);
       except
         on e: Exception do begin
           TMesRec.I(e.Message);
@@ -1244,6 +1424,40 @@ begin
     AgentActiveCountLabel.Font.Style  := [];
     AgentRunningCountLabel.Font.Style := [];
   end;
+end;
+
+procedure TAgentMainForm.AgentCsAdoTestActionExecute(Sender: TObject);
+var
+  cns, fbk: string;
+  okk: boolean;
+begin
+  inherited;
+
+  cns := gsyn.Focused.SelText;
+  if cns.Trim.IsEmpty then begin
+    TMesRec.W('Please select an ADO connection string', 'Connection String ADO Test');
+    Exit;
+  end;
+
+  okk := gcns.CsADOTest(cns, fbk);
+  TMesRec.IW(fbk, okk, 'Connection String ADO Test');
+end;
+
+procedure TAgentMainForm.AgentCsFdTestActionExecute(Sender: TObject);
+var
+  cns, fbk: string;
+  okk: boolean;
+begin
+  inherited;
+
+  cns := gsyn.Focused.SelText;
+  if cns.Trim.IsEmpty then begin
+    TMesRec.W('Please select an ADO connection string', 'Connection String ADO Test');
+    Exit;
+  end;
+
+  okk := gcns.CsFDTest(cns, fbk);
+  TMesRec.IW(fbk, okk, 'Connection String ADO Test');
 end;
 {$ENDREGION}
 

@@ -22,6 +22,16 @@ object MainWebModule: TMainWebModule
       Name = 'PersonWebAction'
       PathInfo = '/Person'
       OnAction = MainWebModulePersonWebActionAction
+    end
+    item
+      Name = 'UserWebAction'
+      PathInfo = '/User'
+      OnAction = MainWebModuleUserWebActionAction
+    end
+    item
+      Name = 'MemberWebAction'
+      PathInfo = '/Member'
+      OnAction = MainWebModuleMemberWebActionAction
     end>
   BeforeDispatch = WebModuleBeforeDispatch
   AfterDispatch = WebModuleAfterDispatch
