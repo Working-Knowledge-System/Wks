@@ -382,7 +382,7 @@ CREATE TABLE [DbaOrganization].[dbo].[TblOrganization](
   , [FldLogoUrl]                                [varchar](512)                  NULL
   , [FldBgColor]                                [varchar](16)                   NULL
   , [FldFgColor]                                [varchar](16)                   NULL
-  , [FldBorderColor]                            [varchar](16)                   NULL
+  , [FldBorderColor]                            [varchar](16)                   NULL // --> FldBorderCss (1px solid red)
   , [FldColor]                                  [varchar](16)                   NULL
   , [FldColor2]                                 [varchar](16)                   NULL
   , [FldInfoColor]                              [varchar](16)                   NULL

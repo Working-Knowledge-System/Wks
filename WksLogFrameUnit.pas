@@ -102,6 +102,7 @@ type
     procedure LogOne(IvFormatString: string; IvVarRecVector: array of TVarRec; IvFbkMode: TFbkModeEnum = fmNone; IvPersistMs: integer = 3000; IvTimeShow: boolean = false); overload;
     // others
     procedure LogOrMsg(IvString: string; IvSuccess: boolean);                                                             // if success log else showmessage
+    procedure LogCoalesce(IvString, IvString2: string);                                                                   //
   end;
 {$ENDREGION}
 
@@ -197,6 +198,14 @@ end;
 procedure TLogFrame.Log(IvE: Exception);
 begin
   Log(TStdRec.StdException(IvE), clRed);
+end;
+
+procedure TLogFrame.LogCoalesce(IvString, IvString2: string);
+begin
+  if IvString.IsEmpty then
+    Log(IvString2)
+  else
+    Log(IvString);
 end;
 {$ENDREGION}
 

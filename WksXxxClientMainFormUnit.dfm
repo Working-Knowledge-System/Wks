@@ -169,11 +169,16 @@ inherited XxxMainForm: TXxxMainForm
   end
   inherited BottomPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
+    ExplicitTop = 680
+    ExplicitWidth = 1580
     inherited LogFrame: TLogFrame
+      ExplicitWidth = 1580
       inherited LogPageControl: TPageControl
+        ExplicitWidth = 1580
         inherited OutputTabSheet: TTabSheet
           inherited OutputRichEdit: TRichEdit
             StyleElements = [seFont, seClient, seBorder]
+            ExplicitWidth = 1570
           end
         end
         inherited LogTabSheet: TTabSheet
@@ -508,7 +513,7 @@ inherited XxxMainForm: TXxxMainForm
               Caption = 'Text'
               ExplicitWidth = 21
             end
-            object XxxSelect1Label: TLabel
+            object XxxSelectLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 253
@@ -517,8 +522,8 @@ inherited XxxMainForm: TXxxMainForm
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
-              Caption = 'Select 1'
-              ExplicitWidth = 40
+              Caption = 'Select'
+              ExplicitWidth = 31
             end
             object XxxSelect2Label: TLabel
               AlignWithMargins = True
@@ -627,7 +632,7 @@ inherited XxxMainForm: TXxxMainForm
               DataSource = XxxDataSource
               TabOrder = 3
             end
-            object XxxSelect1DBEdit: TDBEdit
+            object XxxSelectDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
               Top = 274
@@ -636,7 +641,7 @@ inherited XxxMainForm: TXxxMainForm
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
-              DataField = 'FldSelect1'
+              DataField = 'FldSelect'
               DataSource = XxxDataSource
               TabOrder = 4
             end
@@ -857,22 +862,44 @@ inherited XxxMainForm: TXxxMainForm
   inherited MainPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited MainPageControl: TPageControl
+      inherited ObjectContentPrevTabSheet: TTabSheet
+        inherited ObjectContentPrevTopPanel: TPanel
+          inherited ObjectContentPrevCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
       inherited ObjectContentTabSheet: TTabSheet
         inherited ObjectContentSplitter: TSplitter
           ExplicitHeight = 536
+        end
+        inherited ObjectContentTopPanel: TPanel
+          inherited ObjectContentCharCountLabel: TLabel
+            Height = 22
+          end
         end
         inherited ObjectContentSplitView: TSplitView
           DoubleBuffered = True
         end
       end
       inherited ObjectDataTabSheet: TTabSheet
-        inherited ObjectDataDBSynEdit: TDBSynEdit
-          ExplicitLeft = 0
-          ExplicitTop = 28
-        end
         inherited ObjectDataTopPanel: TPanel
           inherited ObjectDataCharCountLabel: TLabel
             Height = 22
+          end
+        end
+      end
+      inherited ObjectNoteTabSheet: TTabSheet
+        inherited ObjectNoteTopPanel: TPanel
+          inherited ObjectNoteCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited FilesRioTabSheet: TTabSheet
+        inherited FilesRioTopPanel: TPanel
+          inherited FilesRioInfoLabel: TLabel
+            Height = 31
           end
         end
       end
@@ -898,9 +925,6 @@ inherited XxxMainForm: TXxxMainForm
     DataSet = XxxClientDataSet
     Left = 208
     Top = 432
-  end
-  inherited MainSoapConnection: TSoapConnection
-    Connected = True
   end
   object XxxImageList24: TImageList [27]
     ColorDepth = cd32Bit

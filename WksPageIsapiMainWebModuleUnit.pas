@@ -97,7 +97,8 @@ implementation
 {$R *.dfm}
 
 uses
-    Data.DB
+    Winapi.Windows // outputdebugstring
+  , Data.DB
   ;
 {$ENDREGION}
 
@@ -333,6 +334,9 @@ begin
   rmb := giif.Str(FWrq.FieldCookieGet('CoRememberMe', false), ' checked="checked"', '');
   rid := giif.ExP(FWrq.FieldGet('CoRedirectToPageId', ''), '?CoRedirectToPageId=');
 
+//gdbg.Dbg('usr = %s', [usr]);
+//gdbg.Dbg('pas = %s', [pas]);
+
   {$REGION 'Go'}
   // login creation form (once submitted the form pass the controll to /LoginTry)
   con := THtmRec.FormModal(
@@ -412,6 +416,8 @@ begin
     bst := gwrq.FieldCookieGet('CoDateTimeBegin', TDatRec.ZERO_DAT);
     bdt := TDatRec.DatFromIso(bst, TDatRec.ZERO_DAT);
 
+  //gdbg.Dbg('bst = %s', [bst]);
+
     // sessionupdateondba
     gses.DateTimeBegin := bdt;
     gses.Organization := gorg.Obj.&Object;
@@ -452,6 +458,11 @@ begin
 
   // session
   gses.Close(fbk);
+//gses.Reset; //  done in gses.Close
+
+  // busobjreset
+  gmbr.Reset(true);
+  gusr.Reset;
 
   // removefromclientbrowser (if user just Quit then leave the cookies) note: these cookies are deleted if the server-session expire
   TWrsRec.FieldCookieDelete(Response, 'CoDateTime');

@@ -1,4 +1,4 @@
-![EuFlag_110x64](https://github.com/user-attachments/assets/da092afb-ed75-4c3c-bc4e-21195d834e0b)
+﻿![EuFlag_110x64](https://github.com/user-attachments/assets/da092afb-ed75-4c3c-bc4e-21195d834e0b)
 ![EuIntegrate_200x64](https://github.com/user-attachments/assets/0e6c8ddf-229c-4bec-b7cc-e6b4eab850ca)
 ![EuProductive40_324x64](https://github.com/user-attachments/assets/93efead0-d586-4619-a830-059b34f2d878)
 
@@ -36,8 +36,6 @@ The system uses a variety of technologies, languages, and libraries, prioritizin
 - W3CSS, W3JS, PicoCSS
 - HTMX, Alpine, Datastar
 - ESP8266, ESP32
-
-
 
 
 # Objects

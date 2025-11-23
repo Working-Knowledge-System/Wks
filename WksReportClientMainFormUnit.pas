@@ -160,8 +160,6 @@ type
     ReportParamOptionJsonDBSynEdit: TDBSynEdit;
     ReportParamOptionJsonLabel: TLabel;
     ReportParamOptionJsonPanel: TPanel;
-    ReportParamOptionQueryConnStrDBEdit: TDBEdit;
-    ReportParamOptionQueryConnStrLabel: TLabel;
     ReportParamOptionQueryDBSynEdit: TDBSynEdit;
     ReportParamOptionQueryLabel: TLabel;
     ReportParamOptionQueryPanel: TPanel;
@@ -232,6 +230,11 @@ type
     ReportGlobalDataDBSynEdit: TDBSynEdit;
     GlobalClientDataSet: TClientDataSet;
     GlobalDataSource: TDataSource;
+    ReportParamOptionQueryBottomPanel: TPanel;
+    ReportParamOptionQueryConnStrLabel: TLabel;
+    ReportParamOptionQueryConnStrDBEdit: TDBEdit;
+    ReportParamCommLibLabel: TLabel;
+    ReportParamCommLibDBComboBox: TDBComboBox;
     procedure FormCreate(Sender: TObject);
     procedure ActionPostActionExecute(Sender: TObject);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
@@ -276,12 +279,15 @@ uses
 {$REGION 'Routine'}
 procedure TReportMainForm.SynEditsSetup;
 begin
-  gsyn.Setup(ReportDatasetSelectDBSynEdit, Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckSql , OptionFoldingLineShowCheckBox.Checked);
-  gsyn.Setup(ReportDatasetInsertDBSynEdit, Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckSql , OptionFoldingLineShowCheckBox.Checked);
-  gsyn.Setup(ReportDatasetUpdateDBSynEdit, Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckSql , OptionFoldingLineShowCheckBox.Checked);
-  gsyn.Setup(ReportDatasetDeleteDBSynEdit, Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckSql , OptionFoldingLineShowCheckBox.Checked);
-  gsyn.Setup(ReportDatasetJsonDBSynEdit  , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckJson, OptionFoldingLineShowCheckBox.Checked);
-  gsyn.Setup(ReportGlobalDataDBSynEdit   , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckSql , OptionFoldingLineShowCheckBox.Checked);
+  gsyn.Setup(ReportParamOptionCsvDBSynEdit  , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckCsv , OptionFoldingLineShowCheckBox.Checked);
+  gsyn.Setup(ReportParamOptionJsonDBSynEdit , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckJson, OptionFoldingLineShowCheckBox.Checked);
+  gsyn.Setup(ReportParamOptionQueryDBSynEdit, Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckSql , OptionFoldingLineShowCheckBox.Checked);
+  gsyn.Setup(ReportDatasetSelectDBSynEdit   , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckSql , OptionFoldingLineShowCheckBox.Checked);
+  gsyn.Setup(ReportDatasetInsertDBSynEdit   , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckSql , OptionFoldingLineShowCheckBox.Checked);
+  gsyn.Setup(ReportDatasetUpdateDBSynEdit   , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckSql , OptionFoldingLineShowCheckBox.Checked);
+  gsyn.Setup(ReportDatasetDeleteDBSynEdit   , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckSql , OptionFoldingLineShowCheckBox.Checked);
+  gsyn.Setup(ReportDatasetJsonDBSynEdit     , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckJson, OptionFoldingLineShowCheckBox.Checked);
+  gsyn.Setup(ReportGlobalDataDBSynEdit      , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckSql , OptionFoldingLineShowCheckBox.Checked);
 end;
 {$ENDREGION}
 

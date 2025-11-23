@@ -344,7 +344,7 @@ begin
   end else if ock = TCodRec.SQL.Kind then begin
          if not TDbaRec.DsFromSql(oco, dst, aff, fbk) then begin
       mim := giif.NxD(rmt, TCtyRec.CTY_TXT_HTML);
-      res := fbk;
+      res := '[{"FldItem":"Error", "FldDescription":"' + fbk + '"}]';
     end else if SameText(ras, 'AsCsv') then begin
       mim := giif.NxD(rmt, TCtyRec.CTY_TXT_CSV);
       TDstRec.DstToCsv(dst, res);

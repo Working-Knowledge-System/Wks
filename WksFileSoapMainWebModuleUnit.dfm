@@ -5,6 +5,21 @@ object FileMainWebModule: TFileMainWebModule
       Name = 'DefaultHandler'
       PathInfo = '/'
       OnAction = FileMainWebModuleDefaultHandlerAction
+    end
+    item
+      Name = 'FileListWebAction'
+      PathInfo = '/FileList'
+      OnAction = FileMainWebModuleFileListWebActionAction
+    end
+    item
+      Name = 'FileGetWebAction'
+      PathInfo = '/FileGet'
+      OnAction = FileMainWebModuleFileGetWebActionAction
+    end
+    item
+      Name = 'FileSaveWebAction'
+      PathInfo = '/FileSave'
+      OnAction = FileMainWebModuleFileSaveWebActionAction
     end>
   Height = 230
   Width = 415

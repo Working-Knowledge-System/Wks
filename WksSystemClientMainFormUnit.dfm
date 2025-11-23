@@ -16,8 +16,6 @@ inherited SystemMainForm: TSystemMainForm
   inherited TopPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited TopPageControl: TPageControl
-      ExplicitLeft = 0
-      ExplicitTop = 0
       inherited TopTextTabSheet: TTabSheet
         inherited TextToolBar: TToolBar
           Width = 785
@@ -321,8 +319,6 @@ inherited SystemMainForm: TSystemMainForm
   inherited RightPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited RightPageControl: TPageControl
-      ExplicitLeft = -1
-      ExplicitTop = -1
       inherited PropertyTabSheet: TTabSheet
         inherited ObjectJvScrollMax: TJvScrollMax
           StyleElements = [seFont, seClient, seBorder]
@@ -532,7 +528,7 @@ inherited SystemMainForm: TSystemMainForm
             end
           end
           object SystemJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'System'
@@ -548,7 +544,7 @@ inherited SystemMainForm: TSystemMainForm
               AlignWithMargins = True
               Left = 16
               Top = 53
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -560,7 +556,7 @@ inherited SystemMainForm: TSystemMainForm
               AlignWithMargins = True
               Left = 16
               Top = 103
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -572,7 +568,7 @@ inherited SystemMainForm: TSystemMainForm
               AlignWithMargins = True
               Left = 16
               Top = 153
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -584,7 +580,7 @@ inherited SystemMainForm: TSystemMainForm
               AlignWithMargins = True
               Left = 16
               Top = 74
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -601,7 +597,7 @@ inherited SystemMainForm: TSystemMainForm
               AlignWithMargins = True
               Left = 16
               Top = 124
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -614,7 +610,7 @@ inherited SystemMainForm: TSystemMainForm
               AlignWithMargins = True
               Left = 16
               Top = 174
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -627,7 +623,7 @@ inherited SystemMainForm: TSystemMainForm
               AlignWithMargins = True
               Left = 3
               Top = 22
-              Width = 275
+              Width = 273
               Height = 25
               DataSource = SystemDataSource
               VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
@@ -694,6 +690,9 @@ inherited SystemMainForm: TSystemMainForm
             inherited OptionFontSizeLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited OptionTextRightEdgeLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited OptionTabWidthJvSpinEdit: TJvSpinEdit
               StyleElements = [seFont, seClient, seBorder]
             end
@@ -701,6 +700,9 @@ inherited SystemMainForm: TSystemMainForm
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited OptionFontSizeJvSpinEdit: TJvSpinEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTextRightEdgeComboBox: TComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -741,10 +743,7 @@ inherited SystemMainForm: TSystemMainForm
             end
           end
           inherited OptionFilesJvScrollMaxBand: TJvScrollMaxBand
-            Height = 21
-            Expanded = False
             ExpandedHeight = 21
-            ExplicitHeight = 21
             inherited OptionFilesWorkingFolderLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
@@ -769,46 +768,13 @@ inherited SystemMainForm: TSystemMainForm
     StyleElements = [seFont, seClient, seBorder]
     OnClick = MainPanelClick
     inherited MainPageControl: TPageControl
-      ActivePage = SystemSysLogTabSheet
-      inherited ObjectContentPrevTabSheet: TTabSheet
-        inherited ObjectContentPrevTopPanel: TPanel
-          inherited ObjectContentPrevCharCountLabel: TLabel
-            Height = 22
-          end
-        end
-      end
+      ActivePage = SystemSourceTabSheet
       inherited ObjectContentTabSheet: TTabSheet
         inherited ObjectContentSplitter: TSplitter
           ExplicitHeight = 536
         end
-        inherited ObjectContentTopPanel: TPanel
-          inherited ObjectContentCharCountLabel: TLabel
-            Height = 22
-          end
-        end
         inherited ObjectContentSplitView: TSplitView
           DoubleBuffered = True
-        end
-      end
-      inherited ObjectDataTabSheet: TTabSheet
-        inherited ObjectDataTopPanel: TPanel
-          inherited ObjectDataCharCountLabel: TLabel
-            Height = 22
-          end
-        end
-      end
-      inherited ObjectNoteTabSheet: TTabSheet
-        inherited ObjectNoteTopPanel: TPanel
-          inherited ObjectNoteCharCountLabel: TLabel
-            Height = 22
-          end
-        end
-      end
-      inherited FilesRioTabSheet: TTabSheet
-        inherited FilesRioTopPanel: TPanel
-          inherited FilesRioInfoLabel: TLabel
-            Height = 31
-          end
         end
       end
       object SystemSysLogTabSheet: TTabSheet
@@ -818,7 +784,7 @@ inherited SystemMainForm: TSystemMainForm
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 941
+          Width = 898
           Height = 30
           Margins.Left = 0
           Margins.Top = 0
@@ -832,15 +798,14 @@ inherited SystemMainForm: TSystemMainForm
           TabOrder = 0
           object SysLogLabel: TLabel
             AlignWithMargins = True
-            Left = 835
+            Left = 792
             Top = 3
             Width = 98
-            Height = 24
+            Height = 15
             Margins.Right = 8
             Align = alRight
             Caption = 'SysLogCountLabel'
             Layout = tlCenter
-            ExplicitHeight = 15
           end
           object SystemSyslogStartSpeedButton: TSpeedButton
             AlignWithMargins = True
@@ -928,7 +893,7 @@ inherited SystemMainForm: TSystemMainForm
           AlignWithMargins = True
           Left = 3
           Top = 33
-          Width = 936
+          Width = 893
           Height = 530
           Align = alClient
           BorderStyle = bsNone
@@ -953,7 +918,7 @@ inherited SystemMainForm: TSystemMainForm
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 941
+          Width = 898
           Height = 30
           Margins.Left = 0
           Margins.Top = 0
@@ -967,15 +932,14 @@ inherited SystemMainForm: TSystemMainForm
           TabOrder = 0
           object LogCountLabel: TLabel
             AlignWithMargins = True
-            Left = 852
+            Left = 809
             Top = 3
             Width = 81
-            Height = 24
+            Height = 15
             Margins.Right = 8
             Align = alRight
             Caption = 'LogCountLabel'
             Layout = tlCenter
-            ExplicitHeight = 15
           end
           object LogRefreshSpeedButton: TSpeedButton
             AlignWithMargins = True
@@ -1022,7 +986,7 @@ inherited SystemMainForm: TSystemMainForm
           AlignWithMargins = True
           Left = 3
           Top = 33
-          Width = 936
+          Width = 893
           Height = 530
           Align = alClient
           BorderStyle = bsNone
@@ -1056,7 +1020,7 @@ inherited SystemMainForm: TSystemMainForm
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 941
+          Width = 898
           Height = 30
           Margins.Left = 0
           Margins.Top = 0
@@ -1070,15 +1034,14 @@ inherited SystemMainForm: TSystemMainForm
           TabOrder = 0
           object AuditCountLabel: TLabel
             AlignWithMargins = True
-            Left = 843
+            Left = 800
             Top = 3
             Width = 90
-            Height = 24
+            Height = 15
             Margins.Right = 8
             Align = alRight
             Caption = 'AuditCountLabel'
             Layout = tlCenter
-            ExplicitHeight = 15
           end
           object AuditRefreshSpeedButton: TSpeedButton
             AlignWithMargins = True
@@ -1124,7 +1087,7 @@ inherited SystemMainForm: TSystemMainForm
           AlignWithMargins = True
           Left = 3
           Top = 33
-          Width = 936
+          Width = 893
           Height = 530
           Align = alClient
           BorderStyle = bsNone
@@ -1157,7 +1120,7 @@ inherited SystemMainForm: TSystemMainForm
         object Splitter1: TSplitter
           Left = 0
           Top = 370
-          Width = 942
+          Width = 899
           Height = 3
           Cursor = crVSplit
           Align = alBottom
@@ -1168,7 +1131,7 @@ inherited SystemMainForm: TSystemMainForm
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 941
+          Width = 898
           Height = 46
           Margins.Left = 0
           Margins.Top = 0
@@ -1182,15 +1145,14 @@ inherited SystemMainForm: TSystemMainForm
           TabOrder = 0
           object BinariesCountLabel: TLabel
             AlignWithMargins = True
-            Left = 831
+            Left = 788
             Top = 3
             Width = 102
-            Height = 40
+            Height = 15
             Margins.Right = 8
             Align = alRight
             Caption = 'BinariesCountLabel'
             Layout = tlCenter
-            ExplicitHeight = 15
           end
           object BinariesToolBar: TToolBar
             Left = 0
@@ -1236,7 +1198,7 @@ inherited SystemMainForm: TSystemMainForm
           AlignWithMargins = True
           Left = 3
           Top = 49
-          Width = 936
+          Width = 893
           Height = 318
           Align = alClient
           BorderStyle = bsNone
@@ -1265,7 +1227,7 @@ inherited SystemMainForm: TSystemMainForm
         object PageControl1: TPageControl
           Left = 0
           Top = 373
-          Width = 942
+          Width = 899
           Height = 193
           ActivePage = BinariesDescriptionTabSheet
           Align = alBottom
@@ -1276,7 +1238,7 @@ inherited SystemMainForm: TSystemMainForm
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 928
+              Width = 885
               Height = 157
               Align = alClient
               BorderStyle = bsNone
@@ -1298,7 +1260,7 @@ inherited SystemMainForm: TSystemMainForm
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 928
+              Width = 885
               Height = 157
               Align = alClient
               BorderStyle = bsNone
@@ -1322,7 +1284,7 @@ inherited SystemMainForm: TSystemMainForm
           AlignWithMargins = True
           Left = 0
           Top = 0
-          Width = 941
+          Width = 898
           Height = 46
           Margins.Left = 0
           Margins.Top = 0
@@ -1459,47 +1421,36 @@ inherited SystemMainForm: TSystemMainForm
         object SystemSourceMainPanel: TPanel
           Left = 263
           Top = 0
-          Width = 679
+          Width = 636
           Height = 566
           Align = alClient
           BevelOuter = bvNone
           Caption = 'SystemSourceMainPanel'
           ShowCaption = False
           TabOrder = 1
-          object SystemSourceConnStrAdoLabel: TLabel
+          object SystemSourceSourceLabel: TLabel
             AlignWithMargins = True
             Left = 8
-            Top = 182
-            Width = 663
+            Top = 3
+            Width = 620
             Height = 15
             Margins.Left = 8
             Margins.Right = 8
             Align = alTop
-            Caption = 'Connection String ADO'
-            ExplicitWidth = 124
-          end
-          object SystemSourceConnStrFdLabel: TLabel
-            AlignWithMargins = True
-            Left = 8
-            Top = 371
-            Width = 663
-            Height = 15
-            Margins.Left = 8
-            Margins.Right = 8
-            Align = alTop
-            Caption = 'Connection String FD (Firedac)'
-            ExplicitWidth = 162
+            Caption = 'Sources'
+            ExplicitWidth = 41
           end
           object SystemSourceDBGrid: TDBGrid
             AlignWithMargins = True
             Left = 8
-            Top = 8
-            Width = 663
+            Top = 29
+            Width = 620
             Height = 168
             Margins.Left = 8
             Margins.Top = 8
             Margins.Right = 8
             Align = alTop
+            BorderStyle = bsNone
             DataSource = SourceDataSource
             TabOrder = 0
             TitleFont.Charset = DEFAULT_CHARSET
@@ -1511,8 +1462,8 @@ inherited SystemMainForm: TSystemMainForm
           object SystemSourceConnStrAdoDBSynEdit: TDBSynEdit
             AlignWithMargins = True
             Left = 8
-            Top = 203
-            Width = 663
+            Top = 227
+            Width = 620
             Height = 162
             Cursor = crIBeam
             Margins.Left = 8
@@ -1529,6 +1480,7 @@ inherited SystemMainForm: TSystemMainForm
             ParentColor = False
             ParentFont = False
             TabOrder = 1
+            BorderStyle = bsNone
             Gutter.Font.Charset = DEFAULT_CHARSET
             Gutter.Font.Color = clWindowText
             Gutter.Font.Height = -11
@@ -1540,9 +1492,9 @@ inherited SystemMainForm: TSystemMainForm
           object SystemSourceConnStrFdDBSynEdit: TDBSynEdit
             AlignWithMargins = True
             Left = 8
-            Top = 392
-            Width = 663
-            Height = 166
+            Top = 419
+            Width = 620
+            Height = 139
             Cursor = crIBeam
             Margins.Left = 8
             Margins.Right = 8
@@ -1559,6 +1511,7 @@ inherited SystemMainForm: TSystemMainForm
             ParentColor = False
             ParentFont = False
             TabOrder = 2
+            BorderStyle = bsNone
             Gutter.Font.Charset = DEFAULT_CHARSET
             Gutter.Font.Color = clWindowText
             Gutter.Font.Height = -11
@@ -1566,6 +1519,84 @@ inherited SystemMainForm: TSystemMainForm
             Gutter.Font.Style = []
             Gutter.Font.Quality = fqClearTypeNatural
             Gutter.Bands = <>
+          end
+          object SystemSourceConnStrAdoPanel: TPanel
+            Left = 0
+            Top = 200
+            Width = 636
+            Height = 24
+            Align = alTop
+            BevelOuter = bvNone
+            Caption = 'SystemSourceConnStrAdoPanel'
+            ShowCaption = False
+            TabOrder = 3
+            object SystemSourceConnStrAdoLabel: TLabel
+              AlignWithMargins = True
+              Left = 8
+              Top = 3
+              Width = 124
+              Height = 18
+              Margins.Left = 8
+              Margins.Right = 8
+              Align = alLeft
+              Caption = 'Connection String ADO'
+              Layout = tlCenter
+              ExplicitHeight = 15
+            end
+            object SystemSourceConnStrAdoTestLabel: TLabel
+              Left = 200
+              Top = 4
+              Width = 20
+              Height = 15
+              Cursor = crHandPoint
+              Caption = 'Test'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlue
+              Font.Height = -12
+              Font.Name = 'Segoe UI'
+              Font.Style = [fsUnderline]
+              ParentFont = False
+              OnClick = SystemSourceConnStrAdoTestLabelClick
+            end
+          end
+          object SystemSourceConnStrFdPanel: TPanel
+            Left = 0
+            Top = 392
+            Width = 636
+            Height = 24
+            Align = alTop
+            BevelOuter = bvNone
+            Caption = 'SystemSourceConnStrAdoPanel'
+            ShowCaption = False
+            TabOrder = 4
+            object SystemSourceConnStrFdLabel: TLabel
+              AlignWithMargins = True
+              Left = 8
+              Top = 3
+              Width = 162
+              Height = 18
+              Margins.Left = 8
+              Margins.Right = 8
+              Align = alLeft
+              Caption = 'Connection String FD (Firedac)'
+              Layout = tlCenter
+              ExplicitHeight = 15
+            end
+            object SystemSourceConnStrFdTestLabel: TLabel
+              Left = 200
+              Top = 4
+              Width = 20
+              Height = 15
+              Cursor = crHandPoint
+              Caption = 'Test'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlue
+              Font.Height = -12
+              Font.Name = 'Segoe UI'
+              Font.Style = [fsUnderline]
+              ParentFont = False
+              OnClick = SystemSourceConnStrFdTestLabelClick
+            end
           end
         end
       end

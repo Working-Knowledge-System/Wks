@@ -16,8 +16,6 @@ inherited ReportMainForm: TReportMainForm
   inherited TopPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited TopPageControl: TPageControl
-      ExplicitLeft = 0
-      ExplicitTop = 0
       inherited TopSearchTabSheet: TTabSheet
         inherited SearchReplaceOutLabel: TLabel
           StyleElements = [seFont, seClient, seBorder]
@@ -33,6 +31,14 @@ inherited ReportMainForm: TReportMainForm
         end
         inherited SearchReplaceInEdit: TEdit
           StyleElements = [seFont, seClient, seBorder]
+        end
+      end
+      inherited TopUtilsTabSheet: TTabSheet
+        inherited UtilsToolBar: TToolBar
+          ButtonWidth = 46
+          inherited UtilsPythonExecToolButton: TToolButton
+            ExplicitWidth = 46
+          end
         end
       end
     end
@@ -217,6 +223,8 @@ inherited ReportMainForm: TReportMainForm
   inherited RightPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited RightPageControl: TPageControl
+      ExplicitLeft = 2
+      ExplicitTop = -31
       inherited PropertyTabSheet: TTabSheet
         inherited ObjectJvScrollMax: TJvScrollMax
           StyleElements = [seFont, seClient, seBorder]
@@ -426,7 +434,7 @@ inherited ReportMainForm: TReportMainForm
             end
           end
           object ReportJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'Report'
@@ -442,7 +450,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 53
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -454,19 +462,19 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 103
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Export'
-              ExplicitWidth = 34
+              ExplicitWidth = 33
             end
             object ReportSourceLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 153
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -478,7 +486,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 203
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -490,7 +498,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 253
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -502,7 +510,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 303
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -514,7 +522,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 353
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -526,7 +534,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 403
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -538,7 +546,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 453
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -550,7 +558,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 503
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -562,7 +570,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 553
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -574,7 +582,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 74
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -591,7 +599,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 22
-              Width = 275
+              Width = 273
               Height = 25
               DataSource = ReportDataSource
               VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
@@ -603,7 +611,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 124
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -618,7 +626,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 174
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -633,7 +641,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 224
-              Width = 249
+              Width = 247
               Height = 23
               Hint = 'Page'
               Margins.Left = 16
@@ -649,7 +657,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 274
-              Width = 249
+              Width = 247
               Height = 23
               Hint = 'Page'
               Margins.Left = 16
@@ -665,7 +673,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 324
-              Width = 249
+              Width = 247
               Height = 23
               Hint = 'Page'
               Margins.Left = 16
@@ -681,7 +689,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 374
-              Width = 249
+              Width = 247
               Height = 23
               Hint = 'Page'
               Margins.Left = 16
@@ -697,7 +705,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 424
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -710,7 +718,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 474
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -725,7 +733,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 524
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -740,7 +748,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 574
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -755,7 +763,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 616
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Top = 16
@@ -770,7 +778,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 639
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -784,7 +792,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 662
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -798,7 +806,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 721
-              Width = 249
+              Width = 247
               Height = 17
               Hint = 'Show or hide the title of "Params" panel'
               Margins.Left = 16
@@ -813,7 +821,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 744
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -827,7 +835,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 767
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -841,7 +849,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 803
-              Width = 249
+              Width = 247
               Height = 17
               Hint = 'Hide the header table that renders the dataset'
               Margins.Left = 16
@@ -857,7 +865,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 826
-              Width = 249
+              Width = 247
               Height = 17
               Hint = 'Hide the records  count for the dataset'
               Margins.Left = 16
@@ -872,7 +880,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 698
-              Width = 249
+              Width = 247
               Height = 17
               Hint = 'Show or hide the title of "Params" panel'
               Margins.Left = 16
@@ -886,11 +894,11 @@ inherited ReportMainForm: TReportMainForm
             end
           end
           object ReportParamJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'Param'
-            ExpandedHeight = 798
+            ExpandedHeight = 800
             ButtonFont.Charset = ANSI_CHARSET
             ButtonFont.Color = clWindowText
             ButtonFont.Height = -11
@@ -901,20 +909,21 @@ inherited ReportMainForm: TReportMainForm
             object ReportParamLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 122
-              Width = 249
+              Top = 172
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Param'
+              ExplicitTop = 122
               ExplicitWidth = 34
             end
             object ReportParamStateLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 72
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -926,7 +935,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 22
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -937,44 +946,47 @@ inherited ReportMainForm: TReportMainForm
             object ReportParamDefaultCsvLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 172
-              Width = 249
+              Top = 222
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Default (csv)'
+              ExplicitTop = 172
               ExplicitWidth = 66
             end
             object ReportParamCaptionLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 222
-              Width = 249
+              Top = 272
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Caption'
+              ExplicitTop = 222
               ExplicitWidth = 42
             end
             object ReportParamDescriptionLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 322
-              Width = 249
+              Top = 372
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Description'
+              ExplicitTop = 322
               ExplicitWidth = 60
             end
             object ReportParamKindLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 472
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -985,32 +997,34 @@ inherited ReportMainForm: TReportMainForm
             object ReportParamHelpLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 372
-              Width = 249
+              Top = 422
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Help'
+              ExplicitTop = 372
               ExplicitWidth = 25
             end
             object ReportParamPlaceholderLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 272
-              Width = 249
+              Top = 322
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Placeholder'
+              ExplicitTop = 272
               ExplicitWidth = 62
             end
             object ReportParamClassLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 522
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1022,7 +1036,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 572
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1034,7 +1048,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 622
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1045,20 +1059,21 @@ inherited ReportMainForm: TReportMainForm
             object ReportParamEnvLabel: TLabel
               AlignWithMargins = True
               Left = 16
-              Top = 422
-              Width = 249
+              Top = 122
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Environment'
-              ExplicitWidth = 68
+              ExplicitLeft = 8
+              ExplicitTop = 172
             end
             object ReportParamDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 143
-              Width = 249
+              Top = 193
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1066,12 +1081,13 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldParam'
               DataSource = ParamDataSource
               TabOrder = 0
+              ExplicitTop = 143
             end
             object ReportParamStateDBComboBox: TDBComboBox
               AlignWithMargins = True
               Left = 16
               Top = 93
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1091,7 +1107,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 43
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1103,8 +1119,8 @@ inherited ReportMainForm: TReportMainForm
             object ReportParamDefaultCsvDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 193
-              Width = 249
+              Top = 243
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1112,12 +1128,13 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldDefault'
               DataSource = ParamDataSource
               TabOrder = 3
+              ExplicitTop = 193
             end
             object ReportParamCaptionDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 243
-              Width = 249
+              Top = 293
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1125,12 +1142,13 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldCaption'
               DataSource = ParamDataSource
               TabOrder = 4
+              ExplicitTop = 243
             end
             object ReportParamDescriptionDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 343
-              Width = 249
+              Top = 393
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1138,12 +1156,13 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldDescription'
               DataSource = ParamDataSource
               TabOrder = 5
+              ExplicitTop = 343
             end
             object ReportParamKindDBComboBox: TDBComboBox
               AlignWithMargins = True
               Left = 16
               Top = 493
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1176,7 +1195,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 695
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -1190,7 +1209,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 718
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -1204,7 +1223,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 672
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -1217,8 +1236,8 @@ inherited ReportMainForm: TReportMainForm
             object ReportParamHelpDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 393
-              Width = 249
+              Top = 443
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1226,12 +1245,13 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldHelp'
               DataSource = ParamDataSource
               TabOrder = 10
+              ExplicitTop = 393
             end
             object ReportParamPlaceholderDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
-              Top = 293
-              Width = 249
+              Top = 343
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1239,12 +1259,13 @@ inherited ReportMainForm: TReportMainForm
               DataField = 'FldPlaceholder'
               DataSource = ParamDataSource
               TabOrder = 11
+              ExplicitTop = 293
             end
             object ReportParamClassDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
               Top = 543
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1257,7 +1278,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 593
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1270,7 +1291,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 643
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1299,8 +1320,8 @@ inherited ReportMainForm: TReportMainForm
             object ReportParamEnvDBComboBox: TDBComboBox
               AlignWithMargins = True
               Left = 16
-              Top = 443
-              Width = 249
+              Top = 143
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1316,12 +1337,14 @@ inherited ReportMainForm: TReportMainForm
               ParentShowHint = False
               ShowHint = True
               TabOrder = 15
+              ExplicitLeft = 8
+              ExplicitTop = 193
             end
             object ReportParamFromQueryDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
               Top = 741
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -1335,7 +1358,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 764
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -1347,7 +1370,7 @@ inherited ReportMainForm: TReportMainForm
             end
           end
           object ReportDatasetJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'Dataset'
@@ -1363,7 +1386,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 122
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1375,7 +1398,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 72
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1387,7 +1410,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 22
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1399,7 +1422,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 522
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1412,7 +1435,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 572
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1425,7 +1448,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 422
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1437,7 +1460,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 272
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1450,20 +1473,20 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 472
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Max Records'
               Layout = tlCenter
-              ExplicitWidth = 68
+              ExplicitWidth = 67
             end
             object ReportDatasetDescriptionLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 222
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1475,19 +1498,19 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 172
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Title (or csv if dataset has sub-records)'
-              ExplicitWidth = 202
+              ExplicitWidth = 203
             end
             object ReportDatasetConnLibLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 322
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1500,20 +1523,20 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 622
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Timeout (seconds)'
               Layout = tlCenter
-              ExplicitWidth = 98
+              ExplicitWidth = 99
             end
             object ReportDatasetSwitchLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 772
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1526,7 +1549,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 672
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1538,7 +1561,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 722
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1550,7 +1573,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 372
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1562,7 +1585,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 822
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1575,7 +1598,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 143
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1588,7 +1611,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 93
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1608,7 +1631,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 43
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1621,7 +1644,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 543
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1634,7 +1657,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 593
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1647,7 +1670,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 443
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1666,7 +1689,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 293
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1679,7 +1702,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 493
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1692,7 +1715,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 243
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1705,7 +1728,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 193
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1718,7 +1741,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 343
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1737,7 +1760,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 643
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1750,7 +1773,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 877
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Top = 8
@@ -1766,7 +1789,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 793
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1779,7 +1802,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 693
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1792,7 +1815,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 743
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1805,7 +1828,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 956
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -1819,7 +1842,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 933
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -1833,7 +1856,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 910
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Top = 16
@@ -1848,7 +1871,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 393
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1867,7 +1890,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 843
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1878,7 +1901,7 @@ inherited ReportMainForm: TReportMainForm
             end
           end
           object ReportChartJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 279
             Height = 21
             Expanded = False
             Caption = 'Chart'
@@ -1894,7 +1917,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 22
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1906,7 +1929,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 72
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1918,19 +1941,19 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 172
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Title'
-              ExplicitWidth = 22
+              ExplicitWidth = 23
             end
             object ReportChartDescriptionLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 222
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1942,7 +1965,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 272
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1955,7 +1978,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 322
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1968,7 +1991,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 372
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1981,7 +2004,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 422
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1994,7 +2017,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 472
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -2007,7 +2030,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 522
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -2020,7 +2043,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 122
-              Width = 249
+              Width = 247
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -2032,7 +2055,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 43
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -2045,7 +2068,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 93
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -2065,7 +2088,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 193
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -2078,7 +2101,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 243
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -2091,7 +2114,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 293
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -2104,7 +2127,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 343
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -2117,7 +2140,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 393
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -2130,7 +2153,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 443
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -2143,7 +2166,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 493
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -2156,7 +2179,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 543
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -2169,7 +2192,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 143
-              Width = 249
+              Width = 247
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -2182,7 +2205,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 600
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -2196,7 +2219,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 623
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -2210,7 +2233,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 16
               Top = 577
-              Width = 249
+              Width = 247
               Height = 17
               Margins.Left = 16
               Margins.Top = 8
@@ -2280,6 +2303,9 @@ inherited ReportMainForm: TReportMainForm
             inherited OptionFontSizeLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited OptionTextRightEdgeLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited OptionTabWidthJvSpinEdit: TJvSpinEdit
               StyleElements = [seFont, seClient, seBorder]
             end
@@ -2287,6 +2313,9 @@ inherited ReportMainForm: TReportMainForm
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited OptionFontSizeJvSpinEdit: TJvSpinEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTextRightEdgeComboBox: TComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -2350,7 +2379,7 @@ inherited ReportMainForm: TReportMainForm
   inherited MainPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited MainPageControl: TPageControl
-      ActivePage = ReportGlobalTabSheet
+      ActivePage = ReportParamTabSheet
       inherited ObjectContentPrevTabSheet: TTabSheet
         inherited ObjectContentPrevTopPanel: TPanel
           inherited ObjectContentPrevCharCountLabel: TLabel
@@ -2391,6 +2420,9 @@ inherited ReportMainForm: TReportMainForm
             Height = 31
           end
         end
+        inherited FilesRioTree: TVirtualStringTree
+          DefaultNodeHeight = 25
+        end
       end
       object ReportTabSheet: TTabSheet
         Caption = 'Report'
@@ -2399,7 +2431,7 @@ inherited ReportMainForm: TReportMainForm
           AlignWithMargins = True
           Left = 8
           Top = 3
-          Width = 926
+          Width = 883
           Height = 15
           Margins.Left = 8
           Margins.Right = 8
@@ -2411,7 +2443,7 @@ inherited ReportMainForm: TReportMainForm
           AlignWithMargins = True
           Left = 8
           Top = 289
-          Width = 926
+          Width = 883
           Height = 15
           Margins.Left = 8
           Margins.Right = 8
@@ -2423,7 +2455,7 @@ inherited ReportMainForm: TReportMainForm
           AlignWithMargins = True
           Left = 8
           Top = 280
-          Width = 926
+          Width = 883
           Height = 3
           Cursor = crVSplit
           Margins.Left = 8
@@ -2431,12 +2463,13 @@ inherited ReportMainForm: TReportMainForm
           Align = alBottom
           ExplicitLeft = -3
           ExplicitTop = 383
+          ExplicitWidth = 926
         end
         object ReportHeaderDBSynEdit: TDBSynEdit
           AlignWithMargins = True
           Left = 8
           Top = 24
-          Width = 926
+          Width = 883
           Height = 250
           Cursor = crIBeam
           Margins.Left = 8
@@ -2467,7 +2500,7 @@ inherited ReportMainForm: TReportMainForm
           AlignWithMargins = True
           Left = 8
           Top = 310
-          Width = 926
+          Width = 883
           Height = 253
           Cursor = crIBeam
           Margins.Left = 8
@@ -2502,7 +2535,7 @@ inherited ReportMainForm: TReportMainForm
           AlignWithMargins = True
           Left = 8
           Top = 329
-          Width = 926
+          Width = 883
           Height = 3
           Cursor = crVSplit
           Margins.Left = 8
@@ -2515,7 +2548,7 @@ inherited ReportMainForm: TReportMainForm
           AlignWithMargins = True
           Left = 8
           Top = 212
-          Width = 926
+          Width = 883
           Height = 3
           Cursor = crVSplit
           Margins.Left = 8
@@ -2528,7 +2561,7 @@ inherited ReportMainForm: TReportMainForm
           AlignWithMargins = True
           Left = 8
           Top = 95
-          Width = 926
+          Width = 883
           Height = 3
           Cursor = crVSplit
           Margins.Left = 8
@@ -2541,7 +2574,7 @@ inherited ReportMainForm: TReportMainForm
           AlignWithMargins = True
           Left = 8
           Top = 8
-          Width = 926
+          Width = 883
           Height = 81
           Margins.Left = 8
           Margins.Top = 8
@@ -2578,7 +2611,7 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 32
-            Width = 920
+            Width = 877
             Height = 46
             Margins.Top = 32
             Align = alClient
@@ -2601,7 +2634,7 @@ inherited ReportMainForm: TReportMainForm
           AlignWithMargins = True
           Left = 8
           Top = 338
-          Width = 926
+          Width = 883
           Height = 225
           Margins.Left = 8
           Margins.Right = 8
@@ -2614,7 +2647,7 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 3
-            Width = 920
+            Width = 877
             Height = 15
             Align = alTop
             Caption = 
@@ -2622,22 +2655,12 @@ inherited ReportMainForm: TReportMainForm
               ' Fld1 as FldValue, Fld2 as FldCaption from ...)'
             ExplicitWidth = 574
           end
-          object ReportParamOptionQueryConnStrLabel: TLabel
-            AlignWithMargins = True
-            Left = 3
-            Top = 178
-            Width = 920
-            Height = 15
-            Align = alBottom
-            Caption = 'Option Query Connection String (explicit or Source Id)'
-            ExplicitWidth = 286
-          end
           object ReportParamOptionQueryDBSynEdit: TDBSynEdit
             AlignWithMargins = True
             Left = 3
             Top = 24
-            Width = 920
-            Height = 148
+            Width = 877
+            Height = 149
             Cursor = crIBeam
             DataField = 'FldOptionQuery'
             DataSource = ParamDataSource
@@ -2676,26 +2699,77 @@ inherited ReportMainForm: TReportMainForm
                 Kind = gbkMargin
                 Width = 3
               end>
-            TabWidth = 3
+            TabWidth = 4
             WantTabs = True
+            ExplicitHeight = 148
           end
-          object ReportParamOptionQueryConnStrDBEdit: TDBEdit
-            AlignWithMargins = True
-            Left = 3
-            Top = 199
-            Width = 920
-            Height = 23
+          object ReportParamOptionQueryBottomPanel: TPanel
+            Left = 0
+            Top = 176
+            Width = 883
+            Height = 49
             Align = alBottom
-            DataField = 'FldConnStr'
-            DataSource = ParamDataSource
+            BevelOuter = bvNone
+            Caption = 'ReportParamOptionQueryBottomPanel'
+            ShowCaption = False
             TabOrder = 1
+            DesignSize = (
+              883
+              49)
+            object ReportParamOptionQueryConnStrLabel: TLabel
+              AlignWithMargins = True
+              Left = 172
+              Top = 3
+              Width = 285
+              Height = 15
+              Caption = 'Option Query Connection String (explicit or Source Id)'
+            end
+            object ReportParamCommLibLabel: TLabel
+              AlignWithMargins = True
+              Left = 7
+              Top = 3
+              Width = 146
+              Height = 15
+              Margins.Left = 16
+              Margins.Right = 16
+              Caption = 'Options Connection Library'
+            end
+            object ReportParamOptionQueryConnStrDBEdit: TDBEdit
+              AlignWithMargins = True
+              Left = 172
+              Top = 24
+              Width = 709
+              Height = 23
+              Anchors = [akLeft, akTop, akRight]
+              DataField = 'FldConnStr'
+              DataSource = ParamDataSource
+              TabOrder = 0
+            end
+            object ReportParamCommLibDBComboBox: TDBComboBox
+              AlignWithMargins = True
+              Left = 7
+              Top = 24
+              Width = 146
+              Height = 23
+              Margins.Left = 16
+              Margins.Right = 16
+              DataField = 'FldConnLib'
+              DataSource = ParamDataSource
+              Items.Strings = (
+                ''
+                'ADO'
+                'FD')
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 1
+            end
           end
         end
         object ReportParamOptionJsonPanel: TPanel
           AlignWithMargins = True
           Left = 8
           Top = 221
-          Width = 926
+          Width = 883
           Height = 102
           Margins.Left = 8
           Margins.Right = 8
@@ -2708,7 +2782,7 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 3
-            Width = 920
+            Width = 877
             Height = 15
             Align = alTop
             Caption = 
@@ -2720,7 +2794,7 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 24
-            Width = 920
+            Width = 877
             Height = 75
             Cursor = crIBeam
             DataField = 'FldOptionJson'
@@ -2760,7 +2834,7 @@ inherited ReportMainForm: TReportMainForm
                 Kind = gbkMargin
                 Width = 3
               end>
-            TabWidth = 3
+            TabWidth = 4
             WantTabs = True
           end
         end
@@ -2768,7 +2842,7 @@ inherited ReportMainForm: TReportMainForm
           AlignWithMargins = True
           Left = 8
           Top = 104
-          Width = 926
+          Width = 883
           Height = 102
           Margins.Left = 8
           Margins.Right = 8
@@ -2781,7 +2855,7 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 3
-            Width = 920
+            Width = 877
             Height = 15
             Align = alTop
             Caption = 'Options Csv (option Value and Caption will be the same)'
@@ -2791,7 +2865,7 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 24
-            Width = 920
+            Width = 877
             Height = 75
             Cursor = crIBeam
             DataField = 'FldOptionCsv'
@@ -2831,7 +2905,7 @@ inherited ReportMainForm: TReportMainForm
                 Kind = gbkMargin
                 Width = 3
               end>
-            TabWidth = 3
+            TabWidth = 4
             WantTabs = True
           end
         end
@@ -2843,7 +2917,7 @@ inherited ReportMainForm: TReportMainForm
           AlignWithMargins = True
           Left = 8
           Top = 95
-          Width = 926
+          Width = 883
           Height = 3
           Cursor = crVSplit
           Margins.Left = 8
@@ -2856,7 +2930,7 @@ inherited ReportMainForm: TReportMainForm
           AlignWithMargins = True
           Left = 8
           Top = 8
-          Width = 926
+          Width = 883
           Height = 81
           Margins.Left = 8
           Margins.Top = 8
@@ -2893,7 +2967,7 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 3
             Top = 32
-            Width = 920
+            Width = 877
             Height = 46
             Margins.Top = 32
             Align = alClient
@@ -2916,7 +2990,7 @@ inherited ReportMainForm: TReportMainForm
           AlignWithMargins = True
           Left = 8
           Top = 104
-          Width = 926
+          Width = 883
           Height = 454
           Margins.Left = 8
           Margins.Right = 8
@@ -2930,7 +3004,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 912
+              Width = 869
               Height = 418
               Cursor = crIBeam
               DataField = 'FldSelect'
@@ -2981,7 +3055,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 912
+              Width = 869
               Height = 418
               Cursor = crIBeam
               DataField = 'FldInsert'
@@ -3032,7 +3106,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 912
+              Width = 869
               Height = 418
               Cursor = crIBeam
               DataField = 'FldUpdate'
@@ -3083,7 +3157,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 912
+              Width = 869
               Height = 418
               Cursor = crIBeam
               DataField = 'FldDelete'
@@ -3164,7 +3238,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 22
-              Width = 912
+              Width = 869
               Height = 399
               Cursor = crIBeam
               Margins.Top = 22
@@ -3216,7 +3290,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 168
-              Width = 912
+              Width = 869
               Height = 3
               Cursor = crVSplit
               Align = alTop
@@ -3228,7 +3302,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 912
+              Width = 869
               Height = 27
               Align = alTop
               BevelOuter = bvNone
@@ -3264,7 +3338,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 36
-              Width = 912
+              Width = 869
               Height = 126
               Align = alTop
               DataSource = ChartDataSource
@@ -3279,7 +3353,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 177
-              Width = 912
+              Width = 869
               Height = 27
               Align = alTop
               BevelOuter = bvNone
@@ -3315,7 +3389,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 3
               Top = 210
-              Width = 912
+              Width = 869
               Height = 211
               Align = alClient
               DataSource = SerieDataSource
@@ -3334,7 +3408,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 8
               Top = 3
-              Width = 902
+              Width = 859
               Height = 15
               Margins.Left = 8
               Margins.Right = 8
@@ -3346,19 +3420,20 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 8
               Top = 231
-              Width = 902
+              Width = 859
               Height = 3
               Cursor = crVSplit
               Margins.Left = 8
               Margins.Right = 8
               Align = alBottom
               ExplicitTop = 266
+              ExplicitWidth = 902
             end
             object ReportDatasetFooterLabel: TLabel
               AlignWithMargins = True
               Left = 8
               Top = 210
-              Width = 902
+              Width = 859
               Height = 15
               Margins.Left = 8
               Margins.Right = 8
@@ -3370,7 +3445,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 8
               Top = 24
-              Width = 902
+              Width = 859
               Height = 180
               Cursor = crIBeam
               Margins.Left = 8
@@ -3401,7 +3476,7 @@ inherited ReportMainForm: TReportMainForm
               AlignWithMargins = True
               Left = 8
               Top = 240
-              Width = 902
+              Width = 859
               Height = 181
               Cursor = crIBeam
               Margins.Left = 8
@@ -3478,7 +3553,9 @@ inherited ReportMainForm: TReportMainForm
             Colors.UnfocusedColor = clGray
             Colors.UnfocusedSelectionColor = clWhite
             Colors.UnfocusedSelectionBorderColor = clWhite
+            DefaultNodeHeight = 19
             Header.AutoSizeIndex = 0
+            Header.Height = 15
             Header.MainColumn = -1
             NodeDataSize = 4
             TabOrder = 0
@@ -3515,7 +3592,7 @@ inherited ReportMainForm: TReportMainForm
         object ReportGlobalMainPanel: TPanel
           Left = 263
           Top = 0
-          Width = 679
+          Width = 636
           Height = 566
           Align = alClient
           BevelOuter = bvNone
@@ -3526,7 +3603,7 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 8
             Top = 8
-            Width = 663
+            Width = 620
             Height = 152
             Margins.Left = 8
             Margins.Top = 8
@@ -3544,7 +3621,7 @@ inherited ReportMainForm: TReportMainForm
             AlignWithMargins = True
             Left = 8
             Top = 171
-            Width = 663
+            Width = 620
             Height = 387
             Cursor = crIBeam
             Margins.Left = 8

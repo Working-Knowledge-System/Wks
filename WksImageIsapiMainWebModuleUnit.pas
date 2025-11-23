@@ -327,66 +327,68 @@ procedure TMainWebModule.MainWebModulePersonWebActionAction(Sender: TObject; Req
 var
   bol: boolean;
   oid: integer;
-  sql: string;
+  sql, nam, sur: string; // name, surname
   dst: TDataSet;
-  fld: TField; // blobfield
+  fld: TField;  // fieldblob
+  fbs: TStream; // fieldblobstream
   mem: TMemoryStream;
-  blob: TStream;
+
+  procedure memimg(IvText: string);
+  begin
+    TPicRec.PicToStream(TPicRec.PicWithText(IvText, clWebOrange, clWebBlack, 10, 'Segoe UI'), TStream(mem));
+  end;
 begin
   // usage: /WksImageIsapiProject.dll/Person?CoObjId=102'
   // note:  /WksImageIsapiProject.dll/Image?CoObjType=Person&CoObjId=102'  will get the image in the TblObject
 
+  // stream
+  mem := TMemoryStream.Create;
+//try
   // objectid
   oid := StrTOIntDef(Request.QueryFields.Values['CoObjId'], 0);
   if oid <= 0 then begin
-    Response.Content := 'CoObjId is missed';
-    Response.StatusCode := 400; // badrequest
-    Handled := true;
-    Exit;
-  end;
+    memimg('CoObjId is missed');
 
   // dst
-  sql := Format('select FldPicture from DbaPerson.dbo.TblPerson where FldObjectId = %d', [oid]);
-  bol := TDbaRec.DsFromSql(sql, dst);
-  if not bol then begin
-    Response.Content := 'Image not found';
-    Response.StatusCode := 404; // notfound
-    Handled := true;
-    Exit;
-  end;
+  end else begin
+    sql := Format('select FldName, FldSurname, FldPicture from DbaPerson.dbo.TblPerson where FldObjectId = %d', [oid]);
+    bol := TDbaRec.DsFromSql(sql, dst);
+    if not bol then begin
+      memimg('Person not found');
 
-  // field
-  fld := dst.FieldByName('FldPicture');
+    // field
+    end else begin
+      fld := dst.FieldByName('FldPicture');
 
-  // stream
-  mem := TMemoryStream.Create;
+      // blob
+      fbs := dst.CreateBlobStream(fld, bmRead{Write}); // if s.Size = 0 then ...
 
-  // fieldread
-  blob := dst.CreateBlobStream(fld, bmRead{Write}); // if s.Size = 0 then ...
+      // mem (to avoid hint)
+      try
+        mem.CopyFrom(fbs, fbs.Size);
+      finally
+        fbs.Free;
+      end;
 
-  // mem use (to avoid hint)
-  try
-    mem.CopyFrom(blob, blob.Size);
-  finally
-    blob.Free;
+      // person image is empty
+      bol := mem.Size > 0;
+      if not bol then begin // *** here potentially create a syntetic image, may be random ***
+        nam := dst.FieldByName('FldName').AsString;
+        if nam.trim.IsEmpty then nam := '?';
+        sur := dst.FieldByName('FldSurname').AsString;
+        if sur.trim.IsEmpty then sur := '?';
+        memimg(nam[1] + sur[1]);
+      end;
+    end;
   end;
 
   // response
-  bol := mem.Size > 0;
-  if not bol then begin // *** here potentially create a syntetic image, may be random ***
-    Response.Content := 'Image is empty';
-    Response.StatusCode := 404; // notfound
-    Handled := true;
-    Exit;
-  end;
-
-  // contentstreamset
   mem.Position := 0;
   Response.ContentStream := mem;
-
-  // codes
   Response.ContentType := 'image/png';
-  Response.StatusCode := 200; // ok
+//finally
+//  mem.Free;
+//end;
 end;
     {$ENDREGION}
 

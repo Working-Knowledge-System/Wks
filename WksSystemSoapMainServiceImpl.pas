@@ -1112,7 +1112,7 @@ begin
   // script
   sbu.Anl(2);
   sbu.Add('-- vars');
-  sbu.Add('declare @k varchar(64); set @k = ''X:\$Bak\Dba\2020\50''                                          -- backuppath (source)');
+  sbu.Add('declare @k varchar(64); set @k = ''X:\$\Bak\Dba\2020\50''                                          -- backuppath (source)');
   sbu.Add('declare @e varchar(16); set @e = ''.bak''                                                         -- backupfileext');
   sbu.Add('declare @r varchar(96); set @r = ''C:\Program Files\Microsoft SQL Server\MSSQL12.WKS\MSSQL\DATA'' -- restorepath (target)');
   sbu.Add('--print @r');
@@ -1134,7 +1134,7 @@ begin
   sbu.Add('    declare @x varchar(1024)');
   sbu.Add('    set @x = ');
   sbu.Add('    --  RESTORE DATABASE [DbaAgent]');
-  sbu.Add('    --  FROM DISK = N''X:\$Bak\Dba\2020\50\DbaAgent.bak'' WITH FILE = 1');
+  sbu.Add('    --  FROM DISK = N''X:\$\Bak\Dba\2020\50\DbaAgent.bak'' WITH FILE = 1');
   sbu.Add('    --, MOVE N''DbaAgent'' TO N''C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\DATA\DbaAgent.mdf''');
   sbu.Add('    --, MOVE N''DbaAgent_log'' TO N''C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\DATA\DbaAgent_log.ldf'',  NOUNLOAD,  STATS = 5');
   sbu.Add('       ''restore database ['' + @b + '']''');
