@@ -148,8 +148,8 @@ type
     TextUtilsToolButton: TToolButton;
     UtilLineBeginWithPopup: TMenuItem;
     UtilLineNumberingPopup: TMenuItem;
-    LinesBeginWithAction: TAction;
-    LinesNumberingAction: TAction;
+    LineBeginWithAction: TAction;
+    LineNumberingAction: TAction;
     BottomJvNetscapeSplitter: TJvNetscapeSplitter;
     WordsWrapAction: TAction;
     UtilTabsToSpacesPopup: TMenuItem;
@@ -217,8 +217,8 @@ type
     procedure NoCaseActionExecute(Sender: TObject);
     procedure SortAscActionExecute(Sender: TObject);
     procedure SortDescActionExecute(Sender: TObject);
-    procedure LinesBeginWithActionExecute(Sender: TObject);
-    procedure LinesNumberingActionExecute(Sender: TObject);
+    procedure LineBeginWithActionExecute(Sender: TObject);
+    procedure LineNumberingActionExecute(Sender: TObject);
     procedure WordsWrapActionExecute(Sender: TObject);
     procedure TabsToSpacesActionExecute(Sender: TObject);
     procedure SpacesToTabsActionExecute(Sender: TObject);
@@ -287,7 +287,7 @@ implementation
 
 uses
     VirtualTrees.Types
-  , WksSpellcheckFormUnit
+  , WksSpellcheckDialogFormUnit
   , WksPythonUnit
   ;
 {$ENDREGION}
@@ -1213,11 +1213,11 @@ begin
 
   if SynEditCurrent.SelText.IsEmpty then begin
     txt := SynEditCurrent.Text;
-    if TSpellcheckForm.Execute(txt) then
+    if TSpellcheckDialogForm.Execute(txt) then
       SynEditCurrent.Text := txt;
   end else begin
     txt := SynEditCurrent.SelText;
-    if TSpellcheckForm.Execute(txt) then
+    if TSpellcheckDialogForm.Execute(txt) then
       SynEditCurrent.SelText := txt;
   end;
 end;
@@ -1354,7 +1354,7 @@ begin
   SynEditCurrent.CaretXY := car;
 end;
 
-procedure TTextEditorForm.LinesNumberingActionExecute(Sender: TObject);
+procedure TTextEditorForm.LineNumberingActionExecute(Sender: TObject);
 var
   car: TBufferCoord;
   sli: TStringList;
@@ -1380,7 +1380,7 @@ begin
   SynEditCurrent.CaretXY := car;
 end;
 
-procedure TTextEditorForm.LinesBeginWithActionExecute(Sender: TObject);
+procedure TTextEditorForm.LineBeginWithActionExecute(Sender: TObject);
 var
   car: TBufferCoord;
   sli: TStringList;

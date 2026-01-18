@@ -19,16 +19,16 @@ uses
 {$REGION 'Type'}
 type
   IXxxMainDataModule = interface(IAppServerSOAP)
-    ['{06F9DEAE-E322-48C9-A5C6-D0CA0383AA22}'] // *** CHANGE IN NEW OBJ ***
+    ['{06F9DEAE-E322-48C9-A5C6-D0CA0383AA22}'] // *** CHANGE IN NEW OBJ USING CTRL+SHIFT+G ***
   end;
 
   TXxxMainDataModule = class(TSoapDataModule, IXxxMainDataModule, IAppServerSOAP, IAppServer)
     XxxADOConnection: TADOConnection;
+    XxxADOTable: TADOTable;
+    XxxDataSetProvider: TDataSetProvider;
     ObjectADOTable: TADOTable;
     ObjectDataSource: TDataSource;
     ObjectDataSetProvider: TDataSetProvider;
-    XxxADOTable: TADOTable;
-    XxxDataSetProvider: TDataSetProvider;
     procedure SoapDataModuleCreate(Sender: TObject);
   private
     { Private declarations }

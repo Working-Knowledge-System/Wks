@@ -1,9 +1,9 @@
-object ColorForm: TColorForm
+object ColorDialogForm: TColorDialogForm
   Left = 0
   Top = 0
   Caption = 'Color Picker'
   ClientHeight = 422
-  ClientWidth = 788
+  ClientWidth = 720
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,22 +14,22 @@ object ColorForm: TColorForm
   OnCreate = FormCreate
   TextHeight = 13
   object ColorSelectedLabel: TLabel
-    Left = 562
+    Left = 506
     Top = 133
     Width = 69
     Height = 13
     Caption = 'Color Selected'
   end
   object ColorPreviewLabel: TLabel
-    Left = 562
+    Left = 506
     Top = 13
     Width = 66
     Height = 13
     Caption = 'Color Preview'
   end
   object ColorSelectedTrackBar: TTrackBar
-    Left = 562
-    Top = 250
+    Left = 506
+    Top = 258
     Width = 194
     Height = 20
     Hint = 'Opacity'
@@ -41,7 +41,7 @@ object ColorForm: TColorForm
     OnChange = ColorSelectedTrackBarChange
   end
   object OkButton: TButton
-    Left = 410
+    Left = 390
     Top = 384
     Width = 75
     Height = 25
@@ -51,7 +51,7 @@ object ColorForm: TColorForm
     OnClick = OkButtonClick
   end
   object CancelButton: TButton
-    Left = 313
+    Left = 293
     Top = 384
     Width = 75
     Height = 25
@@ -61,7 +61,7 @@ object ColorForm: TColorForm
     OnClick = CancelButtonClick
   end
   object ColorUseRadioGroup: TRadioGroup
-    Left = 562
+    Left = 506
     Top = 295
     Width = 204
     Height = 74
@@ -73,7 +73,7 @@ object ColorForm: TColorForm
     TabOrder = 1
   end
   object ColorUseHtmlEdit: TEdit
-    Left = 658
+    Left = 602
     Top = 340
     Width = 98
     Height = 21
@@ -82,7 +82,7 @@ object ColorForm: TColorForm
     Text = 'COLORUSEHTMLEDIT'
   end
   object ColorUseRgbEdit: TEdit
-    Left = 658
+    Left = 602
     Top = 313
     Width = 98
     Height = 21
@@ -90,58 +90,40 @@ object ColorForm: TColorForm
     TabOrder = 4
     Text = 'COLORUSERBGEDIT'
   end
-  object ColorPreviewMbColorPreview: TmbColorPreview
-    Left = 562
-    Top = 32
-    Width = 204
-    Height = 92
-  end
-  object ColorSelectedMbColorPreview: TmbColorPreview
-    Left = 562
-    Top = 152
-    Width = 204
-    Height = 92
-  end
   object ColorPageControl: TPageControl
     Left = 16
     Top = 8
-    Width = 521
+    Width = 469
     Height = 361
     ActivePage = ColorHSLTabSheet
-    TabOrder = 8
+    TabOrder = 6
     object ColorHSLTabSheet: TTabSheet
       Caption = '  HSL'
       ImageIndex = 2
       object ColorHSLColorPicker: THSLColorPicker
-        AlignWithMargins = True
-        Left = 8
-        Top = 2
-        Width = 505
-        Height = 328
-        Margins.Left = 8
-        Margins.Top = 2
-        Margins.Right = 0
-        SelectedColor = 130817
-        HSPickerHintFormat = 'H: %h S: %s'#13'Hex: %hex'
+        Left = 16
+        Top = 16
+        Width = 442
+        Height = 305
+        SelectedColor = 240
+        HSPickerHintFormat = 'H: %h S: %hslS'#13'Hex: %hex'
         LPickerHintFormat = 'Luminance: %l'
-        Align = alClient
         TabOrder = 0
         OnChange = ColorHSLColorPickerChange
         OnMouseMove = ColorHSLColorPickerMouseMove
-        ExplicitHeight = 313
         DesignSize = (
-          505
-          328)
+          442
+          305)
       end
     end
     object ColorHSLRingTabSheet: TTabSheet
       Caption = 'HSL Ring'
       ImageIndex = 3
       object ColorHSLRingPicker: THSLRingPicker
-        Left = 104
-        Top = 8
-        Width = 300
-        Height = 300
+        Left = 83
+        Top = 16
+        Width = 326
+        Height = 297
         RingPickerHintFormat = 'Hue: %h'
         SLPickerHintFormat = 'S: %hslS L: %l'#13'Hex: %hex'
         TabOrder = 0
@@ -152,10 +134,10 @@ object ColorForm: TColorForm
     object ColorHexTabSheet: TTabSheet
       Caption = 'Hexagon'
       object ColorHexaColorPicker: THexaColorPicker
-        Left = 112
-        Top = 3
-        Width = 321
-        Height = 311
+        Left = 88
+        Top = 16
+        Width = 305
+        Height = 305
         HintFormat = 'RGB(%r, %g, %b)'#13'Hex: #%hex'
         IntensityText = 'Intensity'
         TabOrder = 0
@@ -170,22 +152,14 @@ object ColorForm: TColorForm
       ImageIndex = 1
       object ColorNamedLabel: TLabel
         Left = 124
-        Top = 9
+        Top = 8
         Width = 111
         Height = 13
         Caption = 'Web Safe Named Color'
       end
-      object ColorNamedMbColorList: TmbColorList
-        Left = 124
-        Top = 23
-        Width = 265
-        Height = 292
-        TabOrder = 0
-        OnMouseUp = ColorNamedMbColorListMouseUp
-      end
       object ColorNamedSortByRadioGroup: TRadioGroup
-        Left = 408
-        Top = 17
+        Left = 352
+        Top = 20
         Width = 89
         Height = 209
         Caption = ' Sort By '
@@ -203,14 +177,34 @@ object ColorForm: TColorForm
         OnClick = ColorNamedSortByRadioGroupClick
       end
       object ColorNamedSortByReversedCheckBox: TCheckBox
-        Left = 416
-        Top = 240
+        Left = 360
+        Top = 248
         Width = 81
         Height = 17
         Caption = 'Reversed'
-        TabOrder = 2
+        TabOrder = 0
         OnClick = ColorNamedSortByReversedCheckBoxClick
       end
+      object ColorNamedMbColorList: TmbColorList
+        Left = 16
+        Top = 27
+        Width = 321
+        Height = 292
+        TabOrder = 2
+        OnMouseUp = ColorNamedMbColorListMouseUp
+      end
     end
+  end
+  object ColorPreviewMbColorPreview: TmbColorPreview
+    Left = 506
+    Top = 32
+    Width = 194
+    Height = 89
+  end
+  object ColorSelectedMbColorPreview: TmbColorPreview
+    Left = 506
+    Top = 152
+    Width = 194
+    Height = 89
   end
 end

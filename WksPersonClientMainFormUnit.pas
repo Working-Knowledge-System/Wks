@@ -13,7 +13,7 @@ uses
   JvExtComponent, WksLogFrameUnit, VirtualTrees, DTDBTreeView, DTClientTree,
   Vcl.ToolWin, JvNetscapeSplitter, Vcl.Grids, Vcl.DBGrids, JvComponentBase,
   JvThreadTimer, Vcl.AppEvnts, JvClock, Vcl.Menus, Winapi.WebView2,
-  Winapi.ActiveX, Vcl.Edge, Vcl.WinXCtrls;
+  Winapi.ActiveX, Vcl.Edge, Vcl.WinXCtrls, JvDBDateTimePicker;
 {$ENDREGION}
 
 {$REGION 'Type'}
@@ -130,9 +130,14 @@ procedure TPersonMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // detail
-  if PersonClientDataSet.State = dsEdit then
+  {$REGION 'Object'}
+  {$ENDREGION}
+
+  {$REGION 'Detail'}
+  if not (PersonClientDataSet.State = dsBrowse) then
     PersonDBNavigator.BtnClick(nbPost);
+  {$ENDREGION}
+
 end;
 {$ENDREGION}
 
@@ -234,8 +239,7 @@ procedure TPersonMainForm.PersonClientDataSetAfterPost(DataSet: TDataSet);
 begin
   inherited;
 
-  {$REGION 'detail.person'}
-  // applyupdatetoremoteserver
+  {$REGION 'applyupdatetoremoteserver'}
   if PersonClientDataSet.ApplyUpdates(0) > 0 then
     TMesRec.I('Unable to save %s detail to remote server', [FObj])
   else begin
@@ -250,7 +254,7 @@ procedure TPersonMainForm.PersonClientDataSetReconcileError(DataSet: TCustomClie
 begin
   inherited;
 
-  {$REGION 'detail.person'}
+  {$REGION 'reconcileerror'}
   Action := HandleReconcileError(DataSet, UpdateKind, E);
   {$ENDREGION}
 
@@ -302,8 +306,7 @@ procedure TPersonMainForm.UserClientDataSetAfterPost(DataSet: TDataSet);
 begin
   inherited;
 
-  {$REGION 'detail.user'}
-  // applyupdatetoremoteserver
+  {$REGION 'applyupdatetoremoteserver'}
   if UserClientDataSet.ApplyUpdates(0) > 0 then
     TMesRec.I('Unable to save %s detail to remote server', ['User'])
   else begin
@@ -318,7 +321,7 @@ procedure TPersonMainForm.UserClientDataSetReconcileError(DataSet: TCustomClient
 begin
   inherited;
 
-  {$REGION 'detail.user'}
+  {$REGION 'reconcileerror'}
   Action := HandleReconcileError(DataSet, UpdateKind, E);
   {$ENDREGION}
 

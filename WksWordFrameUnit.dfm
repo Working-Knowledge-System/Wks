@@ -265,7 +265,7 @@ object WordFrame: TWordFrame
   end
   object WordSoapConnection: TSoapConnection
     Agent = 'Embarcadero SOAP 1.4'
-    Connected = True
+    Connected = False
     URL = 'http://localhost/WksWordSoapProject.dll/soap'
     SOAPServerIID = 'IAppServerSOAP - {C99F4735-D6D2-495C-8CA2-E53E5A439E61}'
     UseSOAPAdapter = True

@@ -145,8 +145,8 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="WksSpellcheckFormUnit.pas">
-            <Form>SpellcheckForm</Form>
+        <DCCReference Include="WksSpellcheckDialogFormUnit.pas">
+            <Form>SpellcheckDialogForm</Form>
         </DCCReference>
         <DCCReference Include="WksTextEditorFormUnit.pas">
             <Form>TextEditorForm</Form>

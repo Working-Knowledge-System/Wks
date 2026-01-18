@@ -503,18 +503,18 @@ end;
 {$REGION 'TCvRecipeRec'}
 procedure TCvRecipeRec.Reset;
 begin
-  Id            := CV_RECIPE_ID_DEFAULT;
-  PId           := CV_RECIPE_PID_DEFAULT;
-  Order         := CV_RECIPE_ORDER_DEFAULT;
-  State         := CV_RECIPE_STATE_DEFAULT;
-  Organization  := CV_RECIPE_ORGANIZATION_DEFAULT; // \
-  Owner         := CV_RECIPE_OWNER_DEFAULT       ; //  |-- pseudokey
-  Recipe        := CV_RECIPE_RECIPE_DEFAULT      ; // /
-  Description   := CV_RECIPE_DESCRIPTION_DEFAULT;
-  Code          := CV_RECIPE_CODE_DEFAULT;
-  TestImage     := CV_RECIPE_TESTIMAGE_DEFAULT;
+  Id            := CV_RECIPE_ID_DEFAULT           ;
+  PId           := CV_RECIPE_PID_DEFAULT          ;
+  Order         := CV_RECIPE_ORDER_DEFAULT        ;
+  State         := CV_RECIPE_STATE_DEFAULT        ;
+  Organization  := CV_RECIPE_ORGANIZATION_DEFAULT ; // \
+  Owner         := CV_RECIPE_OWNER_DEFAULT        ; //  |-- pseudokey
+  Recipe        := CV_RECIPE_RECIPE_DEFAULT       ; // /
+  Description   := CV_RECIPE_DESCRIPTION_DEFAULT  ;
+  Code          := CV_RECIPE_CODE_DEFAULT         ;
+  TestImage     := CV_RECIPE_TESTIMAGE_DEFAULT    ;
   TestImagePath := CV_RECIPE_TESTIMAGEPATH_DEFAULT;
-  ProcessShow   := CV_RECIPE_PROCESSSHOW_DEFAULT;
+  ProcessShow   := CV_RECIPE_PROCESSSHOW_DEFAULT  ;
 end;
 
 function  TCvRecipeRec.ToJson: string;

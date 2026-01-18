@@ -4,8 +4,8 @@ object AgentMainDataModule: TAgentMainDataModule
   Width = 715
   object AgentADOConnection: TADOConnection
     ConnectionString = 
-      'Provider=MSOLEDBSQL.1;Password=secret@123;Persist Security Info=' +
-      'True;User ID=sa;Initial Catalog=DbaAgent;Data Source=LOCALHOST'
+      'Provider=MSOLEDBSQL.1;Persist Security Info=True;Data Source=LOC' +
+      'ALHOST;User ID=sa;Password=31316@Wks;Initial Catalog=DbaAgent'
     DefaultDatabase = 'DbaAgent'
     LoginPrompt = False
     Provider = 'MSOLEDBSQL.1'

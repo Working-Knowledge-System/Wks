@@ -13,7 +13,7 @@ uses
   JvExtComponent, WksLogFrameUnit, VirtualTrees, DTDBTreeView, DTClientTree,
   Vcl.ToolWin, JvNetscapeSplitter, JvComponentBase, JvNavigationPane,
   JvDBSpinEdit, JvThreadTimer, Vcl.AppEvnts, JvClock, Vcl.Menus,
-  Winapi.WebView2, Winapi.ActiveX, Vcl.Edge, Vcl.WinXCtrls;
+  Winapi.WebView2, Winapi.ActiveX, Vcl.Edge, Vcl.WinXCtrls, JvDBDateTimePicker;
 {$ENDREGION}
 
 {$REGION 'Type'}
@@ -347,9 +347,14 @@ procedure TPageMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // detail
-  if PageClientDataSet.State = dsEdit then
+  {$REGION 'Object'}
+  {$ENDREGION}
+
+  {$REGION 'Detail'}
+  if not (PageClientDataSet.State = dsBrowse) then
     PageDBNavigator.BtnClick(nbPost);
+  {$ENDREGION}
+
 end;
 {$ENDREGION}
 
@@ -430,8 +435,7 @@ procedure TPageMainForm.PageClientDataSetAfterPost(DataSet: TDataSet);
 begin
   inherited;
 
-  {$REGION 'detail'}
-  // applyupdatetoremoteserver
+  {$REGION 'applyupdatetoremoteserver'}
   if PageClientDataSet.ApplyUpdates(0) > 0 then
     TMesRec.I('Unable to save %s detail to remote server', [FObj])
   else begin
@@ -497,7 +501,7 @@ procedure TPageMainForm.PageClientDataSetReconcileError(DataSet: TCustomClientDa
 begin
   inherited;
 
-  {$REGION 'detail'}
+  {$REGION 'reconcileerror'}
   Action := HandleReconcileError(DataSet, UpdateKind, E);
   {$ENDREGION}
 

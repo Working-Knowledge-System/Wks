@@ -4,16 +4,58 @@ interface
 
 {$REGION 'Uses'}
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, WksBaseClientMainFormUnit, Data.DB,
-  Datasnap.DBClient, Soap.SOAPConn, System.Actions, Vcl.ActnList,
-  System.ImageList, Vcl.ImgList, Vcl.Buttons, SynEdit, SynDBEdit, Vcl.ComCtrls,
-  Vcl.StdCtrls, JvExMask, JvSpin, JvExComCtrls, JvDateTimePicker, Vcl.DBCtrls,
-  Vcl.Mask, Vcl.ExtCtrls, JvExControls, JvScrollMax, JvExExtCtrls,
-  JvExtComponent, WksLogFrameUnit, VirtualTrees, DTDBTreeView, DTClientTree,
-  Vcl.ToolWin, JvNetscapeSplitter, Vcl.Grids, Vcl.DBGrids, JvComponentBase,
-  JvThreadTimer, Vcl.AppEvnts, JvClock, Vcl.Menus, Winapi.WebView2,
-  Winapi.ActiveX, Vcl.Edge, Vcl.WinXCtrls;
+    Winapi.Windows
+  , Winapi.ActiveX
+  , Winapi.Messages
+  , Winapi.WebView2
+  , System.Actions
+  , System.Classes
+  , System.ImageList
+  , System.SysUtils
+  , System.Variants
+  , Vcl.ActnList
+  , Vcl.AppEvnts
+  , Vcl.Buttons
+  , Vcl.ComCtrls
+  , Vcl.Controls
+  , Vcl.DBCtrls
+  , Vcl.DBGrids
+  , Vcl.Dialogs
+  , Vcl.Edge
+  , Vcl.ExtCtrls
+  , Vcl.Forms
+  , Vcl.Graphics
+  , Vcl.Grids
+  , Vcl.ImgList
+  , Vcl.Mask
+  , Vcl.Menus
+  , Vcl.StdCtrls
+  , Vcl.ToolWin
+  , Vcl.WinXCtrls
+  , Data.DB
+  , Datasnap.DBClient
+  , Soap.SOAPConn
+  , JvClock
+  , JvComponentBase
+  , JvDBDateTimePicker
+  , JvDateTimePicker
+  , JvExComCtrls
+  , JvExControls
+  , JvExExtCtrls
+  , JvExMask
+  , JvExtComponent
+  , JvNetscapeSplitter
+  , JvScrollMax
+  , JvSpin
+  , JvThreadTimer
+  , SynDBEdit
+  , SynEdit
+  , VirtualTrees
+  , DTClientTree
+  , DTDBTreeView
+  , WksBaseClientMainFormUnit
+  , WksLogFrameUnit
+  ;
 {$ENDREGION}
 
 {$REGION 'Type'}
@@ -23,7 +65,7 @@ type
     ChartDataSource: TDataSource;
     DatasetClientDataSet: TClientDataSet;
     DatasetDataSource: TDataSource;
-    DatasetAndChartPageControl: TPageControl;
+    ReportDatasetPageControl: TPageControl;
     ParamClientDataSet: TClientDataSet;
     ParamDataSource: TDataSource;
     ReportAction: TActionList;
@@ -208,12 +250,7 @@ type
     ReportDsHeaderOffDBCheckBox: TDBCheckBox;
     ReportDsRecordCountOffDBCheckBox: TDBCheckBox;
     ReportParamsOffDBCheckBox: TDBCheckBox;
-    ReportDatasetHeaderFooterTabSheet: TTabSheet;
-    ReportDatasetHeaderLabel: TLabel;
-    ReportDatasetHeaderDBSynEdit: TDBSynEdit;
-    ReportDatasetFooterSplitter: TSplitter;
-    ReportDatasetFooterLabel: TLabel;
-    ReportDatasetFooterDBSynEdit: TDBSynEdit;
+    ReportDatasetRepeaterTabSheet: TTabSheet;
     ReportTabSheet: TTabSheet;
     ReportHeaderLabel: TLabel;
     ReportHeaderDBSynEdit: TDBSynEdit;
@@ -235,6 +272,65 @@ type
     ReportParamOptionQueryConnStrDBEdit: TDBEdit;
     ReportParamCommLibLabel: TLabel;
     ReportParamCommLibDBComboBox: TDBComboBox;
+    ReportChartSerieJvScrollMaxBand: TJvScrollMaxBand;
+    ReportChartSeriePointJvScrollMaxBand: TJvScrollMaxBand;
+    ReportChartSerieKindLabel: TLabel;
+    ReportChartSerieKindDBComboBox: TDBComboBox;
+    ReportChartSerieTitleLabel: TLabel;
+    ReportChartSerieTitleDBEdit: TDBEdit;
+    ReportChartSerieDescriptionLabel: TLabel;
+    ReportChartSerieDescriptionDBEdit: TDBEdit;
+    ReportChartSerieStateLabel: TLabel;
+    ReportChartSerieStateDBComboBox: TDBComboBox;
+    ReportChartSerieXLabelFieldDBEdit1: TDBEdit;
+    ReportChartSerieXLabelFieldLabel1: TLabel;
+    ReportChartSerieXFieldDBEdit: TDBEdit;
+    ReportChartSerieXFieldLabel: TLabel;
+    ReportChartSerieYFieldLabel: TLabel;
+    ReportChartSerieYFieldDBEdit: TDBEdit;
+    ReportChartSerieZFieldDBEdit: TDBEdit;
+    ReportChartSerieZFieldLabel: TLabel;
+    ReportChartSerieTooltipFieldLabel: TLabel;
+    ReportChartSerieTooltipFieldDBEdit: TDBEdit;
+    ReportChartSerieLineJvScrollMaxBand: TJvScrollMaxBand;
+    ReportChartSerieColorLabel: TLabel;
+    ReportChartSerieColorDBEdit: TDBEdit;
+    ReportChartSerieLineColorLabel1: TLabel;
+    ReportChartSerieLineColorDBEdit1: TDBEdit;
+    ReportChartSerieLineSizeDBEdit1: TDBEdit;
+    ReportChartSerieLineSizeLabel1: TLabel;
+    ReportChartSerieLineTypeDBEdit1: TDBEdit;
+    ReportChartSerieLineTypeLabel1: TLabel;
+    ReportChartSeriePointSizeDBEdit: TDBEdit;
+    ReportChartSeriePointSizeLabel: TLabel;
+    ReportChartSeriePointTypeDBEdit: TDBEdit;
+    ReportChartSeriePointTypeLabel: TLabel;
+    ReportChartSeriePointColorDBEdit: TDBEdit;
+    ReportChartSeriePointColorLabel: TLabel;
+    ReportReportTopPanel: TPanel;
+    ReportGlobalPanel: TPanel;
+    ReportDatasetSelectTemplateLabel: TLabel;
+    ReportDatasetSelectFixLabel: TLabel;
+    ReportDatasetRepeaterItemLabel: TLabel;
+    ReportDatasetRepeaterFooterLabel: TLabel;
+    ReportDatasetRepeaterItemDBSynEdit: TDBSynEdit;
+    ReportDatasetRepeaterOnDBCheckBox: TDBCheckBox;
+    ReportDatasetRepeaterHeaderPanel: TPanel;
+    ReportDatasetRepeaterHeaterLabel: TLabel;
+    ReportDatasetDriverSelectTabSheet: TTabSheet;
+    ReportDatasetDriverSelectDBSynEdit: TDBSynEdit;
+    ReportDatasetDriverSelectLabel: TLabel;
+    ReportDatasetHeaderTabSheet: TTabSheet;
+    ReportDatasetFooterTabSheet: TTabSheet;
+    ReportDatasetHeaderDBSynEdit: TDBSynEdit;
+    ReportDatasetFooterDBSynEdit: TDBSynEdit;
+    ReportDatasetRepeaterFooterDBSynEdit: TDBSynEdit;
+    ReportDatasetRepeaterHeaderDBSynEdit: TDBSynEdit;
+    ReportDatasetRepeaterPreLabel: TLabel;
+    ReportDatasetRepeaterPostLabel: TLabel;
+    ReportDatasetRepeaterPostDBSynEdit: TDBSynEdit;
+    ReportDatasetRepeaterPreDBSynEdit: TDBSynEdit;
+    RepeaterBlockShape: TShape;
     procedure FormCreate(Sender: TObject);
     procedure ActionPostActionExecute(Sender: TObject);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
@@ -249,6 +345,12 @@ type
     procedure ReportDatasetJsonTemplateLabelClick(Sender: TObject);
     procedure ReportDatasetJsonValidateLabelClick(Sender: TObject);
     procedure OptionFoldingLineShowCheckBoxClick(Sender: TObject);
+    procedure ParamClientDataSetAfterPost(DataSet: TDataSet);
+    procedure DatasetClientDataSetAfterPost(DataSet: TDataSet);
+    procedure ChartClientDataSetAfterPost(DataSet: TDataSet);
+    procedure SerieClientDataSetAfterPost(DataSet: TDataSet);
+    procedure ReportDatasetSelectTemplateLabelClick(Sender: TObject);
+    procedure ReportDatasetSelectFixLabelClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -287,6 +389,8 @@ begin
   gsyn.Setup(ReportDatasetUpdateDBSynEdit   , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckSql , OptionFoldingLineShowCheckBox.Checked);
   gsyn.Setup(ReportDatasetDeleteDBSynEdit   , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckSql , OptionFoldingLineShowCheckBox.Checked);
   gsyn.Setup(ReportDatasetJsonDBSynEdit     , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckJson, OptionFoldingLineShowCheckBox.Checked);
+  gsyn.Setup(ReportDatasetHeaderDBSynEdit   , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckHtml, OptionFoldingLineShowCheckBox.Checked);
+  gsyn.Setup(ReportDatasetFooterDBSynEdit   , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckHtml, OptionFoldingLineShowCheckBox.Checked);
   gsyn.Setup(ReportGlobalDataDBSynEdit      , Trunc(OptionTabWidthJvSpinEdit.Value), TCodKindEnum.ckSql , OptionFoldingLineShowCheckBox.Checked);
 end;
 {$ENDREGION}
@@ -319,17 +423,26 @@ procedure TReportMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // detail
-  if ReportClientDataSet.State = dsEdit then
+  {$REGION 'Object'}
+  {$ENDREGION}
+
+  {$REGION 'Detail'}
+  if not (ReportClientDataSet.State = dsBrowse) then
     ReportDBNavigator.BtnClick(nbPost);
-  if ParamClientDataSet.State = dsEdit then
+
+  if not (ParamClientDataSet.State = dsBrowse) then
     ReportParamDBNavigator.BtnClick(nbPost);
-  if DatasetClientDataSet.State = dsEdit then
+
+  if not (DatasetClientDataSet.State = dsBrowse) then
     ReportDatasetDBNavigator.BtnClick(nbPost);
-  if ChartClientDataSet.State = dsEdit then
+
+  if not (ChartClientDataSet.State = dsBrowse) then
     ReportChartDBNavigator.BtnClick(nbPost);
-  if SerieClientDataSet.State = dsEdit then
+
+  if not (SerieClientDataSet.State = dsBrowse) then
     ReportSerieDBNavigator.BtnClick(nbPost);
+  {$ENDREGION}
+
 end;
 {$ENDREGION}
 
@@ -397,13 +510,12 @@ procedure TReportMainForm.ReportClientDataSetAfterPost(DataSet: TDataSet);
 begin
   inherited;
 
-  {$REGION 'detail'}
-  // applyupdatetoremoteserver
+  {$REGION 'applyupdatetoremoteserver'}
   if ReportClientDataSet.ApplyUpdates(0) > 0 then
-    TMesRec.I('Unable to save %s detail to remote server', [FObj])
+    TMesRec.I('Unable to save Report data to remote server')
   else begin
     ReportClientDataSet.Refresh; // IMPORTAN
-    LogFrame.Log('%s detail data saved to remote server', [FObj]);
+    LogFrame.Log('Report data saved to remote server');
   end;
   {$ENDREGION}
 
@@ -413,7 +525,7 @@ procedure TReportMainForm.ReportClientDataSetReconcileError(DataSet: TCustomClie
 begin
   inherited;
 
-  {$REGION 'detail'}
+  {$REGION 'reconcileerror'}
   Action := HandleReconcileError(DataSet, UpdateKind, E);
   {$ENDREGION}
 
@@ -456,6 +568,21 @@ begin
 //DataSet.FieldByName('FldFromContent').Value := null;
   DataSet.Post;
   LogFrame.Log('%s data initialized', [DataSet.FieldByName('FldParam').AsString]);
+  {$ENDREGION}
+
+end;
+
+procedure TReportMainForm.ParamClientDataSetAfterPost(DataSet: TDataSet);
+begin
+  inherited;
+
+  {$REGION 'applyupdatetoremoteserver'}
+  if ParamClientDataSet.ApplyUpdates(0) > 0 then
+    TMesRec.I('Unable to save Param data to remote server')
+  else begin
+    ParamClientDataSet.Refresh; // IMPORTAN
+    LogFrame.Log('Param data saved to remote server');
+  end;
   {$ENDREGION}
 
 end;
@@ -508,81 +635,74 @@ begin
 
 end;
 
-  {$REGION 'Json'}
+procedure TReportMainForm.DatasetClientDataSetAfterPost(DataSet: TDataSet);
+begin
+  inherited;
+
+  {$REGION 'applyupdatetoremoteserver'}
+  if DatasetClientDataSet.ApplyUpdates(0) > 0 then
+    TMesRec.I('Unable to save Dataset data to remote server')
+  else begin
+    DatasetClientDataSet.Refresh; // IMPORTAN
+    LogFrame.Log('Dataset data saved to remote server');
+  end;
+  {$ENDREGION}
+
+end;
+
+procedure TReportMainForm.ReportDatasetSelectTemplateLabelClick( Sender: TObject);
+begin
+  inherited;
+
+  gsyn.InsertTextAtCaret(ReportDatasetSelectDBSynEdit,
+'''
+-- base
+select top($Top$)
+    a.FldId
+  , a.FldObject
+  , b.FldXxx
+  , b.Fld...
+from
+    DbaXxx.dbo.TblObject a inner join
+    DbaXxx.dbo.TblXxx    b on (b.FldObjectId = a.FldId)
+where
+    [RvSqlFilter(b.FldXxx| $Xxx$)]
+order by
+    $OrderBy$
+'''
+  );
+end;
+
+procedure TReportMainForm.ReportDatasetSelectFixLabelClick(Sender: TObject);
+var
+  txt: string;
+begin
+  inherited;
+
+  txt := ReportDatasetSelectDBSynEdit.Text.Trim;
+
+  txt := txt.Replace('SELECT TOP (1000) ', 'select top($Top$)' + sLineBreak + '    ');
+  txt := txt.Replace('  FROM '           , 'from'              + sLineBreak + '    ');
+  txt := txt.Replace('WHERE'             , 'where'                                  );
+
+  txt := txt.Replace('      ,'           , '  , '                                   );
+  txt := txt.Replace(']'                 , ''                                       );
+  txt := txt.Replace('['                 , ''                                       );
+
+  if not txt.Contains('where') then
+  txt := txt + sLineBreak + 'where'    + sLineBreak + '    [RvSqlFilter(FldXxx| $Xxx$)]';
+
+  if not txt.Contains('order by') then
+  txt := txt + sLineBreak + 'order by' + sLineBreak + '    $OrderBy$';
+
+  ReportDatasetSelectDBSynEdit.Text := txt;
+end;
+
 procedure TReportMainForm.ReportDatasetJsonTemplateLabelClick(Sender: TObject);
 begin
   inherited;
 
-  // check
-  if giis.Ex(ReportDatasetJsonDBSynEdit.Text) then
-    TMesRec.W('Unable to insert the Json template, the field is not empty, please clear it first')
-  else
-    ReportDatasetJsonDBSynEdit.Text :=
-                   '{'
-    + sLineBreak + '  "EditMenu": {'
-    + sLineBreak + '    "Visible": false'
-    + sLineBreak + '  , "Items": ['
-    + sLineBreak + '      {"Id": "AddNew", "Visible": true, "Title": "Add New"}'
-    + sLineBreak + '    ]'
-    + sLineBreak + '  }'
-    + sLineBreak + ', "EditData": {' // was "EditIni": {
-  //+ sLineBreak + '    "ReportId": 14'
-    + sLineBreak + '  , "DatasetName": "Xxx"'
-    + sLineBreak + '  , "InsertIfNotExists": false'
-    + sLineBreak + '  , "EditTable": "DbaXxx.dbo.TblXxx"'
-    + sLineBreak + '  , "EditKeyFieldList": ["FldObjectId"] -- or ["FldId"] or ["FldSurname","FldName","FldBirthDate"] or ["FldSsn"]'
-    + sLineBreak + '  , "EditOwnerField": ""                -- or "FldOwner"'
-    + sLineBreak + '  , "EditOneWayField": ""               -- or "FldState"'
-    + sLineBreak + '  , "EditOneWayRange": []               -- or ["Active", "Inactive"]'
-    + sLineBreak + '  , "EditFieldList": ['
-    + sLineBreak + '      {"Field": "FldLocalId"     , "Ctrl": "Text"}'
-    + sLineBreak + '    , {"Field": "FldLocalPId"    , "Ctrl": "Text"}' // TextInt
-    + sLineBreak + '    , {"Field": "FldValue1"      , "Ctrl": "Text"}'
-    + sLineBreak + '    , {"Field": "FldValue2"      , "Ctrl": "Text"}'
-    // person example
-  //+ sLineBreak + '    , {"Field": "FldPerson"      , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldName"        , "Ctrl": "Select", "OptionCsv": ",Null,"               , "OptionJson": "/WksCodeIsapiProject.dll/Code?CoId=?"}'
-  //+ sLineBreak + '    , {"Field": "FldSurname"     , "Ctrl": "Select", "OptionCsv": ",Null,"               , "OptionJson": "/WksCodeIsapiProject.dll/Code?CoId=?"}'
-  //+ sLineBreak + '    , {"Field": "FldGender"      , "Ctrl": "Select", "OptionCsv": ",Null,Male,Female"    , "OptionJson": "/WksCodeIsapiProject.dll/Code?CoId=?"}' // [RvCode(123)]
-  //+ sLineBreak + '    , {"Field": "FldNationality" , "Ctrl": "Select", "OptionCsv": ",Null,Italian,English"}'
-  //+ sLineBreak + '    , {"Field": "FldLanguage"    , "Ctrl": "Select", "OptionCsv": ",Null,Italian,English"}'
-  //+ sLineBreak + '    , {"Field": "FldSsn"         , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldWatNumber"   , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldPhone"       , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldMobile"      , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldEmail"       , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldWww"         , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldAddress"     , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldZipCode"     , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldCity"        , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldProvince"    , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldCountry"     , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldBirthDate"   , "Ctrl": "Date"}
-  //+ sLineBreak + '    , {"Field": "FldTime"        , "Ctrl": "Time"}                               '
-  //+ sLineBreak + '    , {"Field": "FldBirthPlace"  , "Ctrl": "Report", "OptionReport": {"ReportId": 15, "ValueField": "FldPlace", "ColumnField": "%FldLocation% - %FldProvince%"}}' or
-  //+ sLineBreak + '    , {"Field": "FldBirthPlace"  , "Ctrl": "Select", "OptionCsv"   : "http://localhost/WksCodeIsapiProject.dll/Code?CoId=21"}
-  //+ sLineBreak + '    , {"Field": "FldOfficePhone" , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldOfficeMobile", "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldOfficeEmail" , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldOfficeWww"   , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldOfficeFax"   , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldPicture"     , "Ctrl": "Text"}'
-  //+ sLineBreak + '    , {"Field": "FldNote"        , "Ctrl": "Text"}'
-  //+ sLineBreak + '      {"Field": "FldState"       , "Ctrl": "Select", "OptionCsv": "http://localhost/WksCodeIsapiProject.dll/Code?CoId=18"}
-  //+ sLineBreak + '    , {"Field": "FldDate"        , "Ctrl": "Date"}
-    // fipav example
-  //+ sLineBreak + '    , {"Field": "FldTeam1"       , "Ctrl": "Select", "OptionCsv"   : "", "OptionJson": "http://localhost/WksCodeIsapiProject.dll/Code?CoId=23"}
-  //+ sLineBreak + '    , {"Field": "FldTeam2"       , "Ctrl": "Select", "OptionCsv"   : "", "OptionJson": "http://localhost/WksCodeIsapiProject.dll/Code?CoId=23"}
-  //+ sLineBreak + '    , {"Field": "FldRefereeLevel", "Ctrl": "Select", "OptionCsv"   : "", "OptionJson": "http://localhost/WksCodeIsapiProject.dll/Code?CoId=24"}
-  //+ sLineBreak + '    , {"Field": "FldReferee1"    , "Ctrl": "Select", "OptionCsv"   : "", "OptionJson": "http://localhost/WksCodeIsapiProject.dll/Code?CoId=25"}
-  //+ sLineBreak + '    , {"Field": "FldReferee2"    , "Ctrl": "Report", "OptionReport": {"ReportId": 20, "ValueField": "FldLocation", "ColumnFieldCsv": "%FldLocation% - %FldProvince%"}}
-    + sLineBreak + '    ]'
-  //+ sLineBreak + '  , "EditValueRange": []'
-  //+ sLineBreak + '  , "EditUpdatedField": ""'
-  //+ sLineBreak + '  , "EditEnabledStateList": []'
-    + sLineBreak + '  }'
-    + sLineBreak + '}'
-    ;
+  gsyn.InsertTextAtCaret(ReportDatasetJsonDBSynEdit, HTM_TABLEFROMDS_EDIT_JSON);
 end;
 
 procedure TReportMainForm.ReportDatasetJsonValidateLabelClick(Sender: TObject);
@@ -596,8 +716,6 @@ begin
   else
     TMesRec.I(fbk);
 end;
-  {$ENDREGION}
-
 {$ENDREGION}
 
 {$REGION 'ChartCds'}
@@ -605,54 +723,68 @@ procedure TReportMainForm.ChartClientDataSetAfterInsert(DataSet: TDataSet);
 begin
   inherited;
 
-  {$REGION 'detail'}
-  // set
+  {$REGION 'init'}
   DataSet.Edit;
-//DataSet.FieldByName('FldObjectId'      ).Value := FId ; // automatic
-//DataSet.FieldByName('FldOrder'         ).Value := null;
-//DataSet.FieldByName('FldRsNo'          ).Value := null;
-  DataSet.FieldByName('FldState'         ).Value := 'Active';
-//DataSet.FieldByName('FldDataset'       ).Value := null; // automatic
-  DataSet.FieldByName('FldChart'         ).Value := TNamRec.RndInt('Chart');
-//DataSet.FieldByName('FldTitle'         ).Value := null;
-//DataSet.FieldByName('FldSubtitle'      ).Value := null;
-//DataSet.FieldByName('FldDescription'   ).Value := null;
-//DataSet.FieldByName('FldWidth'         ).Value := null;
-//DataSet.FieldByName('FldHeight'        ).Value := null;
-//DataSet.FieldByName('FldTitleOn'       ).Value := null;
-//DataSet.FieldByName('FldPanelOn'       ).Value := null;
-//DataSet.FieldByName('FldPanelClosed'   ).Value := null;
-//DataSet.FieldByName('FldDoExport'      ).Value := null;
-//DataSet.FieldByName('FldTooltipShared' ).Value := null;
-//DataSet.FieldByName('FldXCaption'      ).Value := null;
-//DataSet.FieldByName('FldYCaption'      ).Value := null;
-//DataSet.FieldByName('FldXLabelAngleDeg').Value := null;
-//DataSet.FieldByName('FldYLabelAngleDeg').Value := null;
-//DataSet.FieldByName('FldXFormat'       ).Value := null;
-//DataSet.FieldByName('FldYFormat'       ).Value := null;
-//DataSet.FieldByName('FldXStripLine'    ).Value := null;
-//DataSet.FieldByName('FldYStripLine'    ).Value := null;
-//DataSet.FieldByName('FldXScaleBreak'   ).Value := null;
-//DataSet.FieldByName('FldYScaleBreak'   ).Value := null;
-//DataSet.FieldByName('FldXMargin'       ).Value := null;
-//DataSet.FieldByName('FldYMargin'       ).Value := null;
-//DataSet.FieldByName('FldPanelClosed'   ).Value := null;
-//DataSet.FieldByName('FldDoExport'      ).Value := null;
-//DataSet.FieldByName('FldTooltipShared' ).Value := null;
-//DataSet.FieldByName('FldXCaption'      ).Value := null;
-//DataSet.FieldByName('FldYCaption'      ).Value := null;
-//DataSet.FieldByName('FldXLabelAngleDeg').Value := null;
-//DataSet.FieldByName('FldYLabelAngleDeg').Value := null;
-//DataSet.FieldByName('FldXFormat'       ).Value := null;
-//DataSet.FieldByName('FldYFormat'       ).Value := null;
-//DataSet.FieldByName('FldXStripLine'    ).Value := null;
-//DataSet.FieldByName('FldYStripLine'    ).Value := null;
-//DataSet.FieldByName('FldXScaleBreak'   ).Value := null;
-//DataSet.FieldByName('FldYScaleBreak'   ).Value := null;
-//DataSet.FieldByName('FldXMargin'       ).Value := null;
-//DataSet.FieldByName('FldYMargin'       ).Value := null;
+//DataSet.FieldByName('FldObjectId'        ).Value := FId ; // automatic
+//DataSet.FieldByName('FldOrder'           ).Value := null;
+//DataSet.FieldByName('FldRsNo'            ).Value := null;
+  DataSet.FieldByName('FldState'           ).Value := 'Active';
+//DataSet.FieldByName('FldDataset'         ).Value := null; // automatic
+  DataSet.FieldByName('FldChart'           ).Value := TNamRec.RndInt('Chart');
+//DataSet.FieldByName('FldTitle'           ).Value := null;
+//DataSet.FieldByName('FldSubtitle'        ).Value := null;
+//DataSet.FieldByName('FldDescription'     ).Value := null;
+//DataSet.FieldByName('FldWidth'           ).Value := null;
+//DataSet.FieldByName('FldHeight'          ).Value := null;
+//DataSet.FieldByName('FldTitleOn'         ).Value := null;
+//DataSet.FieldByName('FldPanelOn'         ).Value := null;
+//DataSet.FieldByName('FldPanelClosed'     ).Value := null;
+//DataSet.FieldByName('FldDoExport'        ).Value := null;
+//DataSet.FieldByName('FldTooltipShared'   ).Value := null;
+//DataSet.FieldByName('FldXCaption'        ).Value := null;
+//DataSet.FieldByName('FldYCaption'        ).Value := null;
+//DataSet.FieldByName('FldXLabelAngleDeg'  ).Value := null;
+//DataSet.FieldByName('FldYLabelAngleDeg'  ).Value := null;
+//DataSet.FieldByName('FldXFormat'         ).Value := null;
+//DataSet.FieldByName('FldYFormat'         ).Value := null;
+//DataSet.FieldByName('FldXMargin'         ).Value := null;
+//DataSet.FieldByName('FldYMargin'         ).Value := null;
+//DataSet.FieldByName('FldPanelClosed'     ).Value := null;
+//DataSet.FieldByName('FldDoExport'        ).Value := null;
+//DataSet.FieldByName('FldTooltipShared'   ).Value := null;
+//DataSet.FieldByName('FldXCaption'        ).Value := null;
+//DataSet.FieldByName('FldYCaption'        ).Value := null;
+//DataSet.FieldByName('FldXLabelAngleDeg'  ).Value := null;
+//DataSet.FieldByName('FldYLabelAngleDeg'  ).Value := null;
+//DataSet.FieldByName('FldXFormat'         ).Value := null;
+//DataSet.FieldByName('FldYFormat'         ).Value := null;
+//DataSet.FieldByName('FldXScaleBreak'     ).Value := null;
+//DataSet.FieldByName('FldYScaleBreak'     ).Value := null;
+//DataSet.FieldByName('FldXStripLine'      ).Value := null;
+//DataSet.FieldByName('FldYStripLine'      ).Value := null;
+//DataSet.FieldByName('FldXScaleBreaksJson').Value := null;
+//DataSet.FieldByName('FldYScaleBreaksJson').Value := null;
+//DataSet.FieldByName('FldXStripLinesJson' ).Value := null;
+//DataSet.FieldByName('FldYStripLinesJson' ).Value := null;
+//DataSet.FieldByName('FldXMargin'         ).Value := null;
+//DataSet.FieldByName('FldYMargin'         ).Value := null;
   DataSet.Post;
   LogFrame.Log('%s data initialized', [DataSet.FieldByName('FldChart').AsString]);
+  {$ENDREGION}
+
+end;
+
+procedure TReportMainForm.ChartClientDataSetAfterPost(DataSet: TDataSet);
+begin
+  inherited;
+
+  {$REGION 'applyupdatetoremoteserver'}
+  if ChartClientDataSet.ApplyUpdates(0) > 0 then
+    TMesRec.I('Unable to save Chart data to remote server')
+  else begin
+    ChartClientDataSet.Refresh; // IMPORTAN
+    LogFrame.Log('Chart data saved to remote server');
+  end;
   {$ENDREGION}
 
 end;
@@ -663,8 +795,7 @@ procedure TReportMainForm.SerieClientDataSetAfterInsert(DataSet: TDataSet);
 begin
   inherited;
 
-  {$REGION 'detail'}
-  // set
+  {$REGION 'init'}
   DataSet.Edit;
 //DataSet.FieldByName('FldObjectId'          ).Value := FId ; // automatic
 //DataSet.FieldByName('FldOrder'             ).Value := null;
@@ -701,6 +832,21 @@ begin
 //DataSet.FieldByName('FldYAxisLabelAngleDeg').Value := null;
   DataSet.Post;
   LogFrame.Log('%s data initialized', [DataSet.FieldByName('FldSerie').AsString]);
+  {$ENDREGION}
+
+end;
+
+procedure TReportMainForm.SerieClientDataSetAfterPost(DataSet: TDataSet);
+begin
+  inherited;
+
+  {$REGION 'applyupdatetoremoteserver'}
+  if SerieClientDataSet.ApplyUpdates(0) > 0 then
+    TMesRec.I('Unable to save Serie data to remote server')
+  else begin
+    SerieClientDataSet.Refresh; // IMPORTAN
+    LogFrame.Log('Serie data saved to remote server');
+  end;
   {$ENDREGION}
 
 end;

@@ -80,7 +80,7 @@ type
     { Private declarations }
   //FIni: TIniCls;
     FTic: TTicRec;
-    FWrq: TWrqRec;
+  //FWrq: TWrqRec;
     FWmoRec: TWmoRec;
   public
     { Public declarations }
@@ -191,7 +191,7 @@ begin
 
   // bo initialization via standard method
   if MODULE_USE_ON_METHODS then
-    FWmoRec.BeforeDispatch(Request, Response, FWrq, FTic)
+    FWmoRec.BeforeDispatch(Request, Response{, FWrq}, FTic)
 
   // bo initialization made locally (repeated in every module)
   else begin
@@ -226,7 +226,7 @@ end;
 procedure TMainWebModule.WebModuleAfterDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
   if MODULE_USE_ON_METHODS then
-    FWmoRec.AfterDispatch(Request, Response, FWrq, FTic)
+    FWmoRec.AfterDispatch(Request, Response{, FWrq}, FTic)
   else
     Response.Content := StringReplace(Response.Content, '$RvElapsedMs$', FTic.ElapsedMs.ToString, [rfReplaceAll]);
 end;
@@ -256,7 +256,7 @@ end;
     {$REGION 'Code'}
 procedure TMainWebModule.MainWebModuleCodeWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 var
-  ids, mim, ock, oco, res, qfn, qfv, ras, rmt, fbk: string; // oidstr, mimetype, objcontkind, objcontent, result, queryfieldnane, qfvalue, returnas, returnmimetype
+  ids, mim, ock, oco, res, qfn, qfv, ras, ra2, rmt, fbk: string; // oidstr, mimetype, objcontkind, objcontent, result, queryfieldnane, qfvalue, returnas, returnmimetype
   oid, aff, i: integer;
   cod: TCodRec;
   dst: TDataset;
@@ -298,8 +298,12 @@ begin
   // zip
   ock := cod.Obj.ContentKind;
   oco := cod.Obj.Content;
-  ras := cod.ReturnAs;
+  ras := cod.ReturnAs;       // Csv, Json, ...
   rmt := cod.ReturnMimeType; // mimetype=contenttype
+
+  // override
+  if gwrq.FieldGet('CoReturnAs', ra2, '') then
+    ras := ra2;
 
   // $replace$
     // $*$ params with queryfields values
@@ -345,17 +349,17 @@ begin
          if not TDbaRec.DsFromSql(oco, dst, aff, fbk) then begin
       mim := giif.NxD(rmt, TCtyRec.CTY_TXT_HTML);
       res := '[{"FldItem":"Error", "FldDescription":"' + fbk + '"}]';
-    end else if SameText(ras, 'AsCsv') then begin
+    end else if SameText(ras, 'Csv') then begin
       mim := giif.NxD(rmt, TCtyRec.CTY_TXT_CSV);
       TDstRec.DstToCsv(dst, res);
-    end else if SameText(ras, 'AsJson') then begin
+    end else if SameText(ras, 'Json') then begin
       mim := giif.NxD(rmt, TCtyRec.CTY_APP_JSON);
       TDstRec.DstToJson(dst, res);
-    end else if SameText(ras, 'AsHtml') then begin
+    end else if SameText(ras, 'Html') then begin
       mim := giif.NxD(rmt, TCtyRec.CTY_TXT_HTML);
   //  TDstRec.DstToHtml(dst, res);
       res := html_repater();
-    end else if SameText(ras, 'AsXml') then begin
+    end else if SameText(ras, 'Xml') then begin
       mim := giif.NxD(rmt, TCtyRec.CTY_TXT_XML);
       TDstRec.DstToXml(dst, res);
     end else begin

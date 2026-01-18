@@ -826,6 +826,40 @@ begin
       // gpxy should be set at beginning via ini-data or proxytab-data... so 1st time, enter process will probably fail and the user must be fill-in te proxytab-data
       {$ENDREGION}
 
+      {$REGION 'systemrio'}
+      Log('Requesting System (Wks) data...', fmInfo);
+      if not TSysRec.InitRio(fbk) then begin
+        Log('System problem: unable to get System (Wks) data, %s', [fbk], fmDanger);
+        ControlsShow(true);
+        Exit;
+      end;
+      Log('SYSTEM OK', fmSuccess);
+      {$ENDREGION}
+
+      {$REGION 'clientrio'}
+      Log('Requesting Client existence...', fmInfo);
+      if not TSysRec.BinaryExistsRio(TBynRec.BinaryName, fbk) then begin
+        Log('Client warning: your client is not registered on the system, %s', [fbk], fmWarning);
+        TMesRec.W('Your client is not registered on the system');
+        ControlsShow(true);
+        Exit;
+      end;
+      Log('Requesting Client version...', fmInfo);
+      if not TSysRec.BinaryVersionIsOkRio(TBynRec.BinaryName, TBynRec.Ver, fbk) then begin
+        Log('Client warning: your client version is not the latest, %s', [fbk], fmWarning);
+        TMesRec.W('Your client version is not the latest');
+        ControlsShow(true);
+      //Exit;
+      end;
+     {Log('Requesting Client data...', fmInfo);
+      if not TBynRec.InitRio(fbk) then begin
+        Log('Client problem: unable to get Client data, %s', [fbk], fmDanger);
+        ControlsShow(true);
+        Exit;
+      end;}
+      Log('CLIENT OK', fmSuccess);
+      {$ENDREGION}
+
       {$REGION 'organizationrio'}
       Log('Requesting Organization data...', fmInfo);
       if not gorg.InitRio(OrganizationEdit.Text, gaps.Www, fbk) then begin
@@ -919,40 +953,6 @@ begin
       end;
       PersonApply;
       Log('PERSON OK', fmSuccess);
-      {$ENDREGION}
-
-      {$REGION 'clientrio'}
-      Log('Requesting Client existence...', fmInfo);
-      if not TSysRec.BinaryExistsRio(TBynRec.BinaryName, fbk) then begin
-        Log('Client warning: your client is not registered on the system, %s', [fbk], fmWarning);
-        TMesRec.W('Your client is not registered on the system');
-        ControlsShow(true);
-        Exit;
-      end;
-      Log('Requesting Client version...', fmInfo);
-      if not TSysRec.BinaryVersionIsOkRio(TBynRec.BinaryName, TBynRec.Ver, fbk) then begin
-        Log('Client warning: your client version is not the latest, %s', [fbk], fmWarning);
-        TMesRec.W('Your client version is not the latest');
-        ControlsShow(true);
-      //Exit;
-      end;
-     {Log('Requesting Client data...', fmInfo);
-      if not TBynRec.InitRio(fbk) then begin
-        Log('Client problem: unable to get Client data, %s', [fbk], fmDanger);
-        ControlsShow(true);
-        Exit;
-      end;}
-      Log('CLIENT OK', fmSuccess);
-      {$ENDREGION}
-
-      {$REGION 'systemrio'}
-      Log('Requesting System (Wks) data...', fmInfo);
-      if not TSysRec.InitRio(fbk) then begin
-        Log('System problem: unable to get System (Wks) data, %s', [fbk], fmDanger);
-        ControlsShow(true);
-        Exit;
-      end;
-      Log('SYSTEM OK', fmSuccess);
       {$ENDREGION}
 
       {$REGION 'enter'}

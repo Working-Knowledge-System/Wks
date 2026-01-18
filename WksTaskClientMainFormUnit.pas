@@ -164,9 +164,14 @@ procedure TTaskMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // detail
-  if TaskClientDataSet.State = dsEdit then
+  {$REGION 'Object'}
+  {$ENDREGION}
+
+  {$REGION 'Detail'}
+  if not (TaskClientDataSet.State = dsBrowse) then
     TaskDBNavigator.BtnClick(nbPost);
+  {$ENDREGION}
+
 end;
 {$ENDREGION}
 
@@ -259,8 +264,7 @@ procedure TTaskMainForm.TaskClientDataSetAfterPost(DataSet: TDataSet);
 begin
   inherited;
 
-  {$REGION 'detail'}
-  // applyupdatetoremoteserver
+  {$REGION 'applyupdatetoremoteserver'}
   if TaskClientDataSet.ApplyUpdates(0) > 0 then
     TMesRec.I('Unable to save %s detail to remote server', [FObj])
   else begin
@@ -275,7 +279,7 @@ procedure TTaskMainForm.TaskClientDataSetReconcileError(DataSet: TCustomClientDa
 begin
   inherited;
 
-  {$REGION 'detail'}
+  {$REGION 'reconcileerror'}
   Action := HandleReconcileError(DataSet, UpdateKind, E);
   {$ENDREGION}
 

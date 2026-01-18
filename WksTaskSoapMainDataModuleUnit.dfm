@@ -4,8 +4,8 @@ object TaskMainDataModule: TTaskMainDataModule
   Width = 540
   object TaskADOConnection: TADOConnection
     ConnectionString = 
-      'Provider=MSOLEDBSQL.1;Password=secret@123;Persist Security Info=' +
-      'True;User ID=sa;Initial Catalog=DbaTask;Data Source=LOCALHOST'
+      'Provider=MSOLEDBSQL.1;Persist Security Info=True;Data Source=LOC' +
+      'ALHOST;User ID=sa;Password=31316@Wks;Initial Catalog=DbaTask'
     DefaultDatabase = 'DbaTask'
     LoginPrompt = False
     Provider = 'MSOLEDBSQL.1'
@@ -14,7 +14,7 @@ object TaskMainDataModule: TTaskMainDataModule
   end
   object TaskADOTable: TADOTable
     Connection = TaskADOConnection
-    CursorType = ctKeyset
+    CursorType = ctStatic
     IndexFieldNames = 'FldObjectId'
     MasterFields = 'FldId'
     MasterSource = ObjectDataSource
@@ -39,7 +39,7 @@ object TaskMainDataModule: TTaskMainDataModule
   end
   object ObjectADOTable: TADOTable
     Connection = TaskADOConnection
-    CursorType = ctKeyset
+    CursorType = ctStatic
     TableName = 'TblObject'
     Left = 240
     Top = 40

@@ -6,7 +6,7 @@
 //                            \_/\_/   |_|\_\ /__/                            //
 //                                                                            //
 //                         Working Knowledge System                           //
-//                             Delphi Framework                               //
+//                      Semiconductor Unified Framework                       //
 //                                                                            //
 //                           https://github.com/wks                           //
 //                           https://www.wks.cloud                            //
@@ -48,36 +48,60 @@ interface
 
 {$REGION 'Delphi'}
 (*
-  product                  prodver   packagever   compilerversion   conditionalver
-  ----------------------------------------------------------------------------
-  Delphi 12.* Athene       29        290          36.0              VER360
-  Delphi 11.* Alexandria   28        280          35.0              VER350
-  Delphi 10.1 Berlin       24        240          31.0              VER310
-  Delphi 10   Seattle      23        230          30.0              VER300
-
-
-  alias    delphi                                                     mssql   bytes
+  Release     Name        ProductVer  PackageVer  CompilerVer   ConditionalSymbol
   ------------------------------------------------------------------------------
-   int8    shortint                   -128..127                               1
-   int16   smallInt                -32,768..32,767                 smallint   2
-   int32   integer             -2147483648..2147483647                  int   4
-   int64              -9223372036854775808..9223372036854775807      bigint   8
-  uint8    byte                          0..255                     tinyint   1
-  uint16   word                          0..65535                             2
-  uint32   cardinal                      0..4294967295                        4
-  uint64                                 0..18446744073709551615              8
+  Delphi 13   Florence    37.0        370         37.0          VER370
+  Delphi 12   Athens      29.0        290         36.0          VER360
+  Delphi 11   Alexandria  28.0        280         35.0          VER350
+  Delphi 10.4 Sydney      27.0        270         34.0          VER340
+  Delphi 10.3 Rio         26.0        260         33.0          VER330
+  Delphi 10.2 Tokyo       25.0        250         32.0          VER320
+  Delphi 10.1 Berlin      24.0        240         31.0          VER310
+  Delphi 10   Seattle     23.0        230         30.0          VER300
 
 
-  conditionalcompiles:
+  signed    bytes delphi                       range                      mssql     oracle
+  ----------------------------------------------------------------------------------------
+  int8      1     shortint                  -128..127
+  int16     2     smallInt               -32,768..32,767                  smallint
+  int32     4     integer            -2147483648..2147483647              int
+  int64     8     int64     -9223372036854775808..9223372036854775807     bigint
 
-  {$IF COMPILERVERSION < 31.0} v: TSuperArray {$ELSE} v: ISuperArray {$ENDIF};
-  {$IF COMPILERVERSION < 32.0} TStringDynArray {$ELSE} TArray<string> {$ENDIF};
 
-  {$IF COMPILERVERSION < 32}
-  DBA_CONNECTION_STR      =
-  {$ELSE}
-  DBA_CONNECTION_STR      =
+  unsigned  bytes delphi                        range                     mssql     oracle
+  ----------------------------------------------------------------------------------------
+  uint8     1     byte                          0..255                    tinyint
+  uint16    2     word                          0..65535
+  uint32    4     cardinal                      0..4294967295
+  uint64    8     uint64                        0..18446744073709551615
+
+
+  pointer-sized integer types, platform-dependent
+  use these when storing pointer arithmetic or handles
+  these change size depending on whether the target is Win32 or Win64
+
+  type        size (win32)  size (win64)  signed
+  ----------------------------------------------
+  NativeInt   32-bit        64-bit        yes
+  NativeUInt  32-bit        64-bit        no
+
+
+  using the ConditionalSymbol:
+
+  {$IFDEF VER300}
+    // Delphi 10 Seattle or compatible
   {$ENDIF}
+
+  using the CompilerVersion constants:
+
+  {$IF CompilerVersion >= 31.0}
+  // Delphi 10.1 Berlin and newer
+  {$IFEND}
+
+  {$IF CompilerVersion < 31.0} v: TSuperArray     {$ELSE} v: ISuperArray    {$ENDIF};
+  {$IF CompilerVersion < 32.0} v: TStringDynArray {$ELSE} v: TArray<string> {$ENDIF};
+
+  using Declared() function:
 
   {$IF NOT DECLARED(TStringDynArray)}
     {$IFDEF HAVE_RTTI}
@@ -86,41 +110,140 @@ interface
   TStringDynArray = array of string;
     {$ENDIF}
   {$IFEND}
-*)
-{$ENDREGION}
 
-{$REGION 'Help'}
-(*
-  Client--Server--Database
+
+  ini
+  ---
+  some general and FireDAC parameters are loades from ini file stored in C:\$\X\WksIni_<hostname>.ini
+
+
+  client--server--database
   ------------------------
   an object tipically migh have two similar commands, one to deal with the database and one to deal rio like:
   - function  IdNext{Dba}(IvIdNext: integer; varFbk: string);   with this, the server interact with the db
-  - function  IdNextRio(IvIdNext: integer; varFbk: string);     with this, the server interact with the client
+  - function  IdNextRio(IvIdNext: integer; varFbk: string);     with this, the client interact with the server
 
-  Groups
-  ------
-  [O] = Object         = Obj (ex Xxx)
-  [B] = usinessobjects = Person, User, Session, Organization, Theme, Member (a person, with an account enter a system and become a user with a valid session then join an organization becoming a member)
 
-  Obj                   Object     >    Person     >    User      >     Session    >    Organization >  Member
-  ----------------------------------------------------------------------------------------------------------------------
-  graphic object        Image           Picture         Avatar          -               Logo/LogoLong   Badge
+  objects
+  -------
+  [O] = Object          = Obj (ex Xxx)
+  [B] = Businessobjects = Person, User, Session, Organization, Theme, Member (a person, with an account enter a system and become a user with a valid session then join an organization becoming a member)
+
+  Obj               Object    >   Person    >   User    >   Session   >   Organization    >   Member
+  --------------------------------------------------------------------------------------------------
+  graphicobject     Image         Picture       Avatar      -             Logo/LogoLong       Badge
    
 
   array of const
-  -----------------------------
+  --------------
   array of const is represented by array of TVarRec
   each element in array of const corresponds to a TVarRec structure that holds information about the type and value of the element
+
+
+  dll iis host application
+  ------------------------
+  host application:  C:\Windows\SysWOW64\inetsrv\w3wp.exe
+  parameters:        -debug
+
+
+  configs
+  ----------------------------------------------------
+  output directory:       C:\$\X\$(Platform)\$(Config)
+  units output directory: C:\$\D\$(Platform)\$(Config)
+
+
+  keys
+  ----
+                 F4         run to cursor
+                 F5         add/remove brekpoint
+                 F6         entire ide search
+                 F7         trace into
+                 F8         step over
+                 F9         run
+                 F11        object inspector
+                 F12        toggle code/form
+
+  SHIFT        + F7         trace to next source line
+  SHIFT        + F8         run until function returns
+  SHIFT        + F9         build all files in the project
+  SHIFT        + F11        add to Project
+  SHIFT        + F12        form search
+
+  ALT          + G          go to line number
+  ALT          + Up/Down    toggle Code > Designer > History
+
+  CTRL         + F          search
+  CTRL         + E          search again
+  CTRL         + L          search next
+  CTRL         + R          search & replace
+  CTRL         + J          template completion
+  CTRL         + H          show/hide non visual components
+  CTRL         + S          save
+  CTRL         + D          format code
+  CTRL         + .          entire ide search
+  CTRL         + /          toggle comment
+  Ctrl         + F2         reset the program
+  Ctrl         + F7         evaluate/modify variable
+  Ctrl         + F9         compile/make (changed files only)
+  CTRL         + HOME       go to top
+  CTRL         + END        go to bottom
+  CTRL         + SPACE      opens code completion window
+  Ctrl         + 1..9       go to bookmark
+
+  CTRL         + K O        lowercase
+  CTRL         + K N        uppercase
+  CTRL         + O U        toggle case of a selected block
+
+  CTRL + ALT   + B          breakpoints list
+  CTRL + ALT   + L          local vars
+  CTRL + ALT   + K          raw values in the stack
+  CTRL + ALT   + T          threads
+  CTRL + ALT   + M          modules
+  CTRL + ALT   + P          palette
+  CTRL + ALT   + S          call stack
+  CTRL + ALT   + V          event log
+  CTRL + ALT   + W          watches - view/manage values
+  CTRL + ALT   + F11        project manager
+
+  CTRL + SHIFT + A          opens the find unit window to locate units and add them to the uses clause
+  CTRL + SHIFT + C          invokes class declaration completion for the class at cursor
+  CTRL + SHIFT + E          rename all references to this identifier
+  CTRL + SHIFT + F          search in file/folders
+  CTRL + SHIFT + G          insert new GUID
+  CTRL + SHIFT + H          help about symbol at cursor
+  CTRL + SHIFT + I          indent selected code
+  CTRL + SHIFT + U          un-indent selected code
+  CTRL + SHIFT + L          converts the string currently selected into a resource string
+  CTRL + SHIFT + M          extracts a selected code fragment, turning it into a method
+  CTRL + SHIFT + P          play macro
+  CTRL + SHIFT + R          start/end recording a macro
+  CTRL + SHIFT + S          save all
+  CTRL + SHIFT + T          add to-do (view > tool windows > to-do list)
+  CTRL + SHIFT + F4         close all editor pages, except the main one
+  CTRL + SHIFT + F9         run (witout debugging)
+  CTRL + SHIFT + 1..9       add/remove bookmark
+  CTRL + SHIFT + Up/Down    jump to interface / implementation for a method
+
+  CTRL + SHIFT + K A        expand all
+  CTRL + SHIFT + K C        collapse all classes
+  CTRL + SHIFT + K E        collapse current block
+  CTRL + SHIFT + K G        collapse initialize/finalize and interface/implementation
+  CTRL + SHIFT + K M        collapse all methods
+  CTRL + SHIFT + K T        toggle current block
+
+  CTRL + SHIFT + ALT + F11  project options
+  CTRL + SHIFT + ALT + F9   deploy the project
+  CTRL + SHIFT + ALT + P    sync prototypes (push method declaration changes to the associated interface/implementation)
+
+
+  WebView
+  -------
+  after changing the UserDataFolder or BrowserExecutableFolder property, you must reinitialize the WebView2 by calling the ReinitializeWebView or ReinitializeWebViewWithNewBrowser
+
 *)
 {$ENDREGION}
 
-{$REGION 'ToDo'}
-(*
-  - delete all FldFrom* fields and replace them with FldOwner, all From* values will have to be deduced from FldOwner itself
-*)
-{$ENDREGION}
-
-{$REGION 'Switches'}
+{$REGION 'Inc'}
 {$I Wks000Inc.inc}
 {$ENDREGION}
 
@@ -128,9 +251,9 @@ interface
 uses
     Winapi.Windows
   , Winapi.ADOInt                 // RecordSet -> _Recordset
-  , System.Types
-  , System.Classes
-  , System.SysUtils
+  , System.Types                  //
+  , System.Classes                //
+  , System.SysUtils               //
   , System.Rtti                   // TRttiType, TRttiField, TValue
   , System.Generics.Defaults      // tequalitycomparer
   , System.Generics.Collections   // json.getpairs, tdictionary
@@ -145,6 +268,7 @@ uses
   , Vcl.Imaging.GIFImg            // tgifimage
   , Vcl.Imaging.PNGImage          // tpngimage
   , Vcl.Forms                     // application, screen, form
+  , Vcl.StdCtrls                  // tlabel, tlistbox
   , Vcl.ComCtrls                  // tpagecontrol
 //, Vcl.Controls                  // tcontrol, twincontrol, crhourglass
   , Vcl.DBGrids                   // grid
@@ -210,19 +334,17 @@ uses
 
 {$REGION 'Enum'}
 type
-//TTriStateEnum     = (tsTrue, stFalse, tsUnknown);
-  TWebFrameworkEnum = (wfNone, wfW3Css, wfPicoCss);
-  TCaseEnum         = (cAsIs, cLower, cUpper, cCapital, cCapitalAll);
-  TFbkModeEnum      = (fmNone, fmInfo, fmSuccess, fmWarning, fmDanger, fmError); // bg: transparent, blue, green, orange, red, black
-  TImgTormEnum      = (itNone, itBottom, itTop, itTopBottom);
-  TProcessKindEnum  = (pkUnknown, pk32Bit, pk64Bit);
-  THvDirEnum        = (hvHorizontal, hvVertical);
+  TFbkModeEnum               = (fmNone, fmInfo, fmSuccess, fmWarning, fmDanger, fmError); // bg: transparent, blue, green, orange, red, black
+  TFontCaseEnum              = (fcAsIs, fcLower, fcUpper, fcCapital, fcCapitalAll);
+  TImgTormEnum               = (itNone, itBottom, itTop, itTopBottom);
+  TProcessKindEnum           = (pkUnknown, pk32Bit, pk64Bit);
+  THvDirEnum                 = (hvHorizontal, hvVertical);
+  TWebFrameworkEnum          = (wfNone, wfW3Css, wfPicoCss);
+//TTriStateEnum              = (tsTrue, stFalse, tsUnknown);
 {$ENDREGION}
 
 {$REGION 'Const'}
 const
-
-  // *** INVERT SOME ***
 
   {$REGION 'Strings'}
   OK_STR                     = 'Ok';
@@ -237,12 +359,12 @@ const
   WARNING_STR                = 'WARNING';
   SUCCESS_STR                = 'SUCCESS';
   EXCEPTION_STR              = 'EXCEPTION';
-  NA_STR2                    = 'NA';
-  NA_STR                     = 'Not Available';
-  NOT_IMPLEMENTED_STR        = 'Not Implemented';
-  NOT_AVAILABLE_STR          = 'Not available';
+  NA_STR                     = 'NA';
   NOT_FOUND_STR              = 'Not found';
+//NA_STR2                    = 'Not available';
+  NOT_AVAILABLE_STR          = 'Not available';
   NOT_AUTHORIZED_STR         = 'Not authorized';
+  NOT_IMPLEMENTED_STR        = 'Not implemented';
   NOT_ASSIGNED_STR           = 'Not assigned';
 //NOT_AN_OPTION_STR          = 'Not an option';
   {$ENDREGION}
@@ -251,30 +373,31 @@ const
   CHARS_SPECIAL              = '~!@#$%^&*()_+=-';
   CHAR_DELIMITER             = ',';
   CHAR_CONTENT_CHANGED       = '*';
-//CHAR_CONTENT_CHANGED       = '•'; // dot
+//CHAR_CONTENT_CHANGED       = '•';               // dot
   {$ENDREGION}
 
   {$REGION 'Font'}
-  FONT_FAMILY_REGULAR        = 'Roboto';              // Arial      , Tahoma  , Roboto     , Calibri
-  FONT_FAMILY_MONOSPACE      = 'Roboto Mono';         // Courier New, Consolas, Roboto Mono, Source Code Pro, Inconsolata, IBM Plex Mono, Times New Roman, Arial, Tahoma, Verdana, Courier New, Lucida Console
+  FONT_FAMILY_REGULAR        = 'Roboto';          // Arial      , Tahoma  , Roboto     , Calibri
+  FONT_FAMILY_MONOSPACE      = 'Roboto Mono';     // Courier New, Consolas, Roboto Mono, Source Code Pro, Inconsolata, IBM Plex Mono, Times New Roman, Arial, Tahoma, Verdana, Courier New, Lucida Console
   {$ENDREGION}
 
   {$REGION 'Pauses'}
-  LOG_PAUSE_MS               =  100;                  // inter log sleep pause
-  SHORT_PAUSE_MS             = 1000;                  // sleep pause after a success (ie succesful login)
-  MEDIUM_PAUSE_MS            = 2000;                  //
-  LONG_PAUSE_MS              = 3000;                  // sleep pause after a failure (ie unsuccessful login attempt)
+  LOG_PAUSE_MS               =  100;              // inter log sleep pause
+  SHORT_PAUSE_MS             = 1000;              // sleep pause after a success (ie succesful login)
+  MEDIUM_PAUSE_MS            = 2000;              //
+  LONG_PAUSE_MS              = 3000;              // sleep pause after a failure (ie unsuccessful login attempt)
   {$ENDREGION}
 
   {$REGION 'Dba'}
+//DBA_PROVIDER               = 'SQLNCLI.1'      ; // 
 //DBA_PROVIDER               = 'SQLNCLI11.1'    ; // Microsoft legacy SQL Server Native Client
 //DBA_PROVIDER               = 'SQLOLEDB.1'     ; // Microsoft classic OLE DB Provider for SQL Server (present on Windows Server 2025)
   DBA_PROVIDER               = 'MSOLEDBSQL.1'   ; // Microsoft new OLE DB Driver (need to be installed on Windows Server 2025 but only x64 bit is allowed)
 //DBA_PROVIDER               = 'OraOLEDB.Oracle'; // Oracle new OLE DB Driver (installed with Oracle Client, not Oracle Instant Client)
 
   // mssql
-//DBA_CONNECTION_STR         = 'Provider='+DBA_PROVIDER+';Integrated Security=SSPI  ;Data Source=LOCALHOST;User ID=WINLOGINUSER;Initial Catalog=DbaXxx';           // windows authentication (integrated security)
-  DBA_CONNECTION_STR         = 'Provider='+DBA_PROVIDER+';Persist Security Info=True;Data Source=LOCALHOST;User ID=sa;Password=secret@123;Initial Catalog=DbaXxx'; // sql server authentication wks
+//DBA_CONNECTION_STR         = 'Provider='+DBA_PROVIDER+';Integrated Security=SSPI  ;Data Source=LOCALHOST;User ID=WINLOGINUSER;Initial Catalog=DbaXxx'{,MARS Connection=True};          // windows authentication (integrated security)
+  DBA_CONNECTION_STR         = 'Provider='+DBA_PROVIDER+';Persist Security Info=True;Data Source=LOCALHOST;User ID=sa;Password=31316@Wks;Initial Catalog=DbaXxx'{,MARS Connection=True}; // sql server authentication wks
 
   // oracle
 //DBA_CONNECTION_STR_FD_ORA  = '''
@@ -283,6 +406,7 @@ const
 //User_Name=user
 //Password=pass
 //''';
+
   DBA_CONNECTION_TIMEOUT_SEC = 10;
   DBA_COMMAND_TIMEOUT_SEC    = 300;   // 5 min
   DATASET_MAXRECORDS         = 10000; // ultimatetopmax
@@ -312,88 +436,96 @@ const
   {$ENDREGION}
 
   {$REGION 'License'}
-  LICENSE_MIT             = 'MIT License'
-             + sLineBreak + ''
-             + sLineBreak + 'Copyright (c) 2010-[RvDatNowYear()] [RvWks()]'
-             + sLineBreak + ''
-             + sLineBreak + 'Permission is hereby granted, free of charge, to any person obtaining a copy'
-             + sLineBreak + 'of this software and associated documentation files (the "Software"), to deal'
-             + sLineBreak + 'in the Software without restriction, including without limitation the rights'
-             + sLineBreak + 'to use, copy, modify, merge, publish, distribute, sublicense, and/or sell'
-             + sLineBreak + 'copies of the Software, and to permit persons to whom the Software is'
-             + sLineBreak + 'furnished to do so, subject to the following conditions:'
-             + sLineBreak + ''
-             + sLineBreak + 'The above copyright notice and this permission notice shall be included in all'
-             + sLineBreak + 'copies or substantial portions of the Software.'
-             + sLineBreak + ''
-             + sLineBreak + 'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR'
-             + sLineBreak + 'IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,'
-             + sLineBreak + 'FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE'
-             + sLineBreak + 'AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER'
-             + sLineBreak + 'LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,'
-             + sLineBreak + 'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE'
-             + sLineBreak + 'SOFTWARE.';
+  LICENSE_MIT                = 'MIT License'
+                + sLineBreak + ''
+                + sLineBreak + 'Copyright (c) 2010-[RvDatNowYear()] [RvWks()]'
+                + sLineBreak + ''
+                + sLineBreak + 'Permission is hereby granted, free of charge, to any person obtaining a copy'
+                + sLineBreak + 'of this software and associated documentation files (the "Software"), to deal'
+                + sLineBreak + 'in the Software without restriction, including without limitation the rights'
+                + sLineBreak + 'to use, copy, modify, merge, publish, distribute, sublicense, and/or sell'
+                + sLineBreak + 'copies of the Software, and to permit persons to whom the Software is'
+                + sLineBreak + 'furnished to do so, subject to the following conditions:'
+                + sLineBreak + ''
+                + sLineBreak + 'The above copyright notice and this permission notice shall be included in all'
+                + sLineBreak + 'copies or substantial portions of the Software.'
+                + sLineBreak + ''
+                + sLineBreak + 'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR'
+                + sLineBreak + 'IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,'
+                + sLineBreak + 'FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE'
+                + sLineBreak + 'AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER'
+                + sLineBreak + 'LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,'
+                + sLineBreak + 'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE'
+                + sLineBreak + 'SOFTWARE.';
   {$ENDREGION}
 
   {$REGION 'Privacy'}
-  PRIVACY_STATEMENT       = 'At [RvWks()], we are committed to protecting your privacy.'
-             + sLineBreak + 'This Privacy Statement explains how we collect, use, and safeguard'
-             + sLineBreak + 'your personal information when you use our software.'
-             + sLineBreak + ''
-             + sLineBreak + 'Information We Collect'
-             + sLineBreak + ''
-             + sLineBreak + 'We may collect the following types of personal information:'
-             + sLineBreak + ''
-             + sLineBreak + '- Contact Information: Your name, email address, and phone number.'
-             + sLineBreak + '- Usage Data:          Information about how you interact with our software,'
-             + sLineBreak + '                       including log files, error reports, and analytics data.'
-             + sLineBreak + '- Payment Details:     If applicable, payment information for purchasing our software.'
-             + sLineBreak + ''
-             + sLineBreak + 'How We Use Your Information'
-             + sLineBreak + ''
-             + sLineBreak + 'We use your personal information for the following purposes:'
-             + sLineBreak + ''
-             + sLineBreak + '- To communicate with you regarding updates, support, and other relevant information.'
-             + sLineBreak + '- To provide and maintain our software services.'
-             + sLineBreak + '- To improve our software and enhance the user experience.'
-             + sLineBreak + '- To process payments, if applicable.'
-             + sLineBreak + ''
-             + sLineBreak + 'Data Security'
-             + sLineBreak + ''
-             + sLineBreak + 'We take data security seriously.'
-             + sLineBreak + 'Your information is stored securely and protected'
-             + sLineBreak + 'against unauthorized access, disclosure, or alteration.'
-             + sLineBreak + ''
-             + sLineBreak + 'Third-Party Services'
-             + sLineBreak + ''
-             + sLineBreak + 'We do not use any third-party services that collect and process data on our behalf.'
-           //+ sLineBreak + 'Even if these services adhere to their own privacy policies.'
-             + sLineBreak + ''
-             + sLineBreak + 'Your Choices'
-             + sLineBreak + ''
-             + sLineBreak + '- You can update your personal information yourself or by contacting us.'
-             + sLineBreak + '- You can opt out of receiving marketing communications.'
-             + sLineBreak + '- You can request us to delete your account and all your personal data,'
-             + sLineBreak + '  but the logs will not deleted for security reason.'
-             + sLineBreak + ''
-             + sLineBreak + 'Contact Us'
-             + sLineBreak + ''
-             + sLineBreak + 'If you have any questions or concerns about our privacy practices,'
-             + sLineBreak + 'please contact us at [RvWksEmail()].'
-             + sLineBreak + ''
-             + sLineBreak + 'Thank you for trusting [RvWks()] with your data.'
-             + sLineBreak + ''
-             + sLineBreak + '12/20/2024';
+  PRIVACY_STATEMENT          = 'At [RvWks()], we are committed to protecting your privacy.'
+                + sLineBreak + 'This Privacy Statement explains how we collect, use, and safeguard'
+                + sLineBreak + 'your personal information when you use our software.'
+                + sLineBreak + ''
+                + sLineBreak + 'Information We Collect'
+                + sLineBreak + ''
+                + sLineBreak + 'We may collect the following types of personal information:'
+                + sLineBreak + ''
+                + sLineBreak + '- Contact Information: Your name, email address, and phone number.'
+                + sLineBreak + '- Usage Data:          Information about how you interact with our software,'
+                + sLineBreak + '                       including log files, error reports, and analytics data.'
+                + sLineBreak + '- Payment Details:     If applicable, payment information for purchasing our software.'
+                + sLineBreak + ''
+                + sLineBreak + 'How We Use Your Information'
+                + sLineBreak + ''
+                + sLineBreak + 'We use your personal information for the following purposes:'
+                + sLineBreak + ''
+                + sLineBreak + '- To communicate with you regarding updates, support, and other relevant information.'
+                + sLineBreak + '- To provide and maintain our software services.'
+                + sLineBreak + '- To improve our software and enhance the user experience.'
+                + sLineBreak + '- To process payments, if applicable.'
+                + sLineBreak + ''
+                + sLineBreak + 'Data Security'
+                + sLineBreak + ''
+                + sLineBreak + 'We take data security seriously.'
+                + sLineBreak + 'Your information is stored securely and protected'
+                + sLineBreak + 'against unauthorized access, disclosure, or alteration.'
+                + sLineBreak + ''
+                + sLineBreak + 'Third-Party Services'
+                + sLineBreak + ''
+                + sLineBreak + 'We do not use any third-party services that collect and process data on our behalf.'
+              //+ sLineBreak + 'Even if these services adhere to their own privacy policies.'
+                + sLineBreak + ''
+                + sLineBreak + 'Your Choices'
+                + sLineBreak + ''
+                + sLineBreak + '- You can update your personal information yourself or by contacting us.'
+                + sLineBreak + '- You can opt out of receiving marketing communications.'
+                + sLineBreak + '- You can request us to delete your account and all your personal data,'
+                + sLineBreak + '  but the logs will not deleted for security reason.'
+                + sLineBreak + ''
+                + sLineBreak + 'Contact Us'
+                + sLineBreak + ''
+                + sLineBreak + 'If you have any questions or concerns about our privacy practices,'
+                + sLineBreak + 'please contact us at [RvWksEmail()].'
+                + sLineBreak + ''
+                + sLineBreak + 'Thank you for trusting [RvWks()] with your data.'
+                + sLineBreak + ''
+                + sLineBreak + '12/20/2020';
   {$ENDREGION}
 
   {$REGION 'Obj'}
-  OBJ_ROOT_ID                        = 1;
-  OBJ_ROOT_ZZZ_ID                    = 2;
-  OBJ_ROOT_TEMP_ID                   = 3;
+//OBJ_ROOT_PARENT_ID                 =  0; *** ALL DUPLICATED IN TVstRec ***
+  OBJ_ROOT_ID                        =  1;
+  OBJ_ROOT_ZZZ_ID                    =  2;
+  OBJ_ROOT_TEMP_ID                   =  3;
+  OBJ_ROOT_TEST_ID                   =  4;
+  OBJ_ROOT_HELP_ID                   =  5;
+  OBJ_ROOT_TEMPLATE_ID               =  6;
+  OBJ_ROOT_ORGANIZATION_ID           =  7;
+  OBJ_ROOT_PUBLIC_ID                 =  8;
+  OBJ_ROOT_SYSTEM_ID                 =  9;
+  OBJ_ROOT_RESERVED_ID               = 10;
   {$ENDREGION}
 
   {$REGION 'Paths'}
-  TEMP_PATH                          = 'C:\$\Temp'; //  *** put in System ***
+  TEMP_PATH                          = 'C:\$\Temp'; // *** put in System ***
   {$ENDREGION}
 
   {$REGION 'File'}
@@ -401,17 +533,75 @@ const
   {$ENDREGION}
 
   {$REGION 'Report'}
-  REPORT_EXPORT_PATH                 = 'C:\$\Temp'; //  *** put in System ***
-  REPORT_EXPORT_FILE_MAX_AGE_MINUTES = 5;
+  REPORT_EXPORT_PATH                 = 'C:\$\Temp'; // *** put in System ***
+  REPORT_EXPORT_FILE_MAX_AGE_MINUTES = 5;           // *** put in System ***
   {$ENDREGION}
 
   {$REGION 'Web'}
-  WEB_FRAMEWORK_DEF                  = wfW3Css;
+  CSS_FRAMEWORK_DEFAULT              = wfW3Css;
+  HTM_TABLEFROMDS_EDIT_JSON          = '''
+{
+  "EditMenu": {                                                                                                          -- not implemented
+    "Visible": false                                                                                                     -- not implemented
+  , "Items": [                                                                                                           -- not implemented
+      {"Id": "AddNew", "Visible": true, "Title": "Add New"}                                                              -- not implemented
+    ]                                                                                                                    -- not implemented
+  }                                                                                                                      -- not implemented
+, "EditData": {                                                                                                          -- data for inline edit of cell in a table
+    "InsertIfNotExists": false                                                                                           -- not implemented
+  , "Table"            : "DbaXxx.dbo.TblXxx"                                                                             -- tablename, fully qualified
+  , "KeyFieldList"     : ["FldObjectId", "FldLocalId"]                                                                   -- to make unique the record, one or more fields, cant be empty
+  , "FieldList": [                                                                                                       -- list of editable fields (must not contains the key fields)
+      {"Field": "FldLocalId"    , "Ctrl": "Text"}                                                                        -- text box input
+    , {"Field": "FldLocalPId"   , "Ctrl": "Text"}                                                                        -- text box input
+    , {"Field": "FldText"       , "Ctrl": "Text"}                                                                        -- text box input
+    , {"Field": "FldState"      , "Ctrl": "Search", "ItemsUrl"   : "/WksCodeIsapiProject.dll/Code?CoCodeId=119&CoLike="} -- dynamic search from table report
+    , {"Field": "FldOwner"      , "Ctrl": "Search", "ItemsUrl"   : "/WksCodeIsapiProject.dll/Code?CoCodeId=485&CoLike="} -- dynamic search from table report
+    , {"Field": "FldSearch"     , "Ctrl": "Search", "ItemsUrl"   : "/WksCodeIsapiProject.dll/Code?CoCodeId=132&CoLike="} -- dynamic search from table report
+    , {"Field": "FldSelect"     , "Ctrl": "Select", "ItemsCsv"   : "*,Select1,Select2,Select3"}                          -- inline dropdownlist pre-loaded with items from csv
+    , {"Field": "FldSelect2"    , "Ctrl": "Select", "ItemsJson"  : "[*,Select1,Select2,Select3]"}                        -- inline dropdownlist pre-loaded with items from json
+    , {"Field": "FldSelect3"    , "Ctrl": "Select", "ItemsGet"   : "/WksCodeIsapiProject.dll/Code?CoCodeId=135"}         -- inline dropdownlist pre-loaded with items from a API
+    , {"Field": "FldDate"       , "Ctrl": "Date"}                                                                        -- inline date selector
+    , {"Field": "FldMemo"       , "Ctrl": "Editor"}                                                                      -- modal text editor (no highlight)
+    , {"Field": "FldSql"        , "Ctrl": "Editor", "Type": "Sql"}                                                       -- modal text editor with sql highlight
+    , {"Field": "FldDescription", "Ctrl": "Editor"}                                                                      -- text box input
+  --, {"Field": "FldTime"       , "Ctrl": "Time"}                                                                        -- inline time selector
+  --, {"Field": "FldDateTime"   , "Ctrl": "DateTime"}                                                                    -- inline datetime selector
+  --, {"Field": "FldBoolean"    , "Ctrl": "Checkbox"}                                                                    -- inline checkbox (true/false)
+  --, {"Field": "FldBoolean"    , "Ctrl": "Toggle"}                                                                      -- inline toggle (true/false)
+  --, {"Field": "FldBoolean"    , "Ctrl": "Tristate"}                                                                    -- inline tritoggle (true/false/null)
+  --, {"Field": "FldRadios"     , "Ctrl": "Radios", "ItemsCsv"   : "*,Radio1,Radio2,Radio3"}                             -- inline like a select (uni-selection)
+  --, {"Field": "FldChecks"     , "Ctrl": "Checks", "ItemsCsv"   : "*,Check1,Check2,Check3"}                             -- inline like a select (multi-selection)
+  --, {"Field": "FldPlace"      , "Ctrl": "Report", "ItemsReport": {"ReportId": 15, "ValueField": "FldPlace", "ColumnField": "%FldLocation% - %FldProvince%"}}
+    ]
+  , "OwnerField" : "FldOwner"             -- the record will be editable only if the logged user match this field, the column must to be present
+  , "OneWayField": "FldState"             -- the record is editable only if it is Active.  Once changed to Inactive the entire record will not be editable anymore
+  , "OneWayList" : ["Active", "Inactive"] -- usually just two, to toggle (i.e. if the record is Active and you change it, it become inactive and not editable anymore))
+  , "WhenField"  : "FldWhen"              -- add/set this key only if you need to auto-update a "when" field different than FldWhen (FldWhen field, if present, is update automatically by default)
+  , "WhoField"   : "FldWho"               -- add/set this key only if you need to auto-update a "who" field different than FldWho (FldWho field, if present, is update automatically by default)
+  }
+}
+''';
+  {$ENDREGION}
+
+  {$REGION 'Log'}
+  LOG_DIR                                             = 'C:\$\Log'    ;
+  LOG_FILE_PREFIX                                     = 'Wks'         ;
+  LOG_SYSLOG_HOST                                     = '51.38.98.160';
+  LOG_SYSLOG_PORT                                     = 514           ;
+  LOG_TOPIC_ID_MAX                                    = 4             ;
+  LOG_TOPIC_GENERAL                                   = 0             ;
+  LOG_TOPIC_ENVIRONMENT                               = 1             ;
+  LOG_TOPIC_NETWORK                                   = 2             ;
+  LOG_TOPIC_LOGIN                                     = 3             ;
+  LOG_TOPIC_AUTHORIZATION                             = 4             ;
+  LOG_TOPIC_VEC: array[0..LOG_TOPIC_ID_MAX] of string = ('GENERAL', 'ENVIRONMENT', 'NETWORK', 'LOGIN', 'AUTHORIZATION');
+  // used by JachLog
   {$ENDREGION}
 
   {$REGION 'Vector'}
   TRUE_FALSE_STR_VEC: array [0..1] of string = ('true', 'false');
-  MY_ARRAY     : TArray<string> = ['First','Second','Third']; // *** WARNING if not present errors happens later ***
+  MY_VECTOR                 : TArray<string> = ['First','Second','Third']; // *** WARNING if not present errors happens later ***
   {$ENDREGION}
 
 {$ENDREGION}
@@ -427,7 +617,7 @@ type
     procedure FromHtmlString(const IvString: string; IvDefault: TColor = clWhite); // return a TColor from an html string like #02FF88 (rrggbb)
     procedure ToRgb(var IvR, IvG, IvB: byte);
     procedure FromRgb(IvR, IvG, IvB: byte);
-    function  ToRgbTriple: TRGBTriple; // (const IvColor: TColor)
+    function  ToRgbTriple: TRGBTriple;                                             // (const IvColor: TColor)
     procedure FromRgbTriple(const IvRgbTriple: TRGBTriple);
   end;
 
@@ -475,7 +665,7 @@ type
     Msg        : string;
     Description: string;
     Mode       : TFbkModeEnum;
-    PersistMs  : integer;      // number of milliseconds the message is showed
+    PersistMs  : integer;  // number of milliseconds the message is showed
   //Pass       : integer;
   //Fail       : integer;
   //ElapsedMs  : integer;
@@ -524,151 +714,199 @@ type
   TStringVector  = TArray<string> {TStringDynArray} {array of string};
 //TStringMatrix  = array of TStringVector;
 
-//TByteVector    = TByteDynArray {array of byte};       // like TIdBytes
+//TByteVector    = TByteDynArray {array of byte};   // like TIdBytes
 //TByteMatrix    = array of TByteVector;
 
 //TBitmapVector  = array of TBitmap;
 //TBitmapMatrix  = array of TBitmapVector;
 
   TVariantVector = TArray<variant> {array of variant};  // this is a dynamic array of variants that is resizable (an open array is not resizable!)
-//TVarRecVector  = array of TVarRec;                    // TConstArray
+//TVarRecVector  = array of TVarRec;                // TConstArray
 
-//TRgbVector     = array[0..65535] of TRGBTriple;       // color
-//PRgbVector     = ^TRgbVector;                         // color
+//TRgbVector     = array[0..65535] of TRGBTriple;   // color
+//PRgbVector     = ^TRgbVector;                     // color
   {$ENDREGION}
 
   {$REGION 'Obj'}
   // *************************************************************************** OBJECT (MASTER, FIXED PART)
-//TObjKindEnum = (  // objectkind
-//  okXxx           // prototype
-//, okPerson        // \__ PersonClient
-//, okUser          // /
-//, okOrganization  // organization
-//, okMember        //member = structure
+//TObjKindEnum = ( // objectkind
+//  okXxx          // prototype
+//, okPerson       // \__ PersonClient
+//, okUser         // /
+//, okOrganization // organization
+//, okMember       //member = structure
+// ...
 //);
 
   TObjRem = class(TRemotable)
-  private
-    FId              : integer      ; // FldId
-    FPId             : integer      ; // FldPId
-    FId8             : string       ; // FldId8
-    FOrder           : integer      ; // FldOrder
-    FRev             : integer      ; // FldRev
-    FCreated         : TDateTime    ; // FldCreated
-    FUpdated         : TDateTime    ; // FldUpdated
-    FUpdatedBy       : string       ; // FldUpdatedBy
-    FFromOrganization: string       ; // FldFromOrganization
-    FFromDepartment  : string       ; // FldFromDepartment
-    FFromArea        : string       ; // FldFromArea
-    FFromTeam        : string       ; // FldFromTeam
-    FFromMember      : string       ; // FldFromMember
-    FToOrganization  : string       ; // FldToOrganization
-    FToDepartment    : string       ; // FldToDepartment
-    FToArea          : string       ; // FldToArea
-    FToTeam          : string       ; // FldToTeam
-    FToMember        : string       ; // FldToMember
-    FJobGradeMin     : integer      ; // FldJobGradeMin = ToMemberJobRole + ToMemberJobLevel ?FToMemberJobTitle?
-    FRoute           : string       ; // FldRoute
-    FObjectKind      : string       ; // FldObjectKind
-    FContentKind     : string       ; // FldContentKind
-    FDataKind        : string       ; // FldDataKind
-    FState           : string       ; // FldState
-    FTitle           : string       ; // FldTitle
-    FSubtitle        : string       ; // FldSubtitle
-    FDescription     : string       ; // FldDescription
-    FSpare           : string       ; // FldSpare
-    FEncrypted       : boolean      ; // FldEncrypted
-    FPersist         : boolean      ; // FldPersist
-    FImage           : TByteDynArray; // FldImage
-    FContentPrev     : string       ; // FldContentPrev
-    FContent         : string       ; // FldContent
-    FData            : string       ; // FldData
-    FNote            : string       ; // FldNote
-    FObject          : string       ; // FldObject
-    FEditorCaret     : string       ; // FldEditorCaret
-    FEditorFolding   : TByteDynArray; // FldEditorFolding
+  private                             //    -- ids
+    FId              : integer      ; //    FldId                 int          not null -- Identifier
+    FPId             : integer      ; //  , FldPId                int          not null -- Parent
+    FId8             : string       ; //  , FldId8                char(8)          null -- id8 (absolute id, used in Image and Document)
+                                      //--, FldOId                int          not null -- Owner
+                                      //--, FldGId                int          not null -- GlobalUniversalId GUID
+                                      //--, FldBId                int          not null -- BatchId
+                                      //--, FldLId                int          not null -- LinkId
+    FOrder           : integer      ; //  , FldOrder              int              null -- order
+    FRev             : integer      ; //  , FldRev                int              null -- revision (used in Document)
+    FRouteIdCsv      : string       ; //  , FldRouteIdCsv         varchar(64)      null -- changes/approvals routes IDs name that the object have to follows in case of changes & approvals sequences
+                                      //    -- dates
+    FCreated         : TDateTime    ; //  , FldCreated            datetime         null -- created
+    FUpdated         : TDateTime    ; //  , FldUpdated            datetime         null -- updated/modified
+    FExpire          : TDateTime    ; //  , FldExpire             datetime         null -- expires
+                                      //    -- person from/origin/ownership/tracking
+    FAuthor          : string       ; //  , FldAuthor             varchar(32)      null -- createdby (FldCreator)
+    FOwnerCsv        : string       ; //  , FldOwnerCsv           varchar(256)     null -- members that can act like a owner (override TblMember.dbo.FldOwnerCsv)
+    FUpdatedBy       : string       ; //  , FldUpdatedBy          varchar(32)      null -- updatedby
+                                      //    -- from
+  //FFromOrganization: string       ; //--, FldFromOrganization   varchar(32)      null -- from (please use the Member's Organization)
+                                      //--, FldFromUnit           varchar(32)      null -- from (idem)
+  //FFromDepartment  : string       ; //--, FldFromDepartment     varchar(32)      null -- from (idem)
+  //FFromArea        : string       ; //--, FldFromArea           varchar(32)      null -- from (idem)
+  //FFromTeam        : string       ; //--, FldFromTeam           varchar(32)      null -- from (idem)
+                                      //--, FldFromActivity       varchar(32)      null -- from (idem)
+  //FFromMember      : string       ; //--, FldFromMember         varchar(32)      null -- from (idem)
+                                      //    -- from location
+                                      //--, FldFromSite           varchar(32)      null -- from (idem)
+                                      //--, FldFromBuilding       varchar(32)      null -- from (idem)
+                                      //    -- to/destination/condivision/sharing
+    FToOrganization  : string       ; //  , FldToOrganization     varchar(32)      null -- to Organization
+                                      //--, FldToUnit             varchar(32)      null -- to
+    FToDepartment    : string       ; //  , FldToDepartment       varchar(32)      null -- to
+    FToArea          : string       ; //  , FldToArea             varchar(32)      null -- to
+    FToTeam          : string       ; //  , FldToTeam             varchar(32)      null -- to
+                                      //--, FldToActivity         varchar(32)      null -- to
+    FToMember        : string       ; //  , FldToMember           varchar(32)      null -- to
+                                      //    -- to location
+                                      //--, FldToSite             varchar(32)      null -- to
+                                      //--, FldToBuilding         varchar(32)      null -- to
+    FToJobGradeMin   : integer      ; //  , FldToJobGradeMin      int              null -- min jobgrade to access the object (= ToMemberJobRole + ToMemberJobLevel ?FToMemberJobTitle?)
+                                      //    -- properties
+    FObjectKind      : string       ; //  , FldObjectKind         varchar(16)      null -- used in tree
+    FContentKind     : string       ; //  , FldContentKind        varchar(16)      null -- used in tree
+    FDataKind        : string       ; //  , FldDataKind           varchar(16)      null -- data kind of FldData
+    FGroup           : string       ; //  , FldGroup              varchar(16)      null -- group/category
+    FState           : string       ; //  , FldState              varchar(32)      null -- used in tree
+    FTitle           : string       ; //  , FldTitle              varchar(256)     null -- title, FldCaption
+    FSubtitle        : string       ; //  , FldSubtitle           varchar(256)     null -- subtitle
+    FDescription     : string       ; //  , FldDescription        varchar(256)     null -- description
+    FBgColor         : string       ; //  , FldBgColor            varchar(8)       null -- background color (CSS)
+    FFgColor         : string       ; //  , FldFgColor            varchar(8)       null -- foreground color (CSS)
+                                      //    -- switches
+    FHidden          : boolean      ; //  , FldHidden             bit              null -- hide the object, indipendet from FldState
+    FEncrypted       : boolean      ; //  , FldEncrypted          bit              null -- content, json and payload fields are encripted using the "CriptoKey"
+    FPersist         : boolean      ; //  , FldPersist            bit              null -- onpost save a copy on local-disk
+                                      //    -- image
+    FImage           : TByteDynArray; //  , FldImage              image            null -- image, logo, icon
+                                      //    -- content (text)
+    FContentPrev     : string       ; //  , FldContentPrev        varchar(max)     null -- content-1 (prev version)
+    FContent         : string       ; //  , FldContent            varchar(max)     null -- content (current, online, human)
+                                      //--, FldContentNext        varchar(max)     null -- content+1 (next in development version)
+    FNote            : string       ; //  , FldNote               varchar(max)     null -- allways present notes
+                                      //    -- data
+    FData            : string       ; //  , FldData               varchar(max)     null -- data slot, json (computer)
+    FData1           : string       ; //  , FldData1              varchar(256)     null -- data slot (ex FldSpare)
+    FData2           : string       ; //  , FldData2              varchar(256)     null -- data slot
+    FData3           : string       ; //  , FldData3              varchar(256)     null -- data slot
+    FData4           : string       ; //  , FldData4              varchar(256)     null -- data slot
+                                      //    -- object
+    FObject          : string       ; //  , FldObject             varchar(128) not null -- (ex FldXxx)
+                                      //    -- editor
+    FEditorCaret     : string       ; //  , FldEditorCaret        varchar(32)      null -- obj synedit.content caret info
+    FEditorFolding   : TByteDynArray; //  , FldEditorFolding      varbinary(MAX)   null -- obj synedit.content folding info
+
   //procedure RemToRec(IvObjRec: TObjRec);
   //procedure RemFromRec(IvObjRec: TObjRec);
-  published
-    property Id              : integer       read FId               write FId              ;
-    property PId             : integer       read FPId              write FPId             ;
-    property Id8             : string        read FId8              write FId8             ;
-    property Order           : integer       read FOrder            write FOrder           ;
-    property Rev             : integer       read FRev              write FRev             ;
-    property Created         : TDateTime     read FCreated          write FCreated         ;
-    property Updated         : TDateTime     read FUpdated          write FUpdated         ;
-    property UpdatedBy       : string        read FUpdatedBy        write FUpdatedBy       ;
-    property FromOrganization: string        read FFromOrganization write FFromOrganization;
-    property FromDepartment  : string        read FFromDepartment   write FFromDepartment  ;
-    property FromArea        : string        read FFromArea         write FFromArea        ;
-    property FromTeam        : string        read FFromTeam         write FFromTeam        ;
-    property FromMember      : string        read FFromMember       write FFromMember      ;
-    property ToOrganization  : string        read FToOrganization   write FToOrganization  ;
-    property ToDepartment    : string        read FToDepartment     write FToDepartment    ;
-    property ToArea          : string        read FToArea           write FToArea          ;
-    property ToTeam          : string        read FToTeam           write FToTeam          ;
-    property ToMember        : string        read FToMember         write FToMember        ;
-    property JobGradeMin     : integer       read FJobGradeMin      write FJobGradeMin     ;
-    property Route           : string        read FRoute            write FRoute           ;
-    property ObjectKind      : string        read FObjectKind       write FObjectKind      ;
-    property ContentKind     : string        read FContentKind      write FContentKind     ;
-    property DataKind        : string        read FDataKind         write FDataKind        ;
-    property State           : string        read FState            write FState           ;
-    property Title           : string        read FTitle            write FTitle           ;
-    property Subtitle        : string        read FSubtitle         write FSubtitle        ;
-    property Description     : string        read FDescription      write FDescription     ;
-    property Spare           : string        read FSpare            write FSpare           ;
-    property Encrypted       : boolean       read FEncrypted        write FEncrypted       ;
-    property Persist         : boolean       read FPersist          write FPersist         ;
-    property Image           : TByteDynArray read FImage            write FImage           ;
-    property ContentPrev     : string        read FContentPrev      write FContentPrev     ;
-    property Content         : string        read FContent          write FContent         ;
-    property Data            : string        read FData             write FData            ;
-    property Note            : string        read FNote             write FNote            ;
-    property &Object         : string        read FObject           write FObject          ;
-    property EditorCaret     : string        read FEditorCaret      write FEditorCaret     ;
-    property EditorFolding   : TByteDynArray read FEditorFolding    write FEditorFolding   ;
+  published                                                                                  // stencil
+    property Id              : integer       read FId               write FId              ; // FldId
+    property PId             : integer       read FPId              write FPId             ; // FldPId
+    property Id8             : string        read FId8              write FId8             ; // FldId8
+    property Order           : integer       read FOrder            write FOrder           ; // FldOrder
+    property Rev             : integer       read FRev              write FRev             ; // FldRev
+    property RouteIdCsv      : string        read FRouteIdCsv       write FRouteIdCsv      ; // FldRouteIdCsv
+    property Created         : TDateTime     read FCreated          write FCreated         ; // FldCreated
+    property Updated         : TDateTime     read FUpdated          write FUpdated         ; // FldUpdated
+    property Expire          : TDateTime     read FExpire           write FExpire          ; // FldExpire
+    property Author          : string        read FAuthor           write FAuthor          ; // FldAuthor
+    property OwnerCsv        : string        read FOwnerCsv         write FOwnerCsv        ; // FldOwnerCsv
+    property UpdatedBy       : string        read FUpdatedBy        write FUpdatedBy       ; // FldUpdatedBy
+    property ToOrganization  : string        read FToOrganization   write FToOrganization  ; // FldToOrganization
+    property ToDepartment    : string        read FToDepartment     write FToDepartment    ; // FldToDepartment
+    property ToArea          : string        read FToArea           write FToArea          ; // FldToArea
+    property ToTeam          : string        read FToTeam           write FToTeam          ; // FldToTeam
+    property ToMember        : string        read FToMember         write FToMember        ; // FldToMember
+    property ToJobGradeMin   : integer       read FToJobGradeMin    write FToJobGradeMin   ; // FldToJobGradeMin
+    property ObjectKind      : string        read FObjectKind       write FObjectKind      ; // FldObjectKind
+    property ContentKind     : string        read FContentKind      write FContentKind     ; // FldContentKind
+    property DataKind        : string        read FDataKind         write FDataKind        ; // FldDataKind
+    property Group           : string        read FGroup            write FGroup           ; // FldGroup
+    property State           : string        read FState            write FState           ; // FldState
+    property Title           : string        read FTitle            write FTitle           ; // FldTitle
+    property Subtitle        : string        read FSubtitle         write FSubtitle        ; // FldSubtitle
+    property Description     : string        read FDescription      write FDescription     ; // FldDescription
+    property BgColor         : string        read FBgColor          write FBgColor         ; // FldBgColor
+    property FgColor         : string        read FFgColor          write FFgColor         ; // FldFgColor
+    property Hidden          : boolean       read FHidden           write FHidden          ; // FldHidden
+    property Encrypted       : boolean       read FEncrypted        write FEncrypted       ; // FldEncrypted
+    property Persist         : boolean       read FPersist          write FPersist         ; // FldPersist
+    property Image           : TByteDynArray read FImage            write FImage           ; // FldImage
+    property ContentPrev     : string        read FContentPrev      write FContentPrev     ; // FldContentPrev
+    property Content         : string        read FContent          write FContent         ; // FldContent
+    property Note            : string        read FNote             write FNote            ; // FldNote
+    property Data            : string        read FData             write FData            ; // FldData
+    property Data1           : string        read FData1            write FData1           ; // FldData1
+    property Data2           : string        read FData2            write FData2           ; // FldData2
+    property Data3           : string        read FData3            write FData3           ; // FldData3
+    property Data4           : string        read FData4            write FData4           ; // FldData4
+    property &Object         : string        read FObject           write FObject          ; // FldObject
+    property EditorCaret     : string        read FEditorCaret      write FEditorCaret     ; // FldEditorCaret
+    property EditorFolding   : TByteDynArray read FEditorFolding    write FEditorFolding   ; // FldEditorFolding
   end;
 
   TObjRec = record
-    Id              : integer  ;
-    PId             : integer  ;
-    Id8             : string   ;
-    Order           : integer  ;
-    Rev             : integer  ;
-    Created         : TDateTime;
-    Updated         : TDateTime;
-    UpdatedBy       : string   ;
-    FromOrganization: string   ;
-    FromDepartment  : string   ;
-    FromArea        : string   ;
-    FromTeam        : string   ;
-    FromMember      : string   ;
-    ToOrganization  : string   ;
-    ToDepartment    : string   ;
-    ToArea          : string   ;
-    ToTeam          : string   ;
-    ToMember        : string   ;
-    JobGradeMin     : integer  ;
-    Route           : string   ;
-    ObjectKind      : string   ;
-    ContentKind     : string   ;
-    DataKind        : string   ;
-    State           : string   ;
-    Title           : string   ;
-    Subtitle        : string   ;
-    Description     : string   ;
-    Spare           : string   ;
-    Encrypted       : boolean  ;
-    Persist         : boolean  ;
-    Image{Graphic}  : TGraphic ;
-    ContentPrev     : string   ;
-    Content         : string   ;
-    Data            : string   ;
-    Note            : string   ;
-    &Object         : string   ;
-    EditorCaret     : string   ;
-    EditorFolding   : TBytes   ; // obj synedit.content folding info
+    Id              : integer      ;
+    PId             : integer      ;
+    Id8             : string       ;
+    Order           : integer      ;
+    Rev             : integer      ;
+    RouteIdCsv      : string       ;
+    Created         : TDateTime    ;
+    Updated         : TDateTime    ;
+    Expire          : TDateTime    ;
+    Author          : string       ;
+    OwnerCsv        : string       ;
+    UpdatedBy       : string       ;
+    ToOrganization  : string       ;
+    ToDepartment    : string       ;
+    ToArea          : string       ;
+    ToTeam          : string       ;
+    ToMember        : string       ;
+    ToJobGradeMin   : integer      ;
+    ObjectKind      : string       ;
+    ContentKind     : string       ;
+    DataKind        : string       ;
+    Group           : string       ;
+    State           : string       ;
+    Title           : string       ;
+    Subtitle        : string       ;
+    Description     : string       ;
+    BgColor         : string       ;
+    FgColor         : string       ;
+    Hidden          : boolean      ;
+    Encrypted       : boolean      ;
+    Persist         : boolean      ;
+    Image           : TByteDynArray;
+    ContentPrev     : string       ;
+    Content         : string       ;
+    Note            : string       ;
+    Data            : string       ;
+    Data1           : string       ;
+    Data2           : string       ;
+    Data3           : string       ;
+    Data4           : string       ;
+    &Object         : string       ;
+    EditorCaret     : string       ;
+    EditorFolding   : TByteDynArray;
     procedure Free;
     procedure Reset;
     function  InitDba(IvObj: string; IvId: integer): boolean;
@@ -679,15 +917,18 @@ type
           function  ObjObjectSafe: string;
     class function  ObjPropertyVector(): TArray<string>; static;
     class function  ObjKindVector(): TArray<string>; static;
+    class procedure ObjDstRecordSetup(var IvDst: TDataset; IvIdNew, IvPId: integer; IvObjKind, IvContentKind, IvObject, IvTitle, IvSubtitle, IvDescription, IvOrder: variant); static;
     class function  HasProperty(const IvProperty: string): boolean; static;
     class function  IsBusinessObj(const IvObj: string): boolean; static;
-    class function  IdNext(const IvObj: string; var IvIdNext: integer; var IvFbk: string): boolean; static; // IvObj = Xxx, Person, Account, Code ...
+    class function  IdNext   (const IvObj: string; var IvIdNext: integer; var IvFbk: string): boolean; static; // IvObj = Xxx, Person, Account, Code ...
     class function  IdNextRio(const IvObj: string; var IvIdNext: integer; var IvFbk: string): boolean; static;
-    class function  New(IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvFromOrganization, IvFromMember: string; var IvIdNew: integer): boolean; static;
-    class function  NewRio(IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvFromOrganization, IvFromMember: string; var IvIdNew: integer): boolean; static;
+    class function  DbaNew   (IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvOrganization, IvAuthor: string; var IvIdNew: integer): boolean; static;
+    class function  DbaNewRio(IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvOrganization, IvAuthor: string; var IvIdNew: integer): boolean; static;
           function  ContentKindIsMarkdown: boolean;
-    class function  FieldGet(const IvObj, IvIdOrPath, IvField: string;   var IvValue: variant; const IvDefault: variant): boolean; static;
-    class function  FieldSet(const IvObj, IvIdOrPath, IvField: string; const IvValue: variant): boolean; static;
+    class function  FieldGet   (const IvObj, IvIdOrPath, IvField: string;   var IvValue: variant; const IvDefault: variant): boolean; static; // only TblObject i/o
+    class function  FieldGetRio(const IvObj, IvIdOrPath, IvField: string;   var IvValue: variant; const IvDefault: variant): boolean; static; // idem
+    class function  FieldSet   (const IvObj, IvIdOrPath, IvField: string; const IvValue: variant): boolean; static;                           // idem
+    class function  FieldSetRio(const IvObj, IvIdOrPath, IvField: string; const IvValue: variant): boolean; static;                           // idem
   end;
 
   // *************************************************************************** OBJECT (DETAIL, VARIABLE PART)
@@ -700,11 +941,11 @@ type
 
   {$REGION 'Normal'}
   TAaaRec = record // primordial or not categorized stuff
-    class function  FileVer(const IvFileName: string = ''): string; static;         // 1.0.0.0
-    class function  ProcessKind: TProcessKindEnum; static;                          // unknown, 32bit, 64bit
-    class function  ProcessKindAsText: string; static;                              // unknown, 32bit, 64bit
-  //class function  ProcIs32Bit: boolean; static;                                   // t/f
-  //class function  Proc3264Bits: string; static;                                   // 32bit | 64bit
+    class function  FileVer(const IvFileName: string = ''): string; static;     // 1.0.0.0
+    class function  ProcessKind: TProcessKindEnum; static;                      // unknown, 32bit, 64bit
+    class function  ProcessKindAsText: string; static;                          // unknown, 32bit, 64bit
+  //class function  ProcIs32Bit: boolean; static;                               // t/f
+  //class function  Proc3264Bits: string; static;                               // 32bit | 64bit
   end;
 
   TAggRec = record // agg2d
@@ -757,11 +998,11 @@ type
     AGG_Y_UP           = false;
     AGG_TEXT_UP        = not AGG_Y_UP;
     AGG_TEXT_HEIGHT    = 10.0;
-    AGG_TEXT_COLOR     = '000000ff';            // RGBA
+    AGG_TEXT_COLOR     = '000000ff';        // RGBA
     AGG_TEXT_FONT      = FONT_FAMILY_MONOSPACE; // filename containing the font face to be used
-    AGG_TEXT_ALIGNMENT = 'cc';                  // center-center
-    AGG_TEXT_HINTS     = true;                  // sembra influenzi leggermente lo spessore del testo
-    AGG_TEXT_ROUND_OFF = true;                  // rounds to integers the text x y origin
+    AGG_TEXT_ALIGNMENT = 'cc';              // center-center
+    AGG_TEXT_HINTS     = true;              // sembra influenzi leggermente lo spessore del testo
+    AGG_TEXT_ROUND_OFF = true;              // rounds to integers the text x y origin
     {$ENDREGION}
 
   public
@@ -1095,8 +1336,14 @@ type
   end;
 
   TChartAxisRec = record
-    TitleRec: TChartTitleRec;
-    LabelRec: TChartLabelRec;
+    TitleRec        : TChartTitleRec;
+    LabelRec        : TChartLabelRec;
+    Format          : string;
+    StripLinesJson  : string;
+    ScaleBreacksJson: string;
+    Minimum         : string;
+    Maximum         : string;
+    Margin          : string;
 //public
   //function  ToJson: string;
   end;
@@ -1118,27 +1365,40 @@ type
   TChartPointRecVector = array of TChartPointRec;
 
   TChartSerieRec = record
-    ReportId      : integer; // key
-    Order         : integer;
-    State         : string ;
-    Dataset       : string ; // key
-    Chart         : string ; // key
-    Serie         : string ; // key
-    Kind          : string ; // Column
-    Title         : string ;
-    Legend        : string ;
-    LegendOn      : boolean;
-    ToolTip       : string ;
-    ToolTipShared : boolean;
-    XLabelField   : string ;
-    XField        : string ;
-    YField        : string ;
-    ZField        : string ;
-    ToolTipField  : string ;
-    ColorField    : string ;
-    SizeField     : string ;
-    ShapeField    : string ;
-    PointRecVector: TChartPointRecVector;
+    ReportId          : integer; // key FldObjectId
+    Order             : integer;
+    State             : string ;
+    Dataset           : string ; // key
+    Chart             : string ; // key
+    Serie             : string ; // key
+    Kind              : string ; // Column
+    Title             : string ;
+    Description       : string ;
+    Legend            : string ;
+    LegendOn          : boolean;
+    ToolTip           : string ;
+    ToolTipShared     : boolean;
+    XLabelField       : string ;
+    XField            : string ;
+    YField            : string ;
+    ZField            : string ;
+    ToolTipField      : string ;
+    ColorField        : string ;
+    SizeField         : string ;
+    ShapeField        : string ;
+    Color             : string ;
+    LineSize          : string ;
+    LineType          : string ;
+    LineColor         : string ;
+    MarkerSize        : string ;
+    MarkerType        : string ;
+    MarkerColor       : string ;
+    IsLogarithmic     : boolean;
+    YAxisNo           : integer;
+    YAxisPrefix       : string ;
+    YAxisSuffix       : string ;
+    YAxisLabelAngleDeg: string ;
+    PointRecVector    : TChartPointRecVector;
   //public
     //function  ToJson: string;
   end;
@@ -1146,8 +1406,9 @@ type
   TChartSerieRecVector = array of TChartSerieRec;
 
   TChartRec = record
-    ReportId      : integer; // key
+    ReportId      : integer; // key FldObjectId
     Order         : integer;
+    RsNo          : integer;
     Dataset       : string ; // key
     Chart         : string ; // key
     State         : string ;
@@ -1159,6 +1420,8 @@ type
     TitleOn       : boolean;
     PanelOn       : boolean;
     PanelClosed   : boolean;
+    DoExport      : boolean;
+    TooltipShared : boolean;
     XAxisRec      : TChartAxisRec;
     YAxisRec      : TChartAxisRec;
     SerieRecVector: TChartSerieRecVector; // one or more series of points
@@ -1257,26 +1520,26 @@ type
 
   {$REGION 'TCodKindEnum'}
   TCodKindEnum = ( // EXEC   CODE   DATA   ENUM   codekind --> contentkind *** search JAVA for all places to change ***
-    ckBat          // x      x             0
-  , ckCss          //        x             1
-  , ckCsv          //               x      2
-  , ckDws          // x      x             3
-  , ckEtl          //        x             4
-  , ckHtml         //        x             5
-  , ckIni          //        x             6
-  , ckIss          // x      x             7
-  , ckJava         // x      x             8
-  , ckJs           // x      x             9
-  , ckJsl          // x      x             10
-  , ckJson         //               x      11
-  , ckMd           //        x             12
-  , ckPas          //        x             13
-  , ckPy           // x      x             14
-  , ckR            // x      x             15
-  , ckSql          // x      x             16
-  , ckTxt          //                      17
-  , ckXml          //               x      18
-  , ckYaml         //               x      19
+    ckBat      // x      x             0
+  , ckCss      //        x             1
+  , ckCsv      //               x      2
+  , ckDws      // x      x             3
+  , ckEtl      //        x             4
+  , ckHtml     //        x             5
+  , ckIni      //        x             6
+  , ckIss      // x      x             7
+  , ckJava     // x      x             8
+  , ckJs       // x      x             9
+  , ckJsl      // x      x             10
+  , ckJson     //               x      11
+  , ckMd       //        x             12
+  , ckPas      //        x             13
+  , ckPy       // x      x             14
+  , ckR        // x      x             15
+  , ckSql      // x      x             16
+  , ckTxt      //                      17
+  , ckXml      //               x      18
+  , ckYaml     //               x      19
   );
   {$ENDREGION}
 
@@ -1285,8 +1548,8 @@ type
     Lang                : string;
     Kind{ContentKind}   : string;
     Comm           : string; // commentsingleline
-    Comm1          : string; // commentmultilinesbegin
-    Comm2          : string; // commentmultilinesend
+    Comm1          : string; // commentmultilinebegin
+    Comm2          : string; // commentmultilineend
     DlgDefaultExt  : string;
     DlgFilter      : string;
     ContentTemplate: string;
@@ -1467,7 +1730,7 @@ type
     OutputFileName     : string ;
     RunCommand         : string ;
     DescriptionBlockAdd: boolean;
-    HeaderAndFooterOff : boolean;
+    HeaderAndFooterAdd : boolean;
     CommentRemove      : boolean;
     LinesEmptyRemove   : boolean;
     class function  Vector(): TCoiRecVec; static;
@@ -1691,10 +1954,10 @@ type
 
   {$REGION 'TDatKindEnum'}
   TDatKindEnum = (
-    dkCsv          // 0
-  , dkJson         // 1
-  , dkXml          // 2
-  , dkYaml         // 3
+    dkCsv      // 0
+  , dkJson     // 1
+  , dkXml      // 2
+  , dkYaml     // 3
   );
   {$ENDREGION}
 
@@ -1717,9 +1980,11 @@ type
     class function  TColLuminance(Color: TColor): integer; static;                                       // Result: 0..510
   end;
 
-  TCsvRec = record // csv/list *** merge with TLstRec ***
-    class function  CsvRowField(IvCsvRow: string; IvFieldId: integer): variant; static;
-    class function  CsvRowFieldAppend(var IvCsvRow: string; IvField: string): string; static;
+  TCsvRec = record // csv/list *** 1 row only! --> merge with TLstRec, real csv have to manage multi-lines ***
+    class function  CsvHas(IvCsvRow: string; IvValue: string): boolean; static;
+    class function  CsvRemove(IvCsvRow: string; IvValue: string): string; static;
+    class function  CsvValue(IvCsvRow: string; IvPos: integer): variant; static;
+    class function  CsvAppend(var IvCsvRow: string; IvValue: string): string; static;
     class function  CsvToVec(const IvCsvLineStr: string; Delimiter: Char = ','; QuoteChar: Char = '"'; TrimOutsideQuotes: boolean = true): TArray<string>; static;
   end;
 
@@ -1806,6 +2071,8 @@ type
     // iso8601
     class function  DatFromIso(IvDateTimeIso: string; IvDefault: TDateTime; IvInputIsUTC: boolean = true): TDateTime; static;
     class function  DatToIso(IvDateTime: TDateTime; IvInputIsUTC: boolean = true): string; static;
+    // for log
+    class function  DatForLog(const IvDateTime: TDateTime): string; static;                                           // returns a string like: 2025/01/09 07:04:05 with leading zeroes
     // mssql
     class function  DatToSql(IvDateTime: TDateTime; IvNoMs: boolean = false): string; static;                         // 07/19/1960 11:00:00 --> 19600719 11:00:00.123 or 19600719110000
     class function  DatFromSql(IvDateTimeStr: string): TDateTime; static;                                             // 19600719110000 --> 07/19/1960 11:00:00
@@ -1861,11 +2128,12 @@ type
     DBA_CONN_STR = DBA_CONNECTION_STR;
   public
     // general (for internal use only)
-    class function  CmdExec  (const IvSql: string;  var IvAffected: integer; var IvFbk: string; IvTimeoutSec: integer = DBA_COMMAND_TIMEOUT_SEC): boolean; static;
-    class function  ScalarVar(const IvSql: string;  var IvValue   : variant; const IvDefault: variant; var IvFbk: string; IvTimeOutSec: integer = DBA_COMMAND_TIMEOUT_SEC): boolean; overload; static;
-    class function  ScalarInt(const IvSql: string;  var IvValue   : integer; const IvDefault: integer; var IvFbk: string; IvTimeOutSec: integer = DBA_COMMAND_TIMEOUT_SEC): boolean; overload; static;
-    class function  ScalarStr(const IvSql: string;  var IvValue   : string ; const IvDefault: string ; var IvFbk: string; IvTimeOutSec: integer = DBA_COMMAND_TIMEOUT_SEC): boolean; overload; static;
-    class function  Scalar   (const IvSql: string                          ; const IvDefault: variant                   ; IvTimeOutSec: integer = DBA_COMMAND_TIMEOUT_SEC): variant; overload; static;
+    class function  CmdExec   (const IvSql: string;  var IvAffected: integer; var IvFbk: string; IvTimeoutSec: integer = DBA_COMMAND_TIMEOUT_SEC): boolean; static;
+    class function  CmdExecRio(const IvSql: string;  var IvAffected: integer; var IvFbk: string; IvTimeoutSec: integer = DBA_COMMAND_TIMEOUT_SEC): boolean; static;
+    class function  ScalarVar (const IvSql: string;  var IvValue   : variant; const IvDefault: variant; var IvFbk: string; IvTimeOutSec: integer = DBA_COMMAND_TIMEOUT_SEC): boolean; overload; static;
+    class function  ScalarInt (const IvSql: string;  var IvValue   : integer; const IvDefault: integer; var IvFbk: string; IvTimeOutSec: integer = DBA_COMMAND_TIMEOUT_SEC): boolean; overload; static;
+    class function  ScalarStr (const IvSql: string;  var IvValue   : string ; const IvDefault: string ; var IvFbk: string; IvTimeOutSec: integer = DBA_COMMAND_TIMEOUT_SEC): boolean; overload; static;
+    class function  Scalar    (const IvSql: string                          ; const IvDefault: variant                   ; IvTimeOutSec: integer = DBA_COMMAND_TIMEOUT_SEC): variant; overload; static;
     // dst (general)
     class function  DstFromSql(const IvSql: string; out IvDs: TDataset; const IvConnLib, IvConnStr: string        ; IvFalseIfDsIsEmpty: boolean = true): boolean          ; static;
     // dst (for internal use only)
@@ -1888,10 +2156,12 @@ type
     class function  TblIdAvailableRio    (const IvTbl: string; IvWhere: string = ''): integer; static;
     class function  TblIdNext            (const IvTbl: string; IvUseIdAvailable: boolean = true): integer; static; // use IdMax if false
     class function  TblIdNextRio         (const IvTbl: string; IvUseIdAvailable: boolean = true): integer; static;
+    class function  TblCheck             (const IvSys, IvDba, IvTbl: string; var IvFbk: string): boolean; static; // check table compliance between the database and wks database definition
+    class function  TblCheckRio          (const IvSys, IvDba, IvTbl: string; var IvFbk: string): boolean; static;
     // record
     class function  RecExists            (const IvTbl, IvWhere: string; var IvFbk: string; IvCaseSensitive: boolean = false): boolean; overload; static;
     class function  RecExists            (const IvTbl, IvWhereFld: string; IvWhereValue: variant; var IvFbk: string; IvCaseSensitive: boolean = false): boolean; overload; static;
-    class function  RecInsert            (const IvTbl: string; const IvValueVec: array of const; var IvFbk: string): boolean; overload; static;                                                   // insert simple
+    class function  RecInsert            (const IvTbl: string; const IvValueVec: array of const; var IvFbk: string): boolean; overload; static;                                                  // insert simple
     class function  RecInsertRio         (const IvTbl: string; const IvValueVec: {array of const}TArray<variant>; var IvFbk: string): boolean; overload; static;
     class function  RecInsert            (const IvTbl, IvInsertSqlWithParams: string; const IvVeParamValue: array of const; var IvIdNew: integer; var IvFbk: string): boolean; overload; static; // insert with params and auto idnext (:PId must be the 0th param)
     // field
@@ -1919,23 +2189,23 @@ type
     class function  ObjFieldSet          (const IvObj, IvField, IvIdOrPath: string; IvValue  : variant; var IvFbk: string): boolean; static;
     class function  ObjDetailFieldSet    (const IvObj, IvField, IvIdOrPath: string; IvValue  : variant; var IvFbk: string): boolean; static;
     class function  ObjTblHasField       (const IvObj, IvFld: string): boolean; static;
-    class function  ObjTreeContentDba    (const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean                          ; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; static;              // return a concatenation of FldContent of one object and all childs
-    class function  ObjTreeContentRio    (const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean                          ; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; static;
-    class function  ObjTreeContentRioSave(const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean; IvRemoteFileSpec: string; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; static;
+    class function  ObjTreeContentDba    (const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterAdd, IvCommentRemove, IvLinesEmptyRemove: boolean                          ; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; static; // return a concatenation of FldContent of one object and all childs
+    class function  ObjTreeContentRio    (const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterAdd, IvCommentRemove, IvLinesEmptyRemove: boolean                          ; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; static;
+    class function  ObjTreeContentRioSave(const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterAdd, IvCommentRemove, IvLinesEmptyRemove: boolean; IvRemoteFileSpec: string; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; static;
     class function  ObjIsDescendantOf    (const IvTbl: string; const IvId, IvPId: integer): boolean; static;
-    class function  ObjPathIsAllActive   (const IvTbl: string; const IvId: integer): boolean; static;                                                                                                              // true only if id belongs to pid
+    class function  ObjPathIsAllActive   (const IvTbl: string; const IvId: integer): boolean; static;                                                                        // true only if id belongs to pid
     // hierarchyutils
     class function  HLevel               (const IvTbl: string; const IvId: integer): integer; static;                                                                        // 0=Root, 1=Organization, ...
     class function  HPathVec             (const IvTbl, IvField: string; const IvId: integer; IvStopAtOrganization: boolean = true): TArray<string>; static;                  // ['Root', 'Organization', 'W', 'Wks', 'Modules'] | ['Wks', 'Modules']
     class function  HPath                (const IvTbl, IvField: string; const IvId: integer; IvDivider: string = '/'; IvStopAtOrganization: boolean = true): string; static; // Root/Organization/W/Wks/Modules | Wks/Modules
     // hierarchy (imply a single table similar to TblObject with at least FldId, FldPId)
     class procedure HParentsDs           (const IvTbl                   , IvFldCsv                      : string; const IvId: integer; var IvDs: TDataSet                   ; IvWhere: string = ''; IvOrderBy: string = ''; InIncludeObj: boolean = false); static; // all parents of id
-  //class procedure HObjectDs            (const IvTbl                   , IvFldCsv                      : string; const IvId: integer; var IvDs: TDataSet);                                                                                                                                                                            // item with id
+  //class procedure HObjectDs            (const IvTbl                   , IvFldCsv                      : string; const IvId: integer; var IvDs: TDataSet);                                                                                                                                           // item with id
     class procedure HChildsDs            (const IvTbl                   , IvFldCsv                      : string; const IvId: integer; var IvDs: TDataSet                   ; IvWhere: string = ''; IvOrderBy: string = ''; InIncludeObj: boolean = false); static; // all childs of id
     class function  HTreeDs              (const IvTbl                   , IvFldCsv                      : string; const IvId: integer; var IvDs: TDataSet; var IvFbk: string; IvWhere: string = ''; IvOrderBy: string = ''): boolean; static;                       // parent+item+child
     // hierarchyextended (imply TblObject a loosely connected with a details table b where is possible b.FldObjectId = a.TblObject)
     class procedure HParentsDsEx         (const IvTblObject, IvTblDetail, IvFldObjectCsv, IvFldDetailCsv: string; const IvId: integer; var IvDs: TDataSet                   ; IvWhere: string = ''; IvOrderBy: string = ''; InIncludeObj: boolean = false); static; // all parents of id
-  //class procedure HObjectDsEx          (const IvTblObject, IvTblDetail, IvFldObjectCsv, IvFldDetailCsv: string; const IvId: integer; var IvDs: TDataSet);                                                                                                                                                             // item with id
+  //class procedure HObjectDsEx          (const IvTblObject, IvTblDetail, IvFldObjectCsv, IvFldDetailCsv: string; const IvId: integer; var IvDs: TDataSet);                                                                                                                                           // item with id
     class procedure HChildsDsEx          (const IvTblObject, IvTblDetail, IvFldObjectCsv, IvFldDetailCsv: string; const IvId: integer; var IvDs: TDataSet                   ; IvWhere: string = ''; IvOrderBy: string = ''; InIncludeObj: boolean = false); static; // all childs of id
     class function  HTreeDsEx            (const IvTblObject, IvTblDetail, IvFldObjectCsv, IvFldDetailCsv: string; const IvId: integer; var IvDs: TDataSet; var IvFbk: string; IvWhere: string = ''; IvOrderBy: string = ''): boolean; static;                       // parent+item+child
     // other
@@ -2346,9 +2616,9 @@ type
     }
     {$ENDREGION}
 
-//const
+  const
   //FSY_FILE_ALREADY_EXISTS            = 'File already exists';
-  //FSY_FILE_ALREADY_EXISTS_REPLACE_IT = 'File already exists, do you whant to replace it?';
+    FSY_FILE_ALREADY_EXISTS_REPLACE_IT = 'File already exists, do you whant to replace it?';
   public
     // general
     class function  IsDirectory(IvPathStr: string): boolean; static;
@@ -2448,8 +2718,8 @@ type
     ContentFixed            : boolean;
     Centered                : boolean;
     TitleShow               : boolean;
-    ImageShow               : boolean;
     SubtitleShow            : boolean;
+    ImageShow               : boolean;
     TopNavOff               : boolean;
     SystemInfoOff           : boolean; // SystemFootherOff
     TopSpace                : integer;
@@ -2515,8 +2785,9 @@ type
     class function  P(IvContent: string; IvDimmed: boolean = false; IvItalic: boolean = false): string; static;
     class function  Br(IvCount: integer): string; static;
     class function  Hr(IvWidthPerc: integer = 100; IvColor: string = '#eee'): string; static;
-    class function  Space(IvPx: integer = 8; IvKind: string = 'H'): string; static;                                             // H : <span style="width:%dpx"></span> | V : <div style="height:%dpx"></div>
-    class function  Img(IvSrc: string; IvTitle: string = ''; IvW: integer = 0; IvH: integer = 0; IvIsCard: boolean = false; IvTorn: TImgTormEnum = itNone{, IvClass, IvStyle: string}): string; static;
+    class function  Space(IvPx: integer = 8; IvKind: string = 'H'): string; static;                                               // H : <span style="width:%dpx"></span> | V : <div style="height:%dpx"></div>
+    class function  Img(IvSrc: string; IvTitle: string = ''; IvClass: string = ''; IvStyle: string = ''): string; overload; static;
+    class function  Img(IvSrc: string; IvTitle: string = ''; IvW: integer = 0; IvH: integer = 0; IvIsCard: boolean = false; IvTorn: TImgTormEnum = itNone{, IvClass, IvStyle: string}): string; overload; static;
     class function  Code(IvCode: string; IvLanguage: string = 'plaintext'): string; static;
     class function  Panel(IvFbk: TFbkRec; IvDismisible: boolean = true): string; static;  // *** MERGE WITH THtmRec.Collapse ***
     class function  Collapse(IvTitle, IvSubtitle, IvDescription, IvBody: string; IvHhLevel: integer = 1; IvCoName: string = ''; IvAlignement: string = ''; IvPanelOn: boolean = true; IvPanelClosed: boolean = false): string; static;
@@ -2563,16 +2834,17 @@ type
 
     class function  RepeatFromDs(IvDs: TDataSet; IvHtmlBody: string; IvHtmlHeader: string = ''; IvHtmlFooter: string = ''; IvHtmlDefault: string = ''): string; static;
     class function  RepeatFromSql(IvSql: string; IvHtmlBody: string; IvHtmlHeader: string = ''; IvHtmlFooter: string = ''; IvHtmlDefault: string = ''): string; static;
+    class function  RepeatNestedFromSql(IvDriverSql, IvSqlX, IvBlockHeader, IvBlockItem, IvBlockFooter: string; IvHeader: string = ''; IvFooter: string = ''): string; static;
 
-    class function  Report(IvId: integer; IvHtmlDefaultIfAnyDsIsEmpty: string = ''): string; static;
+    class function  Report(IvId: integer; IvHtmlDefaultIfAnyDsIsEmpty: string = ''; IvParametersOff: boolean = false; IvTableHeaderOff: boolean = false): string; static;
 
     class function  SlidesFromDs(IvDs: TDataSet; IvHtmlSlideBody: string; IvHtmlHeader: string = ''; IvHtmlFooter: string = ''; IvHtmlDefault: string = ''; IvSlideId: integer = 1): string; static; // similar to repeater
     class function  SlidesFromSql(IvSql: string; IvHtmlSlideBody: string; IvHtmlHeader: string = ''; IvHtmlFooter: string = ''; IvHtmlDefault: string = ''; IvSlideId: integer = 1): string; static; // similar to repeater
 
     class function  TopNav(IvId, IvPId: integer; IvUrlAbsolute: boolean = false): string; static;
     class function  Page(IvPage: TPagRec; IvUrlAbsolute: boolean = false): string; overload; static;
-    class function  Page(IvId: integer; IvTitleShow: boolean = true; IvImageShow: boolean = true; IvSubTitleShow: boolean = true; IvTopNavOff: boolean = false; IvSystemInfoOff: boolean = false; IvUrlAbsolute: boolean = false): string; overload; static;
-    class function  Page(IvTitle, IvSubTitle, IvContent: string; IvContentKind: string = ''; IvClass: string = ''; IvStyle: string = ''; IvTitleShow: boolean = true; IvImageShow: boolean = false; IvSubTitleShow: boolean = true; IvTopNavOff: boolean = false; IvSystemInfoOff: boolean = false; IvUrlAbsolute: boolean = false): string; overload; static;
+    class function  Page(IvId: integer                                                                                                 ; IvTitleShow: boolean = true; IvSubTitleShow: boolean = true; IvImageShow: boolean = false; IvTopNavOff: boolean = false; IvSystemInfoOff: boolean = false; IvUrlAbsolute: boolean = false): string; overload; static;
+    class function  Page(IvTitle, IvSubTitle, IvContent: string; IvContentKind: string = ''; IvClass: string = ''; IvStyle: string = ''; IvTitleShow: boolean = true; IvSubTitleShow: boolean = true; IvImageShow: boolean = false; IvTopNavOff: boolean = false; IvSystemInfoOff: boolean = false; IvUrlAbsolute: boolean = false): string; overload; static;
     class function  PageSimple: string; static;
     class function  PageDefault: string; static;
     class function  PageFeedback(IvFbk: TFbkRec): string; static;
@@ -2674,7 +2946,7 @@ type
     class function  Generate: string; static;
   end;
 
-  TIifRec = record // inlineif
+  TIifRec = record // inlineif   *** move to TStrRec ? ***
     function  NxN(IvVar: variant): variant;                                                       // if not exists return null else the variant
     function  NxD(IvStr: string; IvDefault: string = ''): string;                                 // if not exists return default else return string
     function  NxR(IvStr: string; IvSize: integer = 4): string;                                    // if not exists return random string (of 4 chars by default)
@@ -2702,8 +2974,8 @@ type
     constructor Create;
     destructor  Destroy; override;
     procedure SectionIdent(const IvPath: string; var IvSection, IvIdent: string); // path --> section/ident
-    function  StrGet(const IvPath: string; IvDefault: string = ''; IvForceDefaultIfKeyIsEmpty: boolean = false): string;        // normally if a key EXISTS and is EMPTY (like Key=), the IvDefault is not forced
-    procedure StrSet(const IvPath, IvValue: string);                                                                            // with IvForceDefaultIfKeyIsEmpty = true the IvDefault is forced even if the key exists and is empty
+    function  StrGet(const IvPath: string; IvDefault: string = ''; IvForceDefaultIfKeyIsEmpty: boolean = false): string;    // normally if a key EXISTS and is EMPTY (like Key=), the IvDefault is not forced
+    procedure StrSet(const IvPath, IvValue: string);                                                                        // with IvForceDefaultIfKeyIsEmpty = true the IvDefault is forced even if the key exists and is empty
     function  IntGet(const IvPath: string; IvDefault: integer = {0}-1): integer;  // force not needed
     procedure IntSet(const IvPath: string; IvValue: integer);
     function  FloGet(const IvPath: string; IvDefault: double = {0}-1): double;    // force not needed
@@ -2717,7 +2989,7 @@ type
     function  CryGet(const IvPath: string; IvDefault: string = ''; IvForceDefaultIfKeyIsEmpty: boolean = false): string;
     procedure CrySet(const IvPath, IvValue: string);
     function  HksGet(const IvPath: string; IvDefault: string = ''; IvForceDefaultIfKeyIsEmpty: boolean = false): TShortCut; // Hks=HotKeyShortcut
-    procedure HksSet(const IvPath: string; IvValue: TShortCut); // Hks=HotKeyShortcut                                                                     // with IvForceDefaultIfKeyIsEmpty = true the IvDefault is forced even if the key exists and is empty
+    procedure HksSet(const IvPath: string; IvValue: TShortCut); // Hks=HotKeyShortcut                                       // with IvForceDefaultIfKeyIsEmpty = true the IvDefault is forced even if the key exists and is empty
     function  IntVecGet(const IvPath: string; IvDefault: TArray<integer> = []): TArray<integer>;
     procedure IntVecSet(const IvPath: string; IvValue: TArray<integer>);
   end;
@@ -2958,7 +3230,7 @@ type
     const CST_COLS        = 'Cols'      ;
     const CST_DATA        = 'Data'      ;
   public
-    class function  Escape(IvJsonStr: string): string; static;            // encode
+    class function  Escape(IvJsonStr: string): string; static;             // encode
     class function  Unescape(const IvJsonStr: AnsiString): string; static;
     class function  Pretty(IvJsonStr: string): string; static;
     class function  Compiled(IvString: string; IvJsonSrc: string = ''): string; static; // nocomment, noemptylines, rv, rvjson
@@ -2978,8 +3250,8 @@ type
     class function  FromFileUTF8(const IvFileName: string): superobject.ISuperObject; static;      // delphi speaks UTF16!
     class procedure ToFileUTF8(const aFileName: string; o: superobject.ISuperObject); static;      // idem
     // from original unit uDBJson ex TTableJson
-    class function  CreateJsonValue(IvJson: ISuperObject; const IvName: string; const IvValue: variant): boolean; static;
-    class function  CreateJsonValueByField(IvJson: ISuperObject; IvField: TField): boolean; static;
+    class function  CreateJsonValue(var IvJson: ISuperObject; const IvName: string; const IvValue: variant): boolean; static;
+    class function  CreateJsonValueByField(var IvJson: ISuperObject; IvField: TField): boolean; static;
     class function  CreateFieldByJson(IvFields: TFieldDefs; IvColsJson: ISuperObject): boolean; static;
     class function  GetValue(IvJson: ISuperObject; const IvName: string): variant; static;
     class function  GetValue2Field(IvField: TField; IvJsonValue: ISuperObject): variant; static;
@@ -3532,7 +3804,7 @@ type
     class function  HParagraphs(IvPMin, IvPMax, IvWMin, IvWMax: integer): string; static;
   end;
 
-  TLstRec = record // list/csv (commaseparatedvslues) *** merge with TCsvRec ***
+  TLstRec = record // list/csv (commaseparatedvslues) *** merge with TCsvRec and use instead of TLbxRec ***
     class function  LstHas     (IvList, IvItem: string): boolean; static;
     class function  LstAppend  (IvList, IvStr: string; IvSpaceAdd: boolean = false): string; static;
     class function  LstPrepend (IvList, IvStr: string; IvSpaceAdd: boolean = false): string; static;
@@ -3540,6 +3812,10 @@ type
     class function  LstItemNext(var IvPChar: PChar; IvSep: Char = CHAR_DELIMITER): string; static;
     class function  LstFromStr (IvString: string; IvDelimiterStr: string = CHAR_DELIMITER): string; static; // 'aaa  bbb; ccc' = 'aaa,bbb,ccc'
     class function  LstToVector(IvList: string; IvDelimiters: string = CHAR_DELIMITER; IvTrim: boolean = true): TArray<string>{TStringVector}; static; // IvDelimiters can be ',;:'
+  end;
+
+  TLbxRec = record // TListBox
+    class function  LstItemSelect(IvListBox: TListBox; IvValue: string): boolean; static;
   end;
 
   TMatRec = record // math
@@ -3589,15 +3865,15 @@ type
     function  Info: string;
     procedure Free;
     procedure Reset(IvResetObjAlso: boolean = false);
-    function  InitDba(IvOrganization, IvUsername: string; var IvFbk: string): boolean;          // a user after a login (username available) become a member
+    function  InitDba(IvOrganization, IvUsername: string; var IvFbk: string): boolean;                // a user after a login (username available) become a member
     function  InitRio(IvOrganization, IvUsername: string; var IvFbk: string): boolean;
-    function  IsAdmin: boolean;                                                                 // jobgrade >= 70
-    function  HomePath: string;                                                                 // C:\$\Member\W\Wks\I\IarussiFedericoCarloBrian
-    function  BadgeFile: string;                                                                // C:\$\Member\W\Wks\I\IarussiFedericoCarloBrian\IarussiFedericoCarloBrian@WksBadge.png
-    function  HomeUrl(IvUrlAbsolute: boolean = false): string;                                  // /Member\W\Wks/I/IarussiFedericoCarloBrian
-    function  BadgeUrl(IvUrlAbsolute: boolean = false): string;                                 // /Member/W/Wks/I/IarussiFedericoCarloBrian/IarussiFedericoCarloBrian@WksBadge.png
-    function  BadgeImg(IvHeight: integer; IvUrlAbsolute: boolean = false): string;              // <img src="{BadgeUrl}" title="{Info}> style="height:{IvHeightp}x">
-    procedure BadgeGenerate(var IvBadge: TBitmap; IvOrganization, IvWww, IvSite, IvUsername: string);  // bitmap
+    function  IsAdmin: boolean;                                                                       // jobgrade >= 70
+    function  HomePath: string;                                                                       // C:\$\Member\W\Wks\I\IarussiFedericoCarloBrian
+    function  BadgeFile: string;                                                                      // C:\$\Member\W\Wks\I\IarussiFedericoCarloBrian\IarussiFedericoCarloBrian@WksBadge.png
+    function  HomeUrl(IvUrlAbsolute: boolean = false): string;                                        // /Member\W\Wks/I/IarussiFedericoCarloBrian
+    function  BadgeUrl(IvUrlAbsolute: boolean = false): string;                                       // /Member/W/Wks/I/IarussiFedericoCarloBrian/IarussiFedericoCarloBrian@WksBadge.png
+    function  BadgeImg(IvHeight: integer; IvUrlAbsolute: boolean = false): string;                    // <img src="{BadgeUrl}" title="{Info}> style="height:{IvHeightp}x">
+    procedure BadgeGenerate(var IvBadge: TBitmap; IvOrganization, IvWww, IvSite, IvUsername: string); // bitmap
   end;
 
   TMbrRem = class(TRemotable)
@@ -4407,6 +4683,7 @@ type
     Language       : string ; // FldLanguage       // Sql, Mql(Mongo)
     MaxRecords     : integer; // FldMaxRecords     // select top(max)
   //MaxRecordsCsv  : integer; // FldMaxRecordsCsv
+    DriverSelect   : string ; // FldDriverSelect
     Select         : string ; // FldSelect
     SelectDev      : string ; // FldSelectDev
     SelectBak      : string ; // FldSelectBak
@@ -4426,6 +4703,14 @@ type
     PanelClosed    : boolean; // FldPanelClosed
     TimeoutSec     : integer; // FldTimeoutSec
     FeedbackIfEmpty: string ; // FldFeedbackIfEmpty
+    Header         : string ; // FldHeader
+    Footer         : string ; // FldFooter
+    RepeaterHeader : string ; // FldRepeaterHeader (fixed at beginning of the repeater)
+    RepeaterPre    : string ; // FldRepeaterPre    (before the items)                                       \
+    RepeaterItem   : string ; // FldRepeaterItem   (similar items equal to the number of FldSelect row(s))  |--block is repeated if a DriverSelect is present and many FldSelect(s) are generated
+    RepeaterPost   : string ; // FldRepeaterPost   (before the items)                                      /
+    RepeaterFooter : string ; // FldRepeaterFooter (fixed at end of the repeater)
+    RepeaterOn     : boolean; // FldRepeaterOn
   //ExportJson     : string ; // in pdf
     ChartRecVector : TChartRecVector;
   public
@@ -4645,6 +4930,7 @@ type
     function  Info: string;
     function  Exists(IvDateTimeBegin: TDateTime; IvIpLan: string; IvSessionId: integer; var IvFbk: string): boolean;
     function  IsValid(var IvFbk: string): boolean; // user is authenticated and is loggedin
+    function  IsClosed: boolean;
     procedure Reset;
     function  Init(IvKind: string; IvSessionId, IvFingerprintId: cardinal; IvIpLan, IvDomain, IvComputer, IvOsLogin, IvClient, IvVersion, IvServer, IvOrganization, IvUsername: string; var IvFbk: string): boolean;
     function  Insert(var IvFbk: string): boolean;
@@ -4700,10 +4986,10 @@ type
     SOAP_RIO_URL                           =                               '/soap/I%sSoap%sService';         // %1=Xxx, %2=Main
     SOAP_SERVICE                           =                                     'I%sSoap%sServiceservice';  // %1=Xxx, %2=Main
     SOAP_PORT                              =                                     'I%sSoap%sServicePort';     // %1=Xxx, %2=Main
-//    SOAP_SERVER_RIO_URL_FOUND_NO_RS        = 'SOAP server, unable to find RIO service url %s';               // 'SOAP server, impossibile trovare url per servizio RIO di %s';
-//    SOAP_SERVER_RIO_URL_FOUND_OK_RS        = 'SOAP server, found RIO service url %s';                        // 'SOAP server, trovato url per servizio RIO di %s';
-//    SOAP_SERVER_DATAMODULE_URL_FOUND_NO_RS = 'SOAP server, unable to find datamodule url %s';                // 'SOAP server, impossibile trovare url di connessione a %s';
-//    SOAP_SERVER_DATAMODULE_URL_FOUND_OK_RS = 'SOAP server, found datamodule url %s';                         // 'SOAP server, trovato url di connessione a %s';
+//    SOAP_SERVER_RIO_URL_FOUND_NO_RS        = 'SOAP server, unable to find RIO service url %s';             // 'SOAP server, impossibile trovare url per servizio RIO di %s';
+//    SOAP_SERVER_RIO_URL_FOUND_OK_RS        = 'SOAP server, found RIO service url %s';                      // 'SOAP server, trovato url per servizio RIO di %s';
+//    SOAP_SERVER_DATAMODULE_URL_FOUND_NO_RS = 'SOAP server, unable to find datamodule url %s';              // 'SOAP server, impossibile trovare url di connessione a %s';
+//    SOAP_SERVER_DATAMODULE_URL_FOUND_OK_RS = 'SOAP server, found datamodule url %s';                       // 'SOAP server, trovato url di connessione a %s';
   public
     class function  SoapUrl               (var IvFbk: string; var IvUrl : string; IvObj: string = 'System'): boolean; static;
     class function  SoapRioUrl            (var IvFbk: string; var IvUrl : string; IvObj: string = 'System'; IvService: string = 'Main'): boolean; static;
@@ -4717,13 +5003,14 @@ type
 
   TSqlRec = record
   public
-    class function  DbaMainFromTbl(IvTbl: string): string; static;   // DbaXxx               from DbaXxx.dbo.TblXxxYyy
-    class function  TblMasterFromObj(IvObj: string): string; static; // DbaXxx.dbo.TblObject from Xxx
-    class function  TblDetailFromObj(IvObj: string): string; static; // DbaXxx.dbo.TblXxx    from Xxx
-    class function  FldMainFromTbl(IvTbl: string): string; static;   // FldXxx               from DbaXxx.dbo.TblXxxYyy
+    class function  DbaMainFromTbl(IvTbl: string): string; static;                               // DbaXxx               from DbaXxx.dbo.TblXxxYyy
+    class function  TblMasterFromObj(IvObj: string): string; static;                             // DbaXxx.dbo.TblObject from Xxx
+    class function  TblDetailFromObj(IvObj: string): string; static;                             // DbaXxx.dbo.TblXxx    from Xxx
+    class function  FldMainFromTbl(IvTbl: string): string; static;                               // FldXxx               from DbaXxx.dbo.TblXxxYyy
     class function  WhereEnsure(IvWhere: string): string; static;
     class function  OrderByEnsure(IvOrderBy: string): string; static;
-    class function  Val(IvValue: variant; IvDefault: string = 'null'): string; static; // unquoted, quoted or null
+    class function  Val(IvValue: variant; IvDefault: string = 'null'): string; static;           // unquoted, quoted or null
+    class function  ValEx(IvValue: variant; IvDefault: string = 'null'): string; static;         // = 'aaa' | is null
     class function  SqlFilterRv(IvField, IvValue: string): string; static;
     class function  SqlFilter(IvStrToSearch, IvFieldToSearchCsv: string; IvAdditionalExplicitFilter: string = ''; IvUsePercent: boolean = true): string; static;
     class function  SqlDistinct(IvTbl, IvFld, IvItemDefault: string): string; static;
@@ -4843,64 +5130,64 @@ type
   end;
 
   TStrRec = record // string (see TVecRec)
-    class function  StrIsWhite(const IvString: string): boolean; static;                                                    // empty or spaces or tabs
-    class function  StrIsBold(const IvString: string): boolean; static;                                                     // not white
-    class function  StrIs09(const IvString: string): boolean; static;                                                       // 01 only
-    class function  StrIsInteger(IvStr: string): boolean; static;                                                           // str is like 123
-    class function  StrIsFloat(const IvString: string): boolean; static;                                                    // str is like 0.123
-    class function  StrIsNumeric(const IvString: string): boolean; static;                                                  // str is like 123 or 0.123
-    class function  StrIsLike(IvString, IvWildcard: string): boolean; static;                                               // str is like abc?efg*
-    class function  StrIsPath(IvStr: string): boolean; static;                                                              // str is like Aaa/Bbb/.../Xxx
-    class function  StrIsChars(IvStr: string; IvChar: char; var IvCount: integer): boolean; static;                         // str is all the same char, return the number of chars
-    class function  StrIsShelledWith(IvStr, IvChars: string): boolean; static;                                              // str starts and ends witthe same specific char(s) like ..str..
-    class function  StrIsShell(IvStr: string): boolean; static;                                                             // str starts and ends with the same char(s) like **str**
-    class function  StrIsBoxed(IvStr: string; var IvBoxA, IvBoxZ: char): boolean; static;                                   // str is in between () | [] | {}, returns boxchars
-    class function  StrIsQuoted(IvStr: string; IvQuoteChar: char = '"'): boolean; static;                                   // str is enclosed in "" or specified chars
-    class function  StrHas(IvStr, IvSubStr: string; IvCaseInsensitive: boolean = true): boolean; static;                    // str contains substr
-    class function  StrHasRex(IvStr, IvRex: string; IvOpt: TRegExOptions): boolean; static;                                 // str contains a regex pattern
+    class function  StrIsWhite(const IvString: string): boolean; static;                                                                             // empty or spaces or tabs
+    class function  StrIsBold(const IvString: string): boolean; static;                                                                              // not white
+    class function  StrIs09(const IvString: string): boolean; static;                                                                                // 01 only
+    class function  StrIsInteger(IvStr: string): boolean; static;                                                                                    // str is like 123
+    class function  StrIsFloat(const IvString: string): boolean; static;                                                                             // str is like 0.123
+    class function  StrIsNumeric(const IvString: string): boolean; static;                                                                           // str is like 123 or 0.123
+    class function  StrIsLike(IvString, IvWildcard: string): boolean; static;                                                                        // str is like abc?efg*
+    class function  StrIsPath(IvStr: string): boolean; static;                                                                                       // str is like Aaa/Bbb/.../Xxx
+    class function  StrIsChars(IvStr: string; IvChar: char; var IvCount: integer): boolean; static;                                                  // str is all the same char, return the number of chars
+    class function  StrIsShelledWith(IvStr, IvChars: string): boolean; static;                                                                       // str starts and ends witthe same specific char(s) like ..str..
+    class function  StrIsShell(IvStr: string): boolean; static;                                                                                      // str starts and ends with the same char(s) like **str**
+    class function  StrIsBoxed(IvStr: string; var IvBoxA, IvBoxZ: char): boolean; static;                                                            // str is in between () | [] | {}, returns boxchars
+    class function  StrIsQuoted(IvStr: string; IvQuoteChar: char = '"'): boolean; static;                                                            // str is enclosed in "" or specified chars
+    class function  StrHas(IvStr, IvSubStr: string; IvCaseInsensitive: boolean = true): boolean; static;                                             // str contains substr
+    class function  StrHasRex(IvStr, IvRex: string; IvOpt: TRegExOptions): boolean; static;                                                          // str contains a regex pattern
     class function  StrHasWithOpt(IvString, IvSubString: string; IvWholeWord: boolean; IvMatchCase: boolean): boolean; static;                       // contains with options
     class function  StrEndsWith(IvString, IvEndString: string): boolean; static;                                                                     // ends with
     class function  StrOccurences(const IvString, IvSubString: string; IvWholeWord: boolean = false; IvMatchCase: boolean = false): integer; static; // count occurrences with options
     class function  StrPosWithOpt(IvString, IvSubString: string; IvWholeWord: boolean; IvMatchCase: boolean): integer; static;                       // pos with options
     class function  StrReplaceWithOpt(IvString, IvStrOut, IvStrIn: string; IvWholeWord: boolean; IvMatchCase: boolean): string; static;              // replace wiyh options
-    class function  StrReplace(IvStr, IvOut, IvIn: string): string; static;                                                 //
-    class function  StrCapitalize(IvStr: string; IvAll: boolean = true): string; static;                                    // 'this IS a test' --> 'This is a test' | 'This Is A Test'
-    class function  StrCase(IvStr: string; IvCase: TCaseEnum = cAsIs): string; static;                                      // change a string case in several ways
-    class function  StrCollapse(IvStr: string; IvCapitalize: boolean = false): string; static;                              // 'This is a Test' --> Thisisatest | ThisIsATest
-    class function  StrExpand(IvStr: string; IvDelimiter: string = ' '{; IvCase: TCaseEnum = cAsIs}): string; static;       // 'ThisIsATest'    --> 'This Is A Test' but 'This_IsA_Test' --> 'ThisIs ATest'
-    class function  StrCamelCaseFromVec(IvVec: TArray<string>): string; static;                                             // ['aaa', 'BbB']   --> aaaBbb
-    class function  StrPascalCaseFromVec(IvVec: TArray<string>): string; static;                                            // ['aaa', 'BbB']   --> AaaBbb
-    class function  StrCommentRemove(IvStr: string; IvPythonCommentRemove: boolean = false): string; static;                // remove all types of comments
-    class function  StrLinesEmptyRemove(IvStr: string; IvEachLineTrim: boolean = false): string; static;                    // remove all emtpy lines
-    class function  StrShellIt(IvStr, IvStartEndStr: string): string; static;                                               // enclose str between same chars
-    class function  StrUnShell(IvStr: string): string; static;                                                              // remove same chars from str
-    class function  StrShellThick(IvStr: string): integer; static;                                                          // remove same chars from str
-    class function  StrShellChrs(IvStr: string): string; static;                                                            // remove same chars from str
-    class function  StrUnBox(IvStr: string): string; static;                                                                // remove () | [] | {} from str
-    class function  StrLeft(IvStr: string; IvLen: integer): string; static;                                                 //
-    class function  StrRight(IvStr: string; IvLen: integer): string; static;                                                //
-    class function  StrLeftOf(IvTag, IvString: string; IvTagInclude: boolean = false; IvCaseSensitive: boolean = true): string; static;                           //
+    class function  StrReplace(IvStr, IvOut, IvIn: string): string; static;                                                                          //
+    class function  StrCapitalize(IvStr: string; IvAll: boolean = true): string; static;                                                             // 'this IS a test' --> 'This is a test' | 'This Is A Test'
+    class function  StrCase(IvStr: string; IvCase: TFontCaseEnum = fcAsIs): string; static;                                                          // change a string case in several ways
+    class function  StrCollapse(IvStr: string; IvCapitalize: boolean = false): string; static;                                                       // 'This is a Test' --> Thisisatest | ThisIsATest
+    class function  StrExpand(IvStr: string; IvDelimiter: string = ' '{; IvCase: TFontCaseEnum = fcAsIs}): string; static;                           // 'ThisIsATest'    --> 'This Is A Test' but 'This_IsA_Test' --> 'ThisIs ATest'
+    class function  StrCamelCaseFromVec(IvVec: TArray<string>): string; static;                                                                      // ['aaa', 'BbB']   --> aaaBbb
+    class function  StrPascalCaseFromVec(IvVec: TArray<string>): string; static;                                                                     // ['aaa', 'BbB']   --> AaaBbb
+    class function  StrCommentRemove(IvStr: string; IvPythonCommentRemove: boolean = false): string; static;                                         // remove all types of comments
+    class function  StrLinesEmptyRemove(IvStr: string; IvEachLineTrim: boolean = false): string; static;                                             // remove all emtpy lines
+    class function  StrShellIt(IvStr, IvStartEndStr: string): string; static;                                                                        // enclose str between same chars
+    class function  StrUnShell(IvStr: string): string; static;                                                                                       // remove same chars from str
+    class function  StrShellThick(IvStr: string): integer; static;                                                                                   // remove same chars from str
+    class function  StrShellChrs(IvStr: string): string; static;                                                                                     // remove same chars from str
+    class function  StrUnBox(IvStr: string): string; static;                                                                                         // remove () | [] | {} from str
+    class function  StrLeft(IvStr: string; IvLen: integer): string; static;                                                                          //
+    class function  StrRight(IvStr: string; IvLen: integer): string; static;                                                                         //
+    class function  StrLeftOf(IvTag, IvString: string; IvTagInclude: boolean = false; IvCaseSensitive: boolean = true): string; static;              //
     class function  StrRightOf(IvTag, IvString: string; IvTagInclude: boolean = false; IvCaseSensitive: boolean = true; IvLast: boolean = false): string; static; // use the 1st tag in the string
-    class function  StrBetween(IvTagLeft, IvTagRight, IvString: string; IvCaseSensitive: boolean = true): string; static;                                         // or Inside s1 = '[', s2 = ']', s3 = 'abc[xxx]def' -> 'xxx'
-    class function  StrDel(IvStr, IvStrOrCharToDelete: string): string; static;                                             //
-    class function  StrReplicate(IvStr: string; IvN: integer): string; static;                                              // repear a string n times
-  //class function  StrSplitB(IvString: string; IvDelimiters: string = ','): TStringDynArray; static;                       // DUP see TVecRecVecFromStr() returning a TArray<string>
-    class function  StrWordAppend(IvStr, IvWord: string; IvSeparator: string = ' '): string; static;                        // src + ' ' + word
-    class function  StrKeep(IvStr: string; const IvCharToKeepSet: TSysCharSet): string; static;                             //
-    class function  StrLettersOnly(IvStr: string): string; static;                                                          // remove any char not in [A..Z][a..z]
-    class function  StrCoalesce(IvStrVector: TArray<string>; IvDefault: string = ''): string; static;                       // return the 1st non empty value in vector
-    class function  StrJoin(IvStrVector: TArray<string>; IvDelimiter: string = ''): string; static;                         // ['aaa', 'BbB']   --> aaa_BbB
-    class function  StrConcat(IvStrVector: TArray<string>; IvDelimiter: string = ''): string; static;                       // ['aaa', 'BbB']   --> _aaa_BbB
-    class procedure StrInsertAt(var IvStr: string; const IvStrToInsert: string; IvAtPos: integer); static;                  // insert str into a string at given position
-    class function  StrCommentHas(IvStr, IvComment: string; out IvBlanks: integer): boolean; static;                        // return true if str is like '# aaa' or '  # aaa' , return how many blanks at the beginning of the string
+    class function  StrBetween(IvTagLeft, IvTagRight, IvString: string; IvCaseSensitive: boolean = true): string; static;                            // or Inside s1 = '[', s2 = ']', s3 = 'abc[xxx]def' -> 'xxx'
+    class function  StrDel(IvStr, IvStrOrCharToDelete: string): string; static;                                                                      //
+    class function  StrReplicate(IvStr: string; IvN: integer): string; static;                                                                       // repear a string n times
+  //class function  StrSplitB(IvString: string; IvDelimiters: string = ','): TStringDynArray; static;                                                // DUP see TVecRecVecFromStr() returning a TArray<string>
+    class function  StrWordAppend(IvStr, IvWord: string; IvSeparator: string = ' '): string; static;                                                 // src + ' ' + word
+    class function  StrKeep(IvStr: string; const IvCharToKeepSet: TSysCharSet): string; static;                                                      //
+    class function  StrLettersOnly(IvStr: string): string; static;                                                                                   // remove any char not in [A..Z][a..z]
+    class function  StrCoalesce(IvStrVector: TArray<string>; IvDefault: string = ''): string; static;                                                // return the 1st non empty value in vector
+    class function  StrJoin(IvStrVector: TArray<string>; IvDelimiter: string = ''): string; static;                                                  // ['aaa', 'BbB']   --> aaa_BbB
+    class function  StrConcat(IvStrVector: TArray<string>; IvDelimiter: string = ''): string; static;                                                // ['aaa', 'BbB']   --> _aaa_BbB
+    class procedure StrInsertAt(var IvStr: string; const IvStrToInsert: string; IvAtPos: integer); static;                                           // insert str into a string at given position
+    class function  StrCommentHas(IvStr, IvComment: string; out IvBlanks: integer): boolean; static;                                                 // return true if str is like '# aaa' or '  # aaa' , return how many blanks at the beginning of the string
     class function  StrCommentToggle(IvStr, IvComment: string; IvAtBegin: boolean = false; IvReplace: boolean = false): string; static;
-    class function  StrSafe(IvStr: string): string; static;                                                                 // camelcase removing spaces and punctuation chars
-    class function  StrRemoveFirst(IvStr: string; IvCharCount: integer): string; static;                                    //
-    class function  StrRemoveLast(IvStr: string; IvCharCount: integer): string; static;                                     //
-    class function  StrOneLine(IvString: string): string; static;                                                           // remove \n\r
-    class function  StrOneSpace(IvString: string): string; static;                                                          // '  ' -> ' '
-    class function  StrTabToSpaces(IvString: string; IvSpaces: integer = 1): string; static;                                // '\t -> ' ' *** only 1 space for now ***
-    class function  StrFromBool(IvBool: boolean; IvTrueStr: string = 'true'; IvFalseStr: string = 'false'): string; static; // True, Ok, ... | False, No, ... configurable output strings
+    class function  StrSafe(IvStr: string): string; static;                                                                                          // camelcase removing spaces and punctuation chars
+    class function  StrRemoveFirst(IvStr: string; IvCharCount: integer): string; static;                                                             //
+    class function  StrRemoveLast(IvStr: string; IvCharCount: integer): string; static;                                                              //
+    class function  StrOneLine(IvString: string): string; static;                                                                                    // remove \n\r
+    class function  StrOneSpace(IvString: string): string; static;                                                                                   // '  ' -> ' '
+    class function  StrTabToSpaces(IvString: string; IvSpaces: integer = 1): string; static;                                                         // '\t -> ' ' *** only 1 space for now ***
+    class function  StrFromBool(IvBool: boolean; IvTrueStr: string = 'true'; IvFalseStr: string = 'false'): string; static;                          // True, Ok, ... | False, No, ... configurable output strings
     class procedure StrToFile(const IvFile, IvString: string); static;
     class function  StrFromFile(const IvFile: string): string; static;
   end;
@@ -5013,35 +5300,35 @@ type
     INC_PATH               = 'C:\$\Include';
     // urls
     HOME_URL               = 'http://' + WWW;
-    LOGO_URL               = '/Organization/W/Wks/WksLogo.png';                                        // use LogoGraphic
-    LOGO_LONG_URL          = '/Organization/W/Wks/WksLogoLong.png';                                    // use LogoLongGraphic
+    LOGO_URL               = '/Organization/W/Wks/WksLogo.png';                                              // use LogoGraphic
+    LOGO_LONG_URL          = '/Organization/W/Wks/WksLogoLong.png';                                          // use LogoLongGraphic
     ICON_URL               = '/Organization/W/Wks/WksIcon.ico';
     // files
-  //FILE_VEC: array [0..2] of string = ('C:\$\Include\W\wks\js\wks.js' , 'C:\$Include\W\wks\css\wks.css' , 'C:\$\X\Win32\Debug\Default.htm');
-    FILE_VEC:         TArray<string> = ['C:\$\Include\W\wks\js\wks.js'{, 'C:\$Include\W\wks\css\wks.css'}, 'C:\$\X\Win32\Debug\Default.htm'];
+  //FILE_VEC: array [0..2] of string = ('C:\$\Include\W\wks\js-new\wks.js' , 'C:\$Include\W\wks\css-new\wks.css' , 'C:\$\X\Win32\Debug\Default-new.htm');
+    FILE_VEC:         TArray<string> = ['C:\$\Include\W\wks\js-new\wks.js'{, 'C:\$Include\W\wks\css-new\wks.css'}, 'C:\$\X\Win32\Debug\Default-new.htm'];
     // ids
     HELP_PAGE_HOME_ID      = 5;
     // options&settings
-    CSS_FRAMEWORK          = {read from db or} WEB_FRAMEWORK_DEF;
+    CSS_FRAMEWORK          = {read from db or} CSS_FRAMEWORK_DEFAULT;
     URL_CHECK              = true;
     WebSystemInfoOff       : boolean = false;
     WebPoweredByOff        : boolean = true;
   public
-    class function  Info: string; static;                                                                // returns 'WKS www.wks.cloud'
-    class function  Copyright: string; static;                                                           // returns '(c) 2010-present WKS www.wks.cloud'
-    class procedure WksWebFilesGenerate(IvUseSpin: boolean = true); static;                              // generate wks.js (not wks.css) from DbaCode + Default.htm directly
-    class function  InitDba(var IvFbk: string): boolean; static;                                         // *** not implemented but used in LoginForm ***
-    class function  InitRio(var IvFbk: string): boolean; static;                                         // *** not implemented but used in LoginForm ***
+    class function  Info: string; static;                                                                    // returns 'WKS www.wks.cloud'
+    class function  Copyright: string; static;                                                               // returns '(c) 2010-present WKS www.wks.cloud'
+    class procedure WksWebFilesGenerate(IvJs, IvCss, IvHtml: boolean; IvHtmlUseSpin: boolean = true); static;// generate wks.js (and wks.css) from DbaCode + Default.htm directly
+    class function  InitDba(var IvFbk: string): boolean; static;                                             // *** not implemented but used in LoginForm ***
+    class function  InitRio(var IvFbk: string): boolean; static;                                             // *** not implemented but used in LoginForm ***
     class function  BinaryExists(IvBinary: string; var IvFbk: string): boolean; static;
     class function  BinaryExistsRio(IvBinary: string; var IvFbk: string): boolean; static;
     class function  BinaryVersionIsOk(IvBinary, IvVer: string; var IvFbk: string): boolean; static;
     class function  BinaryVersionIsOkRio(IvBinary, IvVer: string; var IvFbk: string): boolean; static;
-    class function  LogoFile{Spec}: string; static;                                                       // C:\$Organization\W\Wks\WksLogo.png
-    class function  LogoLongFile{Spec}: string; static;                                                   // C:\$Organization\W\Wks\WksLogoLong.png
-    class function  LogoImg{Html}(IvHeight: integer; IvUrlAbsolute: boolean = false): string; static;     // <img src="/Organization/W/Wks/WksLogo.png" title="WKS www.wks.cloud" style="height:??px">
-    class function  LogoLongImg{Html}(IvHeight: integer; IvUrlAbsolute: boolean = false): string; static; // <img src="/Organization/W/Wks/WksLogoLong.png" title="WKS www.wks.cloud" style="height:??px">
-    class function  LogoGraphic    : TGraphic; static;                                                    // binaryimage
-    class function  LogoLongGraphic: TGraphic; static;                                                    // forslides
+    class function  LogoFile{Spec}: string; static;                                                           // C:\$Organization\W\Wks\WksLogo.png
+    class function  LogoLongFile{Spec}: string; static;                                                       // C:\$Organization\W\Wks\WksLogoLong.png
+    class function  LogoImg{Html}(IvHeight: integer; IvUrlAbsolute: boolean = false): string; static;         // <img src="/Organization/W/Wks/WksLogo.png" title="WKS www.wks.cloud" style="height:??px">
+    class function  LogoLongImg{Html}(IvHeight: integer; IvUrlAbsolute: boolean = false): string; static;     // <img src="/Organization/W/Wks/WksLogoLong.png" title="WKS www.wks.cloud" style="height:??px">
+    class function  LogoGraphic    : TGraphic; static;                                                        // binaryimage
+    class function  LogoLongGraphic: TGraphic; static;                                                        // forslides
 end;
 
   {$REGION 'TTasKindEnum'}
@@ -5071,23 +5358,23 @@ end;
   TTheRec = record // theme [B]
   const
     // theme
-    THEME_DEF               = 'black'              ; // guithemename
-    STATE_DEF               = 'Active'             ; // state
-    GRADE_DEF               = 'w3-theme'           ; // see: TW3fRec w3-theme-<color>.css
-    FONT_FAMILY_DEF         = 'Verdana'            ; // Verdana, sans-serif
-    FONT_WEIGHT_DEF         = '500'                ; // 500..900
-   {NAV_}SIZE_CLASS_DEF     = 'w3-large'           ; // navsize: w3-tiny, w3-small, w3-medium, w3-large, w3-xlarge, w3-xxlarge, w3-xxxlarge, w3-jumbo
-    PADDING_CLASS_DEF       = 'w3-padding-x-large' ; //
-    BORDERED_CLASS_DEF      = ''                   ; //
-    HIGHLIGHTJS_THEME_DEF   = 'agate'              ; // highlightjsthemename
-    PRIMARY60BG_COLOR_DEF   = 'FFFFFF'             ; // white
-    SECONDARY30FG_COLOR_DEF = '7A7A7A'             ; // gray
-    ACCENT10_COLOR_DEF      = '4F81BD'             ; // windowsblue
-    ERROR_COLOR_DEF         = '404040'             ; // black
-    DANGER_COLOR_DEF        = 'FF4300'             ; // red
-    WARNING_COLOR_DEF       = 'FF6A00'             ; // darkorange
-    INFO_COLOR_DEF          = '0055FF'             ; // blue
-    SUCCESS_COLOR_DEF       = '007F00'             ; // green
+    THEME_DEFAULT               = 'black'              ; // guithemename
+    STATE_DEFAULT               = 'Active'             ; // state
+    GRADE_DEFAULT               = 'w3-theme'           ; // see: TW3fRec w3-theme-<color>.css
+    FONT_FAMILY_DEFAULT         = 'Verdana'            ; // Verdana, sans-serif
+    FONT_WEIGHT_DEFAULT         = '500'                ; // 500..900
+   {NAV_}SIZE_CLASS_DEFAULT     = 'w3-large'           ; // navsize: w3-tiny, w3-small, w3-medium, w3-large, w3-xlarge, w3-xxlarge, w3-xxxlarge, w3-jumbo
+    PADDING_CLASS_DEFAULT       = 'w3-padding-x-large' ; //
+    BORDERED_CLASS_DEFAULT      = ''                   ; //
+    HIGHLIGHTJS_THEME_DEFAULT   = 'agate'              ; // highlightjsthemename
+    PRIMARY60BG_COLOR_DEFAULT   = 'FFFFFF'             ; // white
+    SECONDARY30FG_COLOR_DEFAULT = '7A7A7A'             ; // gray
+    ACCENT10_COLOR_DEFAULT      = '4F81BD'             ; // windowsblue
+    ERROR_COLOR_DEFAULT         = '404040'             ; // black
+    DANGER_COLOR_DEFAULT        = 'FF4300'             ; // red
+    WARNING_COLOR_DEFAULT       = 'FF6A00'             ; // darkorange
+    INFO_COLOR_DEFAULT          = '0055FF'             ; // blue
+    SUCCESS_COLOR_DEFAULT       = '007F00'             ; // green
     // vectors
   //THEME_VEC            : TArray<string> = TW3fRec.THEME_NAME_VEC;
     GRADE_VEC            : TArray<string> = ['w3-theme', 'w3-theme-gradient'];
@@ -5186,7 +5473,7 @@ end;
   end;
 
   TTxtRec = record // text
-  public                                                                                            // count all kinds of charcters in a memo
+  public                                                                                                          // count all kinds of charcters in a memo
     class function  TxtCharsFrequency(IvText: TStrings; var IvDigits{, IvNumbers}, IvLetters, IvLowers, IvUppers, IvPucts, IvSeps, IvSymbols, IvWhites: integer; var IvFbk: string): boolean; static;
     class function  TxtWordCount(IvText: TStrings; IvWord: string): integer; static;
     class function  TxtWordFirst(IvText: TStrings): string; static;
@@ -5221,11 +5508,11 @@ end;
     // scheme username password      host           port           path?           pathinfo     querystring     fragment
   const // *** MOVE TO cnst SECTION ***
   //GOOGLEDOTCOM   = 'http://www.google.com';
-  //MYIPDOTNET     = 'https://www.wks.cloud/WksYourIpIsapiProject.dll';         // *** Wks have to be replaced by TSysRec.PREFIX ***
-  //MYIPDOTNET     = 'http://requestbin.net/ip';                                // double reading to avoid DoS
-  //MYIPDOTNET     = 'http://ipinfo.io/ip';                                     //
-    MYIPDOTNET     = 'https://ifconfig.co/ip';                                  //
-  //UNSPLASHDOTCOM = 'https://source.unsplash.com';                             // images & bg
+  //MYIPDOTNET     = 'https://www.wks.cloud/WksYourIpIsapiProject.dll';     // *** Wks have to be replaced by TSysRec.PREFIX ***
+  //MYIPDOTNET     = 'http://requestbin.net/ip';                            // double reading to avoid DoS
+  //MYIPDOTNET     = 'http://ipinfo.io/ip';                                 //
+    MYIPDOTNET     = 'https://ifconfig.co/ip';                              //
+  //UNSPLASHDOTCOM = 'https://source.unsplash.com';                         // images & bg
   public
     Scheme   : string; // http // protocol
     Username : string; // login
@@ -5237,16 +5524,16 @@ end;
     QueryInfo: string; // ?param1=val&param2=val
     Fragment : string; // nose
   public
-    function  Parse(IvUrl: string; IvPart: string = ''): string;                                   // also load all above members
-    function  PatInfo(IvUrl: string): string;                                                      // class-procedures cannot access instance-members
+    function  Parse(IvUrl: string; IvPart: string = ''): string;             // also load all above members
+    function  PatInfo(IvUrl: string): string;                                // class-procedures cannot access instance-members
     class function  HttpRemove(IvUrl: string): string; static;
     class function  ProtocolEnsure(IvUrl: string; IvProtocol: string = 'http://'; IvSecure: boolean = false): string; static; // ensure url begins with http:// or https://
-    class function  Encode(IvQueryClearValue: string): string; static;                             // only query fields part?
-    class function  Decode(IvQueryObscureValue: string): string; static;                           // only query fields part?
+    class function  Encode(IvQueryClearValue: string): string; static;       // only query fields part?
+    class function  Decode(IvQueryObscureValue: string): string; static;     // only query fields part?
     class function  IsValid(IvUrl: string): boolean; static;
     class function  Exists(IvUrl: string; IvCheck: boolean = false{; IvProtocol: string = 'http://'}): boolean; static;
-    class procedure Open(IvUrl: string); static;                                                   // open a NEW browser/tab
-    class procedure Go(IvUrl: string); static;                                                     // launch the url in the already available browser/tab
+    class procedure Open(IvUrl: string); static;                             // open a NEW browser/tab
+    class procedure Go(IvUrl: string); static;                               // launch the url in the already available browser/tab
     class procedure GoEdge(IvUrl: string); static;
     class procedure GoChrome(IvUrl: string); static;
     class procedure GoFirefox(IvUrl: string); static;
@@ -5317,7 +5604,7 @@ end;
     class function  VecHas(const IvString: string; IvStringVector: TStringVector; IvCaseSensitive: boolean = false): boolean; static;    //
     class function  VecFromStr(IvStr: string; IvDelimChars: string = ','; IvTrim: boolean = true): TArray<string>; overload; static;     // 'This, is,A  ,Test'                   --> ['This', 'Is', 'A', 'Test']
     class function  VecIntFromStr(IvStr: string; IvDelimChars: string = ','): TArray<integer>; static;                                   // '1, 2,3  ,4'                          --> [1, 2, 3, 4]
-    class function  VecFromStrCamel(IvStr: string; IvCase: TCaseEnum = cAsIs): TArray<string>; static;                                   // ThisIsATest                           --> ['This', 'Is', 'A', 'Test']
+    class function  VecFromStrCamel(IvStr: string; IvCase: TFontCaseEnum = fcAsIs): TArray<string>; static;                              // ThisIsATest                           --> ['This', 'Is', 'A', 'Test']
     class function  VecToList(IvStrVec: TArray<string>; IvDelimiter: string = ','; IvQuoted: boolean = false): string; overload; static; // ['Aaa', 'Bbb', ...]                   --> 'Aaa,Bbb,...'
     class function  VecToList(IvIntVec: TArray<integer>; IvDelimiter: string = ','; IvQuoted: boolean = false): string; overload; static;// [1, 2, ...]                           --> '1,2,...'
     class function  VecToListFmt(IvStrVec: TArray<string>; IvDelimiter: string = ','; IvItemFmt: string = '%s'): string; static;         // ['Aaa', 'Bbb', ...],  '{"fld": "%s"}' --> {"fld": "Aaa"}, {"fld": "Bbb"}, ...
@@ -5345,16 +5632,16 @@ end;
 
   TVstRec = record // virtualstringtree
   const
-    ROOT_ID         =   1;
-    ZZZ_ID          =   2;
-    TEMP_ID         =   3;
-    TEST_ID         =   4;
-    HELP_ID         =   5;
-    TEMPLATE_ID     =   6;
-    ORGANIZATION_ID =   7;
-    PUBLIC_ID       =   8;
-    SYSTEM_ID       =   9;
-    RESERVED_ID     =  10;
+//  ROOT_ID         =   1;
+//  ZZZ_ID          =   2;
+//  TEMP_ID         =   3;
+//  TEST_ID         =   4;
+//  HELP_ID         =   5;
+//  TEMPLATE_ID     =   6;
+//  ORGANIZATION_ID =   7;
+//  PUBLIC_ID       =   8;
+//  SYSTEM_ID       =   9;
+//  RESERVED_ID     =  10;
   //SYS_1ST_ID      =   1; // 1st system id
   //SYS_LAST_ID     = 100; // last system id
   public
@@ -5363,8 +5650,8 @@ end;
     class function  NodeHasChildren(                         IvNode: PVirtualNode): boolean; static;
     class procedure NodeParamSet   (IvVst: TBaseVirtualTree; IvNode: PVirtualNode; IvObj: string; IvDs: TDataSet); static;
     class procedure NodeParamGet   (IvVst: TBaseVirtualTree; IvNode: PVirtualNode; var IvId, IvPId, IvOrder: integer; var IvName, IvObj, IvObjectKind, IvContentKind, IvState, IvOrganization, IvData: string); static;
-    class procedure OnPaintText    (IvVst: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType); static;
     class procedure OnCompareNodes (IvVst: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: integer); static;
+    class procedure OnPaintText    (IvVst: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType); static;
     class procedure OnGetImageIndex(IvVst: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: boolean; var ImageIndex: TImageIndex); static;
   end;
 
@@ -5380,8 +5667,8 @@ end;
     {$ENDREGION}
 
   const
-  //FILE_VEC:             array [0..3] of string = ('C:\$Include\W\w3\w3.js', 'C:\$Include\W\w3\w3color.js', 'C:\$Include\W\w3\w3.css', 'C:\$Include\W\w3\w3-theme-%s.css');
-    FILE_VEC                    : TArray<string> = ['C:\$Include\W\w3\w3.js', 'C:\$Include\W\w3\w3color.js', 'C:\$Include\W\w3\w3.css', 'C:\$Include\W\w3\w3-theme-%s.css'];
+  //FILE_VEC:             array [0..3] of string = ('C:\$Include\W\w3\4.0-new\w3.js', 'C:\$Include\W\w3\4.0-new\w3color.js', 'C:\$Include\W\w3\4.0-new\w3.css', 'C:\$Include\W\w3\4.0-new\w3-theme-%s.css');
+    FILE_VEC                    : TArray<string> = ['C:\$Include\W\w3\4.0-new\w3.js', 'C:\$Include\W\w3\4.0-new\w3color.js', 'C:\$Include\W\w3\4.0-new\w3.css', 'C:\$Include\W\w3\4.0-new\w3-theme-%s.css'];
 
     THEME_NAME_VEC              : TArray<string> = ['amber'      ,'black'      ,'blue'       ,'blue-grey'  ,'brown'      ,'cyan'       ,'dark-grey'  ,'deep-orange','deep-purple','green'      ,'grey'       ,'indigo'     ,'khaki'      ,'light-blue' ,'light-green','light-grey' ,'lime'       ,'orange'     ,'pink'       ,'purple'     ,'red'        ,'silver'     ,'teal'       ,'white'      ,'yellow'     ];
     THEME_COLOR_VEC             : TArray<string> = ['#ffc107'    ,'#0f0f0f'    ,'#2196f3'    ,'#607d8b'    ,'#795548'    ,'#00bcd4'    ,'#616161'    ,'#ff5722'    ,'#673ab7'    ,'#4caf50'    ,'#9e9e9e'    ,'#3f51b5'    ,'#f0e68c'    ,'#87ceeb'    ,'#8bc34a'    ,'#e7e7e7'    ,'#cddc39'    ,'#ffa500'    ,'#e91e63'    ,'#9c27b0'    ,'#f44336'    ,'#c0c0c0'    ,'#009688'    ,'#ffffff'    ,'#ffeb3b'    ];
@@ -5421,7 +5708,7 @@ end;
     class function  W3ColorFromTheme(IvTheme: string): string; static;
     class function  W3ThemeCssGenerate(IvTheme, IvH60PrimaryBgColor, IvH30SecondaryFgColor, IvH10AccentColor: string): string; static; // https://blog.logrocket.com/building-color-palette-css
     class function  W3ThemeTestHtmlGenerate: string; static;
-    class procedure W3WebFilesGenerate; static;
+    class procedure W3WebFilesGenerate(IvW3Js, IvW3ColorJs, IvW3Css, IvW3ThemeCss: boolean); static;
   end;
 
   TWicRec = record // windowsimagecomponent
@@ -5502,8 +5789,8 @@ end;
     {class} procedure OnWebModuleCreate; {static;}
     {class} procedure OnWebModuleDestroy; {static;}
     {class} procedure OnWebModuleException(IvWebResponse: TWebResponse; IvE: Exception); {static;}
-    {class} procedure BeforeDispatch(IvWebRequest: TWebRequest; IvWebResponse: TWebResponse; var IvWrq: TWrqRec; var IvTic: TTicRec); {static;}
-    {class} procedure AfterDispatch (IvWebRequest: TWebRequest; IvWebResponse: TWebResponse; var IvWrq: TWrqRec; var IvTic: TTicRec); {static;}
+    {class} procedure BeforeDispatch(IvWebRequest: TWebRequest; IvWebResponse: TWebResponse{; var IvWrq: TWrqRec}; var IvTic: TTicRec); {static;}
+    {class} procedure AfterDispatch (IvWebRequest: TWebRequest; IvWebResponse: TWebResponse{; var IvWrq: TWrqRec}; var IvTic: TTicRec); {static;}
   //class procedure BeforeSend;?
   //class procedure AfterSend;?
   end;
@@ -5515,26 +5802,7 @@ end;
 
 {$ENDREGION}
 
-{$REGION 'Const ii'}
-const
-
-  {$REGION 'JachLog'}
-  LOG_DIR                 = 'C:\$\Log'    ; // *** save to system ***
-  LOG_FILE_PREFIX         = 'Wks'         ;
-  LOG_SYSLOG_HOST         = '51.38.98.160';
-  LOG_SYSLOG_PORT         = 514           ;
-  LOG_TOPIC_ID_MAX        = 4             ;
-  LOG_TOPIC_GENERAL       = 0             ;
-  LOG_TOPIC_ENVIRONMENT   = 1             ;
-  LOG_TOPIC_NETWORK       = 2             ;
-  LOG_TOPIC_LOGIN         = 3             ;
-  LOG_TOPIC_AUTHORIZATION = 4             ;
-  LOG_TOPIC_VEC: array[0..LOG_TOPIC_ID_MAX] of string = ('GENERAL', 'ENVIRONMENT', 'NETWORK', 'LOGIN', 'AUTHORIZATION');
-  {$ENDREGION}
-
-{$ENDREGION}
-
-{$REGION 'GlobalVars'}
+{$REGION 'Global'}
 var
   // globalvar
   glo_h: cardinal;                 // handle
@@ -5606,10 +5874,10 @@ uses
   , Winapi.Messages               // winmsg
   ,{WInapi.}Wcrypt2               // windows CryptoAPI2 (see if embarcadero has imported it in its own file)
   , Winapi.RichEdit               // trichedit
-  , System.TypInfo                //
   , System.DateUtils              //
   , System.IOUtils                //
-  , System.UITypes                //
+  , System.TypInfo                // need to stay here!
+  , System.UITypes                // tcolor
   , System.Variants               //
   , System.StrUtils               //
   , System.Character              // char utils
@@ -5626,7 +5894,6 @@ uses
   , Vcl.GraphUtil                 // colorrgbtohls, colorhlstorgb, ColorToWebColor{Hex}Str/WebColor{Hex}StrToColor, ColorToWebColorName/WebColorNameToColor
   , Vcl.ExtActns                  // tbrowseurl
   , Vcl.Dialogs                   // MessageDlg
-  , Vcl.StdCtrls                  // tlabel
   , Vcl.Menus                     // shortcuttotext
   , Vcl.ExtDlgs                   // topenpicturedialog, tsavepicturedialog
   , Winapi.Wincodec               // GUID_CONTAINERFORMATICO
@@ -5656,16 +5923,16 @@ uses
   , FireDAC.Stan.Def
   , FireDAC.Stan.Pool
   , FireDAC.Stan.Async
-  , FireDAC.Phys
+  , FireDAC.Stan.Param
   , FireDAC.VCLUI.Wait
   , FireDAC.Comp.Client
+  , FireDAC.Comp.DataSet
+  , FireDAC.Phys
 //, FireDAC.Phys.Oracle           // only enterprise/architect
 //, FireDAC.Phys.OracleDef        // idem
-  , FireDAC.Stan.Param
   , FireDAC.DatS
-  , FireDAC.DApt.Intf
   , FireDAC.DApt
-  , FireDAC.Comp.DataSet
+  , FireDAC.DApt.Intf
   , WksSearchFormUnit             // searchform
   , WksReplaceFormUnit            // replaceform
   , WksReplaceConfirmFormUnit     // replaceconfirmform
@@ -6007,12 +6274,12 @@ begin
     Exit;
 
   // setup
-  agg.NoLine;                         // text without borders
-//agg.LineWidth(0.1*t);               // ?
-//agg.LineColor.FromHexStr(color);    // text border color
-  agg.FillColor.FromHexStr(color);    // text internal color
-//agg.TextHints := AGG_TEXT_HINTS;    // ?
-//agg.FlipText := flip;               // changes the vertical direction of fonts (false = font is upside-down)
+  agg.NoLine;                      // text without borders
+//agg.LineWidth(0.1*t);            // ?
+//agg.LineColor.FromHexStr(color); // text border color
+  agg.FillColor.FromHexStr(color); // text internal color
+//agg.TextHints := AGG_TEXT_HINTS; // ?
+//agg.FlipText := flip;            // changes the vertical direction of fonts (false = font is upside-down)
   agg.Font(PAnsiChar(font), h, bold, italic, FONT_CHACHE, Deg2Rad(rotate));
 
   // alignment
@@ -6266,13 +6533,13 @@ begin
   Result := '';
 
   for i := 1 to l do begin
-    n := n shl 5;       // move buffer left by 5 to make room
+    n := n shl 5; // move buffer left by 5 to make room
 
     p := Pos(u[i], VALID_CHARS);
     if p >= 0 then
       n := n + (p - 1); // add value into buffer
 
-    j := j + 5;         // keep track of number of bits in buffer
+    j := j + 5;   // keep track of number of bits in buffer
 
     if (j >= 8) then begin
       j := j - 8;
@@ -7111,6 +7378,7 @@ begin
   else if n.Contains('EditorProject'  ) then Result := 'Editor'      // standalone Editor (on the fly specialized editors, like python editor)
   else if n.Contains('UtilProject'    ) then Result := 'Utility'     // standalone utility app
   else if n.Contains('UtilsProject'   ) then Result := 'Utility'     // standalone utility app
+  else if n.Contains('CtrlPackage'    ) then Result := 'Ctrl'        // ctrl package (.bpl)
 //else if n.Contains('DemoProject'    ) then Result := 'Demo'        // standalone demo app
   else if n.Contains('TestProject'    ) then Result := 'Test'        // standalone test app (dtest, ctrls, comps)
   else begin                                Result := 'Unknown';                                                                                                //, Rest, Datasnap, Server, Service
@@ -7317,9 +7585,36 @@ begin
 end;
 
 function  TChartRec.ToCanvasJs: string;
+
+  {$REGION 'var'}
 var
-  i, j: integer; // serie, point
-  chb, seb, ptb: TSbuRec; // chart, series, points stringbuilder
+  // chart
+  chb: TSbuRec; // stringbuilder
+  // serie
+  i: integer;   // idx
+  seb: TSbuRec; // stringbuilder
+  sty: string;  // type
+  // point
+  j: integer;   // idx
+  ptb: TSbuRec; // stringbuilder
+  {$ENDREGION}
+
+  {$REGION 'macro'}
+function  scaleBreacksJson(IvJson: string): string;
+begin
+  Result := '';
+  if not IvJson.Trim.IsEmpty then
+    Result := Format('    , scaleBreaks: {%s}', [IvJson]);
+end;
+
+function  stripLinesJson(IvJson: string): string;
+begin
+  Result := '';
+  if not IvJson.Trim.IsEmpty then
+    Result := Format('    , stripLines: [%s]', [IvJson]);
+end;
+  {$ENDREGION}
+
 begin
   // series
   seb.Clr;
@@ -7356,9 +7651,11 @@ begin
   //ptb.Text := StringReplace(ptb.Text, 'z: $', 'z: ', [rfReplaceAll]);
 
     // serie
+    sty := TStrRec.StrLeftOf(' -', SerieRecVector[i].Kind); // TStrRec.StrCamelCaseFromVec([SerieRecVector[i].Kind]
     seb.Add('    ,{ // series-%s'                            , [IntToStr(i)                                            ], true                                                            , 0);
     seb.Add('      name: "%s"'                               , [SerieRecVector[i].Serie                                ]                                                                     );
-    seb.Add('    , type: "%s"'                               , [TStrRec.StrCamelCaseFromVec([SerieRecVector[i].Kind])  ]                                                                     );
+    seb.Add('    , type: "%s"'                               , [giif.NxD(sty, 'scatter')]                                                                                                    );
+    seb.Add('    , color: "%s"'                              , [SerieRecVector[i].Color                                ], not SerieRecVector[i].Color.IsEmpty                                );
   //seb.Add('    , markerType: "%s"'                         , ['circle'                                               ]                                                                     );
   //seb.Add('    , markerColor: "%s"'                        , [ColorNameRnd                                           ]                                                                     );
   //seb.Add('    , markerSize: "%s"'                         , ['4'                                                    ]                                                                     );
@@ -7374,7 +7671,7 @@ begin
   Delete(seb.Text, 1, 1);
 
   // chart
-  chb.Add('<div id="%s" style="width:%s; height:%s; margin-left:auto; margin-right:auto;"></div>', [Chart, Width, Height  ]                                                                  );
+  chb.Add('<div id="%s" style="width:%s; height:%s; margin-left:auto; margin-right:auto;"></div>', [Chart, giif.NxD(Width, '100%'), giif.NxD(Height, '320px')]                               );
   chb.Add('<script>'                                                                                                                                                                         );
   chb.Add('window.onload = function() {'                                                                                                                                                     );
   chb.Add('  var chart = new CanvasJS.Chart("%s", {'        , [Chart                                                   ]                                                                     );
@@ -7389,7 +7686,7 @@ begin
   chb.Add('  , zoomType: "%s"'                              , ['xy'                                                    ]                                                                     );
   // title'
   chb.Add('  , title: {'                                                                                                                                                                     );
-  chb.Add('      text: "%s"'                                , [Title                                                   ]                                                                     );
+  chb.Add('      text: "%s"'                                , [giif.NxD(Title, '')                                     ]                                                                     );
   chb.Add('    , fontFamily: "%s"'                          , ['consolas'                                              ]                                                                     ); // gthe.FontFamily
   chb.Add('    , fontWeight: "%s"'                          , ['normal'                                                ]                                                                     ); // gthe.FontWeight
   chb.Add('    , fontSize: %s'                              , ['18'                                                    ]                                                                     ); // px
@@ -7414,7 +7711,7 @@ begin
 //chb.Add('    }'                                                                                                                                                                            );
   // axisx'
   chb.Add('  , axisX: {'                                                                                                                                                                     );
-  chb.Add('      title: "%s"'                               , [XAxisRec.TitleRec.Caption                               ], not XAxisRec.TitleRec.Caption.IsEmpty                              );
+  chb.Add('      title: "%s"'                               , [giif.NxD(XAxisRec.TitleRec.Caption, 'X')                ]{, not XAxisRec.TitleRec.Caption.IsEmpty *** NOT AS 1st! ***}        );
   chb.Add('    , titleFontSize: %s'                         , ['16'                                                    ]                                                                     ); // px
   chb.Add('    , titleFontFamily: "%s"'                     , ['tahoma'                                                ]                                                                     ); // gthe.FontFamily
   chb.Add('    , titleFontColor: "%s"'                      , ['gray'                                                  ]                                                                     );
@@ -7427,10 +7724,15 @@ begin
   chb.Add('    , prefix: "%s"'                              , [XAxisRec.LabelRec.Prefix                                ], not XAxisRec.LabelRec.Prefix.IsEmpty                               );
   chb.Add('    , suffix: "%s"'                              , [XAxisRec.LabelRec.Suffix                                ], not XAxisRec.LabelRec.Suffix.IsEmpty                               );
   chb.Add('    , labelAngle: %s'                            , [XAxisRec.LabelRec.AngleDeg                              ], not XAxisRec.LabelRec.AngleDeg.IsEmpty                             );
+  chb.Add(       scaleBreacksJson(XAxisRec.ScaleBreacksJson)                                                                                                                                 );
+  chb.Add(       stripLinesJson(XAxisRec.StripLinesJson)                                                                                                                                     );
+//chb.Add('    , interlacedColor: "%s"'                     , ['#F0F8FF'                                               ]                                                                     );
+  chb.Add('    , minimum: %s'                               , [XAxisRec.Minimum                                        ], not XAxisRec.Minimum.trim.IsEmpty                                  );
+  chb.Add('    , maximum: %s'                               , [XAxisRec.Maximum                                        ], not XAxisRec.Maximum.trim.IsEmpty                                  );
   chb.Add('    }'                                                                                                                                                                            );
   // axisy'
   chb.Add('  , axisY: {'                                                                                                                                                                     );
-  chb.Add('      title: "%s"'                               , [YAxisRec.TitleRec.Caption                               ], not YAxisRec.TitleRec.Caption.IsEmpty                              );
+  chb.Add('      title: "%s"'                               , [giif.NxD(YAxisRec.TitleRec.Caption, 'Y')                ]{, not YAxisRec.TitleRec.Caption.IsEmpty *** NOT AS 1st! ***}        );
   chb.Add('    , titleFontSize: %s'                         , ['16'                                                    ]                                                                     ); // px
   chb.Add('    , titleFontFamily: "%s"'                     , ['tahoma'                                                ]                                                                     ); // gthe.FontFamily
   chb.Add('    , titleFontColor: "%s"'                      , ['gray'                                                  ]                                                                     );
@@ -7443,9 +7745,11 @@ begin
   chb.Add('    , prefix: "%s"'                              , [YAxisRec.LabelRec.Prefix                                ], not YAxisRec.LabelRec.Prefix.IsEmpty                               );
   chb.Add('    , suffix: "%s"'                              , [YAxisRec.LabelRec.Suffix                                ], not YAxisRec.LabelRec.Suffix.IsEmpty                               );
   chb.Add('    , labelAngle: %s'                            , [YAxisRec.LabelRec.AngleDeg                              ], not YAxisRec.LabelRec.AngleDeg.IsEmpty                             );
-//chb.Add('    , minimum: %s'                               , [YAxisRec.                                               ]                                                                     );
-//chb.Add('    , maximum: %s'                               , [YAxisRec.                                               ]                                                                     );
+  chb.Add(       scaleBreacksJson(YAxisRec.ScaleBreacksJson)                                                                                                                                 );
+  chb.Add(       stripLinesJson(YAxisRec.StripLinesJson)                                                                                                                                     );
 //chb.Add('    , interlacedColor: "%s"'                     , ['#F0F8FF'                                               ]                                                                     );
+  chb.Add('    , minimum: %s'                               , [YAxisRec.Minimum                                        ], not YAxisRec.Minimum.trim.IsEmpty                                  );
+  chb.Add('    , maximum: %s'                               , [YAxisRec.Maximum                                        ], not YAxisRec.Maximum.trim.IsEmpty                                  );
   chb.Add('    }'                                                                                                                                                                            );
   // series'
   chb.Add('  , data: ['      );
@@ -7683,7 +7987,7 @@ begin
     if      SameText(h, 'ZBOOK'     ) then Result := ''
     else if SameText(h, 'DELL'      ) then Result := ''
     else if SameText(h, 'WKS'       ) then Result := ''
-    else                                   Result := 'Provider=SQLNCLI11.1;Data Source=LOCALHOST;Initial Catalog=DbaXxx;User ID=sa;Password=secret;Persist Security Info=True;MARS Connection=True';
+    else                                   Result := DBA_CONNECTION_STR;
     //raise Exception.CreateFmt('Unable to create ADO connection string, unknown db host %s', [h.ToUpper])
   end;
 end;
@@ -7874,7 +8178,7 @@ function  TCnsRec.CsSqLiteFD(IvFile, IvUsername, IvPassword: string): string;
 begin
   Result :=
      'DriverID=' + 'SQLite'
-  + ';Database=' + IvFile        // X:\$\I\WksDba.sdb
+  + ';Database=' + IvFile   // X:\$\I\WksDba.sdb
   + ';Encrypt='  + 'No'
   ;
 end;
@@ -7890,7 +8194,7 @@ begin
 
   // build
   Result :=
-     'Provider='                + 'MSOLEDBSQL.1' // SQLNCLI.1, SQLNCLI11.1, SQLOLEDB.1, MSOLEDBSQL.1, OraOLEDB.Oracle
+     'Provider='                + 'MSOLEDBSQL.1'
   + ';Persist Security Info='   + 'True'         // if True the connection object will remember username/password otherwise it will connect just once and if you close the connection you will not be able to connect again, default is False
   + ';MARS Connection='         + 'True'         // multiple active recordset
 //+ ';Auto Translate='          + 'True'
@@ -7918,11 +8222,11 @@ end;
 function  TCnsRec.CsMsSqlFD(IvServer, IvDatabase, IvUsername, IvPassword: string; IvUseIntegratedSecurity: boolean): string;
 begin
   Result :=
-     'DriverID='              + 'MSSQL'                            // IvFDConnection.DriverName             := r;
-  + ';SERVER='                + IvServer         // PHOBOS         // IvFDConnection.Params.Append('Server=' + s);
-  + ';DATABASE='              + IvDatabase       // DbaAaa         // IvFDConnection.Params.Database        := d;
-  + ';User_Name='             + IvUsername       // sa             // IvFDConnection.Params.Username        := u;
-  + ';Password='              + IvPassword       // secret         // IvFDConnection.Params.Password        := p;
+     'DriverID='              + 'MSSQL'                        // IvFDConnection.DriverName             := r;
+  + ';SERVER='                + IvServer         // PHOBOS     // IvFDConnection.Params.Append('Server=' + s);
+  + ';DATABASE='              + IvDatabase       // DbaAaa     // IvFDConnection.Params.Database        := d;
+  + ';User_Name='             + IvUsername       // sa         // IvFDConnection.Params.Username        := u;
+  + ';Password='              + IvPassword       // secret     // IvFDConnection.Params.Password        := p;
   + ';ApplicationName='       + TSysRec.ACRONYM  // ?
   + ';Workstation='           + UNKNOWN_STR      // ?
   + ';MARS='                  + 'True'{'yes'}    // multiple active result set
@@ -7934,13 +8238,13 @@ var
   s, t, i, n, d, u, p, o: string; // server, port, sid, servicename, database, username, password, datasource
 begin
   // http://docwiki.embarcadero.com/RADStudio/Tokyo/en/Connect_to_Oracle_Server_(FireDAC)
-  s := giif.NxD(IvServer     , 'localhost');                                // server                 10.176.154.55, azklarity01.azit.lfoundry.com, azracprod09.azit.micron.com
-  t := giif.NxD(IvPort       , ''         );                                // port                   1521
-  i := giif.NxD(IvSId        , ''         );                                // sid                    ?
-  n := giif.NxD(IvServiceName, ''         );                                // servicename            azracprod09.micron.com/udbfab9
-  d := giif.NxD(IvDatabase   , ''         );                                // defaultdba or schemaid ESDA, PARAM, PROBE, REFERENCE, SIGMA, SWRINFO, ...
-  u := giif.NxD(IvUsername   , ''         );                                // username               YMS, MIT_SSSECTION_SET_EMPTY_YE
-  p := giif.NxD(IvPassword   , ''         );                                // password               changeme, changeyourpassword
+  s := giif.NxD(IvServer     , 'localhost');     // server                 10.176.154.55, azklarity01.azit.lfoundry.com, azracprod09.azit.micron.com
+  t := giif.NxD(IvPort       , ''         );     // port                   1521
+  i := giif.NxD(IvSId        , ''         );     // sid                    ?
+  n := giif.NxD(IvServiceName, ''         );     // servicename            azracprod09.micron.com/udbfab9
+  d := giif.NxD(IvDatabase   , ''         );     // defaultdba or schemaid ESDA, PARAM, PROBE, REFERENCE, SIGMA, SWRINFO, ...
+  u := giif.NxD(IvUsername   , ''         );     // username               YMS, MIT_SSSECTION_SET_EMPTY_YE
+  p := giif.NxD(IvPassword   , ''         );     // password               changeme, changeyourpassword
   o := giif.Str(IvDatasource  <> '', IvDatasource, CsOracleDs(s, t, i, n)); // odbcdatasource: SIGMA, ...
 
   // Provider=OraOLEDB.Oracle.1;Password=changeme;Persist Security Info=True;User ID=YMS;Data Source="(DESCRIPTION=(CID=GTU_APP)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=azracprod09.azit.micron.com)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=azracprod09.micron.com)))"
@@ -8272,7 +8576,7 @@ begin
   OutputFileName      := '';
   RunCommand          := '';
   DescriptionBlockAdd := false;
-  HeaderAndFooterOff  := true ;
+  HeaderAndFooterAdd  := false;
   CommentRemove       := false;
   LinesEmptyRemove    := false;
 end;
@@ -8306,7 +8610,7 @@ begin
       OutputFileName      := dst.FieldByName('FldOutputFileName'     ).AsString;
       RunCommand          := dst.FieldByName('FldRunCommand'         ).AsString;
       DescriptionBlockAdd := dst.FieldByName('FldDescriptionBlockAdd').AsBoolean;
-      HeaderAndFooterOff  := dst.FieldByName('FldHeaderAndFooterOff' ).AsBoolean;
+      HeaderAndFooterAdd  := dst.FieldByName('FldHeaderAndFooterAdd' ).AsBoolean;
       CommentRemove       := dst.FieldByName('FldCommentRemove'      ).AsBoolean;
       LinesEmptyRemove    := dst.FieldByName('FldLinesEmptyRemove'   ).AsBoolean;
 
@@ -8322,7 +8626,7 @@ end;
 class function THlsRec.Brighten(Color: TColor; Factor: integer): TColor;
 begin
   Color := ColorToRGB(Color);
-  if 0 < Factor then begin            // 0 = no changes
+  if 0 < Factor then begin // 0 = no changes
     if Factor > MaxFactor then
       Factor := MaxFactor;
     Result := (          (((255 - ((Color shr 16) and $FF)) * Factor) div MaxFactor)) shl 8;
@@ -8336,7 +8640,7 @@ end;
 class function THlsRec.Darken(Color: TColor; Factor: integer): TColor;
 begin
   Color := ColorToRGB(Color);
-  if 0 < Factor then begin            // 0 = no changes
+  if 0 < Factor then begin // 0 = no changes
     if Factor > MaxFactor then
       Factor := MaxFactor;
     Result := (          ((((Color shr 16) and $FF) * Factor) div MaxFactor)) shl 8;
@@ -8352,7 +8656,7 @@ var
   DstValue: integer;
 begin
   Color := ColorToRGB(Color);
-  if Factor <> 0 then begin            // 0 = no changes
+  if Factor <> 0 then begin // 0 = no changes
     if Factor > 0 then begin
       DstValue := 255;
     end else begin
@@ -8375,18 +8679,18 @@ begin
     case CurrentLum of
       1..255:
         begin
-          if NewLum <= 255 then             // lower segment
+          if NewLum <= 255 then // lower segment
             Result := (Value * NewLum) div CurrentLum
-          else                              // lower -> upper segment
+          else                  // lower -> upper segment
             Result := NewLum - 255 + (Value * (510 - NewLum)) div CurrentLum;
         end;
       256..509:
         begin
           Value := 255 - Value;
           CurrentLum := 510 - CurrentLum;
-          if NewLum <= 255 then             // upper -> lower segment
+          if NewLum <= 255 then // upper -> lower segment
             Result := NewLum - (Value * NewLum) div CurrentLum
-          else                              // upper segment
+          else                  // upper segment
             Result := 255 - (Value * (510 - NewLum)) div CurrentLum;
         end;
     else // black or white
@@ -8966,24 +9270,39 @@ end;
   {$ENDREGION}
 
   {$REGION 'TCsvRec'}
-class function TCsvRec.CsvRowField(IvCsvRow: string; IvFieldId: integer): variant;
+class function TCsvRec.CsvHas(IvCsvRow, IvValue: string): boolean;
 begin
-  Result := SplitString(IvCsvRow, ',')[IvFieldId];
+  Result := (',' + IvCsvRow).Contains(',' + IvValue);
 end;
 
-class function TCsvRec.CsvRowFieldAppend(var IvCsvRow: string; IvField: string): string;
+class function TCsvRec.CsvRemove(IvCsvRow, IvValue: string): string;
+begin
+  // simple
+  Result := ',' + IvCsvRow;
+  Result := StringReplace(Result, ',' + IvValue, '', [rfReplaceAll, rfIgnoreCase]);
+  Delete(Result, 1, 1);
+
+  // vector *** see old wks files ***
+end;
+
+class function TCsvRec.CsvValue(IvCsvRow: string; IvPos: integer): variant;
+begin
+  Result := SplitString(IvCsvRow, ',')[IvPos];
+end;
+
+class function TCsvRec.CsvAppend(var IvCsvRow: string; IvValue: string): string;
 begin
   if IvCsvRow.IsEmpty then
-    IvCsvRow := IvField
+    IvCsvRow := IvValue
   else
-    IvCsvRow := IvCsvRow + ',' + IvField;
+    IvCsvRow := IvCsvRow + ',' + IvValue;
 end;
 
 class function TCsvRec.CsvToVec(const IvCsvLineStr: string; Delimiter, QuoteChar: Char; TrimOutsideQuotes: boolean): TArray<string>;
 var
   res: TList<string>;
   sb: TStringBuilder;
-  i, L: Integer;
+  i, l: Integer;
   c: Char;
   InQuotes: Boolean;
   FieldStarted: Boolean;
@@ -8994,7 +9313,7 @@ var
   begin
     s := sb.ToString;
     if TrimOutsideQuotes then
-      s := TrimRight(s);                // right-trim spaces/tabs added outside quotes
+      s := TrimRight(s); // right-trim spaces/tabs added outside quotes
     res.Add(s);
     sb.Clear;
     FieldStarted := False;
@@ -9008,13 +9327,13 @@ begin
 
     i := 1;
     L := Length(IvCsvLineStr);
-    while i <= L do begin
+    while i <= l do begin
       c := IvCsvLineStr[i];
 
       if InQuotes then begin
         if c = QuoteChar then begin
           // escaped quote inside quoted field: "" -> "
-          if (i < L) and (IvCsvLineStr[i+1] = QuoteChar) then begin
+          if (i < l) and (IvCsvLineStr[i+1] = QuoteChar) then begin
             sb.Append(QuoteChar);
             Inc(i);            // consume the second quote
           end else
@@ -9189,6 +9508,11 @@ end;
 class function  TDatRec.DatToIso(IvDateTime: TDateTime; IvInputIsUTC: boolean): string;
 begin
   Result := DateToISO8601(IvDateTime, IvInputIsUTC);
+end;
+
+class function  TDatRec.DatForLog(const IvDateTime: TDateTime): string;
+begin
+  Result := FormatDateTime('yyyy"/"mm"/"dd hh:nn:ss"', IvDateTime);
 end;
 
 class function  TDatRec.DatFromIso(IvDateTimeIso: string; IvDefault: TDateTime; IvInputIsUTC: boolean): TDateTime;
@@ -9464,6 +9788,16 @@ begin
   end;
 end;
 
+class function  TDbaRec.CmdExecRio(const IvSql: string; var IvAffected: integer; var IvFbk: string; IvTimeoutSec: integer): boolean;
+begin
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemDbaCmdExecSoap(IvSql, IvAffected, IvFbk, IvTimeoutSec);
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
+
 class function  TDbaRec.ScalarVar(const IvSql: string; var IvValue: variant; const IvDefault: variant; var IvFbk: string; IvTimeOutSec: integer): boolean;
 var
   sql, fld: string;
@@ -9543,23 +9877,23 @@ var
   // general
   sql, fbk: string;
 //  aff{, i}: integer;
-  cst: string;             // connection string
-//  rix: integer;            // sub-recordset count
-//  con: string;             // co-name
-//  tcp: string;             // table caption
+  cst: string;         // connection string
+//  rix: integer;      // sub-recordset count
+//  con: string;       // co-name
+//  tcp: string;       // table caption
 
   // datates
-//dsr: string;             // dataset result
+//dsr: string;         // dataset result
 
   // ado
-//aco: TADOConnection;     // conn
-  aqy: TADOQuery;          // query
-//  dst: TADODataSet;        // dataset, datasetnext
+//aco: TADOConnection; // conn
+  aqy: TADOQuery;      // query
+//  dst: TADODataSet;  // dataset, datasetnext
 
   // fd
-  fco: TFDConnection;      // conn
-  fqy: TFDQuery;           // query
-//fm1: TFDMemTable;        // memtable
+  fco: TFDConnection;  // conn
+  fqy: TFDQuery;       // query
+//fm1: TFDMemTable;    // memtable
   {$ENDREGION}
 
 begin
@@ -9669,11 +10003,11 @@ begin
   qry := TADOQuery.Create(nil);
 //try
     try
-      sql := grva.Rva(IvSql);                                                   // *** TRY TO USE AND CENTRALIZE ONLY HERE ***
+      sql := grva.Rva(IvSql);                         // *** TRY TO USE AND CENTRALIZE ONLY HERE ***
       qry.ConnectionString := DBA_CONN_STR;
       qry.SQL.Text := sql;
       qry.Active := true;
-      IvDs := qry;                                                              // *** IMPORTANT *** do not create IvDs outside
+      IvDs := qry;                                    // *** IMPORTANT *** do not create IvDs outside
       IvAffected := IvDs.RecordCount;
       if IvDs.IsEmpty {IvAffected <= 0} then begin
         IvFbk := 'Dataset is empty';
@@ -9691,7 +10025,7 @@ begin
       end;
     end;
 //finally
-//  qry.Free;                                                                   // *** IMPORTANT *** free IvDs in the calling code
+//  qry.Free;                                         // *** IMPORTANT *** free IvDs in the calling code
 //end;
 end;
 
@@ -9810,8 +10144,8 @@ end;}
 
 class function TDbaRec.VecFromDst(var IvDst: TDataset; IvFieldIdx: integer): TArray<string>;
 var
-  i, aff: integer;
-  val, fbk: string;
+  i{, aff}: integer;
+  val{, fbk}: string;
 begin
   // exit
   if (not Assigned(IvDst)) or IvDst.IsEmpty then begin
@@ -9823,6 +10157,7 @@ begin
   // load
 //try
     SetLength(Result, IvDst.RecordCount);
+    IvDst.First;
     for i := 0 to IvDst.RecordCount - 1 do begin
       val := IvDst.Fields[IvFieldIdx].AsString;
       if val.Trim.IsEmpty then
@@ -9851,7 +10186,12 @@ end;
 
 class function  TDbaRec.TblExistsRio(const IvTbl: string): boolean;
 begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemTblExistsSoap(IvTbl);
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemTblExistsSoap(IvTbl);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 class function  TDbaRec.TblIdAvailable(const IvTbl: string; IvWhere: string): integer;
@@ -9886,7 +10226,12 @@ end;
 
 class function  TDbaRec.TblIdAvailableRio(const IvTbl: string; IvWhere: string): integer;
 begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemTblIdAvailableSoap(IvTbl, IvWhere);
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemTblIdAvailableSoap(IvTbl, IvWhere);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 class function  TDbaRec.TblIdExists(const IvTbl: string; IvId: integer): boolean;
@@ -9899,7 +10244,12 @@ end;
 
 class function  TDbaRec.TblIdExistsRio(const IvTbl: string; IvId: integer; var IvFbk: string): boolean;
 begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemTblIdExistsSoap(IvTbl, IvId);
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemTblIdExistsSoap(IvTbl, IvId);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 class function  TDbaRec.TblIdMax(const IvTbl: string; IvWhere: string): integer;
@@ -9915,7 +10265,12 @@ end;
 
 class function  TDbaRec.TblIdMaxRio(const IvTbl: string; IvWhere: string): integer;
 begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemTblIdMaxSoap(IvTbl, IvWhere);
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemTblIdMaxSoap(IvTbl, IvWhere);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 class function  TDbaRec.TblIdNext(const IvTbl: string; IvUseIdAvailable: boolean): integer;
@@ -9928,7 +10283,123 @@ end;
 
 class function  TDbaRec.TblIdNextRio(const IvTbl: string; IvUseIdAvailable: boolean): integer;
 begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemTblIdNextSoap(IvTbl, IvUseIdAvailable);
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemTblIdNextSoap(IvTbl, IvUseIdAvailable);
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+class function  TDbaRec.TblCheck(const IvSys, IvDba, IvTbl: string; var IvFbk: string): boolean;
+var
+  sql, sq2, fld, fl2, typ, ty2, len, le2: string;
+  dst, ds2: TDataset;
+  cnt, cn2, i: integer;
+begin
+  // wks defs
+  sql := Format('''
+  select
+      *
+  from
+      DbaSystem.dbo.TblField
+  where
+      FldSystem   = '%s' -- Wks
+  and FldDatabase = '%s' -- DbaEquipment
+  and FldTable    = '%s' -- TblEquipment
+  order by
+      FldOrder
+  ''', [IvSys, IvDba, IvTbl]);
+  Result := TDbaRec.DsFromSql(sql, dst, IvFbk);
+  if not Result then begin
+    IvFbk := IvFbk + ', check table definition';
+    Exit;
+  end;
+
+  // dba actual phisical
+  sq2 := Format('''
+  use [%s]
+  select
+      c.name                          as FldField
+    , t.name                          as FldType
+    , case
+          when t.name in ('varchar', 'char', 'nvarchar', 'nchar') then c.max_length
+          when t.name in ('decimal', 'numeric')                   then concat(c.precision, ',', c.scale)
+          else                                                    null
+      end                             as FldLength --OrPrecision
+    , c.is_nullable                   as FldNullable
+  from
+      sys.columns c                                    join
+      sys.types   t on c.user_type_id = t.user_type_id join
+      sys.tables tb on c.object_id    = tb.object_id   join
+      sys.schemas s on tb.schema_id   = s.schema_id
+  where
+      s.name = 'dbo'
+  and tb.name = '%s'
+  order by
+      c.column_id
+  ''', [IvDba, IvTbl]);
+  Result := TDbaRec.DsFromSql(sq2, ds2, IvFbk);
+  if not Result then begin
+    IvFbk := IvFbk + ', no phisical table exists';
+    Exit;
+  end;
+
+  // same number of fields?
+  cnt := dst.RecordCount;
+  cn2 := ds2.RecordCount;
+  Result := cnt = cn2;
+  if not Result then begin
+    IvFbk := Format('number of fields are different: %d, %d', [cnt, cn2]);
+    Exit;
+  end;
+
+  // fields loop
+  for i := 1 to dst.RecordCount do begin
+    // same name
+    fld := dst.FieldByName('FldField').AsString;
+    fl2 := ds2.FieldByName('FldField').AsString;
+    Result := SameText(fld, fl2);
+    if not Result then begin
+      IvFbk := Format('field %d names are different: %s, %s', [i, fld, fl2]);
+      Exit;
+    end;
+
+    // same datatype, len/prec
+    typ := dst.FieldByName('FldType').AsString;
+    ty2 := ds2.FieldByName('FldType').AsString;
+    Result := SameText(typ, ty2);
+    if not Result then begin
+      IvFbk := Format('field %d data-types are different: %s, %s', [i, typ, ty2]);
+      Exit;
+    end;
+
+    // same len/prec
+    len := dst.FieldByName('FldLength').AsString;
+    le2 := ds2.FieldByName('FldLength').AsString; if le2 = '-1' then le2 := 'max';
+
+    Result := SameText(len, le2);
+    if not Result then begin
+      IvFbk := Format('field %d data-types are different: %s, %s', [i, len, le2]);
+      Exit;
+    end;
+
+    // next
+    dst.Next;
+    ds2.Next;
+  end;
+
+  IvFbk := Format('table %s is equal to the definition', [IvTbl]);
+end;
+
+class function  TDbaRec.TblCheckRio(const IvSys, IvDba, IvTbl: string; var IvFbk: string): boolean;
+begin
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemTblCheckSoap(IvSys, IvDba, IvTbl, IvFbk);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
     {$ENDREGION}
 
@@ -9964,8 +10435,8 @@ begin
   try
     try
       tbl.InsertRecord(IvValueVec); // *** WARNING ***
-      IvFbk:= 'Record inserted';   // if the target table contains a uniqueidentifier field, the corresponding value must be like: {CEBAF03C-9A54-408A-B9DB-54E62F92C900}
-      Result := true;              // even if MSSQL Management Studio report a GUID witout brackets, the inserted value must have the brackets!
+      IvFbk:= 'Record inserted';    // if the target table contains a uniqueidentifier field, the corresponding value must be like: {CEBAF03C-9A54-408A-B9DB-54E62F92C900}
+      Result := true;               // even if MSSQL Management Studio report a GUID witout brackets, the inserted value must have the brackets!
     except
       on e: Exception do begin
         IvFbk := Format('EXCEPTION: %s', [e.Message]);
@@ -9980,7 +10451,12 @@ end;
 
 class function TDbaRec.RecInsertRio(const IvTbl: string; const IvValueVec: {array of const}TArray<variant>; var IvFbk: string): boolean;
 begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemRecInsertSoap(IvTbl, IvValueVec, IvFbk);
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemRecInsertSoap(IvTbl, IvValueVec, IvFbk);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 class function  TDbaRec.RecInsert(const IvTbl, IvInsertSqlWithParams: string; const IvVeParamValue: array of const; var IvIdNew: integer; var IvFbk: string): boolean;
@@ -10080,7 +10556,12 @@ end;
 
 class function  TDbaRec.FldHasValueRio(const IvTbl, IvFld: string; const IvValue: variant; var IvFbk: string): boolean;
 begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemFldHasValueSoap(IvTbl, IvFld, IvValue, IvFbk);
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemFldHasValueSoap(IvTbl, IvFld, IvValue, IvFbk);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 class function  TDbaRec.FldGet(const IvTbl, IvFld: string; IvId: integer; var IvValue: variant; IvDefault: variant; var IvFbk: string): boolean;
@@ -10090,7 +10571,12 @@ end;
 
 class function  TDbaRec.FldGetRio(const IvTbl, IvFld: string; IvId: integer; var IvValue: variant; IvDefault: variant; var IvFbk: string): boolean;
 begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemFldGetSoap(IvTbl, IvFld, IvId, IvValue, IvDefault, IvFbk);
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemFldGetSoap(IvTbl, IvFld, IvId, IvValue, IvDefault, IvFbk);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 class function  TDbaRec.FldGetWhere(const IvTbl, IvFld: string; IvWhere: string; var IvValue: variant; IvDefault: variant; var IvFbk: string): boolean;
@@ -10103,7 +10589,12 @@ end;
 
 class function  TDbaRec.FldGetWhereRio(const IvTbl, IvFld: string; IvWhere: string; var IvValue: variant; IvDefault: variant; var IvFbk: string): boolean;
 begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemFldGetWhereSoap(IvTbl, IvFld, IvWhere, IvValue, IvDefault, IvFbk);
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemFldGetWhereSoap(IvTbl, IvFld, IvWhere, IvValue, IvDefault, IvFbk);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 class function  TDbaRec.FldSet(const IvTbl, IvFld: string; IvId: integer; const IvValue: variant; var IvFbk: string): boolean;
@@ -10113,7 +10604,12 @@ end;
 
 class function  TDbaRec.FldSetRio(const IvTbl, IvFld: string; IvId: integer; const IvValue: variant; var IvFbk: string): boolean;
 begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemFldSetSoap(IvTbl, IvFld, IvId, IvValue, IvFbk);
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemFldSetSoap(IvTbl, IvFld, IvId, IvValue, IvFbk);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 class function  TDbaRec.FldSetWhere(const IvTbl, IvFld: string; IvWhere: string; const IvValue: variant; var IvFbk: string): boolean;
@@ -10127,7 +10623,12 @@ end;
 
 class function  TDbaRec.FldSetWhereRio(const IvTbl, IvFld: string; IvWhere: string; const IvValue: variant; var IvFbk: string): boolean;
 begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemFldSetWhereSoap(IvTbl, IvFld, IvWhere, IvValue, IvFbk);
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemFldSetWhereSoap(IvTbl, IvFld, IvWhere, IvValue, IvFbk);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 class function TDbaRec.FldInc(const IvTbl, IvFld, IvWhere: string; var IvFbk: string): boolean;
@@ -10137,7 +10638,12 @@ end;
 
 class function TDbaRec.FldIncRio(const IvTbl, IvFld, IvWhere: string; var IvFbk: string): boolean;
 begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemFldIncSoap(IvTbl, IvFld, IvWhere, IvFbk);
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemFldIncSoap(IvTbl, IvFld, IvWhere, IvFbk);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 class function TDbaRec.FldDec(const IvTbl, IvFld, IvWhere: string; var IvFbk: string): boolean;
@@ -10147,7 +10653,12 @@ end;
 
 class function TDbaRec.FldDecRio(const IvTbl, IvFld, IvWhere: string; var IvFbk: string): boolean;
 begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemFldDecSoap(IvTbl, IvFld, IvWhere, IvFbk);
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemFldDecSoap(IvTbl, IvFld, IvWhere, IvFbk);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 class function  TDbaRec.FldDoMath(const IvTbl, IvFld, IvWhere: string; IvOperator: char; IvOperand: string; var IvFbk: string): boolean;
@@ -10168,7 +10679,7 @@ begin
   // a operator b
   try
     if (IvOperand = '') and (IvOperator = '-') then
-      res := -a                          // invert
+      res := -a                            // invert
     else begin
       case IvOperator of
         '+': res := a + b;                 // addition
@@ -10198,7 +10709,12 @@ end;
 
 class function  TDbaRec.FldDoMathRio(const IvTbl, IvFld, IvWhere: string; IvOperator: char; IvOperand: string; var IvFbk: string): boolean;
 begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemFldDoMathSoap(IvTbl, IvFld, IvWhere, IvOperator, IvOperand, IvFbk);
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemFldDoMathSoap(IvTbl, IvFld, IvWhere, IvOperator, IvOperand, IvFbk);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
     {$ENDREGION}
 
@@ -10283,7 +10799,7 @@ begin
   Result := CmdExec(sql, aff, IvFbk); // *** WARNING might delete comments and Rv[Xxx()] in FldContents due to previous Rv ***
 end;
 
-class function  TDbaRec.ObjTreeContentDba(const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean;
+class function  TDbaRec.ObjTreeContentDba(const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterAdd, IvCommentRemove, IvLinesEmptyRemove: boolean; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean;
 var
   i: integer;
   tik: TTicRec;
@@ -10322,45 +10838,15 @@ begin
 
     // items
     for i := 0 to IvAffected - 1 do begin
-      // item
-      oid := dst.FieldByName('FldId'            ).AsInteger; // FldId
-      pid := dst.FieldByName('FldPId'           ).AsInteger; // FldPId
-                                                             // FldId8
-      ord := dst.FieldByName('FldOrder'         ).AsInteger; // FldOrder
-                                                             // FldRev
-                                                             // FldCreated
-                                                             // FldUpdated
-                                                             // FldUpdatedBy
-                                                             // FldFromOrganization
-                                                             // FldFromDepartment
-                                                             // FldFromArea
-                                                             // FldFromTeam
-                                                             // FldFromMember
-                                                             // FldToOrganization
-                                                             // FldToDepartment
-                                                             // FldToArea
-                                                             // FldToTeam
-                                                             // FldToMember
-                                                             // FldJobGradeMin
-                                                             // FldRoute
-                                                             // FldObjectKind
-      cki := dst.FieldByName('FldContentKind'   ).AsString ; // FldContentKind
-                                                             // FldDataKind
-    //sta := dst.FieldByName('FldState'         ).AsString ; // FldState
-                                                             // FldTitle
-                                                             // FldSubtitle
-      des := dst.FieldByName('FldDescription'   ).AsString ; // FldDescription
-      des := des.Trim;                                       // FldSpare
-                                                             // FldEncrypted
-                                                             // FldPersist
-                                                             // FldImage
-                                                             // FldContentPrev
-      con := dst.FieldByName('FldContent'       ).AsString ; // FldContent
-                                                             // FldData
-                                                             // FldNote
-      ona := dst.FieldByName('FldObject'        ).AsString ; // FldObject
-                                                             // FldEditorCaret
-                                                             // FldEditorFolding
+  // item
+      oid := dst.FieldByName('FldId'            ).AsInteger;
+      pid := dst.FieldByName('FldPId'           ).AsInteger;
+      ord := dst.FieldByName('FldOrder'         ).AsInteger;
+      cki := dst.FieldByName('FldContentKind'   ).AsString ;
+    //sta := dst.FieldByName('FldState'         ).AsString ;
+      des := dst.FieldByName('FldDescription'   ).AsString ; des := des.Trim;
+      con := dst.FieldByName('FldContent'       ).AsString ;
+      ona := dst.FieldByName('FldObject'        ).AsString ;
 
       // commentstrings
       com := TCodRec.CommentStr(cki);
@@ -10368,7 +10854,7 @@ begin
       co2 := TCodRec.Comment2Str(cki);
 
       // commentcharsandrow
-      if not IvHeaderAndFooterOff then begin
+      if IvHeaderAndFooterAdd then begin
         if      Sametext('Html', cki) then
           csr := co1 + StringOfChar(com.Chars[0], 73) + co2   // <!------------>
         else if Sametext('Css', cki) then
@@ -10378,7 +10864,7 @@ begin
       end;
 
       // header
-      if not IvHeaderAndFooterOff then begin
+      if IvHeaderAndFooterAdd then begin
         a := Format('%s', [ona]);
         b := Format('(oid:%d, pid:%d, ord:%d)', [oid, pid, ord]);
         sbu.Add(csr, true, System.Math.IfThen(i = 0, 0, 2));
@@ -10412,7 +10898,7 @@ begin
     end;
 
     // footer
-    if not IvHeaderAndFooterOff then begin
+    if IvHeaderAndFooterAdd then begin
       a := Format('END', []);
       b := Format('(generated by wks @ %s in %d ms)', [DateTimeToStr(Now), tik.ElapsedMs]);
       sbu.Add(csr, true, 2);
@@ -10434,14 +10920,24 @@ begin
   end;
 end;
 
-class function  TDbaRec.ObjTreeContentRio(const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean;
+class function  TDbaRec.ObjTreeContentRio(const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterAdd, IvCommentRemove, IvLinesEmptyRemove: boolean; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean;
 begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemObjectTreeContent(IvObj, IvIdOrPath, IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove, IvAffected, IvObjName, IvHTreeContent, IvFbk);
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemObjTreeContentSoap(IvObj, IvIdOrPath, IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterAdd, IvCommentRemove, IvLinesEmptyRemove, IvAffected, IvObjName, IvHTreeContent, IvFbk);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
-class function  TDbaRec.ObjTreeContentRioSave(const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean; IvRemoteFileSpec: string; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean;
+class function  TDbaRec.ObjTreeContentRioSave(const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterAdd, IvCommentRemove, IvLinesEmptyRemove: boolean; IvRemoteFileSpec: string; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean;
 begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemObjectTreeContentSave(IvObj, IvIdOrPath, IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove, IvRemoteFileSpec, IvAffected, IvObjName, IvHTreeContent, IvFbk);
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemObjTreeContentSaveSoap(IvObj, IvIdOrPath, IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterAdd, IvCommentRemove, IvLinesEmptyRemove, IvRemoteFileSpec, IvAffected, IvObjName, IvHTreeContent, IvFbk);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 class function  TDbaRec.ObjTblHasField(const IvObj, IvFld: string): boolean;
@@ -10734,7 +11230,7 @@ begin
   fls := IvFldCsv.Trim;
   if fls.IsEmpty then
     fls := TSqlRec.FldMainFromTbl(IvTbl);
-  fld := TCsvRec.CsvRowField(fls, 0);
+  fld := TCsvRec.CsvValue(fls, 0);
   fl2 := ', ' + fls;
   fl3 := fl2.Replace(', Fld', ', ng.Fld');
 
@@ -11423,8 +11919,6 @@ end;
 
     {$REGION 'record'}
 class procedure TDstRec.RecordRecycleSoft(IvDs: TDataSet);
-var
-  i: integer;
 begin
   IvDs.Edit;
   IvDs.FieldByName('FldPId'  ).Value := OBJ_ROOT_ZZZ_ID;
@@ -14069,20 +14563,27 @@ begin
     Result := Format('<div style="height:%dpx"></div>', [IvPx]);
 end;
 
+class function  THtmRec.Img(IvSrc, IvTitle, IvClass, IvStyle: string): string;
+begin
+  Result := Format('<img class="w3-image%s" src="%s"%s%s>', [IvClass, IvSrc, giif.ExFmt(IvStyle, ' style="%s"'), giif.ExFmt(IvTitle.Replace('"', '&quot;'), ' title="%s"')]);
+end;
+
 class function  THtmRec.Img(IvSrc, IvTitle: string; IvW, IvH: integer; IvIsCard: boolean; IvTorn: TImgTormEnum{, IvClass, IvStyle: string}): string;
 var
-  {a,} t, w, h, c, clk: string;
+  {a,} t, w, h, c, clk: string; // title, width, height, class, onclick
 begin
-//if not IvAlt.IsEmpty   then a := Format(' alt="%s"'           , [IvAlt]);
-  if not IvTitle.IsEmpty then t := Format(' title="%s"'         , [IvTitle.Replace('"', '&quot;')]); // *** THIS SHOULD BE DONE IN ALL ATTRIBUTES ***
-  if IvW > 0             then w := Format('style="width:%dpx;"' , [IvW  ]); // ' width="%d"'  no px, not ideal
-  if IvH > 0             then h := Format('style="height:%dpx;"', [IvH  ]); // ' height="%d"' no px, not ideal
-  if IvIsCard            then c := ' w3-card-4';
+//if not IvAlt.IsEmpty   then a := Format(' alt="%s"'            , [IvAlt]);
+  if not IvTitle.IsEmpty then t := Format(' title="%s"'          , [IvTitle.Replace('"', '&quot;')]); // *** THIS SHOULD BE DONE IN ALL ATTRIBUTES OR GET THE ATTR FROM A CENTRAL CONTROLLED FUNCTION***
+  if IvW > 0             then w := Format(' style="width:%dpx;"' , [IvW  ]); // ' width="%d"'  no px, not ideal
+  if IvH > 0             then h := Format(' style="height:%dpx;"', [IvH  ]); // ' height="%d"' no px, not ideal
+  if IvIsCard            then c := ' w3-card-4' else c := '';
 
-  if not True then
-    clk := ' onclick="wksImageModalViewerShow(this);"' else clk := '';
+//if not True then
+//  clk := ' onclick="wksImageModalViewerShow(this);"'
+//else
+    clk := '';
 
-  Result := Format('<img class="w3-image%s"%s src="%s"%s%s%s>', [c, clk, IvSrc, t, w, h]);
+  Result := Format('<img class="w3-image%s" src="%s" %s %s %s %s>', [c, IvSrc, w, h, t, clk]);
 
        if IvTorn = itBottom    then Result := Format('<div class="w3-shadow"><div class="w3-torn-bot">%s</div></div>'    , [Result])
   else if IvTorn = itTopBottom then Result := Format('<div class="w3-shadow"><div class="w3-torn-top-bot">%s</div></div>', [Result])
@@ -14890,7 +15391,7 @@ var
   // spare
 //okc: boolean;         // oktocontinue
 //str: string;          // buffer
-  sbu{, sbu2}: TSbuRec;   // txtbuilder
+  sbu, sbu2: TSbuRec;   // txtbuilder main, secondary for each vertical tables
   fbk: string;          // feedback
   nus: string;          // nullstr
   ems: string;          // emptystr
@@ -14903,6 +15404,7 @@ var
 //cef: string;          // coeditfbk
 
   // names
+  rnd: string;          // uniquetag
   nam: string;          // name
   cpn: string;          // collapsename
   tna: string;          // tablename
@@ -15016,41 +15518,41 @@ var
       Result := TStrRec.StrExpand(Result);
   end;
 
-  procedure cell_add;
+  procedure cell_add(var ivsbu: TSbuRec);
   begin
     if fld.IsNull then
-      sbu.Add('<td><span class="w3-theme-text-muted">%s</span></td>', [nus])
+      ivsbu.Add('<td><span class="w3-theme-text-muted">%s</span></td>', [nus])
 
     else if fld.AsString.IsEmpty then
-      sbu.Add('<td><span class="w3-theme-text-muted">%s</span></td>', [ems])
+      ivsbu.Add('<td><span class="w3-theme-text-muted">%s</span></td>', [ems])
 
     else if fld.FieldName = 'FldNo' then
-      sbu.Add('<td><span id="Co' + fld.AsString + '">' + fld.AsString + '</span></td>') // add handle for hook <a href=#CoNo></a> for example with No = P1, P2, ...
+      ivsbu.Add('<td><span id="Co' + fld.AsString + '">' + fld.AsString + '</span></td>') // add handle for hook <a href=#CoNo></a> for example with No = P1, P2, ...
 
     else if TStrRec.StrIsLike(fld.FieldName, 'Fld*Color') then
-    //sbu.Add('<span class="badge" style="background-color: ' + fld.AsString + '">&#9679</span>')
-      sbu.Add('<td><div title="' + fld.AsString + '" style="display: inline-block; width: 1em; aspect-ratio: 1 / 1; vertical-align: middle; background-color: ' + fld.AsString + ';"></div></td>')
+    //ivsbu.Add('<span class="badge" style="background-color: ' + fld.AsString + '">&#9679</span>')
+      ivsbu.Add('<td><div title="' + fld.AsString + '" style="display: inline-block; width: 1em; aspect-ratio: 1 / 1; vertical-align: middle; background-color: ' + fld.AsString + ';"></div></td>')
 
     else if fld.FieldName = 'FldState' then
-      sbu.Add(
+      ivsbu.Add(
         '<td style="padding:6px 8px">'
       + '<span class="w3-tag w3-round-xxlarge w3-%s" style="padding-top: 1.0px;padding-bottom: 1.5px;color: %s;border: %s">%s</span>'
       + '</td>'
       , [TStaRec.ColorBgCssFromState(fld.AsString), TStaRec.ColorFgCssFromState(fld.AsString), TStaRec.BorderCssFromState(fld.AsString), fld.AsString]{, not fld.AsString.IsEmpty})
 
-    else if 'FldFromMember,FldMember,FldOwner'.Contains(fld.FieldName) then
-      sbu.Add('<td><span class="w3-text-green" style="font-style: italic;">%s</span></td>', [fld.AsString])
+    else if 'FldAuthor,FldMember,FldOwner'.Contains(fld.FieldName) then
+      ivsbu.Add('<td><span class="w3-text-green" style="font-style: italic;">%s</span></td>', [fld.AsString])
 
     else if fld.FieldName.EndsWith('Md') then
-      sbu.Add('<td>%s</td>', [TMkdRec.Process(fld.AsString)])
+      ivsbu.Add('<td>%s</td>', [TMkdRec.Process(fld.AsString)])
 
     else begin
     //cva := StringReplace(cva, 'Dollar', '$', []);
     //cva := StringReplace(cva, 'Euro'  , '€', []);
     //cva := Strip(cva, false); // htmltagsstrip
-    //cva := Encode(cva);       // charsescape
+    //cva := Encode(cva);   // charsescape
     //if cva.Contains(sLineBreak) then cva := StringReplace(cva, sLineBreak, HBR);
-      sbu.Add('<td>%s</td>', [fld.AsString]);
+      ivsbu.Add('<td>%s</td>', [fld.AsString]);
     end;
   end;
   {$ENDREGION}
@@ -15211,6 +15713,7 @@ begin
     {$ENDREGION}
 
     {$REGION 'names'}
+    rnd := TRndRec.RndStr(2, true);
     if IvCoName.IsEmpty then
       nam := TNamRec.Co // conamernd
     else
@@ -15236,16 +15739,20 @@ begin
 
     {$REGION 'consider deleting the special columns in the dataset'}
     {
-    if field is ghost or is ifadmin then delete the fielld or flags it and skip later
+    if field is ghost or is ifadmin then delete the field or flags it and skip later
     }
+    {$ENDREGION}
+
+    {$REGION 'reset'}
+    sbu.Clr;
     {$ENDREGION}
 
     {$REGION 'horizontal'}
   if IvDir = hvHorizontal then begin
 
       {$REGION 'pre'}
-    sbu.Add('<!-- tablehorizontal -->', true, 0);             // class = w3-table w3--striped w3-hoverable w3--border w3-bordered w3--card-4 w3--small w3-margin-bottom
-    sbu.Add('<div class="w3-section">');                      // style = width:auto;margin-left:auto;margin-right:auto;
+    sbu.Add('<!-- tablehorizontal -->', true, 0);  // class = w3-table w3--striped w3-hoverable w3--border w3-bordered w3--card-4 w3--small w3-margin-bottom
+    sbu.Add('<div class="w3-section">');           // style = width:auto;margin-left:auto;margin-right:auto;
     sbu.Add('<span class="w3-small" style="cursor:pointer;" onclick="w3.toggleShow(''#%s'')">%d row(s)</span>', [cpn, roz], not IvDsRecordCountOff);
     sbu.Add('<div class="w3-responsive" id="%s">', [cpn]);
     sbu.Add('<table class="%s" style="%s" %s>', [tcl, tsy, THtmRec.IdName(tna)]);
@@ -15432,7 +15939,7 @@ begin
         ccn := Format('CoR%dC%d', [roj, coi]);
 
         // cell (eventually decorate it)
-        cell_add;
+        cell_add(sbu);
       end;
       sbu.Add('</tr>');
       {$ENDREGION}
@@ -15457,20 +15964,22 @@ begin
     IvDs.First;
 
       {$REGION 'pre'}
-  //sbu.Add('<!-- tablesvertical -->', true, 0);
-  //sbu.Add('<span class="w3-small">%d record(s)</span>', [roz], not IvDsRecordCountOff);
+  //sbu{2?}.Add('<!-- tablesvertical -->', true, 0);
+  //sbu{2?}.Add('<span class="w3-small">%d record(s)</span>', [roz], not IvDsRecordCountOff);
       {$ENDREGION}
 
       {$REGION 'tables *** MAY CALL ITSELF HORIZONTAL? ***'}
     while not IvDs.Eof do begin
-      // reset
-      sbu{2}.Clr;
+
+      {$REGION 'reset'}
+      sbu2.Clr;
+      {$ENDREGION}
 
       {$REGION 'pre'}
-      sbu{2}.Add('<!-- tablevertical%d -->', [IvDs.RecNo], true, 0);
-      sbu{2}.Add('<div class="w3-section">');
-      sbu{2}.Add('<div class="w3-responsive">', true);
-      sbu{2}.Add('<table class="%s" style="%s" %s>', [IvClass, IvStyle, THtmRec.IdName(Format('%s%d', [tna, IvDs.RecNo]))]);
+      sbu2.Add('<!-- tablevertical%d -->', [IvDs.RecNo], true, 0);
+      sbu2.Add('<div class="w3-section">');
+      sbu2.Add('<div class="w3-responsive">', true);
+      sbu2.Add('<table class="%s" style="%s" %s>', [IvClass, IvStyle, THtmRec.IdName(Format('%s%d', [tna, IvDs.RecNo]))]);
       {$ENDREGION}
 
       {$REGION 'header'}
@@ -15479,22 +15988,22 @@ begin
 
       {$REGION 'rows'}
       for fld in IvDs.Fields do begin
-        sbu{2}.Add('<tr>');
+        sbu2.Add('<tr>');
 
         // cellheaderkey
-        sbu{2}.Add('<th class="w3-left-align w3-%s w3-padding-medium" style="width: 0">%s</th>', [gthe.Theme, column_name(fld.FieldName)], not IvDsHeaderOff);
+        sbu2.Add('<th class="w3-left-align w3-%s w3-padding-medium" style="width: 0">%s</th>', [gthe.Theme, column_name(fld.FieldName)], not IvDsHeaderOff);
 
         // cell (eventually decorate it)
-        cell_add;
+        cell_add(sbu2);
 
-        sbu{2}.Add('</tr>');
+        sbu2.Add('</tr>');
       end;
       {$ENDREGION}
 
       {$REGION 'post'}
-      sbu{2}.Add('</table>');
-      sbu{2}.Add('</div>');
-      sbu{2}.Add('</div>');
+      sbu2.Add('</table>');
+      sbu2.Add('</div>');
+      sbu2.Add('</div>');
       {$ENDREGION}
 
       // add
@@ -15502,7 +16011,7 @@ begin
         {IvDs.FieldByName(IvVertTitleField=FldObject).AsString} ''      // title
       , Format('Record %d of %d', [IvDs.RecNo, IvDs.RecordCount])       // subtitle
       , {IvDs.FieldByName(IvVertDescrField=FldDescription).AsString} '' // description
-      , sbu{2}.Text                                                       // body
+      , sbu2.Text                                                       // body
       , 6                                                               // hlevel
       , ''                                                              // coname
       , 'Left'                                                          // alignment
@@ -15522,7 +16031,7 @@ begin
 
       {$REGION 'gui searcsuggestions and modaleditor *** DUPLICATED *** already available as a standard .Page()'}
     sbu.Add('<!-- searchsuggestions -->'                                                                                                                                           );
-    sbu.Add('<div id="CoSearchSuggestionsDiv"></div>'                                                                                                                              );
+    sbu.Add('<div id="CoSearchSuggestionsDiv"></div>'                                                                                                                              ); // *** create on the fly in js ***
 
     sbu.Add('<!-- modalmemoeditor -->'                                                                                                                                             );
     sbu.Add('<div class="w3-modal w3-animate-opacity" %s>'                                                                                                  , [THtmRec.IdName(ena)]);
@@ -15555,47 +16064,6 @@ begin
       {$ENDREGION}
 
       {$REGION 'editjson'}
-(*
-{
-  "EditMenu": {
-    "Visible": false
-  , "Items": [
-      {"Id": "AddNew", "Visible": true, "Title": "Add New"}
-    ]
-  }
-, "EditData": {
-    "InsertIfNotExists": false                         -- implemented?
-  , "Table"            : "DbaXxx.dbo.TblXxx"           -- ok
-  , "KeyFieldList"     : ["FldObjectId", "FldLocalId"] -- to make unique the record, one or more fields, cant be empty
-  , "FieldList": [                                     -- list of editable fields (should not contains the key fields))
-      {"Field": "FldLocalId"  , "Ctrl": "Text"}         -- inline input text
-    , {"Field": "FldLocalPId" , "Ctrl": "Text"}
-    , {"Field": "FldState"    , "Ctrl": "Select", "ItemsCsv": ",Active,Inactive"}
-    , {"Field": "FldOwner"    , "Ctrl": "Search", "ApiUrl": "//..."}                                          -- expected json: [{FldItem:"...", FldDescription:"..."}, ...]
-    , {"Field": "FldText"     , "Ctrl": "Text"}
-    , {"Field": "FldSearch"   , "Ctrl": "Search", "ApiUrl": "https://..."}
-    , {"Field": "FldSelect1"  , "Ctrl": "Select", "ItemsCsv": "*,Select1,Select2,Select3"}                    -- inline dropdownlist pre-loaded with items from csv
-    , {"Field": "FldSelect2"  , "Ctrl": "Select", "ItemsJson": "[*,Select1,Select2,Select3]"}                 -- inline dropdownlist pre-loaded with items from json
-    , {"Field": "FldSelect3"  , "Ctrl": "Select", "ItemsGet": "/WksCodeIsapiProject.dll/Code?CoCodeId=135"}   -- inline dropdownlist pre-loaded with items from a API
-  --, {"Field": "FldRadios"   , "Ctrl": "Radios", "ItemsCsv": "*,Radio1,Radio2,Radio3"}                       -- inline like a select
-  --, {"Field": "FldChecks"   , "Ctrl": "Checks", "ItemsCsv": "*,Check1,Check2,Check3"}                       -- inline like a select with multiselect option
-    , {"Field": "FldDatetime" , "Ctrl": "Datetime"}                                                           -- inline datetime selector
-    , {"Field": "FldDate"     , "Ctrl": "Date"}                                                               -- inline date selector
-    , {"Field": "FldTime"     , "Ctrl": "Time"}                                                               -- inline time selector
-    , {"Field": "FldBit"      , "Ctrl": "Boolean", "Type": "Checkbox"}                                        -- inline checkbox (true/false)
-  --, {"Field": "FldBit"      , "Ctrl": "Bit"    , "Type": "Toggle"}                                          -- inline toggle (true/false)
-  --, {"Field": "FldBit"      , "Ctrl": "Bit"    , "Type": "Tristate"}                                        -- inline tritoggle (true/false/null)
-    , {"Field": "FldMemo"     , "Ctrl": "Editor"}                                                             -- modal text editor
-    , {"Field": "FldSql"      , "Ctrl": "Editor", "Type": "Sql"}                                              -- modal text editor with sql highlight
-    ]
-  , "OwnerField" : "FldOwner"             -- the record will be editable only if the logged user match this field, the column must to be present
-  , "OneWayField": "FldState"             -- the record is editable only if it is Active.  Once changed to Inactive the entire record will not be editable anymore
-  , "OneWayList" : ["Active", "Inactive"] -- usually just two, to toggle (i.e. if the record is Active and you change it, it become inactive and not editable anymore))
-  , "WhenField"  : "FldWhen"              -- FldWhen, if present, is update by default, add/set this key only if you need to update a different field
-  , "WhoField"   : "FldWho"               -- FldWho, if present, is update by default, add/set this key only if you need to update a different field
-  }
-}
-*)
     jso := TJSONObject.Create;
     try
       try
@@ -15670,7 +16138,7 @@ begin
         {$ENDREGION}
 
         {$REGION 'globalconsts'}
-    sbu.Add('var kfv = %s;'                                                                                     , [fky]); // ["FldObjectId", "FldLocalId"] keyfieldvector
+    sbu.Add('var kfv%s = %s;'                                                                              , [rnd, fky]); // ["FldObjectId", "FldLocalId"] keyfieldvector
     sbu.Add('var oyf = "%s";'                                                                                   , [oyf]); // onewayfield
     sbu.Add('var efvn= %s'                                                                                      , [fes]); // editfieldvectornested
     sbu.Add('var efv = efvn.map(function(x){return x.Field;});'                                                        ); // editfieldvector   [] | ["FldA", "FldB"]
@@ -15683,8 +16151,8 @@ begin
         {$ENDREGION}
 
         {$REGION 'globalfuncs'}
-    sbu.Add('function AjaxPost(fn, ov, nv, kfv, kvv) {'                                                                );
-    sbu.Add('    if ((nv == null) || (nv.trim() == ov.trim())) {'                                                                        ); // sametooldvalue
+    sbu.Add('function AjaxPost%s(fn, ov, nv, kfv, kvv) {'                                                       , [rnd]);
+    sbu.Add('    if ((nv == null) || (nv.trim() == ov.trim())) {'                                                      ); // sametooldvalue
     sbu.Add('        $td.text(ov);'                                                                                    ); // tablecellreset
   if USE_LOCAL_SNACKBAR then begin
     sbu.Add('        $("#%s").show();'                                                                          , [fkn]); // fbksnackbarshow
@@ -15795,11 +16263,11 @@ begin
                     
     // row-j key-values
     sbu.Add('    kvv = [];'                                                                                            ); // ["aaaa", "bbbb"] keyvaluevector, corresponding to keyfieldvector, used later
-    sbu.Add('    for (i = 0; i < kfv.length; i++) {'                                                                   );
+    sbu.Add('    for (i = 0; i < kfv%s.length; i++) {'                                                          , [rnd]);
   //sbu.Add('        kvv.push($tr.find("td").eq(i).text());'                                                           );
-    sbu.Add('        var ii = $td.closest("table").find("th#Co"+kfv[i]).index();'                                      ); // col-i index              0, 1, ...
+    sbu.Add('        var ii = $td.closest("table").find("th#Co"+kfv%s[i]).index();'                             , [rnd]); // col-i index              0, 1, ...
     sbu.Add('        if (ii == -1) {'                                                                                  );
-    sbu.Add('            alert("Unable to find key field " + kfv[i] + " please check your JsonEdit.EditIni");'         );
+    sbu.Add('            alert("Unable to find key field " + kfv%s[i] + " please check your JsonEdit.EditIni");', [rnd]);
     sbu.Add('            return;'                                                                                      );
     sbu.Add('        };'                                                                                               );
     sbu.Add('        var kft = $tr.find("td").eq(ii).text();'                                                          ); // cell key text            1234
@@ -15832,7 +16300,7 @@ begin
   //sbu.Add('        xx.keypress(function(ky) {'                                                                       ); // enter key press
   //sbu.Add('            if (ky.which == 13) {'                                                                        );
   //sbu.Add('                nv = xx.val();'                                                                           );
-  //sbu.Add('                AjaxPost(fn, ov, nv, kfv, kvv);'                                                          );
+  //sbu.Add('                AjaxPost%s(fn, ov, nv, kfv%s, kvv);'                                          , [rnd, rnd]);
   //sbu.Add('                xx.blur();'                                                                               );
   //sbu.Add('            }'                                                                                            );
   //sbu.Add('        })'                                                                                               );
@@ -15843,7 +16311,7 @@ begin
     sbu.Add('                xx.blur();'                                                                               );
     sbu.Add('            } else if (e.type == ''blur'') {'                                                             );
     sbu.Add('                nv = xx.val();'                                                                           );
-    sbu.Add('                AjaxPost(fn, ov, nv, kfv, kvv);'                                                          );
+    sbu.Add('                AjaxPost%s(fn, ov, nv, kfv%s, kvv);'                                          , [rnd, rnd]);
     sbu.Add('            }'                                                                                            );
     sbu.Add('        })'                                                                                               );
 
@@ -15858,7 +16326,7 @@ begin
     sbu.Add('        xx[0].style.width = "240px";'                                                                     );
     sbu.Add('        xx.focus();'                                                                                      );
     sbu.Add('        xx.select();'                                                                                     );
-    sbu.Add('        xx.on(''keyup'', function(e){'                                                               ); // esc|enterkey|blur - xx.on() has event delegation, xx.blur() does not
+    sbu.Add('        xx.on(''keyup'', function(e){'                                                                    ); // esc|enterkey|blur - xx.on() has event delegation, xx.blur() does not
     sbu.Add('            if (e.keyCode == ''27'') {'                                                                   );
     sbu.Add('                xx.parent().text(ov);'                                                                    );
     sbu.Add('                sugg.innerHTML = "";'                                                                     );
@@ -15867,12 +16335,12 @@ begin
   //sbu.Add('                xx.blur();'                                                                               );
   //sbu.Add('            } else if (e.type == ''blur'') {'                                                             );
   //sbu.Add('                nv = xx.val();'                                                                           );
-  //sbu.Add('                AjaxPost(fn, ov, nv, kfv, kvv);'                                                          );
+  //sbu.Add('                AjaxPost%s(fn, ov, nv, kfv%s, kvv);'                                          , [rnd, rnd]);
     sbu.Add('            }'                                                                                            );
     sbu.Add('        })'                                                                                               );
-  //sbu.Add('        // apiurl'                                                                                        );
-  //sbu.Add('        const API_URL = "https://www.wks.cloud/WksCodeIsapiProject.dll/Code?CoCodeId=132&CoLike=";'       );
-    sbu.Add('        const API_URL = fldj.ApiUrl;'                                                                     );
+  //sbu.Add('        // itemsurl'                                                                                      );
+  //sbu.Add('        const ITEMS_URL = "/WksCodeIsapiProject.dll/Code?CoCodeId=132&CoLike=";'                          );
+    sbu.Add('        const ITEMS_URL = fldj.ItemsUrl;'                                                                 );
   //sbu.Add('        // callserverafter3chars'                                                                         );
     sbu.Add('        xx[0].addEventListener("input", async () => {'                                                    );
   //sbu.Add('             // suggestiondivposition'                                                                    );
@@ -15887,7 +16355,7 @@ begin
     sbu.Add('             }'                                                                                           );
   //sbu.Add('             searchSuggestionsPosition();'                                                                );
     sbu.Add('             try {'                                                                                       );
-    sbu.Add('                 const response = await fetch(API_URL + encodeURIComponent(text));'                       );
+    sbu.Add('                 const response = await fetch(ITEMS_URL + encodeURIComponent(text));'                     );
     sbu.Add('                 const json = await response.json();'                                                     ); // expected json: [{FldItem:"...", FldDescription:"..."}, ...]
     sbu.Add('                 // build the suggestion list'                                                            );
     sbu.Add('                 sugg.innerHTML = "";'                                                                    );
@@ -15913,7 +16381,7 @@ begin
     sbu.Add('                     sugg.innerHTML = "";'                                                                );
     sbu.Add('                     sugg.style.display = "none";'                                                        ); // maybe create and delete here the div
     sbu.Add('                     nv = xx.val();'                                                                      );
-    sbu.Add('                     AjaxPost(fn, ov, nv, kfv, kvv);'                                                     );
+    sbu.Add('                     AjaxPost%s(fn, ov, nv, kfv%s, kvv);'                                     , [rnd, rnd]);
     sbu.Add('                 });'                                                                                     );
     sbu.Add('                 sugg.appendChild(nullr);'                                                                );
   //sbu.Add('                 // --- data rows ---'                                                                    );
@@ -15930,7 +16398,7 @@ begin
     sbu.Add('                         sugg.innerHTML = "";'                                                            );
     sbu.Add('                         sugg.style.display = "none";'                                                    ); // maybe create and delete here the div
     sbu.Add('                         nv = xx.val();'                                                                  );
-    sbu.Add('                         AjaxPost(fn, ov, nv, kfv, kvv);'                                                 );
+    sbu.Add('                         AjaxPost%s(fn, ov, nv, kfv%s, kvv);'                                 , [rnd, rnd]);
     sbu.Add('                     });'                                                                                 );
     sbu.Add('                     sugg.appendChild(r);'                                                                );
     sbu.Add('                 });'                                                                                     );
@@ -15969,7 +16437,7 @@ begin
   //sbu.Add('        document.body.style.cursor = "default";'                                                          );
   //sbu.Add('        $("html,body").css("cursor", "default");'                                                         );
   //sbu.Add('        xx.select();'                                                                                     );
-  //sbu.Add('        xx.on(''select2:close'','); // this works for select2 but will complicate the code to much!
+  //sbu.Add('        xx.on(''select2:close'', ...);'                                                                   ); // this works for select2 but will complicate the code to much!
     sbu.Add('        xx.on(''keyup blur'', function(e){'                                                               );
     sbu.Add('            if (e.keyCode == ''27'') {'                                                                   );
     sbu.Add('                xx.parent().text(ov);'                                                                    );
@@ -15977,7 +16445,7 @@ begin
     sbu.Add('                xx.blur();'                                                                               );
     sbu.Add('            } else if (e.type == ''blur'') {'                                                             );
     sbu.Add('                nv = xx.val();'                                                                           );
-    sbu.Add('                AjaxPost(fn, ov, nv, kfv, kvv);'                                                          );
+    sbu.Add('                AjaxPost%s(fn, ov, nv, kfv%s, kvv);'                                          , [rnd, rnd]);
     sbu.Add('            }'                                                                                            );
     sbu.Add('        })'                                                                                               );
 
@@ -16001,7 +16469,7 @@ begin
     sbu.Add('                nv = xx.val();'                                                                           );
     sbu.Add('                const [yyyy, mm, dd] = nv.split("-");'                                                    ); // nv format is yyyy-mm-dd
     sbu.Add('                const nv2 = `${mm}/${dd}/${yyyy}`;'                                                       ); // nv2 format is mm/dd/yyyy
-    sbu.Add('                AjaxPost(fn, ov, nv2, kfv, kvv);'                                                         );
+    sbu.Add('                AjaxPost%s(fn, ov, nv2, kfv%s, kvv);'                                         , [rnd, rnd]);
     sbu.Add('            }'                                                                                            );
     sbu.Add('        })'                                                                                               );
     sbu.Add('    } else if (ctr == "Time") {'                                                                          );
@@ -16032,7 +16500,7 @@ begin
     sbu.Add('        $("#%s").click(function() {'                                                               , [kna]); // okbtnclick
     sbu.Add('            nv = $("#%s").val();'                                                                  , [xna]); // newvalueget
     sbu.Add('            $("#%s").hide();'                                                                      , [ena]); // modaleditorhide
-    sbu.Add('            AjaxPost(fn, ov, nv, kfv, kvv);'                                                              );
+    sbu.Add('            AjaxPost%s(fn, ov, nv, kfv%s, kvv);'                                              , [rnd, rnd]);
     sbu.Add('        });'                                                                                              );
 
     // gui prompt panel (default)
@@ -16042,7 +16510,7 @@ begin
     sbu.Add('            wks.fbkInfo("nothing has been changed");'                                                     );
     sbu.Add('            return;'                                                                                      );
     sbu.Add('        } else {'                                                                                         );
-    sbu.Add('            AjaxPost(fn, ov, nv, kfv, kvv);'                                                              );
+    sbu.Add('            AjaxPost%s(fn, ov, nv, kfv%s, kvv);'                                              , [rnd, rnd]);
     sbu.Add('        }'                                                                                                );
     sbu.Add('    }'                                                                                                    );
     sbu.Add('});'                                                                                                      );
@@ -16080,29 +16548,30 @@ var
   // general
   sql, fbk: string;
   aff{, i}: integer;
-  cst: string;             // connection string
-  rix: integer;            // sub-recordset count
-  con: string;             // co-name
-  tcp: string;             // table caption
+  cst: string;         // connection string
+  rix: integer;        // sub-recordset count
+  con: string;         // co-name
+  tcp: string;         // table caption
 
   // datates
-//dsr: string;             // dataset result
+//dsr: string;         // dataset result
 
   // ado
-//aco: TADOConnection;     // conn
-  aqy: TADOQuery;          // query
-  dst: TADODataSet;        // dataset, datasetnext
+//aco: TADOConnection; // conn
+  aqy: TADOQuery;      // query
+  dst: TADODataSet;    // dataset, datasetnext
 
   // fd
-  fco: TFDConnection;      // conn
-  fqy: TFDQuery;           // query
-//fm1: TFDMemTable;        // memtable
+  fco: TFDConnection;  // conn
+  fqy: TFDQuery;       // query
+//fm1: TFDMemTable;    // memtable
   {$ENDREGION}
 
 begin
   try
     // init
     sql := grva.Rva(IvSql);
+    Result := '';
 
     // *** REDUCE THE FOLLOWING CONSIDERING TDbaRec.DstFromSql   or ... REMOVE TableFromSql and use only TableFromDst !!!     A*S*A*P ***
 
@@ -16287,20 +16756,145 @@ end;
 
 class function  THtmRec.RepeatFromSql(IvSql, IvHtmlBody, IvHtmlHeader, IvHtmlFooter, IvHtmlDefault: string): string;
 var
-  ok: boolean;
+  okk: boolean;
   dst: TDataset;
 begin
-  ok := TDbaRec.DsFromSql(IvSql, dst, false); // *** use the general version DstFromSql ! ***
-  if not ok then
-    Result := Modal(true, 'CoRepeatFromSqlModal', Code(IvSql, 'sql'), H(2, 'Unable to creater a repeater from sql'))
-  else try
-    Result := RepeatFromDs(dst, IvHtmlBody, IvHtmlHeader, IvHtmlFooter, IvHtmlDefault);
+  try
+    okk := TDbaRec.DsFromSql(IvSql, dst, false); // *** use the general version DstFromSql ! ***
+    if not okk then
+      Result := Modal(true, 'CoRepeatFromSqlModal', Code(IvSql, 'sql'), H(2, 'Unable to creater a repeater from sql'))
+    else
+      Result := RepeatFromDs(dst, IvHtmlBody, IvHtmlHeader, IvHtmlFooter, IvHtmlDefault);
   finally
     dst.Free;
   end;
 end;
 
-class function  THtmRec.Report(IvId: integer; IvHtmlDefaultIfAnyDsIsEmpty: string): string;
+class function  THtmRec.RepeatNestedFromSql(IvDriverSql, IvSqlX, IvBlockHeader, IvBlockItem, IvBlockFooter, IvHeader, IvFooter: string): string;
+//const
+//  IvDriverSql = '''
+//select
+//    FldTable
+//  , substring(FldTable, 4) as FldTitle
+//  , FldPurpose
+//from
+//   DbaSystem.dbo.TblTable
+//where
+//    FldSystem   = 'Wks'
+//and FldDatabase = 'DbaEquipment'
+//and FldTable not in ('TblObject', 'TblState')
+//order by
+//    FldOrder
+//''';
+//  IvSqlX = '''
+//select
+//    FldField
+//  , substring(FldField, 4) as FldItem
+//  , FldDescription
+//from
+//   DbaSystem.dbo.TblField
+//where
+//    FldSystem   = 'Wks'
+//and FldDatabase = 'DbaEquipment'
+//and FldTable    = '$FldTable$'
+//and FldField not in ('FldObjectId')
+//order by
+//    FldOrder
+//''';
+//  IvHeader = 'The structure reflects how equipment is typically handled in wafer fabs, and it aligns with Facilities, Process, Equipment Engineering, EHS, and Manufacturing requirements.';
+//  IvBlockHeader = '<h2>$#$. $FldTitle$</h2><p><b>Purpose:</b> $FldPurpose$</p>'; // <ul style="margin:0px;">  </ul>
+//IvBlockItem   = '<li><b>$FldItem$</b> - <i>$FldDescription$</i></li>';
+//  IvBlockItem   = '<div class="w3-padding-small w3-row"><div class=" w3-col" style="width:300px"><b>$FldItem$</b></div><div class="w3-rest"><i>$FldDescription$</i></div></div>';
+//  IvBlockFooter = '<br>total: <b>$%$</b><br><br>';
+//  IvFooter = '<b>Grand Total: $@$</b><br><br><br>';
+var
+  sql, sqx: string;
+  dst, dsx: TDataset;
+  tmh, tmx, tmf: string;
+  sbu: TSbuRec;
+  i, j, f, t, z: integer; // outerloop, innerloop, innerloopstotal, grandtotal
+begin
+  // exit
+  if IvDriverSql.Trim.IsEmpty or IvSqlX.Trim.IsEmpty then
+    Exit;
+
+  // header
+  Result := IvHeader;
+
+  // blocks
+  z := 0;
+  if not IvBlockItem.Trim.IsEmpty then begin
+    // dst
+    i := 0;
+    sql := IvDriverSql;
+    TDbaRec.DsFromSql(sql, dst);
+    while not dst.Eof do begin
+      // inc
+      Inc(i);
+
+      // blockheader
+      tmh := IvBlockHeader;
+      // compile
+      tmh := StringReplace(tmh, '$#$', i.ToString, [rfReplaceAll]);
+      for f := 0 to dst.FieldCount - 1 do
+        tmh := StringReplace(tmh, '$'+dst.Fields[f].FieldName+'$', dst.Fields[f].AsString, [rfReplaceAll]);
+      // add
+      sbu.Add(tmh);
+
+      // sqx
+      sqx := IvSqlX;
+      // compile
+      sqx := StringReplace(sqx, '$#$', i.ToString, [rfReplaceAll]);
+      for f := 0 to dst.FieldCount - 1 do
+        sqx := StringReplace(sqx, '$'+dst.Fields[f].FieldName+'$', dst.Fields[f].AsString, [rfReplaceAll]);
+      // dsx
+      j := 0;
+      TDbaRec.DsFromSql(sqx, dsx);
+      while not dsx.Eof do begin
+        // inc
+        Inc(j);
+
+        // blockitem
+        tmx := IvBlockItem;
+        // compile
+        tmx := StringReplace(tmx, '$#$', j.ToString, [rfReplaceAll]);
+        for f := 0 to dsx.FieldCount - 1 do
+          tmx := StringReplace(tmx, '$'+dsx.Fields[f].FieldName+'$', dsx.Fields[f].AsString, [rfReplaceAll]);
+        // add
+        sbu.Add(tmx);
+
+        dsx.Next;
+      end;
+
+      // totals
+      t := j;
+      z := z + j;
+
+      // blockfooter
+      tmf := IvBlockFooter;
+      // compile
+      tmf := StringReplace(tmf, '$#$', i.ToString, [rfReplaceAll]);
+      tmf := StringReplace(tmf, '$%$', t.ToString, [rfReplaceAll]);
+      for f := 0 to dst.FieldCount - 1 do
+        tmf := StringReplace(tmf, '$'+dst.Fields[f].FieldName+'$', dst.Fields[f].AsString, [rfReplaceAll]);
+      // add
+      sbu.Add(tmf);
+
+      dst.Next;
+    end;
+
+    // blocks (with header, item(s) and footer)
+    Result := Result + sbu.Text;
+  end;
+
+  // footer
+  Result := Result + '<br>' + IvFooter;
+
+  // replace
+  Result := Result.Replace('$@$', z.ToString, [rfReplaceAll]);
+end;
+
+class function  THtmRec.Report(IvId: integer; IvHtmlDefaultIfAnyDsIsEmpty: string; IvParametersOff, IvTableHeaderOff: boolean): string;
 
   {$REGION 'help'}
   {
@@ -16370,7 +16964,7 @@ class function  THtmRec.Report(IvId: integer; IvHtmlDefaultIfAnyDsIsEmpty: strin
 var
   // common
 //okk: boolean;
-  con, pro, ctr, sql, fbk: string;   // coname, profilername
+  con, pro, ctr{, sql}, fbk: string;   // coname, profilername
 
   // report
   rid: integer;                 // id
@@ -16415,12 +17009,12 @@ var
   pvv: TArray<string>;          // values in case a raram is a serie of checkboxes [x] [x] [ ] and more thatn one value has been selected
 
   // options (select,checkbox,radio)
-  ocv: TArray<string>;          // csv -> vec
-  ojv: TArray<string>;          // json-> vec
   oqd: TDataset;                // sql -> dst
-  oqv: TArray<string>;          // sql -> vec
-  oav: TArray<string>;          // total caption
+  ocv, occ: TArray<string>;     // csv -> vec values, captions
+  ojv, ojc: TArray<string>;     // json-> vec values, captions
+  oqv, oqc: TArray<string>;     // sql -> vec values, captions
   ovv: TArray<string>;          // total value
+  oav: TArray<string>;          // total caption
 
   // datasets
   j  : integer;                 // idx
@@ -16429,8 +17023,8 @@ var
   dsh: string;                  // singlehtml
   dds: TDataset;                // dataset
   ddi: THvDirEnum;              // mode
-  dcs: string;                  // connstr
-  dcl: string;                  // connlib
+//dcs: string;                  // connstr
+//dcl: string;                  // connlib
 
   // charts
   k  : integer;                 // idx
@@ -16462,6 +17056,67 @@ var
       pna := ivpav[i].Param;
       pva := StringReplace(ivpav[i].Value, '*', '%', [rfReplaceAll]);
       Result := StringReplace(Result, '$'+pna+'$', pva, [rfReplaceAll]);
+    end;
+  end;
+
+  procedure reportdatasetrec_compile(var ivtreportdatasetrec: TReportDataSetRec; ivpav: TReportParamRecVector);
+  var
+    Ctx : TRttiContext;
+    RttiType: TRttiType;
+    Field: TRttiField;
+    val: TValue;
+//  par: TReportParamRec;
+//  pan, pav: string;
+    str: string;
+  begin
+    Ctx := TRttiContext.Create;
+    try
+  // reflect
+      RttiType := Ctx.GetType(TypeInfo(TReportDataSetRec));
+
+  // recordloop
+      for Field in RttiType.GetFields do begin
+    // skip
+        if not (Field.FieldType.TypeKind in [tkUString, tkLString, tkWString, tkString]) then
+          continue;
+
+    // valuecurrent
+        val := Field.GetValue(@ivtreportdatasetrec);
+
+    // skip
+        if not val.ToString.Contains('$') then
+          continue;
+
+    // replace
+        str := params_replace(val.ToString, ivpav);
+
+    // selectively
+        case Field.FieldType.TypeKind of
+          tkUString, tkLString, tkWString, tkString: begin
+            Field.SetValue(@ivtreportdatasetrec, str);
+          end;
+
+      // you can extend with more kinds (sets, dyn arrays, nested records, etc. tkUnknow, tkSetn, tkClass, tkMethod, tkVariant, tkArray, tkRecord, tkInterface, tkDynArray, tkClassRef, tkPointer, tkProcedure, tkMRecord)
+         {tkInteger, tkInt64, tkEnumeration: begin
+            if str.trim.IsEmpty then
+              Field.SetValue(@ivtreportdatasetrec, StrToInt(str));
+          end;
+
+          tkFloat: begin
+            Field.SetValue(@ivtreportdatasetrec, Random * 1000.0);
+          end;
+
+          tkBool: begin
+            Field.SetValue(@ivtreportdatasetrec, Boolean(Random(2) = 0));
+          end;
+
+          tkChar, tkWChar: begin
+            Field.SetValue(@ivtreportdatasetrec, Char(Ord('A') + Random(26)));
+          end;}
+        end;
+      end;
+    finally
+      Ctx.Free;
     end;
   end;
   {$ENDREGION}
@@ -16549,19 +17204,30 @@ begin
         ocv := []
       else
         ocv := TCsvRec.CsvToVec(poc); // TVecRec.VecFromStr(poc);
+      // options captions csv (same as value)
+      occ := ocv;
 
       // options values json
       if poj.Trim.IsEmpty then
         ojv := []
       else
         ojv := []; // *** not implemented ***
+      // options captions json (same as value *** for now ***)
+      ojc := ojv;
 
       // options values sql
       if poq.Trim.IsEmpty then
         oqv := []
       else begin
-        if TDbaRec.DstFromSql(poq, oqd, plb, pcs) then
-          oqv := TDbaRec.VecFromDst(oqd);
+        if TDbaRec.DstFromSql(poq, oqd, plb, pcs) then begin
+          // value
+          oqv := TDbaRec.VecFromDst(oqd, 0);
+          // caption
+          if oqd.FieldCount = 2 then
+            oqc := TDbaRec.VecFromDst(oqd, 1)
+          else
+            oqc := oqv;
+        end;
         if Assigned(oqd) then
           oqd.Free;
       end;
@@ -16569,8 +17235,8 @@ begin
       // options values total
       ovv := ocv + ojv + oqv;
 
-      // option captions *** same as value, json and sql not implemented ***
-      oav := ovv;
+      // option captions total
+      oav := occ + ojc + oqc;
 
       // value
       pva := gwrq.FieldGet(con, pve[i].Default); // can return: Aaa | "Aaa Bbb" | "Aaa,Bbb" | "Aaa, Bbb"
@@ -16581,7 +17247,7 @@ begin
         if StrToIntDef(pva, 10) > DATASET_MAXRECORDS then
           pva := IntToStr(DATASET_MAXRECORDS);
       end else if not pve[i].Value{Inspector}.IsEmpty then begin
-        // Inspector should contain script to evaluate the incoming paramvalue
+        // inspector should contain script to evaluate the incoming paramvalue
         // inspectorcompile (replace $Param$ with paramvalue)
         // inspectorrun and get result (detectscriptinglang py/js)
         // replace pva with result
@@ -16643,6 +17309,10 @@ begin
   gpro.TimerByName[pro].Stop;
   {$ENDREGION}
 
+  {$REGION 'header'}
+  rsb.Add(rer.Header);
+  {$ENDREGION}
+
   {$REGION 'datasets'}
   dsb.Clr;
   dve := rer.DatasetRecVector;
@@ -16652,15 +17322,11 @@ begin
 
   // dataset(s) = chart(s) + table
   end else begin
+
     for j := Low(dve) to High(dve) do begin
 
-      {$REGION 'common'}
-      // connstr
-      dcs := dve[j].ConnStr;
-      dcl := dve[j].ConnLib;
-
-      // sql
-      sql := params_replace(dve[j].Select, pve);
+      {$REGION 'replace'}
+      reportdatasetrec_compile(dve[j], pve);
       {$ENDREGION}
 
       {$REGION 'chart(s)'} // *** MOVE TO TableFromDs, see TableFromDs where also there is a macro to inject charts in each sub-recordset ***
@@ -16669,7 +17335,7 @@ begin
         gpro.TimerByName[pro].Start;
 
         // ds
-        TDbaRec.DstFromSql(sql, dds, dcl, dcs);
+        TDbaRec.DstFromSql({sql}dve[j].Select, dds, {dcl}dve[j].ConnLib, {dcs}dve[j].ConnStr);
 
         csb.Clr;
         cve := dve[j].ChartRecVector;
@@ -16698,49 +17364,59 @@ begin
       end;
       {$ENDREGION}
 
-      {$REGION 'table'}
-      pro := Format('Report.%s.Table', [dve[j].Dataset]);
-      gpro.TimerByName[pro].Start;
+      if not dve[j].RepeaterOn then begin
 
-      // mode
-      ddi :=  TEnuRec.EnumFromStr<THvDirEnum>('hv'+dve[j].Mode, hvHorizontal); // Horiz, Vert
+        {$REGION 'table'}
+        pro := Format('Report.%s.Table', [dve[j].Dataset]);
+        gpro.TimerByName[pro].Start;
 
-      // table
-      dsh := TableFromSql(j, sql, dcs, dcl, dve[j].FeedbackIfEmpty, 'Co'+dve[j].Dataset, dve[j].&Class, dve[j].Style, dve[j].Editable, dve[j].Json, ddi, rer.DsRecordCountOff, rer.DsHeaderOff);
+        // mode
+        ddi := TEnuRec.EnumFromStr<THvDirEnum>('hv'+dve[j].Mode, hvHorizontal); // Horiz, Vert
 
-      // oppure
-      // ritornare un vettore di ds da
-      // ok := TDbaRec.DsFromSqlMulty(IvSql, dstvec, fbk, false); <-- da fare, probabilmente buono anche in altre occasioni
-      // luppare dstvec
-      // for i := low(dstvec) to high(dstvec) do
-      // dsh := dsh + '<br><br><br>' + TableFromDs(dstvec[i]);
+        // table
+        dsh := TableFromSql(j, {sql}dve[j].Select, {dcs}dve[j].ConnStr, {dcl}dve[j].ConnLib, dve[j].FeedbackIfEmpty, 'Co'+dve[j].Dataset, dve[j].&Class, dve[j].Style, dve[j].Editable, dve[j].Json, ddi, rer.DsRecordCountOff, rer.DsHeaderOff);
 
-      // sqlfbkifadmin
-      if {*** call is local to the server ***} {and gses.IsValid(fbk) and} gmbr.IsAdmin and (not rer.DsRecordCountOff) then begin
-      con := TNamRec.Co('Sql%dModal', [j]);
-      dsh := dsh
-      + sLineBreak + ModalBtn('Sql', con, Code(sql, 'sql'), H(2, Format('Sql %d', [j])), BtnStd('Close', 0, con), fmInfo);
+        // oppure
+        // ritornare un vettore di ds da
+        // ok := TDbaRec.DsFromSqlMulty(IvSql, dstvec, fbk, false); <-- da fare, probabilmente buono anche in altre occasioni
+        // luppare dstvec
+        // for i := low(dstvec) to high(dstvec) do
+        // dsh := dsh + '<br><br><br>' + TableFromDs(dstvec[i]);
+
+        // sqlfbkifadmin
+        if {*** call is local to the server ***} {and gses.IsValid(fbk) and} gmbr.IsAdmin and (not rer.DsRecordCountOff) then begin
+        con := TNamRec.Co('Sql%dModal', [j]);
+        dsh := dsh
+        + sLineBreak + ModalBtn('Sql', con, Code({sql}dve[j].Select, 'sql'), H(2, Format('Sql %d', [j])), BtnStd('Close', 0, con), fmInfo);
+        end;
+
+        // collapse
+        if dve[j].TitleOn then
+          dsh := Collapse(giif.NxD(dve[j].Title, dve[j].Dataset), dve[j].Description, '', dsh, 3, '', 'Left', dve[j].PanelOn, dve[j].PanelClosed);
+
+        // addtable
+        dsb.Add(dsh);
+
+        gpro.TimerByName[pro].Stop;
+        {$ENDREGION}
+
+      end else begin
+
+        {$REGION 'repeter'}
+        dsb.Add(RepeatNestedFromSql(dve[j].DriverSelect, dve[j].Select, dve[j].RepeaterPre, dve[j].RepeaterItem, dve[j].RepeaterPost, dve[j].RepeaterHeader, dve[j].RepeaterFooter));
+        {$ENDREGION}
+
       end;
-
-      // collapse
-      if dve[j].TitleOn then
-        dsh := Collapse(giif.NxD(dve[j].Title, dve[j].Dataset), dve[j].Description, '', dsh, 3, '', 'Left', dve[j].PanelOn, dve[j].PanelClosed);
-
-      // addtable
-      dsb.Add(dsh);
-
-      gpro.TimerByName[pro].Stop;
-      {$ENDREGION}
 
       {$REGION 'export(s)'}
       if exp then begin
         pro := Format('Report.%s.Export', [dve[j].Dataset]);
         gpro.TimerByName[pro].Start;
-        TDbaRec.DstFromSql(sql, eds, dcl, dcs);
+        TDbaRec.DstFromSql({sql}dve[j].Select, eds, {dcl}dve[j].ConnLib, {dcs}dve[j].ConnStr);
         TDstRec.DstToCsv(eds, etx, false, false, true);
         exx.AppendLine(Format('============== dataset %d', [j])) // add here the real csv from ds
-        // .AppendLine('Fld1,Fld2,Fld3')
-        // .AppendLine('1111,2222,3333')
+    // .AppendLine('Fld1,Fld2,Fld3')
+    // .AppendLine('1111,2222,3333')
            .Append(etx);
         gpro.TimerByName[pro].Stop;
       end;
@@ -16770,6 +17446,10 @@ begin
     rsb.Add('<br>');
     rsb.Add(rhe);
   end;
+  {$ENDREGION}
+
+  {$REGION 'footer'}
+  rsb.Add(rer.Footer);
   {$ENDREGION}
 
   {$REGION 'export'}
@@ -17012,9 +17692,9 @@ var
 
   procedure ItemsAdd(IvHideOnSmallScreen: boolean);
   var
-    aun: boolean; // authenticationneeded
+    aun: boolean;                         // authenticationneeded
     hss, bit, fle, sel, cap, tit: string; // hideonsmallornot, baritem, floatleft, selected, caption
-    jgm, cnt, cn2: integer; // jobgrademin
+    jgm, cnt, cn2: integer;               // ToJobGradeMin
   begin
     hss := giif.Str(IvHideOnSmallScreen, ' w3-hide-small', '');
     bit := giif.Str(IvHideOnSmallScreen, '', ' w3-bar-item');
@@ -17029,7 +17709,7 @@ var
         Continue
       end;
       // skip for member's js not equal or above  jgminimum
-      jgm := dst.FieldByName('FldJobGradeMin').AsInteger;
+      jgm := dst.FieldByName('FldToJobGradeMin').AsInteger;
       if gmbr.JobGrade < jgm then begin
         dst.Next;
         Continue
@@ -17064,7 +17744,7 @@ var
               Continue
             end;
             // skip for member's js not equal or above  jgminimum
-            jgm := ds2.FieldByName('FldJobGradeMin').AsInteger;
+            jgm := ds2.FieldByName('FldToJobGradeMin').AsInteger;
             if gmbr.JobGrade < jgm then begin
               ds2.Next;
               Continue
@@ -17154,7 +17834,7 @@ begin
   try
 
     {$REGION 'navbar'}
-  sbu.Add('<div class="w3-bar %s %s %s">'                                                         , [{gthe.FgColor,} gthe.Grade, gthe.BorderedClass, gthe.SizeClass], true, 0);
+  sbu.Add('<div class="w3-bar %s %s %s">'                                                            , [{gthe.FgColor,} gthe.Grade, gthe.BorderedClass, gthe.SizeClass], true, 0);
 
     {$REGION 'itemsonlargeandsmallscreen'}
 
@@ -17476,7 +18156,9 @@ begin
   sbu.Add('<!-- js -->'                                                                                                      ); // js
 //sbu.Add('<!--script src="https://unpkg.com/htmx.org"></script-->'                                                          ); // htmx
   sbu.Add('<script src="%s/Include/J/jquery/3.7.1/jquery-3.7.1.min.js"></script>'                                     , [www]); // jquery *** ELIMINATE, REPLACE WITH STANDARD JS ***
-  sbu.Add('<script src="%s/Include/C/canvasjs/chart/%s/canvasjs.min.js"></script>'                          , [www, '3.14.6']); // 1.9.6(nowatermark)
+  sbu.Add('<script src="%s/Include/C/canvasjs/chart/%s/canvasjs.min.js"></script>'                         , [www, '3.14.10']); // 1.9.6(nowatermark)
+//sbu.Add('<script src="%s/Include/C/canvasjs/stockchart/%s/canvasjs.stock.min.js"></script>'              , [www, '1.14.10']); // canvasjs.stock.min.js includes also canvasjs.min.js functionalities so remove it!
+  sbu.Add('<script src="%s/Include/J/jquery-sparkline/%s/jquery.sparkline.js"></script>'                     , [www, '2.1.2']); // https://omnipotent.net/jquery.sparkline
   sbu.Add('<script src="%s/Include/H/highlightjs/11.11.1/highlight.min.js"></script>'                                 , [www]); // highlight
   sbu.Add('<script>hljs.highlightAll();</script>'                                                                            ); // highlight
 
@@ -17682,14 +18364,14 @@ end;
     {$ENDREGION}
 
     {$REGION 'footer'}
+if not IvPage.SystemInfoOff{FooterAdd} then begin
 //sbu.Add('<hr>'                                                                                                                                   );
   sbu.Add('<footer class="w3-container w3-center">'                                                                                                );
-if not IvPage.SystemInfoOff then begin
   if not TSysRec.WebSystemInfoOff then begin
   sbu.Add(  '<!-- systeminfo -->'                                                                                                                  );
   sbu.Add(  '<p class="w3-small w3-text-gray">'                                                                                                    ); // sysinfo
   sbu.Add(  '%s %s application server (%s %s)', [TSysRec.ACRONYM, gctx.WksModule.ToUpper, genv.Environment, TAaaRec.ProcessKindAsText]             );
-  sbu.Add(  ' - %s - %s', [DateTimetoStr(Now()), gwrq.WebRequestOrig.RemoteAddr]                                                                   );
+  sbu.Add(  ' - %s - %s - %s', [DateTimetoStr(Now()), TNetRec.IpLan, gwrq.WebRequestOrig.RemoteAddr]                                               );
   sbu.Add(  ' - orga %d - client %d - session %d - request %d', [gorg.ObjectId, gwrq.FingerprintId, gwrq.SessionId{gses.SessionId}, gwrq.RequestId]);
   sbu.Add(  ' - elapsed time $RvElapsedMs$ ms'                                                                                                     );
   sbu.Add(  '</p>'                                                                                                                                 );
@@ -17698,34 +18380,36 @@ if not IvPage.SystemInfoOff then begin
   sbu.Add(  '<p class="w3-small w3-text-gray">'                                                                                                    );
   if not TSysRec.WebPoweredByOff then begin
   sbu.Add(  '<!-- poweredby -->'                                                                                                                   ); // poweredby
-  sbu.Add(  'Powered by <a href="%s" target="_blank"><img src="%s" class="w3-image" style="height:18px" title="%s"></a>', [TSysRec.HOME_URL, TSysRec.ICON_URL, TSysRec.NAME]);
+//sbu.Add(  'Powered by <a href="%s" target="_blank"><img src="%s" class="w3-image" style="height:18px" title="%s"></a>', [TSysRec.HOME_URL, TSysRec.ICON_URL, TSysRec.NAME]);
+  sbu.Add(  'Powered by <a href="%s" target="_blank">%s</a>', [TSysRec.HOME_URL, Img(TSysRec.ICON_URL, TSysRec.NAME, '', 'height: 18px')]          );
   end else begin
-  sbu.Add(  '<!-- organizationlogo -->'                                                                                                            ); // poweredby
-  sbu.Add(  '<a href="%s" target="_blank"><img src="%s" class="w3-image" style="height:18px" title="%s"></a>', [gorg.Www, gorg.LogoUrl(), gorg.Slogan]);
+  sbu.Add(  '<!-- organizationlogo -->'                                                                                                            ); // orgalogo
+//sbu.Add(  '<a href="%s" target="_blank"><img src="%s" class="w3-image" style="height:18px" title="%s"></a>', [gorg.Www, gorg.LogoUrl(), gorg.Slogan]);
+  sbu.Add(  '<a href="%s" target="_blank">%s</a>', [gorg.Www, Img(gorg.LogoUrl(), gorg.Slogan, '', 'height: 18px')]                                );
   end;
-  sbu.Add(  '</p><br><br>'                                                                                                                     );
-end;
+  sbu.Add(  '</p><br><br>'                                                                                                                         );
   sbu.Add('</footer>'                                                                                                                              );
+end;
     {$ENDREGION}
 
     {$REGION 'utilswidgets'}
 
-      {$REGION 'gototop'}
-  sbu.Add('<!-- gototop -->'                                                                                                                                 ); // gototop
-//sbu.Add('<input class="w3-button w3-circle w3-theme-d1 w3-card-4" id="CoGoToTopButton" type="button" value="Go To Top" onclick="wksGoToTopFunction();">'   );
-  sbu.Add('<button type="button" class="w3-button w3-circle w3-theme-a w3-card-4" id="CoGoToTopButton" title="Go to the top" onclick="wksGoToTopFunction();"');
+      {$REGION 'gotop'}
+  sbu.Add('<!-- gotop -->'                                                                                                                                   );
+//sbu.Add('<input class="w3-button w3-circle w3-theme-d1 w3-card-4" id="CoGoTopButton" type="button" value="Go To Top" onclick="wksGoTopFunction();">'       );
+  sbu.Add('<button type="button" class="w3-button w3-circle w3-theme-a w3-card-4" id="CoGoTopButton" title="Go to the top" onclick="wksGoTopFunction();"'    );
   sbu.Add(' style="display:none;padding:0px;position:fixed;width:40px;height:40px;bottom:20px;right:20px;"><i class="fa fa-chevron-up"></i>'        , true, 0);
   sbu.Add('</button>'                                                                                                                                        );
   sbu.Add('<script>'                                                                                                                                         );
-  sbu.Add('function  wksGoToTopFunction() {'                                                                                                                 );
+  sbu.Add('function  wksGoTopFunction() {'                                                                                                                   );
   sbu.Add('  document.body.scrollTop = 0;'                                                                                                                   );
   sbu.Add('  document.documentElement.scrollTop = 0;'                                                                                                        );
   sbu.Add('}'                                                                                                                                                );
   sbu.Add('function  w3ScrollFunction() {'                                  {when the user scrolls down 200px from the top of the document, show the button} );
   sbu.Add('  if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {'                                                               );
-  sbu.Add('    document.getElementById("CoGoToTopButton").style.display = "block";'                                                                          );
+  sbu.Add('    document.getElementById("CoGoTopButton").style.display = "block";'                                                                            );
   sbu.Add('  } else {'                                                                                                                                       );
-  sbu.Add('    document.getElementById("CoGoToTopButton").style.display = "none";'                                                                           );
+  sbu.Add('    document.getElementById("CoGoTopButton").style.display = "none";'                                                                             );
   sbu.Add('  }'                                                                                                                                              );
   sbu.Add('}'                                                                                                                                                );
   sbu.Add('</script>'                                                                                                                                        );
@@ -17805,7 +18489,7 @@ end;
   Result := sbu.Text;
 end;
 
-class function  THtmRec.Page(IvId: integer; IvTitleShow, IvImageShow, IvSubTitleShow, IvTopNavOff, IvSystemInfoOff: boolean; IvUrlAbsolute: boolean): string;
+class function  THtmRec.Page(IvId: integer                                                          ; IvTitleShow, IvSubTitleShow, IvImageShow, IvTopNavOff, IvSystemInfoOff, IvUrlAbsolute: boolean): string;
 var
   ish, isw, pas: boolean; // ishelp, iswebsitehome, pass
   pag: TPagRec;
@@ -17838,28 +18522,29 @@ begin
   else if pag.AuthenticationNeededHirerarchical and not gses.IsValid(fbk) then
     Result := PageInfo('Login required.', Format('The requested %s require a logged-in user.<p>Please <a href="/WksPageIsapiProject.dll/Login" title="Login">Login</a><p>Or create a <a href="/WksPageIsapiProject.dll/AccountCreate" title="New Account">New Account</a>', [pai])) // *** Wks have to be replaced by TSysRec.PREFIX ***
 
-  // notmemberjobgrademin
-  else if pag.Obj.{ToMember}JobGradeMin > gmbr.JobGrade then
-    Result := PageInfo('Insufficient MemberJobGrade.', Format('The requested %s require a member with Job Grade "%d".<p>Your actual Job Grade is "%d"', [pai, pag.Obj.{ToMember}JobGradeMin, gmbr.JobGrade]))
+  // notmemberToJobGradeMin
+  else if pag.Obj.{ToMember}ToJobGradeMin > gmbr.JobGrade then
+    Result := PageInfo('Insufficient MemberJobGrade.', Format('The requested %s require a member with Job Grade "%d".<p>Your actual Job Grade is "%d"', [pai, pag.Obj.{ToMember}ToJobGradeMin, gmbr.JobGrade]))
 
   // notmemberjobtitle
 //else if (pag.MemberJobTitleNeeded <> '') and not (gmbr.JobTitle >= pag.MemberJobTitleNeeded) then
 //  Result := PageInfo('Insufficient privileges.', Format('The requested %s require a member with Job Title "%s".<p>Your actual Job Title is "%s"', [pai, pag.MemberJobTitleNeeded, gmbr.JobTitle]))
 
-  // serve
+  // ok
   else begin
     // override
-//    if IvTitleShow     then pag.TitleShow     := IvTitleShow    ;
-//    if IvImageeShow    then pag.ImageShow     := IvImageShow    ;
-//    if IvSubTitleShow  then pag.SubTitleShow  := IvSubTitleShow ;
-//    if IvTopNavOff     then pag.TopNavOff     := IvTopNavOff    ;
-//    if IvSystemInfoOff then pag.SystemInfoOff := IvSystemInfoOff;
+    if IvTitleShow     <> pag.TitleShow     then pag.TitleShow     := IvTitleShow    ;
+    if IvSubTitleShow  <> pag.SubTitleShow  then pag.SubTitleShow  := IvSubTitleShow ;
+    if IvImageShow     <> pag.ImageShow     then pag.ImageShow     := IvImageShow    ;
+    if IvTopNavOff     <> pag.TopNavOff     then pag.TopNavOff     := IvTopNavOff    ;
+    if IvSystemInfoOff <> pag.SystemInfoOff then pag.SystemInfoOff := IvSystemInfoOff;
 
+    // serve
     Result := Page(pag, IvUrlAbsolute);
   end;
 end;
 
-class function  THtmRec.Page(IvTitle, IvSubTitle, IvContent, IvContentKind, IvClass, IvStyle: string; IvTitleShow, IvImageShow, IvSubTitleShow, IvTopNavOff, IvSystemInfoOff, IvUrlAbsolute: boolean): string;
+class function  THtmRec.Page(IvTitle, IvSubTitle, IvContent, IvContentKind, IvClass, IvStyle: string; IvTitleShow, IvSubTitleShow, IvImageShow, IvTopNavOff, IvSystemInfoOff, IvUrlAbsolute: boolean): string;
 var
   pag: TPagRec;
 begin
@@ -17870,8 +18555,8 @@ begin
   pag.Obj.SubTitle    := IvSubTitle;
   pag.Obj.Content     := IvContent;
   pag.TitleShow       := IvTitleShow;
-  pag.ImageShow       := IvImageShow;
   pag.SubTitleShow    := IvSubTitleShow;
+  pag.ImageShow       := IvImageShow;
   pag.ContainerOn     := true;
   pag.ContentFixed    := true;
   pag.Centered        := true;
@@ -18240,16 +18925,16 @@ const
         + sLineBreak + 'OptionWeekWorkOneStart=44924.7916666667'
         ;
   INI_SERVER_DEFAULT = '[Database]'
-        + sLineBreak + 'Db0CsADO=Provider=SQLNCLI11.1;Data Source=LOCALHOST;Initial Catalog=DbaAaa;User ID=sa;Password=secret;Persist Security Info=True;MARS Connection=True'
-        + sLineBreak + 'Db0CsFD=DriverID=Mssql;Server=LOCALHOST;Database=DbaAaa;User_Name=sa;Password=secret'
+        + sLineBreak + 'Db0CsADO=Provider=MSOLEDBSQL.1;Persist Security Info=True;Data Source=LOCALHOST;User ID=sa;Password=31316@Wks;Initial Catalog=DbaXxx' {;MARS Connection=True}
+        + sLineBreak + 'Db0CsFD=DriverID=Mssql;Server=LOCALHOST;Database=DbaXxx;User_Name=sa;Password=31316@Wks'
         + sLineBreak
         + sLineBreak + '[WebRequest]'
         + sLineBreak + 'OtpIsActive=0'
         + sLineBreak + 'AuditIsActive=0'
         ;
   INI_DEMON_DEFAULT  = '[Database]'
-        + sLineBreak + 'Db0CsADO=Provider=SQLNCLI11.1;Data Source=LOCALHOST;Initial Catalog=DbaAaa;User ID=sa;Password=secret;Persist Security Info=True;MARS Connection=True'
-        + sLineBreak + 'Db0CsFD=DriverID=Mssql;Server=LOCALHOST;Database=DbaAaa;User_Name=sa;Password=secret'
+        + sLineBreak + 'Db0CsADO=Provider=MSOLEDBSQL.1;Persist Security Info=True;Data Source=LOCALHOST;User ID=sa;Password=31316@Wks;Initial Catalog=DbaXxx' {;MARS Connection=True}
+        + sLineBreak + 'Db0CsFD=DriverID=Mssql;Server=LOCALHOST;Database=DbaXxx;User_Name=sa;Password=31316@Wks'
         ;
 var
   hos, exe, pat, fil: string; // host, exe, path, file
@@ -18791,14 +19476,14 @@ begin
     Exit(TJSONNull.Create);
 end;
 
-class function  TJsoRec.CreateJsonValue(IvJson: ISuperObject; const IvName: string; const IvValue: variant): boolean;
+class function  TJsoRec.CreateJsonValue(var IvJson: ISuperObject; const IvName: string; const IvValue: variant): boolean;
 begin
   Result := false;
   IvJson.O[IvName] := SO(IvValue);
   Result := true;
 end;
 
-class function  TJsoRec.CreateJsonValueByField(IvJson: ISuperObject; IvField: TField): boolean;
+class function  TJsoRec.CreateJsonValueByField(var IvJson: ISuperObject; IvField: TField): boolean;
 begin
   Result := false;
   if      IvField.IsNull                then IvJson.O[IvField.FieldName] := SO(Null)
@@ -18851,7 +19536,7 @@ end;
 
 class function  TJsoRec.JsonToDataSet(IvDataSet: TDataSet; IvDataJson: ISuperObject): integer;
 var
-  i: integer;
+//i: integer;
   sj: ISuperObject; // subjson
   it: TSuperObjectIter; // soiterator
 begin
@@ -19469,6 +20154,20 @@ begin
 end;
   {$ENDREGION}
 
+  {$REGION 'TLbxRec'}
+class function TLbxRec.LstItemSelect(IvListBox: TListBox; IvValue: string): boolean;
+var
+  i: integer;
+begin
+  for i := 0 to IvListBox.Items.Count - 1 do begin
+    if SameText(IvListBox.Items[i], IvValue) then begin
+      IvListBox.ItemIndex := i;
+      Exit;
+    end;
+  end;
+end;
+  {$ENDREGION}
+
   {$REGION 'TMatRec'}
 class function TMatRec.AbsoluteValue(IvValue: double): double;
 begin
@@ -19677,7 +20376,12 @@ begin
 
   rem := TMbrRem.Create;
   try
-    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemMemberInitSoap(IvOrganization, IvUsername, rem, IvFbk);
+    Screen.Cursor := crHourGlass;
+    try
+      Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemMemberInitSoap(IvOrganization, IvUsername, rem, IvFbk);
+    finally
+      Screen.Cursor := crDefault;
+    end;
     if Result then begin
       // master
       Obj.RecFromRem(rem.ObjRem);
@@ -19756,7 +20460,7 @@ procedure TMbrRec.BadgeGenerate(var IvBadge: TBitmap; IvOrganization, IvWww, IvS
 {                                  54mm --> 127                    5   bra
                       ---------------------------------------  ------- +h2
                     |     /           ______            \     |   10   mar
-                    |    |           (      )            |    |   10   hoh      //  GATE_ACCESS_LEVEL ?
+                    |    |           (      )            |    |   10   hoh  //  GATE_ACCESS_LEVEL ?
                     |    |            ¯¯¯¯¯¯             |    |   10   spa
                     |    |  ---------------------------  |    |
                     |    | |            Logo           | |    |   25   loh
@@ -20162,7 +20866,7 @@ begin
     $002A4949, $2A004D4D, $2B004D4D: Result := 'image/tiff'; // 49 49 2A 00 or 4D 4D 00 2A or 4D 4D 00 2B
     $E011CFD0:                                               // Microsoft Office applications D0 CF 11 E0 = DOCFILE
       if IvLength > 600 then
-      case System.SysUtils.PWordArray(IvContent)^[256] of                    // at offset 512
+      case System.SysUtils.PWordArray(IvContent)^[256] of    // at offset 512
         $A5EC: Result := 'application/msword';               // EC A5 C1 00
         $FFFD: // FD FF FF
           case System.SysUtils.PByteArray(IvContent)^[516] of
@@ -20273,7 +20977,7 @@ var
   itm: TMkdItemRec;
   alf, ome: char; // alfa, omega
   new, fno: string;
-  chz: integer;   // charscount
+//chz: integer;   // charscount
   tre: TRegEx;
   mat: TMatch;
   mar: TMatRec;
@@ -20795,7 +21499,7 @@ var
           if Length(arv) < 7 then SetLength(arv, 7);
 
           // centered?
-          ise :=  arv[5].Contains('^');
+          ise :=  arv[4].Contains('^');
 
           // card?
           isc :=  arv[5].Contains('card');
@@ -20804,7 +21508,7 @@ var
                if arv[6].Contains('topbot') then tor := itTopBottom
           else if arv[6].Contains('top')    then tor := itTop
           else if arv[6].Contains('bot')    then tor := itBottom
-          else                                               tor := itNone;
+          else                                   tor := itNone;
 
           // url
           if IvUrlAbsolute and arv[0].StartsWith('/') then
@@ -20816,7 +21520,7 @@ var
           Result := THtmRec.Img(url, arv[1], StrToIntDef(arv[2], 0), StrToIntDef(arv[3], 0), isc, tor);
 
           // center
-          if ise then Result := Result + Format('<center>%s</center>', [Result]); // *** make a general function ***
+          if ise then Result := Format('<center>%s</center>', [Result]);                            // *** make a general function ***
 
       //end else if alf = '{' then begin                                                            // unused            -->   <movie...>
         //if Length(arv) < 4 then SetLength(arv, 4);
@@ -21339,13 +22043,14 @@ begin;
 end;
   {$ENDREGION}
 
-  {$REGION 'TObjRec MASTER'}
+  {$REGION 'TObjRec MASTER TRACKING'}
 procedure TObjRec.Free;
 begin
   if Assigned(Image) then
     try
     //Image.Free;
-      FreeAndNil(Image);
+    //FreeAndNil(Image);
+      Image := nil;
     except
       on e: Exception do
         glog.Log(e.Message);
@@ -21354,44 +22059,49 @@ end;
 
 procedure TObjRec.Reset;
 begin
-  Id              := {0}-1 ;
-  PId             := {0}-1 ;
-  Id8             := ''    ;
-  Order           := 0     ;
-  Rev             := 0     ;
-  Created         := 0     ;
-  Updated         := 0     ;
-  UpdatedBy       := ''    ;
-  FromOrganization:= ''    ;
-  FromDepartment  := ''    ;
-  FromArea        := ''    ;
-  FromTeam        := ''    ;
-  FromMember      := ''    ;
-  ToOrganization  := ''    ;
-  ToDepartment    := ''    ;
-  ToArea          := ''    ;
-  ToTeam          := ''    ;
-  ToMember        := ''    ;
-  JobGradeMin     := 0     ;
-  Route           := ''    ;
-  ObjectKind      := ''    ;
-  ContentKind     := ''    ;
-  DataKind        := ''    ;
-  State           := ''    ;
-  Title           := ''    ;
-  Subtitle        := ''    ;
-  Description     := ''    ;
-  Spare           := ''    ;
-  Encrypted       := false ;
-  Persist         := false ;
-  Image           := nil   ;
-  ContentPrev     := ''    ;
-  Content         := ''    ;
-  Data            := ''    ;
-  Note            := ''    ;
-  &Object         := ''    ;
-  EditorCaret     := ''    ;
-  EditorFolding   := nil   ;
+  Id              := -1   ;
+  PId             := -1   ;
+  Id8             := ''   ;
+  Order           := 0    ;
+  Rev             := 0    ;
+  RouteIdCsv      := ''   ;
+  Created         := 0    ;
+  Updated         := 0    ;
+  Expire          := 0    ;
+  Author          := ''   ;
+  OwnerCsv        := ''   ;
+  UpdatedBy       := ''   ;
+  ToOrganization  := ''   ;
+  ToDepartment    := ''   ;
+  ToArea          := ''   ;
+  ToTeam          := ''   ;
+  ToMember        := ''   ;
+  ToJobGradeMin   := 0    ;
+  ObjectKind      := ''   ;
+  ContentKind     := ''   ;
+  DataKind        := ''   ;
+  Group           := ''   ;
+  State           := ''   ;
+  Title           := ''   ;
+  Subtitle        := ''   ;
+  Description     := ''   ;
+  BgColor         := ''   ;
+  FgColor         := ''   ;
+  Hidden          := false;
+  Encrypted       := false;
+  Persist         := false;
+  Image           := nil  ;
+  ContentPrev     := ''   ;
+  Content         := ''   ;
+  Note            := ''   ;
+  Data            := ''   ;
+  Data1           := ''   ;
+  Data2           := ''   ;
+  Data3           := ''   ;
+  Data4           := ''   ;
+  &Object         := ''   ;
+  EditorCaret     := ''   ;
+  EditorFolding   := nil  ;
 end;
 
 function  TObjRec.InitDba(IvObj: string; IvId: integer): boolean;
@@ -21411,36 +22121,41 @@ begin
       Id8                  := dst.FieldByName('FldId8'                ).AsString  ;
       Order                := dst.FieldByName('FldOrder'              ).AsInteger ;
       Rev                  := dst.FieldByName('FldRev'                ).AsInteger ;
+      RouteIdCsv           := dst.FieldByName('FldRouteIdCsv'         ).AsString  ;
       Created              := dst.FieldByName('FldCreated'            ).AsDateTime;
       Updated              := dst.FieldByName('FldUpdated'            ).AsDateTime;
+      Expire               := dst.FieldByName('FldExpire'             ).AsDateTime;
+      Author               := dst.FieldByName('FldAuthor'             ).AsString  ;
+      OwnerCsv             := dst.FieldByName('FldOwnerCsv'           ).AsString  ;
       UpdatedBy            := dst.FieldByName('FldUpdatedBy'          ).AsString  ;
-      FromOrganization     := dst.FieldByName('FldFromOrganization'   ).AsString  ;
-      FromDepartment       := dst.FieldByName('FldFromDepartment'     ).AsString  ;
-      FromArea             := dst.FieldByName('FldFromArea'           ).AsString  ;
-      FromTeam             := dst.FieldByName('FldFromTeam'           ).AsString  ;
-      FromMember           := dst.FieldByName('FldFromMember'         ).AsString  ;
       ToOrganization       := dst.FieldByName('FldToOrganization'     ).AsString  ;
       ToDepartment         := dst.FieldByName('FldToDepartment'       ).AsString  ;
       ToArea               := dst.FieldByName('FldToArea'             ).AsString  ;
       ToTeam               := dst.FieldByName('FldToTeam'             ).AsString  ;
       ToMember             := dst.FieldByName('FldToMember'           ).AsString  ;
-     {ToMember}JobGradeMin := dst.FieldByName('FldJobGradeMin'        ).AsInteger ;
-      Route                := dst.FieldByName('FldRoute'              ).AsString  ;
+      ToJobGradeMin        := dst.FieldByName('FldToJobGradeMin'      ).AsInteger ;
       ObjectKind           := dst.FieldByName('FldObjectKind'         ).AsString  ;
       ContentKind          := dst.FieldByName('FldContentKind'        ).AsString  ;
       DataKind             := dst.FieldByName('FldDataKind'           ).AsString  ;
+      Group                := dst.FieldByName('FldGroup'              ).AsString  ;
       State                := dst.FieldByName('FldState'              ).AsString  ;
       Title                := dst.FieldByName('FldTitle'              ).AsString  ;
       Subtitle             := dst.FieldByName('FldSubtitle'           ).AsString  ;
       Description          := dst.FieldByName('FldDescription'        ).AsString  ;
-      Spare                := dst.FieldByName('FldSpare'              ).AsString  ;
+      BgColor              := dst.FieldByName('FldBgColor'            ).AsString  ;
+      FgColor              := dst.FieldByName('FldFgColor'            ).AsString  ;
+      Hidden               := dst.FieldByName('FldHidden'             ).AsBoolean ;
       Encrypted            := dst.FieldByName('FldEncrypted'          ).AsBoolean ;
       Persist              := dst.FieldByName('FldPersist'            ).AsBoolean ;
-    //TGraRec.FromBlobField(Image, TBlobField(dst.FieldByName('FldImage')))       ;
+    //TGraRec.FromBlobField(Image, TBlobField(dst.FieldByName('FldImage')));
       ContentPrev          := dst.FieldByName('FldContentPrev'        ).AsString  ;
       Content              := dst.FieldByName('FldContent'            ).AsString  ;
-      Data                 := dst.FieldByName('FldData'               ).AsString  ;
       Note                 := dst.FieldByName('FldNote'               ).AsString  ;
+      Data                 := dst.FieldByName('FldData'               ).AsString  ;
+      Data1                := dst.FieldByName('FldData1'              ).AsString  ;
+      Data2                := dst.FieldByName('FldData2'              ).AsString  ;
+      Data3                := dst.FieldByName('FldData3'              ).AsString  ;
+      Data4                := dst.FieldByName('FldData4'              ).AsString  ;
       &Object              := dst.FieldByName('FldObject'             ).AsString  ;
       EditorCaret          := dst.FieldByName('FldEditorCaret'        ).AsString  ;
     //TGraRec.FromBlobField(EditorFolding, TBlobField(dst.FieldByName('FldEditorFolding')));
@@ -21455,86 +22170,96 @@ begin
   if not Assigned(IvObjRem) then
     Exit;
 
-  Id               := IvObjRem.Id              ;
-  PId              := IvObjRem.PId             ;
-  Id8              := IvObjRem.Id8             ;
-  Order            := IvObjRem.Order           ;
-  Rev              := IvObjRem.Rev             ;
-  Created          := IvObjRem.Created         ;
-  Updated          := IvObjRem.Updated         ;
-  UpdatedBy        := IvObjRem.UpdatedBy       ;
-  FromOrganization := IvObjRem.FromOrganization;
-  FromDepartment   := IvObjRem.FromDepartment  ;
-  FromArea         := IvObjRem.FromArea        ;
-  FromTeam         := IvObjRem.FromTeam        ;
-  FromMember       := IvObjRem.FromMember      ;
-  ToOrganization   := IvObjRem.ToOrganization  ;
-  ToDepartment     := IvObjRem.ToDepartment    ;
-  ToArea           := IvObjRem.ToArea          ;
-  ToTeam           := IvObjRem.ToTeam          ;
-  ToMember         := IvObjRem.ToMember        ;
-  JobGradeMin      := IvObjRem.JobGradeMin     ;
-  Route            := IvObjRem.Route           ;
-  ObjectKind       := IvObjRem.ObjectKind      ;
-  ContentKind      := IvObjRem.ContentKind     ;
-  DataKind         := IvObjRem.DataKind        ;
-  State            := IvObjRem.State           ;
-  Title            := IvObjRem.Title           ;
-  Subtitle         := IvObjRem.Subtitle        ;
-  Description      := IvObjRem.Description     ;
-  Spare            := IvObjRem.Spare           ;
-  Encrypted        := IvObjRem.Encrypted       ;
-  Persist          := IvObjRem.Persist         ;
-//Image            := IvObjRem.Image           ;
-  ContentPrev      := IvObjRem.ContentPrev     ;
-  Content          := IvObjRem.Content         ;
-  Data             := IvObjRem.Data            ;
-  Note             := IvObjRem.Note            ;
-  &Object          := IvObjRem.&Object         ;
-  EditorCaret      := IvObjRem.EditorCaret     ;
-//EditorFolding    := IvObjRem.EditorFolding   ;
+  Id             := IvObjRem.Id            ;
+  PId            := IvObjRem.PId           ;
+  Id8            := IvObjRem.Id8           ;
+  Order          := IvObjRem.Order         ;
+  Rev            := IvObjRem.Rev           ;
+  RouteIdCsv     := IvObjRem.RouteIdCsv    ;
+  Created        := IvObjRem.Created       ;
+  Updated        := IvObjRem.Updated       ;
+  Expire         := IvObjRem.Expire        ;
+  Author         := IvObjRem.Author        ;
+  OwnerCsv       := IvObjRem.OwnerCsv      ;
+  UpdatedBy      := IvObjRem.UpdatedBy     ;
+  ToOrganization := IvObjRem.ToOrganization;
+  ToDepartment   := IvObjRem.ToDepartment  ;
+  ToArea         := IvObjRem.ToArea        ;
+  ToTeam         := IvObjRem.ToTeam        ;
+  ToMember       := IvObjRem.ToMember      ;
+  ToJobGradeMin  := IvObjRem.ToJobGradeMin ;
+  ObjectKind     := IvObjRem.ObjectKind    ;
+  ContentKind    := IvObjRem.ContentKind   ;
+  DataKind       := IvObjRem.DataKind      ;
+  Group          := IvObjRem.Group         ;
+  State          := IvObjRem.State         ;
+  Title          := IvObjRem.Title         ;
+  Subtitle       := IvObjRem.Subtitle      ;
+  Description    := IvObjRem.Description   ;
+  BgColor        := IvObjRem.BgColor       ;
+  FgColor        := IvObjRem.FgColor       ;
+  Hidden         := IvObjRem.Hidden        ;
+  Encrypted      := IvObjRem.Encrypted     ;
+  Persist        := IvObjRem.Persist       ;
+//Image          := IvObjRem.Image         ;
+  ContentPrev    := IvObjRem.ContentPrev   ;
+  Content        := IvObjRem.Content       ;
+  Note           := IvObjRem.Note          ;
+  Data           := IvObjRem.Data          ;
+  Data1          := IvObjRem.Data1         ;
+  Data2          := IvObjRem.Data2         ;
+  Data3          := IvObjRem.Data3         ;
+  Data4          := IvObjRem.Data4         ;
+  &Object        := IvObjRem.&Object       ;
+  EditorCaret    := IvObjRem.EditorCaret   ;
+//EditorFolding  := IvObjRem.EditorFolding ;
 end;
 
 procedure TObjRec.RecToRem(var IvObjRem: TObjRem);
 begin
-  IvObjRem.Id               := Id              ;
-  IvObjRem.PId              := PId             ;
-  IvObjRem.Id8              := Id8             ;
-  IvObjRem.Order            := Order           ;
-  IvObjRem.Rev              := Rev             ;
-  IvObjRem.Created          := Created         ;
-  IvObjRem.Updated          := Updated         ;
-  IvObjRem.UpdatedBy        := UpdatedBy       ;
-  IvObjRem.FromOrganization := FromOrganization;
-  IvObjRem.FromDepartment   := FromDepartment  ;
-  IvObjRem.FromArea         := FromArea        ;
-  IvObjRem.FromTeam         := FromTeam        ;
-  IvObjRem.FromMember       := FromMember      ;
-  IvObjRem.ToOrganization   := ToOrganization  ;
-  IvObjRem.ToDepartment     := ToDepartment    ;
-  IvObjRem.ToArea           := ToArea          ;
-  IvObjRem.ToTeam           := ToTeam          ;
-  IvObjRem.ToMember         := ToMember        ;
-  IvObjRem.JobGradeMin      := JobGradeMin     ;
-  IvObjRem.Route            := Route           ;
-  IvObjRem.ObjectKind       := ObjectKind      ;
-  IvObjRem.ContentKind      := ContentKind     ;
-  IvObjRem.DataKind         := DataKind        ;
-  IvObjRem.State            := State           ;
-  IvObjRem.Title            := Title           ;
-  IvObjRem.Subtitle         := Subtitle        ;
-  IvObjRem.Description      := Description     ;
-  IvObjRem.Spare            := Spare           ;
-  IvObjRem.Encrypted        := Encrypted       ;
-  IvObjRem.Persist          := Persist         ;
-//IvObjRem.Image            := Image           ;
-  IvObjRem.ContentPrev      := ContentPrev     ;
-  IvObjRem.Content          := Content         ;
-  IvObjRem.Data             := Data            ;
-  IvObjRem.Note             := Note            ;
-  IvObjRem.&Object          := &Object         ;
-  IvObjRem.EditorCaret      := EditorCaret     ;
-//IvObjRem.EditorFolding    := EditorFolding   ;
+  IvObjRem.Id             := Id            ;
+  IvObjRem.PId            := PId           ;
+  IvObjRem.Id8            := Id8           ;
+  IvObjRem.Order          := Order         ;
+  IvObjRem.Rev            := Rev           ;
+  IvObjRem.RouteIdCsv     := RouteIdCsv    ;
+  IvObjRem.Created        := Created       ;
+  IvObjRem.Updated        := Updated       ;
+  IvObjRem.Expire         := Expire        ;
+  IvObjRem.Author         := Author        ;
+  IvObjRem.OwnerCsv       := OwnerCsv      ;
+  IvObjRem.UpdatedBy      := UpdatedBy     ;
+  IvObjRem.ToOrganization := ToOrganization;
+  IvObjRem.ToDepartment   := ToDepartment  ;
+  IvObjRem.ToArea         := ToArea        ;
+  IvObjRem.ToTeam         := ToTeam        ;
+  IvObjRem.ToMember       := ToMember      ;
+  IvObjRem.ToJobGradeMin  := ToJobGradeMin ;
+  IvObjRem.ObjectKind     := ObjectKind    ;
+  IvObjRem.ContentKind    := ContentKind   ;
+  IvObjRem.DataKind       := DataKind      ;
+  IvObjRem.Group          := Group         ;
+  IvObjRem.State          := State         ;
+  IvObjRem.Title          := Title         ;
+  IvObjRem.Subtitle       := Subtitle      ;
+  IvObjRem.Description    := Description   ;
+  IvObjRem.BgColor        := BgColor       ;
+  IvObjRem.FgColor        := FgColor       ;
+  IvObjRem.Hidden         := Hidden        ;
+  IvObjRem.Encrypted      := Encrypted     ;
+  IvObjRem.Persist        := Persist       ;
+//IvObjRem.Image          := Image         ;
+  IvObjRem.ContentPrev    := ContentPrev   ;
+  IvObjRem.Content        := Content       ;
+  IvObjRem.Note           := Note          ;
+  IvObjRem.Data           := Data          ;
+  IvObjRem.Data1          := Data1         ;
+  IvObjRem.Data2          := Data2         ;
+  IvObjRem.Data3          := Data3         ;
+  IvObjRem.Data4          := Data4         ;
+  IvObjRem.&Object        := &Object       ;
+  IvObjRem.EditorCaret    := EditorCaret   ;
+//IvObjRem.EditorFolding  := EditorFolding ;
 end;
 
 function  TObjRec.ObjObjectSafe: string;
@@ -21573,6 +22298,58 @@ begin
   end;
 end;
 
+class procedure TObjRec.ObjDstRecordSetup(var IvDst: TDataset; IvIdNew, IvPId: integer; IvObjKind, IvContentKind, IvObject, IvTitle, IvSubtitle, IvDescription, IvOrder: variant);
+begin
+//IvDst.Insert;
+//IvDst.Edit;
+
+  IvDst.FieldByName('FldId'                 ).AsInteger  := IvIdNew;
+  IvDst.FieldByName('FldPId'                ).AsInteger  := IvPId;
+  IvDst.FieldByName('FldId8'                ).AsString   := TId8Rec.Generate;
+  IvDst.FieldByName('FldOrder'              ).Value      := IvOrder;
+  IvDst.FieldByName('FldRev'                ).Value      := null;
+  IvDst.FieldByName('FldRouteIdCsv'         ).Value      := null;
+  IvDst.FieldByName('FldCreated'            ).AsDateTime := now;
+  IvDst.FieldByName('FldUpdated'            ).Value      := null;
+  IvDst.FieldByName('FldExpire'             ).Value      := null;
+  IvDst.FieldByName('FldAuthor'             ).AsString   := gmbr.Member;
+  IvDst.FieldByName('FldOwnerCsv'           ).Value      := null;
+  IvDst.FieldByName('FldUpdatedBy'          ).Value      := null;
+  IvDst.FieldByName('FldToOrganization'     ).AsString   := gmbr.Organization;
+  IvDst.FieldByName('FldToDepartment'       ).AsString   := gmbr.Department;
+  IvDst.FieldByName('FldToArea'             ).AsString   := gmbr.Area;
+  IvDst.FieldByName('FldToTeam'             ).AsString   := gmbr.Team;
+  IvDst.FieldByName('FldToMember'           ).AsString   := '*';
+  IvDst.FieldByName('FldToJobGradeMin'      ).Value      := null;
+  IvDst.FieldByName('FldObjectKind'         ).Value      := IvObjKind;
+  IvDst.FieldByName('FldContentKind'        ).Value      := IvContentKind;
+  IvDst.FieldByName('FldDataKind'           ).Value      := null;
+  IvDst.FieldByName('FldGroup'              ).Value      := null;
+  IvDst.FieldByName('FldState'              ).AsString   := TStaRec.Active.Name;
+  IvDst.FieldByName('FldTitle'              ).Value      := IvTitle;
+  IvDst.FieldByName('FldSubtitle'           ).Value      := IvSubtitle;
+  IvDst.FieldByName('FldDescription'        ).Value      := IvDescription;
+  IvDst.FieldByName('FldBgColor'            ).Value      := null;
+  IvDst.FieldByName('FldFgColor'            ).Value      := null;
+  IvDst.FieldByName('FldHidden'             ).Value      := null;
+  IvDst.FieldByName('FldEncrypted'          ).Value      := null;
+  IvDst.FieldByName('FldPersist'            ).Value      := null;
+//TGraRec.FromBlobField(Image, TBlobField(IvDst.FieldByName('FldImage')));
+  IvDst.FieldByName('FldContentPrev'        ).Value      := null;
+  IvDst.FieldByName('FldContent'            ).Value      := null;
+  IvDst.FieldByName('FldNote'               ).Value      := null;
+  IvDst.FieldByName('FldData'               ).Value      := null;
+  IvDst.FieldByName('FldData1'              ).Value      := null;
+  IvDst.FieldByName('FldData2'              ).Value      := null;
+  IvDst.FieldByName('FldData3'              ).Value      := null;
+  IvDst.FieldByName('FldData4'              ).Value      := null;
+  IvDst.FieldByName('FldObject'             ).Value      := IvObject;
+  IvDst.FieldByName('FldEditorCaret'        ).Value      := null;
+//TGraRec.FromBlobField(EditorFolding, TBlobField(IvDst.FieldByName('FldEditorFolding')));
+
+//IvDst.Post;
+end;
+
 class function  TObjRec.ObjKindVector: TArray<string>; // [OBJECTLIST]
 begin
   Result := [
@@ -21582,18 +22359,18 @@ begin
   , 'Temp'
   , 'Test'
   , 'Help'
-  , 'Param'
-  , 'Switch'
   , 'Template'
   , 'Organization'
   , 'Public'
   , 'System'
   , 'Reserved'
 
-  // objectkind
+  // accessory
   , 'Folder'
   , 'Library'
   , 'Link'
+  , 'Param'
+  , 'Switch'
 
   // obj
   , 'Person'
@@ -21601,12 +22378,24 @@ begin
 //, 'Organization'
   , 'Member'
   , 'Account'
+  , 'Agent'
   , 'Code'
-  , 'Page'
   , 'Document'
+//, 'Equipment'
+//, 'File'
+//, 'Form'
+//, 'Image'
+  , 'Item'
+//, 'Invoice'
+//, 'Note'
+//, 'Ocv'
+  , 'Page'
   , 'Report'
+  , 'Spc'
 //, 'System'
 //, 'Task'
+//, 'Ticket'
+//, 'Xxx'
 
   // structure
 //, 'Organization'
@@ -21614,6 +22403,12 @@ begin
   , 'Area'
   , 'Team'
   , 'Member'
+
+  // manufacturing
+  , 'Equipment'
+  , 'Component'
+  , 'Chamber'
+  , 'Sensor'
 
   // task
   , 'Portfolio'
@@ -21652,10 +22447,15 @@ end;
 
 class function  TObjRec.IdNextRio(const IvObj: string; var IvIdNext: integer; var IvFbk: string): boolean;
 begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemObjectIdNextSoap(IvObj, IvIdNext, IvFbk);
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemObjIdNextSoap(IvObj, IvIdNext, IvFbk);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
-class function  TObjRec.New(IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvFromOrganization, IvFromMember: string; var IvIdNew: integer): boolean;
+class function  TObjRec.DbaNew(IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvOrganization, IvAuthor: string; var IvIdNew: integer): boolean;
 var
   idn, pid, aff: integer;
   tbl, sql, fbk: string;
@@ -21667,7 +22467,7 @@ begin
 
   pid := TDbaRec.ObjIdFromIdOrPath(IvObj, IvIdOrPath);
 
-  mbr.InitDba(IvFromOrganization, IvFromMember, fbk);
+  mbr.InitDba(IvOrganization, IvAuthor, fbk);
 
   sql :=         'insert into Dba'+IvObj+'.dbo.TblObject'
   + sLineBreak + 'select'
@@ -21675,46 +22475,56 @@ begin
   + sLineBreak + '  , FldPId = '              + pid.ToString
   + sLineBreak + '  , FldId8 = '              + TId8Rec.Generate.QuotedString
   + sLineBreak + '  , FldOrder = '            + 'null'
-  + sLineBreak + '  , FldRev = '              + '0'
+  + sLineBreak + '  , FldRev = '              + 'null'
+  + sLineBreak + '  , FldRouteIdCsv = '       + 'null'
   + sLineBreak + '  , FldCreated = '          + DateTimeToStr(now).QuotedString
   + sLineBreak + '  , FldUpdated = '          + 'null'
+  + sLineBreak + '  , FldExpire = '           + 'null'
+  + sLineBreak + '  , FldAuthor = '           + TSqlRec.Val(mbr.Member)
+  + sLineBreak + '  , FldOwnerCsv = '         + 'null'
   + sLineBreak + '  , FldUpdatedBy = '        + 'null'
-  + sLineBreak + '  , FldFromOrganization = ' + TSqlRec.Val(mbr.Organization)
-  + sLineBreak + '  , FldFromDepartment = '   + TSqlRec.Val(mbr.Department)
-  + sLineBreak + '  , FldFromArea = '         + TSqlRec.Val(mbr.Area)
-  + sLineBreak + '  , FldFromTeam = '         + TSqlRec.Val(mbr.Team)
-  + sLineBreak + '  , FldFromMember = '       + TSqlRec.Val(mbr.Member)
   + sLineBreak + '  , FldToOrganization = '   + TSqlRec.Val(mbr.Organization)
   + sLineBreak + '  , FldToDepartment = '     + TSqlRec.Val(mbr.Department)
   + sLineBreak + '  , FldToArea = '           + TSqlRec.Val(mbr.Area)
   + sLineBreak + '  , FldToTeam = '           + TSqlRec.Val(mbr.Team)
   + sLineBreak + '  , FldToMember = '         + QuotedStr('*')
-  + sLineBreak + '  , FldJobGradeMin = '      + 'null'
-  + sLineBreak + '  , FldRoute = '            + 'null'
-  + sLineBreak + '  , FldObjectKind = '       + QuotedStr('Member')
-  + sLineBreak + '  , FldContentKind = '      + QuotedStr('Txt')
+  + sLineBreak + '  , FldToJobGradeMin = '    + 'null'
+  + sLineBreak + '  , FldObjectKind = '       + QuotedStr(IvObj)
+  + sLineBreak + '  , FldContentKind = '      + 'null'
   + sLineBreak + '  , FldDataKind = '         + 'null'
+  + sLineBreak + '  , FldGroup = '            + 'null'
   + sLineBreak + '  , FldState = '            + TStaRec.Active.Name.QuotedString
   + sLineBreak + '  , FldTitle = '            + 'null'
   + sLineBreak + '  , FldSubtitle = '         + 'null'
   + sLineBreak + '  , FldDescription = '      + 'null'
-  + sLineBreak + '  , FldSpare = '            + 'null'
-  + sLineBreak + '  , FldEncrypted = '        + '0'
-  + sLineBreak + '  , FldPersist = '          + '1'
+  + sLineBreak + '  , FldBgColor = '          + 'null'
+  + sLineBreak + '  , FldFgColor = '          + 'null'
+  + sLineBreak + '  , FldHidden = '           + 'null'
+  + sLineBreak + '  , FldEncrypted = '        + 'null'
+  + sLineBreak + '  , FldPersist = '          + 'null'
   + sLineBreak + '  , FldImage = '            + 'null'
   + sLineBreak + '  , FldContentPrev = '      + 'null'
   + sLineBreak + '  , FldContent = '          + 'null'
-  + sLineBreak + '  , FldData = '             + 'null'
   + sLineBreak + '  , FldNote = '             + 'null'
+  + sLineBreak + '  , FldData = '             + 'null'
+  + sLineBreak + '  , FldData1 = '            + 'null'
+  + sLineBreak + '  , FldData2 = '            + 'null'
+  + sLineBreak + '  , FldData3 = '            + 'null'
+  + sLineBreak + '  , FldData4 = '            + 'null'
   + sLineBreak + '  , FldObject = '           + IvObject.QuotedString
   + sLineBreak + '  , FldEditorCared = '      + 'null'
   + sLineBreak + '  , FldEditorFolding = '    + 'null';
   Result := TDbaRec.CmdExec(sql, aff, fbk);
 end;
 
-class function  TObjRec.NewRio(IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvFromOrganization, IvFromMember: string; var IvIdNew: integer): boolean;
+class function  TObjRec.DbaNewRio(IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvOrganization, IvAuthor: string; var IvIdNew: integer): boolean;
 begin
-  Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemObjectNewRio(IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvFromOrganization, IvFromMember, IvIdNew);
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemObjNewSoap(IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvOrganization, IvAuthor, IvIdNew);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 class function  TObjRec.FieldGet(const IvObj, IvIdOrPath, IvField: string; var IvValue: variant; const IvDefault: variant): boolean;
@@ -21723,27 +22533,45 @@ var
   oid: integer;
 begin
   tbl := TSqlRec.TblMasterFromObj(IvObj);
-  fld := ifthen(SameStr(IvObj, 'Object'), 'FldId', 'FldObjectId');
+  fld := 'FldId'; // ifthen(SameStr(IvObj, 'Object'), 'FldId', 'FldObjectId');
   oid := TDbaRec.ObjIdFromIdOrPath(IvObj, IvIdOrPath);
   sql := Format('select top(1) %s from %s where %s = %d', [IvField, tbl, fld, oid]);
   IvValue := TDbaRec.Scalar(sql, IvDefault);
   Result := true;
 end;
 
+class function TObjRec.FieldGetRio(const IvObj, IvIdOrPath, IvField: string; var IvValue: variant; const IvDefault: variant): boolean;
+begin
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemObjFieldGetSoap(IvObj, IvIdOrPath, IvField, IvValue, IvDefault);
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
+
 class function  TObjRec.FieldSet(const IvObj, IvIdOrPath, IvField: string; const IvValue: variant): boolean;
 var
-  tbl, fld, sql, fbk: string;
+  tbl, fld, val, sql, fbk: string;
   oid, aff: integer;
 begin
   tbl := TSqlRec.TblMasterFromObj(IvObj);
-  fld := ifthen(SameStr(IvObj, 'Object'), 'FldId', 'FldObjectId');
+  fld := 'FldId'; // ifthen(SameStr(IvObj, 'Object'), 'FldId', 'FldObjectId');
+  val := TSqlRec.Val(IvValue);
   oid := TDbaRec.ObjIdFromIdOrPath(IvObj, IvIdOrPath);
-  sql := Format('update %s set %s = %s where %s = %d', [tbl, IvField, IvValue, fld, oid]);
+  sql := Format('update %s set %s = %s where %s = %d', [tbl, IvField, val, fld, oid]);
   Result := TDbaRec.CmdExec(sql, aff, fbk);
 end;
-  {$ENDREGION}
 
-  {$REGION 'TObjRec DETAILS'}
+class function TObjRec.FieldSetRio(const IvObj, IvIdOrPath, IvField: string; const IvValue: variant): boolean;
+begin
+  Screen.Cursor := crHourGlass;
+  try
+    Result := (TRioRec.HttpRio as ISystemSoapMainService).SystemObjFieldSetSoap(IvObj, IvIdOrPath, IvField, IvValue);
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
   {$ENDREGION}
 
   {$REGION 'TOrgRec'}
@@ -22068,8 +22896,8 @@ begin
   ContentFixed             := true ;
   Centered                 := true ;
   TitleShow                := true ;
+  SubtitleShow             := true ;
   ImageShow                := false;
-  SubtitleShow             := false;
   TopNavOff                := false;
   SystemInfoOff            := false;
   TopSpace                 :=  0   ;
@@ -22121,8 +22949,8 @@ begin
       ContentFixed             := dst.FieldByName('FldContentFixed'        ).AsBoolean;
       Centered                 := dst.FieldByName('FldCentered'            ).AsBoolean;
       TitleShow                := dst.FieldByName('FldTitleShow'           ).AsBoolean;
-      ImageShow                := dst.FieldByName('FldImageShow'           ).AsBoolean;
       SubtitleShow             := dst.FieldByName('FldSubtitleShow'        ).AsBoolean;
+      ImageShow                := dst.FieldByName('FldImageShow'           ).AsBoolean;
       TopNavOff                := dst.FieldByName('FldTopNavOff'           ).AsBoolean;
       SystemInfoOff            := dst.FieldByName('FldSystemInfoOff'       ).AsBoolean;
       TopSpace                 := dst.FieldByName('FldTopSpace'            ).AsInteger;
@@ -22172,13 +23000,13 @@ begin
   end;
 
   // help
-  //   id pid lev   path                 FldObject      FldAuthenticationNeeded
-  //    1	  0	  5		\658\267\171\97\7\1  Root           NULL
-  //    7	  1	  4		\658\267\171\97\7    Organization   NULL
-  //   97	  7	  3		\658\267\171\97      W              NULL
-  //  171	 97	  2	  \658\267\171         Wks            NULL
-  //  267	171	  1	  \658\267             Report         1
-  //  658	267  	0	  \658                 Sessions       0        <--- starthereandgoup
+  //   id   pid   lev   path                 FldObject      FldAuthenticationNeeded
+  //    1     0   5     \658\267\171\97\7\1  Root           NULL
+  //    7     1   4     \658\267\171\97\7    Organization   NULL
+  //   97     7   3     \658\267\171\97      W              NULL
+  //  171    97   2     \658\267\171         Wks            NULL
+  //  267   171   1     \658\267             Report         1
+  //  658   267   0     \658                 Sessions       0        <--- starthereandgoup
 end;
   {$ENDREGION}
 
@@ -22241,7 +23069,7 @@ begin
 end;
 
 class function  TPatRec.NameChange(const IvFile, IvNameNew: string): string;
-var                                // C:\Path\Name.ext
+var                             // C:\Path\Name.ext
   p, n, e: string;
 begin
   p := ExtractFilePath(IvFile); // C:\Path\
@@ -22748,14 +23576,14 @@ end;
 class function  TPicRec.PicWithText(IvText: string; IvBgColor, IvTextColor: TColor; IvFontSize: integer; IvFont: string): TPicture;
 var
   siz: TSize;
-  smx: integer; // sizemax
+  smx: integer;      // sizemax
   sqp, sqe: integer; // square padding, edge
   rec: TRect;
   bmp: TBitmap;
   pic: TPicture;
 
-  {Edge,} {MaxBox,} sz{, PAD}: integer;
-  // = 12;        // inner padding (px) around text
+//{Edge,} {MaxBox,} sz{, PAD}: integer;
+  // = 12;           // inner padding (px) around text
 
   procedure FitFontToBox(Canvas: TCanvas; const S: string; Target: Integer);
   begin
@@ -23179,39 +24007,48 @@ begin
       SetLength(IvDatasetRecVector, Length(IvDatasetRecVector)+1);
 
       // dataset
-      IvDatasetRecVector[i].ReportId        := dst.FieldByName('FldObjectId'       ).AsInteger; // key
-      IvDatasetRecVector[i].Order           := dst.FieldByName('FldOrder'          ).AsInteger;
-      IvDatasetRecVector[i].State           := dst.FieldByName('FldState'          ).AsString ;
-      IvDatasetRecVector[i].Dataset         := dst.FieldByName('FldDataset'        ).AsString ; // key
-      IvDatasetRecVector[i].Title           := dst.FieldByName('FldTitle'          ).AsString ;
-      IvDatasetRecVector[i].Description     := dst.FieldByName('FldDescription'    ).AsString ;
-      IvDatasetRecVector[i].Mode            := dst.FieldByName('FldMode'           ).AsString ; // Horizontal/Vertical
-      IvDatasetRecVector[i].ConnStr         := dst.FieldByName('FldConnStr'        ).AsString ;
-      IvDatasetRecVector[i].ConnLib         := dst.FieldByName('FldConnLib'        ).AsString ;
-    //IvDatasetRecVector[i].ParamStr        := dst.FieldByName('FldParamStr'       ).AsString ;
-    //IvDatasetRecVector[i].DefaultStr      := dst.FieldByName('FldDefaultStr'     ).AsString ;
-      IvDatasetRecVector[i].Language        := dst.FieldByName('FldLanguage'       ).AsString ;
-      IvDatasetRecVector[i].MaxRecords      := dst.FieldByName('FldMaxRecords'     ).AsInteger;
-    //IvDatasetRecVector[i].MaxRecordsCsv   := dst.FieldByName('FldMaxRecordsCsv'  ).AsString ;
-      IvDatasetRecVector[i].Select          := dst.FieldByName('FldSelect'         ).AsString ;
-      IvDatasetRecVector[i].SelectDev       := dst.FieldByName('FldSelectDev'      ).AsString ;
-      IvDatasetRecVector[i].SelectBak       := dst.FieldByName('FldSelectBak'      ).AsString ;
-      IvDatasetRecVector[i].Insert          := dst.FieldByName('FldInsert'         ).AsString ;
-      IvDatasetRecVector[i].Update          := dst.FieldByName('FldUpdate'         ).AsString ;
-      IvDatasetRecVector[i].Delete          := dst.FieldByName('FldDelete'         ).AsString ;
-      IvDatasetRecVector[i].ViewerCsv       := dst.FieldByName('FldViewerCsv'      ).AsString ;
-      IvDatasetRecVector[i].Editable        := dst.FieldByName('FldEditable'       ).AsBoolean;
-      IvDatasetRecVector[i].EditorCsv       := dst.FieldByName('FldEditorCsv'      ).AsString ;
-      IvDatasetRecVector[i].EditIni         := dst.FieldByName('FldEditIni'        ).AsString ;
-      IvDatasetRecVector[i].Json            := dst.FieldByName('FldJson'           ).AsString ;
-      IvDatasetRecVector[i].Switch          := dst.FieldByName('FldSwitch'         ).AsString ;
-      IvDatasetRecVector[i].&Class          := dst.FieldByName('FldClass'          ).AsString.Replace(',', '');
-      IvDatasetRecVector[i].Style           := dst.FieldByName('FldStyle'          ).AsString.Replace(',', ';');
-      IvDatasetRecVector[i].TitleOn         := dst.FieldByName('FldTitleOn'        ).AsBoolean;
-      IvDatasetRecVector[i].PanelOn         := dst.FieldByName('FldPanelOn'        ).AsBoolean;
-      IvDatasetRecVector[i].PanelClosed     := dst.FieldByName('FldPanelClosed'    ).AsBoolean;
-      IvDatasetRecVector[i].TimeoutSec      := dst.FieldByName('FldTimeoutSec'     ).AsInteger;
-      IvDatasetRecVector[i].FeedbackIfEmpty := dst.FieldByName('FldFeedbackIfEmpty').AsString ;
+      IvDatasetRecVector[i].ReportId        := dst.FieldByName('FldObjectId'       ).AsInteger;                  //FldObjectId    // key
+      IvDatasetRecVector[i].Order           := dst.FieldByName('FldOrder'          ).AsInteger;                  //FldOrder
+      IvDatasetRecVector[i].State           := dst.FieldByName('FldState'          ).AsString ;                  //FldState
+      IvDatasetRecVector[i].Dataset         := dst.FieldByName('FldDataset'        ).AsString ;                  //FldDataset     // key
+      IvDatasetRecVector[i].Title           := dst.FieldByName('FldTitle'          ).AsString ;                  //FldTitle
+      IvDatasetRecVector[i].Description     := dst.FieldByName('FldDescription'    ).AsString ;                  //FldDescription
+      IvDatasetRecVector[i].Mode            := dst.FieldByName('FldMode'           ).AsString ;                  //FldMode        // Horizontal/Vertical
+      IvDatasetRecVector[i].ConnStr         := dst.FieldByName('FldConnStr'        ).AsString ;                  //FldConnStr
+      IvDatasetRecVector[i].ConnLib         := dst.FieldByName('FldConnLib'        ).AsString ;                  //FldConnLib
+    //IvDatasetRecVector[i].ParamStr        := dst.FieldByName('FldParamStr'       ).AsString ;                  //FldParamStr
+    //IvDatasetRecVector[i].DefaultStr      := dst.FieldByName('FldDefaultStr'     ).AsString ;                  //FldDefaultStr
+      IvDatasetRecVector[i].Language        := dst.FieldByName('FldLanguage'       ).AsString ;                  //FldLanguage
+      IvDatasetRecVector[i].MaxRecords      := dst.FieldByName('FldMaxRecords'     ).AsInteger;                  //FldMaxRecords
+    //IvDatasetRecVector[i].MaxRecordsCsv   := dst.FieldByName('FldMaxRecordsCsv'  ).AsString ;                  //FldMaxRecordsCsv
+      IvDatasetRecVector[i].DriverSelect    := dst.FieldByName('FldDriverSelect'   ).AsString ;                  //FldDriverSelect
+      IvDatasetRecVector[i].Select          := dst.FieldByName('FldSelect'         ).AsString ;                  //FldSelect
+      IvDatasetRecVector[i].SelectDev       := dst.FieldByName('FldSelectDev'      ).AsString ;                  //FldSelectDev
+      IvDatasetRecVector[i].SelectBak       := dst.FieldByName('FldSelectBak'      ).AsString ;                  //FldSelectBak
+      IvDatasetRecVector[i].Insert          := dst.FieldByName('FldInsert'         ).AsString ;                  //FldInsert
+      IvDatasetRecVector[i].Update          := dst.FieldByName('FldUpdate'         ).AsString ;                  //FldUpdate
+      IvDatasetRecVector[i].Delete          := dst.FieldByName('FldDelete'         ).AsString ;                  //FldDelete
+      IvDatasetRecVector[i].ViewerCsv       := dst.FieldByName('FldViewerCsv'      ).AsString ;                  //FldViewerCsv
+      IvDatasetRecVector[i].Editable        := dst.FieldByName('FldEditable'       ).AsBoolean;                  //FldEditable
+      IvDatasetRecVector[i].EditorCsv       := dst.FieldByName('FldEditorCsv'      ).AsString ;                  //FldEditorCsv
+      IvDatasetRecVector[i].EditIni         := dst.FieldByName('FldEditIni'        ).AsString ;                  //FldEditIni
+      IvDatasetRecVector[i].Json            := dst.FieldByName('FldJson'           ).AsString ;                  //FldJson
+      IvDatasetRecVector[i].Switch          := dst.FieldByName('FldSwitch'         ).AsString ;                  //FldSwitch
+      IvDatasetRecVector[i].&Class          := dst.FieldByName('FldClass'          ).AsString.Replace(',', '');  //FldClass
+      IvDatasetRecVector[i].Style           := dst.FieldByName('FldStyle'          ).AsString.Replace(',', ';'); //FldStyle
+      IvDatasetRecVector[i].TitleOn         := dst.FieldByName('FldTitleOn'        ).AsBoolean;                  //FldTitleOn
+      IvDatasetRecVector[i].PanelOn         := dst.FieldByName('FldPanelOn'        ).AsBoolean;                  //FldPanelOn
+      IvDatasetRecVector[i].PanelClosed     := dst.FieldByName('FldPanelClosed'    ).AsBoolean;                  //FldPanelClosed
+      IvDatasetRecVector[i].TimeoutSec      := dst.FieldByName('FldTimeoutSec'     ).AsInteger;                  //FldTimeoutSec
+      IvDatasetRecVector[i].FeedbackIfEmpty := dst.FieldByName('FldFeedbackIfEmpty').AsString ;                  //FldFeedbackIfEmpty
+      IvDatasetRecVector[i].Header          := dst.FieldByName('FldHeader'         ).AsString ;                  //FldHeader
+      IvDatasetRecVector[i].Footer          := dst.FieldByName('FldFooter'         ).AsString ;                  //FldFooter
+      IvDatasetRecVector[i].RepeaterHeader  := dst.FieldByName('FldRepeaterHeader' ).AsString ;                  //FldRepeaterHeader
+      IvDatasetRecVector[i].RepeaterPre     := dst.FieldByName('FldRepeaterPre'    ).AsString ;                  //FldRepeaterPre
+      IvDatasetRecVector[i].RepeaterItem    := dst.FieldByName('FldRepeaterItem'   ).AsString ;                  //FldRepeaterItem
+      IvDatasetRecVector[i].RepeaterPost    := dst.FieldByName('FldRepeaterPost'   ).AsString ;                  //FldRepeaterPost
+      IvDatasetRecVector[i].RepeaterFooter  := dst.FieldByName('FldRepeaterFooter' ).AsString ;                  //FldRepeaterFooter
+      IvDatasetRecVector[i].RepeaterOn      := dst.FieldByName('FldRepeaterOn'     ).AsBoolean;                  //FldRepeaterOn
 
       // charts
       {Result :=} ChartDbaSelect(IvDatasetRecVector[i].ChartRecVector, rid, IvDatasetRecVector[i].Dataset, IvFbk);
@@ -23249,7 +24086,7 @@ begin
   {$ENDREGION}
 
   {$REGION 'load'}
-  sql := Format(   ' select'
+  sql := Format( ' select'
   + sLineBreak + '     *'
   + sLineBreak + ' from'
   + sLineBreak + '     DbaReport.dbo.TblChart'
@@ -23276,23 +24113,47 @@ begin
       SetLength(IvChartRecVector, Length(IvChartRecVector)+1);
 
       // chart
-      IvChartRecVector[i].ReportId                   := dst.FieldByName('FldObjectId'      ).AsInteger; // key
-      IvChartRecVector[i].Order                      := dst.FieldByName('FldOrder'         ).AsInteger;
-      IvChartRecVector[i].State                      := dst.FieldByName('FldState'         ).AsString;
-      IvChartRecVector[i].Dataset                    := dst.FieldByName('FldDataset'       ).AsString;  // key
-      IvChartRecVector[i].Chart                      := dst.FieldByName('FldChart'         ).AsString;  // key
-      IvChartRecVector[i].Title                      := dst.FieldByName('FldTitle'         ).AsString;
-      IvChartRecVector[i].Subtitle                   := dst.FieldByName('FldSubtitle'      ).AsString;
-      IvChartRecVector[i].Description                := dst.FieldByName('FldDescription'   ).AsString;
-      IvChartRecVector[i].Width                      := dst.FieldByName('FldWidth'         ).AsString;
-      IvChartRecVector[i].Height                     := dst.FieldByName('FldHeight'        ).AsString;
-      IvChartRecVector[i].TitleOn                    := dst.FieldByName('FldTitleOn'       ).AsBoolean;
-      IvChartRecVector[i].PanelOn                    := dst.FieldByName('FldPanelOn'       ).AsBoolean;
-      IvChartRecVector[i].PanelClosed                := dst.FieldByName('FldPanelClosed'   ).AsBoolean;
-      IvChartRecVector[i].XAxisRec.TitleRec.Caption  := dst.FieldByName('FldXCaption'      ).AsString;
-      IvChartRecVector[i].YAxisRec.TitleRec.Caption  := dst.FieldByName('FldYCaption'      ).AsString;
-      IvChartRecVector[i].XAxisRec.LabelRec.AngleDeg := dst.FieldByName('FldXLabelAngleDeg').AsString;
-      IvChartRecVector[i].YAxisRec.LabelRec.AngleDeg := dst.FieldByName('FldYLabelAngleDeg').AsString;
+      IvChartRecVector[i].ReportId                   := dst.FieldByName('FldObjectId'        ).AsInteger; // key
+      IvChartRecVector[i].Order                      := dst.FieldByName('FldOrder'           ).AsInteger;
+      IvChartRecVector[i].RsNo                       := dst.FieldByName('FldRsNo'            ).AsInteger;
+      IvChartRecVector[i].State                      := dst.FieldByName('FldState'           ).AsString;
+      IvChartRecVector[i].Dataset                    := dst.FieldByName('FldDataset'         ).AsString;  // key
+      IvChartRecVector[i].Chart                      := dst.FieldByName('FldChart'           ).AsString;  // key
+      IvChartRecVector[i].Title                      := dst.FieldByName('FldTitle'           ).AsString;
+      IvChartRecVector[i].Subtitle                   := dst.FieldByName('FldSubtitle'        ).AsString;
+      IvChartRecVector[i].Description                := dst.FieldByName('FldDescription'     ).AsString;
+      IvChartRecVector[i].Width                      := dst.FieldByName('FldWidth'           ).AsString;
+      IvChartRecVector[i].Height                     := dst.FieldByName('FldHeight'          ).AsString;
+      IvChartRecVector[i].TitleOn                    := dst.FieldByName('FldTitleOn'         ).AsBoolean;
+      IvChartRecVector[i].PanelOn                    := dst.FieldByName('FldPanelOn'         ).AsBoolean;
+      IvChartRecVector[i].PanelClosed                := dst.FieldByName('FldPanelClosed'     ).AsBoolean;
+
+      IvChartRecVector[i].DoExport                   := dst.FieldByName('FldDoExport'        ).AsBoolean;
+      IvChartRecVector[i].TooltipShared              := dst.FieldByName('FldTooltipShared'   ).AsBoolean;
+
+      IvChartRecVector[i].XAxisRec.TitleRec.Caption  := dst.FieldByName('FldXCaption'        ).AsString;
+      IvChartRecVector[i].YAxisRec.TitleRec.Caption  := dst.FieldByName('FldYCaption'        ).AsString;
+
+      IvChartRecVector[i].XAxisRec.LabelRec.AngleDeg := dst.FieldByName('FldXLabelAngleDeg'  ).AsString;
+      IvChartRecVector[i].YAxisRec.LabelRec.AngleDeg := dst.FieldByName('FldYLabelAngleDeg'  ).AsString;
+
+      IvChartRecVector[i].XAxisRec.Format            := dst.FieldByName('FldXFormat'         ).AsString;
+      IvChartRecVector[i].YAxisRec.Format            := dst.FieldByName('FldYFormat'         ).AsString;
+
+      IvChartRecVector[i].XAxisRec.StripLinesJson    := dst.FieldByName('FldXStripLinesJson' ).AsString;
+      IvChartRecVector[i].YAxisRec.StripLinesJson    := dst.FieldByName('FldYStripLinesJson' ).AsString;
+
+      IvChartRecVector[i].XAxisRec.ScaleBreacksJson  := dst.FieldByName('FldXScaleBreaksJson').AsString;
+      IvChartRecVector[i].YAxisRec.ScaleBreacksJson  := dst.FieldByName('FldYScaleBreaksJson').AsString;
+
+      IvChartRecVector[i].XAxisRec.Minimum           := dst.FieldByName('FldXMinimum'        ).AsString;
+      IvChartRecVector[i].YAxisRec.Minimum           := dst.FieldByName('FldYMinimum'        ).AsString;
+
+      IvChartRecVector[i].XAxisRec.Maximum           := dst.FieldByName('FldXMaximum'        ).AsString;
+      IvChartRecVector[i].YAxisRec.Maximum           := dst.FieldByName('FldYMaximum'        ).AsString;
+
+      IvChartRecVector[i].XAxisRec.Margin            := dst.FieldByName('FldXMargin'         ).AsString;
+      IvChartRecVector[i].YAxisRec.Margin            := dst.FieldByName('FldYMargin'         ).AsString;
 
       // series
       {Result :=} SerieDbaSelect(IvChartRecVector[i].SerieRecVector, rid, IvChartRecVector[i].Dataset, IvChartRecVector[i].Chart, IvFbk);
@@ -23365,26 +24226,39 @@ begin
       SetLength(IvSerieRecVector, Length(IvSerieRecVector)+1);
 
       // serie
-      IvSerieRecVector[i].ReportId      := dst.FieldByName('FldObjectId'     ).AsInteger; // key
-      IvSerieRecVector[i].Order         := dst.FieldByName('FldOrder'        ).AsInteger;
-      IvSerieRecVector[i].State         := dst.FieldByName('FldState'        ).AsString;
-      IvSerieRecVector[i].Dataset       := dst.FieldByName('FldDataset'      ).AsString;  // key
-      IvSerieRecVector[i].Chart         := dst.FieldByName('FldChart'        ).AsString;  // key
-      IvSerieRecVector[i].Serie         := dst.FieldByName('FldSerie'        ).AsString;  // key
-      IvSerieRecVector[i].Kind          := dst.FieldByName('FldKind'         ).AsString;
-      IvSerieRecVector[i].Title         := dst.FieldByName('FldTitle'        ).AsString;
-      IvSerieRecVector[i].Legend        := dst.FieldByName('FldLegend'       ).AsString;
-      IvSerieRecVector[i].LegendOn      := dst.FieldByName('FldLegendOn'     ).AsBoolean;
-      IvSerieRecVector[i].ToolTip       := dst.FieldByName('FldToolTip'      ).AsString;
-      IvSerieRecVector[i].ToolTipShared := dst.FieldByName('FldToolTipShared').AsBoolean;
-      IvSerieRecVector[i].XLabelField   := dst.FieldByName('FldXLabelField'  ).AsString;
-      IvSerieRecVector[i].XField        := dst.FieldByName('FldXField'       ).AsString;
-      IvSerieRecVector[i].YField        := dst.FieldByName('FldYField'       ).AsString;
-      IvSerieRecVector[i].ZField        := dst.FieldByName('FldZField'       ).AsString;
-      IvSerieRecVector[i].ToolTipField  := dst.FieldByName('FldToolTipField' ).AsString;
-      IvSerieRecVector[i].ColorField    := dst.FieldByName('FldColorField'   ).AsString;
-      IvSerieRecVector[i].SizeField     := dst.FieldByName('FldSizeField'    ).AsString;
-      IvSerieRecVector[i].ShapeField    := dst.FieldByName('FldShapeField'   ).AsString;
+      IvSerieRecVector[i].ReportId           := dst.FieldByName('FldObjectId'          ).AsInteger; // key
+      IvSerieRecVector[i].Order              := dst.FieldByName('FldOrder'             ).AsInteger;
+      IvSerieRecVector[i].State              := dst.FieldByName('FldState'             ).AsString;
+      IvSerieRecVector[i].Dataset            := dst.FieldByName('FldDataset'           ).AsString;  // key
+      IvSerieRecVector[i].Chart              := dst.FieldByName('FldChart'             ).AsString;  // key
+      IvSerieRecVector[i].Serie              := dst.FieldByName('FldSerie'             ).AsString;  // key
+      IvSerieRecVector[i].Kind               := dst.FieldByName('FldKind'              ).AsString;
+      IvSerieRecVector[i].Title              := dst.FieldByName('FldTitle'             ).AsString;
+      IvSerieRecVector[i].Description        := dst.FieldByName('FldDescription'       ).AsString;
+      IvSerieRecVector[i].Legend             := dst.FieldByName('FldLegend'            ).AsString;
+      IvSerieRecVector[i].LegendOn           := dst.FieldByName('FldLegendOn'          ).AsBoolean;
+      IvSerieRecVector[i].ToolTip            := dst.FieldByName('FldToolTip'           ).AsString;
+      IvSerieRecVector[i].ToolTipShared      := dst.FieldByName('FldToolTipShared'     ).AsBoolean;
+      IvSerieRecVector[i].XLabelField        := dst.FieldByName('FldXLabelField'       ).AsString;
+      IvSerieRecVector[i].XField             := dst.FieldByName('FldXField'            ).AsString;
+      IvSerieRecVector[i].YField             := dst.FieldByName('FldYField'            ).AsString;
+      IvSerieRecVector[i].ZField             := dst.FieldByName('FldZField'            ).AsString;
+      IvSerieRecVector[i].ToolTipField       := dst.FieldByName('FldToolTipField'      ).AsString;
+      IvSerieRecVector[i].ColorField         := dst.FieldByName('FldColorField'        ).AsString;
+      IvSerieRecVector[i].SizeField          := dst.FieldByName('FldSizeField'         ).AsString;
+      IvSerieRecVector[i].ShapeField         := dst.FieldByName('FldShapeField'        ).AsString;
+      IvSerieRecVector[i].Color              := dst.FieldByName('FldColor'             ).AsString;
+      IvSerieRecVector[i].LineSize           := dst.FieldByName('FldLineSize'          ).AsString;
+      IvSerieRecVector[i].LineType           := dst.FieldByName('FldLineType'          ).AsString;
+      IvSerieRecVector[i].LineColor          := dst.FieldByName('FldLineColor'         ).AsString;
+      IvSerieRecVector[i].MarkerSize         := dst.FieldByName('FldMarkerSize'        ).AsString;
+      IvSerieRecVector[i].MarkerType         := dst.FieldByName('FldMarkerType'        ).AsString;
+      IvSerieRecVector[i].MarkerColor        := dst.FieldByName('FldMarkerColor'       ).AsString;
+      IvSerieRecVector[i].IsLogarithmic      := dst.FieldByName('FldIsLogarithmic'     ).AsBoolean;
+      IvSerieRecVector[i].YAxisNo            := dst.FieldByName('FldYAxisNo'           ).AsInteger;
+      IvSerieRecVector[i].YAxisPrefix        := dst.FieldByName('FldYAxisPrefix'       ).AsString;
+      IvSerieRecVector[i].YAxisSuffix        := dst.FieldByName('FldYAxisSuffix'       ).AsString;
+      IvSerieRecVector[i].YAxisLabelAngleDeg := dst.FieldByName('FldYAxisLabelAngleDeg').AsString;
 
       // next
       dst.Next;
@@ -23548,43 +24422,52 @@ class procedure TRicRec.TextAdd(IvRichEdit: TRichEdit; IvString: string; IvColor
 var
   cha: TCharFormat2;
 begin
-  // bg
-  if IvColorBg <> clWindow then begin
-    FillChar(cha, sizeof(cha), 0);
-    cha.cbSize := sizeof(cha);
-    cha.dwMask := CFM_BACKCOLOR;
-    cha.crBackColor := ColorToRGB(IvColorBg);
-    IvRichEdit.Perform(EM_SETCHARFORMAT, SCF_SELECTION, lparam(@cha));
+  IvRichEdit.Lines.BeginUpdate;
+  try
+    // bg
+    if IvColorBg <> clWindow then begin
+      FillChar(cha, sizeof(cha), 0);
+      cha.cbSize := sizeof(cha);
+      cha.dwMask := CFM_BACKCOLOR;
+      cha.crBackColor := ColorToRGB(IvColorBg);
+      IvRichEdit.Perform(EM_SETCHARFORMAT, SCF_SELECTION, lparam(@cha));
+    end;
+
+    // fg
+    IvRichEdit.SelAttributes.Color := IvColorFg;
+
+    // align
+    IvRichEdit.Paragraph.Alignment := IvAlign;
+
+    // size
+    IvRichEdit.SelAttributes.Size  := IvSize;
+
+    // style
+    IvRichEdit.SelAttributes.Style := [];
+    if IvBold      then IvRichEdit.SelAttributes.Style := IvRichEdit.SelAttributes.Style + [fsBold];
+    if IvUnderline then IvRichEdit.SelAttributes.Style := IvRichEdit.SelAttributes.Style + [fsUnderline];
+    if IvItalic    then IvRichEdit.SelAttributes.Style := IvRichEdit.SelAttributes.Style + [fsItalic];
+    if IvStrikeOut then IvRichEdit.SelAttributes.Style := IvRichEdit.SelAttributes.Style + [fsStrikeOut];
+
+    // move caret to the end and always add at the end, no matter what the user has selected
+    IvRichEdit.SelStart := IvRichEdit.GetTextLen;
+    IvRichEdit.SelLength := 0;
+    IvRichEdit.SelText := IvString + sLineBreak;
+
+    // scrolldown
+    IvRichEdit.SelStart := IvRichEdit.GetTextLen; // again
+    IvRichEdit.Perform(EM_SCROLLCARET, 0, 0); // scrolls until the caret
+  //IvRichEdit.Perform(EM_LINESCROLL, 0, 1);  // scroll just one line, no garantee to scroll to the bottom is the user has moved up the cursor
+  finally
+    IvRichEdit.Lines.EndUpdate;
   end;
-
-  // fg
-  IvRichEdit.SelAttributes.Color := IvColorFg;
-
-  // align
-  IvRichEdit.Paragraph.Alignment := IvAlign;
-
-  // size
-  IvRichEdit.SelAttributes.Size  := IvSize;
-
-  // style
-  IvRichEdit.SelAttributes.Style := [];
-  if IvBold      then IvRichEdit.SelAttributes.Style := IvRichEdit.SelAttributes.Style + [fsBold];
-  if IvUnderline then IvRichEdit.SelAttributes.Style := IvRichEdit.SelAttributes.Style + [fsUnderline];
-  if IvItalic    then IvRichEdit.SelAttributes.Style := IvRichEdit.SelAttributes.Style + [fsItalic];
-  if IvStrikeOut then IvRichEdit.SelAttributes.Style := IvRichEdit.SelAttributes.Style + [fsStrikeOut];
-
-  // scrolldown
-  SendMessage(IvRichEdit.Handle, EM_LINESCROLL, 0, 1);
-
-  // add
-  IvRichEdit.SelText := IvString;
 end;
 
 class procedure TRicRec.RowAdd(IvRichEdit: TRichEdit; IvString: string; IvColorFg,
   IvColorBg: TColor; IvAlign: TAlignment; IvSize: integer; IvBold, IvUnderline,
   IvItalic, IvStrikeOut: boolean);
 begin
-  TextAdd(IvRichEdit, IvString + sLineBreak, IvColorFg, IvColorBg, IvAlign, IvSize, IvBold, IvUnderline, IvItalic, IvStrikeOut);
+  TextAdd(IvRichEdit, IvString{ + sLineBreak}, IvColorFg, IvColorBg, IvAlign, IvSize, IvBold, IvUnderline, IvItalic, IvStrikeOut);
 end;
   {$ENDREGION}
 
@@ -23711,10 +24594,10 @@ begin                                                                          /
   if s.Contains('[o]') then s := s.Replace('[o]', '&#11093;', [rfReplaceAll]); // this can impact if o is js a variable!
   if s.Contains('[z]') then s := s.Replace('[z]', '&#9889;' , [rfReplaceAll]); // this can impact if z is js a variable!
   if s.Contains('[#]') then s := s.Replace('[#]', '&#9940;' , [rfReplaceAll]);
-  if s.Contains('[=]') then s := s.Replace('[=]', '&#9776;' , [rfReplaceAll]); //	a list, options, params
-  if s.Contains('[Q]') then s := s.Replace('[Q]', '&#9862;' , [rfReplaceAll]); //	wafer
-  if s.Contains('[O]') then s := s.Replace('[O]', '&#9898;' , [rfReplaceAll]); //	circle big white
-  if s.Contains('[O]') then s := s.Replace('[O]', '&#9899;' , [rfReplaceAll]); //	circle big black
+  if s.Contains('[=]') then s := s.Replace('[=]', '&#9776;' , [rfReplaceAll]); // a list, options, params
+  if s.Contains('[Q]') then s := s.Replace('[Q]', '&#9862;' , [rfReplaceAll]); // wafer
+  if s.Contains('[O]') then s := s.Replace('[O]', '&#9898;' , [rfReplaceAll]); // circle big white
+  if s.Contains('[O]') then s := s.Replace('[O]', '&#9899;' , [rfReplaceAll]); // circle big black
 end;
 
 procedure TRvaRec.RvaIf(var s: string);
@@ -23998,9 +24881,10 @@ var
   begin
     Result := '?';
          if fun.Equals('HtmForm')                then Result := 'DaFare'
-    else if fun.Equals('HtmReport')              then Result := THtmRec.Report(a[0].ToInteger, a[1])                                                   // [RvHtmReportFromId(id | default-if-any-ds-is-empty)]]
-    else if fun.Equals('HtmRepeatFromSql')       then Result := THtmRec.RepeatFromSql(a[0], a[1], a[2], a[3], a[4])                                    // [RvHtmRepeatSql(sql | html-block-with-$FldAaa$ | header | footer | default-if-empty)]
-    else if fun.Equals('HtmSlidesFromSql')       then Result := THtmRec.SlidesFromSql(a[0], a[1], a[2], a[3], a[4], StrToIntDef(a[5], 1))              // [RvHtmSlidesSql(sql | html-slide-block-with-$FldAaa$ | header | footer | default-if-empty | slideid)] (similar to repeater)
+    else if fun.Equals('HtmReport')              then Result := THtmRec.Report(a[0].ToInteger, a[1], StrToBoolDef(a[2], false), StrToBoolDef(a[3], false))  // [RvHtmReportFromId(id | default-if-any-ds-is-empty | parameters-off | tableheader-off)]]
+    else if fun.Equals('HtmRepeatFromSql')       then Result := THtmRec.RepeatFromSql(a[0], a[1], a[2], a[3], a[4])                                         // [RvHtmRepeatSql(sql | html-block-with-$FldAaa$ | header | footer | default-if-empty)]
+    else if fun.Equals('HtmRepeatNestedFromSql') then Result := THtmRec.RepeatNestedFromSql(a[0], a[1], a[2], a[3], a[4], a[5], a[6])                       // driver-sql| driven-item-sql| item-header| item-body| item-footer| top-header| bottom-footer
+    else if fun.Equals('HtmSlidesFromSql')       then Result := THtmRec.SlidesFromSql(a[0], a[1], a[2], a[3], a[4], StrToIntDef(a[5], 1))                   // [RvHtmSlidesSql(sql | html-slide-block-with-$FldAaa$ | header | footer | default-if-empty | slideid)] (similar to repeater)
     else if fun.Equals('HtmTableFromSql')        then Result := THtmRec.TableFromSql(StrToIntDef(a[0], 0), a[1], a[2], a[3], a[4], a[5], a[6], a[7], false, '', hvHorizontal, StrToBoolDef(a[4], false), StrToBoolDef(a[5], false))
     else if fun.Equals('HtmWordifyFromSql')      then Result := 'ToDo' // [RvHtmWordifyFromSql(dts# | sql | connstr | connlib | default-if-empty | coname | class | style | recordcountoff | headeroff | editable-true-false | edit-json | direction-horiz-vert)
     ;
@@ -24738,9 +25622,9 @@ var
 begin
   sql :=         'select 1 from DbaClient.dbo.TblSession'
   + sLineBreak + 'where'
-  + sLineBreak + '    FldDateTimeBegin       = ' + TSqlRec.Val(IvDateTimeBegin)
-  + sLineBreak + 'and FldSessionId           = ' + TSqlRec.Val(IvSessionId)
-  + sLineBreak + 'and FldIpLan               = ' + TSqlRec.Val(IvIpLan);
+  + sLineBreak + '    FldDateTimeBegin ' + TSqlRec.ValEx(IvDateTimeBegin)
+  + sLineBreak + 'and FldSessionId     ' + TSqlRec.ValEx(IvSessionId)
+  + sLineBreak + 'and FldIpLan         ' + TSqlRec.ValEx(IvIpLan);
   Result := TDbaRec.Scalar(sql, 0) = 1;
   IvFbk := ifthen(Result, 'Session exists', 'Session does nor exists');
 end;
@@ -24751,14 +25635,27 @@ var
 begin
   sql :=         'select 1 from DbaClient.dbo.TblSession'
   + sLineBreak + 'where'
-  + sLineBreak + '    FldDateTimeBegin       = ' + TSqlRec.Val(DateTimeBegin)
-  + sLineBreak + 'and FldDateTimeEnd        is ' + 'null'
-  + sLineBreak + 'and FldIpLan               = ' + TSqlRec.Val(IpLan        )
-  + sLineBreak + 'and FldSessionId           = ' + TSqlRec.Val(SessionId    )
-  + sLineBreak + 'and FldOrganization        = ' + TSqlRec.Val(Organization )
-  + sLineBreak + 'and FldUsername            = ' + TSqlRec.Val(Username     );
+  + sLineBreak + '    FldDateTimeBegin ' + TSqlRec.ValEx(DateTimeBegin)
+  + sLineBreak + 'and FldDateTimeEnd   is null'
+  + sLineBreak + 'and FldIpLan         ' + TSqlRec.ValEx(IpLan        )
+  + sLineBreak + 'and FldSessionId     ' + TSqlRec.ValEx(SessionId    )
+  + sLineBreak + 'and FldOrganization  ' + TSqlRec.ValEx(Organization )
+  + sLineBreak + 'and FldUsername      ' + TSqlRec.ValEx(Username     );
   Result := TDbaRec.Scalar(sql, 0) = 1;
   IvFbk := ifthen(Result, 'Session is valid', 'Session is not valid');
+end;
+
+function TSesRec.IsClosed: boolean;
+var
+  sql: string;
+begin
+  sql :=         'select 1 from DbaClient.dbo.TblSession'
+  + sLineBreak + 'where'
+  + sLineBreak + '    FldDateTimeEnd   is not null'
+  + sLineBreak + 'and FldIpLan         ' + TSqlRec.ValEx(IpLan        )
+  + sLineBreak + 'and FldSessionId     ' + TSqlRec.ValEx(SessionId    )
+  + sLineBreak + 'and FldFingerprintId ' + TSqlRec.ValEx(FingerprintId);
+  Result := TDbaRec.Scalar(sql, 0) = 1;
 end;
 
 procedure TSesRec.Reset;
@@ -24999,9 +25896,9 @@ begin
     if not Result then
       Exit;
 
-    Smtp         := rem.Smtp;      // Wks
-    Host         := rem.Host;      // www.wks.cloud
-    Port         := rem.Port;      // 25
+    Smtp         := rem.Smtp;     // Wks
+    Host         := rem.Host;     // www.wks.cloud
+    Port         := rem.Port;     // 25
     Username     := rem.Username;
     Password     := rem.Password;
   finally
@@ -25220,6 +26117,17 @@ begin
     Result := Trim(IvValue).QuotedString;
 end;
 
+class function TSqlRec.ValEx(IvValue: variant; IvDefault: string): string;
+var
+  value: string;
+begin
+  value := Val(IvValue, IvDefault);
+  if SameText(value, 'null') then
+    Result := ' is null'
+  else
+    Result := ' = ' + value
+end;
+
 class function  TSqlRec.SqlFilterRv(IvField, IvValue: string): string;
 
   {$REGION 'Help'}
@@ -25323,7 +26231,7 @@ class function  TSqlRec.SqlFilter(IvStrToSearch, IvFieldToSearchCsv, IvAdditiona
 var
   i: integer;
   vec: {$IF COMPILERVERSION < 32.0} TStringDynArray {$ELSE} TArray<string> {$ENDIF}; // fieldvec
-  fil: string;          // filter
+  fil: string; // filter
 begin
   // vector
   vec := TArray<string>(SplitString(IvFieldToSearchCsv, ',')); // 10.1
@@ -25619,12 +26527,12 @@ end;
   {$ENDREGION}
 
   {$REGION 'TStrRec'}
-class function TStrRec.StrIsWhite(const IvString: string): boolean;
+class function  TStrRec.StrIsWhite(const IvString: string): boolean;
 begin
   Result := IvString.Trim.IsEmpty;
 end;
 
-class function TStrRec.StrIsBold(const IvString: string): boolean;
+class function  TStrRec.StrIsBold(const IvString: string): boolean;
 begin
   Result := not StrIsWhite(IvString);
 end;
@@ -25913,18 +26821,18 @@ begin
     Result := Uppercase(Copy(IvStr, 1, 1)) + Lowercase(Copy(IvStr, 2, Length(IvStr))); // proper
 end;
 
-class function  TStrRec.StrCase(IvStr: string; IvCase: TCaseEnum): string;
+class function  TStrRec.StrCase(IvStr: string; IvCase: TFontCaseEnum): string;
 begin
   case IvCase of
-    cAsIs:
+    fcAsIs:
       Result := IvStr;
-    cLower:
+    fcLower:
       Result := IvStr.ToLower;
-    cUpper:
+    fcUpper:
       Result := IvStr.ToUpper;
-    cCapital:
+    fcCapital:
       Result := StrCapitalize(IvStr, false);
-    cCapitalAll:
+    fcCapitalAll:
       Result := StrCapitalize(IvStr, true);
   end;
 end;
@@ -25945,7 +26853,7 @@ begin
     Result := Result.Replace(#13, '');
 end;
 
-class function  TStrRec.StrExpand(IvStr, IvDelimiter: string{; IvCase: TCaseEnum}): string;
+class function  TStrRec.StrExpand(IvStr, IvDelimiter: string{; IvCase: TFontCaseEnum}): string;
 var
   p, c: char;       // prevchar, currchar
   i, j, k: integer; // count, prevcharord, currcharord
@@ -26720,28 +27628,28 @@ var
 begin
   // regionskind
            if CodeKind in [ckJava, ckJs, ckJsl] then begin
-    a := '\/\/\[REGION ''.*''\]';                                               // //[REGION 'abc']
-    b := '\/\/\[ENDREGION\]';                                                   // //[ENDREGION]
+    a := '\/\/\[REGION ''.*''\]';                                           // //[REGION 'abc']
+    b := '\/\/\[ENDREGION\]';                                               // //[ENDREGION]
 
   end else if CodeKind = ckCss  then begin
-    a := '\/\*\[REGION ''.*''\]\*\/';                                           // /*[REGION 'abc']*/
-    b := '\/\*\[ENDREGION\]\*\/';                                               // /*[ENDREGION]*/
+    a := '\/\*\[REGION ''.*''\]\*\/';                                       // /*[REGION 'abc']*/
+    b := '\/\*\[ENDREGION\]\*\/';                                           // /*[ENDREGION]*/
 
   end else if CodeKind = ckHtml then begin
-    a := '<!--\[REGION ''.*''\]-->';                                            // <!--[REGION 'abc']-->
-    b := '<!--\[ENDREGION\]-->';                                                // <!--[ENDREGION]-->
+    a := '<!--\[REGION ''.*''\]-->';                                        // <!--[REGION 'abc']-->
+    b := '<!--\[ENDREGION\]-->';                                            // <!--[ENDREGION]-->
 
   end else if CodeKind in [ckDws, ckIss, ckPas] then begin
-    a := '{$REGION ''.*''}';                                                    // {REGION 'abc'}
-    b := '{$ENDREGION}';                                                        // {ENDREGION}
+    a := '{$REGION ''.*''}';                                                // {REGION 'abc'}
+    b := '{$ENDREGION}';                                                    // {ENDREGION}
 
   end else if CodeKind in [ckPy, ckR, ckYaml]  then begin
-    a := '##\[REGION ''.*''\]';                                                 // ##[REGION 'abc']
-    b := '##\[ENDREGION\]';                                                     // ##[ENDREGION]
+    a := '##\[REGION ''.*''\]';                                             // ##[REGION 'abc']
+    b := '##\[ENDREGION\]';                                                 // ##[ENDREGION]
 
   end else begin  // ckEtl, ckJson, ckSql, ckTxt
-    a := '--\[REGION ''.*''\]';                                                 // --[REGION 'abc']
-    b := '--\[ENDREGION\]';                                                     // --[ENDREGION]
+    a := '--\[REGION ''.*''\]';                                             // --[REGION 'abc']
+    b := '--\[ENDREGION\]';                                                 // --[ENDREGION]
   end;
 
   // scan
@@ -27353,90 +28261,108 @@ begin
   Result := Format('(c) 2010-present %s %s', [ACRONYM, WWW]);
 end;
 
-class procedure TSysRec.WksWebFilesGenerate(IvUseSpin: boolean = true);
+class procedure TSysRec.WksWebFilesGenerate(IvJs, IvCss, IvHtml, IvHtmlUseSpin: boolean);
+const
+  IvWithChild           = true;
+  IvDescriptionBlockAdd = false;
+  IvHeaderAndFooterAdd  = false;
+  IvCommentRemove       = false;
+  IvLinesEmptyRemove    = false;
 var
   aff: integer;
   sbu: TSbuRec;
   nam, txt, fbk: string;
 begin
-  if not TDirectory.Exists(TSysRec.INC_PATH + '\wks') then
-    TDirectory.CreateDirectory(TSysRec.INC_PATH + '\wks');
 
-  // wks.js (hierarchical)
-  TDbaRec.ObjTreeContentDba('Code', 'Root/Organization/W/Wks/js/wks.js', true, {IvDescriptionBlockAdd}false, {IvHeaderAndFooterOff}false, {IvCommentRemove}false, {IvLinesEmptyRemove}false, aff, nam, txt, fbk);
-  sbu.Text := txt;
-  sbu.SaveToFile(TSysRec.INC_PATH + '\wks\js\wks.js');
+  {$REGION 'js'}
+  if IvJs then begin
+    // ensure
+    if not TDirectory.Exists(TSysRec.INC_PATH + '\W\wks\js-new') then
+      TDirectory.CreateDirectory(TSysRec.INC_PATH + '\W\wks\js-new');
 
-  // wks.css (hierarchical) *** nop, use w3.css ***
-//TDbaRec.ObjTreeContentDba('Code', 'Root/Organization/W/Wks/css/wks.css', true, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, aff, nam, txt, fbk);
-//sbu.Text := txt;
-//sbu.SaveToFile(TSysRec.INC_PATH + '\wks\css\wks.css');
-
-  // Default.htm
-  sbu.Clr;
-  sbu.Add('<!DOCTYPE html>'                                                       , true , 0);
-  sbu.Add('<html lang="en">'                                                                );
-  sbu.Add('<head>'                                                                          );
-  sbu.Add('  <title>%s Default Page</title>'                            , [gorg.Obj.&Object]); // TSysRec.ACRONYM // gorg.Organization
-  sbu.Add(''                                                                                );
-  sbu.Add('  <!-- META -->'                                                                 );
-  sbu.Add('  <meta charset="utf-8">'                                                        );
-  sbu.Add('  <meta http-equiv="refresh" content="0; url=/WksPageIsapiProject.dll/">'        ); // *** Wks have to be replaced by TSysRec.PREFIX ***
-  sbu.Add('  <meta name="description" content="%s" />'                      , [TSysRec.NAME]); // gorg.Name
-  sbu.Add('  <meta name="author" content="%s" />'                         , [TSysRec.AUTHOR]);
-  sbu.Add('  <link rel="icon" type="image/x-icon" href="%s" />'         , [TSysRec.ICON_URL]); // gorg.LogoIconUrl   option: rel="shortcut icon"
-  if IvUseSpin then begin
-  sbu.Add(''                                                                                );
-  sbu.Add('  <!-- EXTERNAL -->'                                                             );
-  sbu.Add('  <!--script language="javascript" src= "/Include/J/jquery/3.2.1/jquery.min.js"></script-->'                       );
-  sbu.Add('  <!--link   rel="stylesheet"      href="/Include/H/highslide/4.1.13/highslide/highslide.css" /-->'                );
-  sbu.Add('  <!--script language="javascript" src= "/Include/H/highslide/4.1.13/highslide/highslide-full.js"></script-->'     );
-  sbu.Add('  <!--script language="javascript" src= "/Include/H/highslide/4.1.13/highslide/highslide-with-html.js"></script-->');
-  sbu.Add('  <link rel="stylesheet" href="/Include/W/w3/4.0/w3-theme-%s.css" />'  , ['grey']); // gthe.Theme
-  sbu.Add('  <link rel="stylesheet" href="/Include/W/w3/4.0/w3.css" />'                     );
-  sbu.Add(''                                                                                );
-  sbu.Add('  <!-- INTERNAL -->'                                                             );
-  sbu.Add('  <link rel="icon" type="image/x-icon" href="/Organization/W/Wks/WksIcon.ico" />');
-  sbu.Add('  <link rel="stylesheet" type="text/css" href="/Include/W/wks/css/wks.css" />'   );
-  sbu.Add('  <script src="/Include/W/wks/js/wks.js"></script>'                              );
+    // wks.js (hierarchical)
+    TDbaRec.ObjTreeContentDba('Code', 'Root/Organization/W/Wks/js/wks.js', IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterAdd, IvCommentRemove, IvLinesEmptyRemove, aff, nam, txt, fbk);
+    sbu.Text := txt;
+    sbu.SaveToFile(TSysRec.INC_PATH + '\W\wks\js-new\wks.js');
   end;
-  sbu.Add('</head>'                                                                         );
-  sbu.Add('<body>'                                                                          ); // oncontextmenu="return false";
-  if IvUseSpin then begin
-  sbu.Add('  <!--br>'                                                                       );
-  sbu.Add('  <center>'                                                                      );
-  sbu.Add('  Wks Application Web Server'                                                    );
-  sbu.Add('  </center>'                                                                     );
-  sbu.Add('  <pre>'                                                                         );
-  sbu.Add('- host: www.wks.cloud'                                                           );
-  sbu.Add('- hw  : 1 Virtual Server'                                                        );
-  sbu.Add('- cpu : 1 Intel Xeon X5670 @2.93GHz'                                             );
-  sbu.Add('- ram : 8 GB'                                                                    );
-  sbu.Add('- net : unknown'                                                                 );
-  sbu.Add('- hd  : 80 Gb'                                                                   );
-  sbu.Add('- os  : 1 Windows Server 2012 Standard 64 bit'                                   );
-  sbu.Add('- adm : wks@wks.cloud'                                                           );
-  sbu.Add('- iis : iis8'                                                                    );
-  sbu.Add('- why : wks development'                                                         );
-  sbu.Add('  </pre-->'                                                                      );
-  sbu.Add(''                                                                                );
-  sbu.Add('  <div class="w3-waitloader-spin"></div>'                                        );
-  sbu.Add('  <div class="w3-waitloader-number"</div>'                                       );
-  sbu.Add(''                                                                                );
-  sbu.Add('  <script>'                                                                      );
-  sbu.Add('  var waitloadernumber = document.querySelector(".w3-waitloader-number");'       );
-  sbu.Add('  var count = 0;'                                                                );
-  sbu.Add('  setInterval('                                                                  );
-  sbu.Add('    () => {'                                                                     );
-  sbu.Add('      count++;'                                                                  );
-  sbu.Add('      if (count > 0) waitloadernumber.textContent = count;'                      );
-  sbu.Add('    }'                                                                           );
-  sbu.Add('  , 1000);'                                                                      );
-  sbu.Add('  </script>'                                                                     );
+  {$ENDREGION}
+
+  {$REGION 'css *** NOP! USE w3.css ***'}
+  if IvCss then begin
+    // ensure
+    if not TDirectory.Exists(TSysRec.INC_PATH + '\W\wks\css-new') then
+      TDirectory.CreateDirectory(TSysRec.INC_PATH + '\W\wks\css-new');
+
+    // wks.css (hierarchical)
+    TDbaRec.ObjTreeContentDba('Code', 'Root/Organization/W/Wks/css/wks.css', IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterAdd, IvCommentRemove, IvLinesEmptyRemove, aff, nam, txt, fbk);
+    sbu.Text := txt;
+    sbu.SaveToFile(TSysRec.INC_PATH + '\W\wks\css-new\wks.css');
   end;
-  sbu.Add('</body>'                                                                         );
-  sbu.Add('</html>'                                                                         );
-  sbu.SaveToFile(TSysRec.HOME_PATH + '\Default.htm');
+  {$ENDREGION}
+
+  {$REGION 'htm'}
+  if IvHtml then begin
+    // Default.htm
+    sbu.Clr;
+    sbu.Add('<!DOCTYPE html>'                                                       , true , 0);
+    sbu.Add('<html lang="en">'                                                                );
+    sbu.Add('<head>'                                                                          );
+    sbu.Add('  <title>%s Default Page</title>'                            , [gorg.Obj.&Object]); // TSysRec.ACRONYM // gorg.Organization
+    sbu.Add(''                                                                                );
+    sbu.Add('  <!-- META -->'                                                                 );
+    sbu.Add('  <meta charset="utf-8">'                                                        );
+    sbu.Add('  <meta http-equiv="refresh" content="0; url=/WksPageIsapiProject.dll/">'        ); // *** Wks have to be replaced by TSysRec.PREFIX ***
+    sbu.Add('  <meta name="description" content="%s" />'                      , [TSysRec.NAME]); // gorg.Name
+    sbu.Add('  <meta name="author" content="%s" />'                         , [TSysRec.AUTHOR]);
+    sbu.Add('  <link rel="icon" type="image/x-icon" href="%s" />'         , [TSysRec.ICON_URL]); // gorg.LogoIconUrl   option: rel="shortcut icon"
+    sbu.Add(''                                                                                );
+    sbu.Add('  <!-- EXTERNAL -->'                                                             );
+    sbu.Add('  <link rel="stylesheet" href="/Include/W/w3/4.0/w3-theme-%s.css" />'  , ['grey']); // gthe.Theme
+    sbu.Add('  <link rel="stylesheet" href="/Include/W/w3/4.0/w3.css" />'                     );
+    sbu.Add(''                                                                                );
+    sbu.Add('  <!-- INTERNAL -->'                                                             );
+    sbu.Add('  <link rel="stylesheet" type="text/css" href="/Include/W/wks/css/wks.css" />'   );
+    sbu.Add('  <script src="/Include/W/wks/js/wks.js"></script>'                              );
+    sbu.Add('</head>'                                                                         );
+    sbu.Add('<body>'                                                                          ); // oncontextmenu="return false";
+  //sbu.Add('  <!--br>'                                                                       );
+  //sbu.Add('  <center>'                                                                      );
+  //sbu.Add('  Wks Application Web Server'                                                    );
+  //sbu.Add('  </center>'                                                                     );
+  //sbu.Add('  <pre>'                                                                         );
+  //sbu.Add('- host: www.wks.cloud'                                                           );
+  //sbu.Add('- hw  : 1 Virtual Server'                                                        );
+  //sbu.Add('- cpu : 1 Intel Xeon X5670 @2.93GHz'                                             );
+  //sbu.Add('- ram : 8 GB'                                                                    );
+  //sbu.Add('- net : unknown'                                                                 );
+  //sbu.Add('- hd  : 80 Gb'                                                                   );
+  //sbu.Add('- os  : 1 Windows Server 2012 Standard 64 bit'                                   );
+  //sbu.Add('- adm : wks@wks.cloud'                                                           );
+  //sbu.Add('- iis : iis10'                                                                   );
+  //sbu.Add('- why : wks development'                                                         );
+  //sbu.Add('  </pre-->'                                                                      );
+    if IvHtmlUseSpin then begin
+    sbu.Add(''                                                                                );
+    sbu.Add('  <div class="w3-waitloader-spin"></div>'                                        );
+    sbu.Add('  <div class="w3-waitloader-number"</div>'                                       );
+    sbu.Add(''                                                                                );
+    sbu.Add('  <script>'                                                                      );
+    sbu.Add('  var waitloadernumber = document.querySelector(".w3-waitloader-number");'       );
+    sbu.Add('  var count = 0;'                                                                );
+    sbu.Add('  setInterval('                                                                  );
+    sbu.Add('    () => {'                                                                     );
+    sbu.Add('      count++;'                                                                  );
+    sbu.Add('      if (count > 0) waitloadernumber.textContent = count;'                      );
+    sbu.Add('    }'                                                                           );
+    sbu.Add('  , 1000);'                                                                      );
+    sbu.Add('  </script>'                                                                     );
+    end;
+    sbu.Add('</body>'                                                                         );
+    sbu.Add('</html>'                                                                         );
+    sbu.SaveToFile(TSysRec.HOME_PATH + '\Default-new.htm');
+  end;
+  {$ENDREGION}
+
 end;
 
 class function  TSysRec.InitDba(var IvFbk: string): boolean;
@@ -27580,24 +28506,24 @@ end;
   {$REGION 'TTheRec'}
 procedure TTheRec.Reset;
 begin
-  ObjectId           := 0                      ;
-  Theme              := THEME_DEF              ;
-  State              := STATE_DEF              ;
-  Grade              := GRADE_DEF              ;
-  FontFamily         := FONT_FAMILY_DEF        ;
-  FontWeight         := FONT_WEIGHT_DEF        ;
-  SizeClass          := SIZE_CLASS_DEF         ;
-  PaddingClass       := PADDING_CLASS_DEF      ;
-  BorderedClass      := BORDERED_CLASS_DEF     ;
-  HighlightJs        := HIGHLIGHTJS_THEME_DEF  ;
-  Primary60BgColor   := PRIMARY60BG_COLOR_DEF  ;
-  Secondary30FgColor := SECONDARY30FG_COLOR_DEF;
-  Accent10Color      := ACCENT10_COLOR_DEF     ;
-  ErrorColor         := ERROR_COLOR_DEF        ;
-  DangerColor        := DANGER_COLOR_DEF       ;
-  WarningColor       := WARNING_COLOR_DEF      ;
-  InfoColor          := INFO_COLOR_DEF         ;
-  SuccessColor       := SUCCESS_COLOR_DEF      ;
+  ObjectId           := 0                          ;
+  Theme              := THEME_DEFAULT              ;
+  State              := STATE_DEFAULT              ;
+  Grade              := GRADE_DEFAULT              ;
+  FontFamily         := FONT_FAMILY_DEFAULT        ;
+  FontWeight         := FONT_WEIGHT_DEFAULT        ;
+  SizeClass          := SIZE_CLASS_DEFAULT         ;
+  PaddingClass       := PADDING_CLASS_DEFAULT      ;
+  BorderedClass      := BORDERED_CLASS_DEFAULT     ;
+  HighlightJs        := HIGHLIGHTJS_THEME_DEFAULT  ;
+  Primary60BgColor   := PRIMARY60BG_COLOR_DEFAULT  ;
+  Secondary30FgColor := SECONDARY30FG_COLOR_DEFAULT;
+  Accent10Color      := ACCENT10_COLOR_DEFAULT     ;
+  ErrorColor         := ERROR_COLOR_DEFAULT        ;
+  DangerColor        := DANGER_COLOR_DEFAULT       ;
+  WarningColor       := WARNING_COLOR_DEFAULT      ;
+  InfoColor          := INFO_COLOR_DEFAULT         ;
+  SuccessColor       := SUCCESS_COLOR_DEFAULT      ;
 end;
 
 function  TTheRec.InitDba(IvOrganizationId: integer; var IvFbk: string): boolean;
@@ -27613,24 +28539,24 @@ begin
     if dst.IsEmpty then begin
       sql :=         'insert into DbaOrganization.dbo.TblTheme'
       + sLineBreak + 'select'
-      + sLineBreak + '    FldObjectId = '           + TSqlRec.Val(IvOrganizationId       )
-      + sLineBreak + '  , FldTheme = '              + TSqlRec.Val(THEME_DEF              )
-      + sLineBreak + '  , FldState = '              + TSqlRec.Val(STATE_DEF              )
-      + sLineBreak + '  , FldGrade = '              + TSqlRec.Val(GRADE_DEF              )
-      + sLineBreak + '  , FldFontFamily = '         + TSqlRec.Val(FONT_FAMILY_DEF        )
-      + sLineBreak + '  , FldFontWeight = '         + TSqlRec.Val(FONT_WEIGHT_DEF        )
-      + sLineBreak + '  , FldSizeClass = '          + TSqlRec.Val(SIZE_CLASS_DEF         )
-      + sLineBreak + '  , FldPaddingClass = '       + TSqlRec.Val(PADDING_CLASS_DEF      )
-      + sLineBreak + '  , FldBorderedClass = '      + TSqlRec.Val(BORDERED_CLASS_DEF     )
-      + sLineBreak + '  , FldHighlightJs = '        + TSqlRec.Val(HIGHLIGHTJS_THEME_DEF  )
-      + sLineBreak + '  , FldPrimary60BgColor = '   + TSqlRec.Val(PRIMARY60BG_COLOR_DEF  )
-      + sLineBreak + '  , FldSecondary30FgColor = ' + TSqlRec.Val(SECONDARY30FG_COLOR_DEF)
-      + sLineBreak + '  , FldAccent10Color = '      + TSqlRec.Val(ACCENT10_COLOR_DEF     )
-      + sLineBreak + '  , FldErrorColor = '         + TSqlRec.Val(ERROR_COLOR_DEF        )
-      + sLineBreak + '  , FldDangerColor = '        + TSqlRec.Val(DANGER_COLOR_DEF       )
-      + sLineBreak + '  , FldWarningColor = '       + TSqlRec.Val(WARNING_COLOR_DEF      )
-      + sLineBreak + '  , FldInfoColor = '          + TSqlRec.Val(INFO_COLOR_DEF         )
-      + sLineBreak + '  , FldSuccessColor = '       + TSqlRec.Val(SUCCESS_COLOR_DEF      );
+      + sLineBreak + '    FldObjectId = '           + TSqlRec.Val(IvOrganizationId           )
+      + sLineBreak + '  , FldTheme = '              + TSqlRec.Val(THEME_DEFAULT              )
+      + sLineBreak + '  , FldState = '              + TSqlRec.Val(STATE_DEFAULT              )
+      + sLineBreak + '  , FldGrade = '              + TSqlRec.Val(GRADE_DEFAULT              )
+      + sLineBreak + '  , FldFontFamily = '         + TSqlRec.Val(FONT_FAMILY_DEFAULT        )
+      + sLineBreak + '  , FldFontWeight = '         + TSqlRec.Val(FONT_WEIGHT_DEFAULT        )
+      + sLineBreak + '  , FldSizeClass = '          + TSqlRec.Val(SIZE_CLASS_DEFAULT         )
+      + sLineBreak + '  , FldPaddingClass = '       + TSqlRec.Val(PADDING_CLASS_DEFAULT      )
+      + sLineBreak + '  , FldBorderedClass = '      + TSqlRec.Val(BORDERED_CLASS_DEFAULT     )
+      + sLineBreak + '  , FldHighlightJs = '        + TSqlRec.Val(HIGHLIGHTJS_THEME_DEFAULT  )
+      + sLineBreak + '  , FldPrimary60BgColor = '   + TSqlRec.Val(PRIMARY60BG_COLOR_DEFAULT  )
+      + sLineBreak + '  , FldSecondary30FgColor = ' + TSqlRec.Val(SECONDARY30FG_COLOR_DEFAULT)
+      + sLineBreak + '  , FldAccent10Color = '      + TSqlRec.Val(ACCENT10_COLOR_DEFAULT     )
+      + sLineBreak + '  , FldErrorColor = '         + TSqlRec.Val(ERROR_COLOR_DEFAULT        )
+      + sLineBreak + '  , FldDangerColor = '        + TSqlRec.Val(DANGER_COLOR_DEFAULT       )
+      + sLineBreak + '  , FldWarningColor = '       + TSqlRec.Val(WARNING_COLOR_DEFAULT      )
+      + sLineBreak + '  , FldInfoColor = '          + TSqlRec.Val(INFO_COLOR_DEFAULT         )
+      + sLineBreak + '  , FldSuccessColor = '       + TSqlRec.Val(SUCCESS_COLOR_DEFAULT      );
       TDbaRec.CmdExec(sql, aff, IvFbk);
       // retry
       InitDba(IvOrganizationId, IvFbk);
@@ -27638,23 +28564,23 @@ begin
     // load
     end else begin
       ObjectId           :=          dst.FieldByName('FldObjectId'          ).AsInteger;
-      Theme              := giif.NxD(dst.FieldByName('FldTheme'             ).AsString, THEME_DEF              );
-      State              := giif.NxD(dst.FieldByName('FldState'             ).AsString, STATE_DEF              );
-      Grade              := giif.NxD(dst.FieldByName('FldGrade'             ).AsString, GRADE_DEF              );
-      FontFamily         := giif.NxD(dst.FieldByName('FldFontFamily'        ).AsString, FONT_FAMILY_DEF        );
-      FontWeight         := giif.NxD(dst.FieldByName('FldFontWeight'        ).AsString, FONT_WEIGHT_DEF        );
-      SizeClass          := giif.NxD(dst.FieldByName('FldSizeClass'         ).AsString, SIZE_CLASS_DEF         );
-      PaddingClass       := giif.NxD(dst.FieldByName('FldPaddingClass'      ).AsString, PADDING_CLASS_DEF      );
-      BorderedClass      := giif.NxD(dst.FieldByName('FldBorderedClass'     ).AsString, BORDERED_CLASS_DEF     );
-      HighlightJs        := giif.NxD(dst.FieldByName('FldHighlightJs'       ).AsString, HIGHLIGHTJS_THEME_DEF  );
-      Primary60BgColor   := giif.NxD(dst.FieldByName('FldPrimary60BgColor'  ).AsString, PRIMARY60BG_COLOR_DEF  );
-      Secondary30FgColor := giif.NxD(dst.FieldByName('FldSecondary30FgColor').AsString, SECONDARY30FG_COLOR_DEF);
-      Accent10Color      := giif.NxD(dst.FieldByName('FldAccent10Color'     ).AsString, ACCENT10_COLOR_DEF     );
-      ErrorColor         := giif.NxD(dst.FieldByName('FldErrorColor'        ).AsString, ERROR_COLOR_DEF        );
-      DangerColor        := giif.NxD(dst.FieldByName('FldDangerColor'       ).AsString, DANGER_COLOR_DEF       );
-      WarningColor       := giif.NxD(dst.FieldByName('FldWarningColor'      ).AsString, WARNING_COLOR_DEF      );
-      InfoColor          := giif.NxD(dst.FieldByName('FldInfoColor'         ).AsString, INFO_COLOR_DEF         );
-      SuccessColor       := giif.NxD(dst.FieldByName('FldSuccessColor'      ).AsString, SUCCESS_COLOR_DEF      );
+      Theme              := giif.NxD(dst.FieldByName('FldTheme'             ).AsString, THEME_DEFAULT              );
+      State              := giif.NxD(dst.FieldByName('FldState'             ).AsString, STATE_DEFAULT              );
+      Grade              := giif.NxD(dst.FieldByName('FldGrade'             ).AsString, GRADE_DEFAULT              );
+      FontFamily         := giif.NxD(dst.FieldByName('FldFontFamily'        ).AsString, FONT_FAMILY_DEFAULT        );
+      FontWeight         := giif.NxD(dst.FieldByName('FldFontWeight'        ).AsString, FONT_WEIGHT_DEFAULT        );
+      SizeClass          := giif.NxD(dst.FieldByName('FldSizeClass'         ).AsString, SIZE_CLASS_DEFAULT         );
+      PaddingClass       := giif.NxD(dst.FieldByName('FldPaddingClass'      ).AsString, PADDING_CLASS_DEFAULT      );
+      BorderedClass      := giif.NxD(dst.FieldByName('FldBorderedClass'     ).AsString, BORDERED_CLASS_DEFAULT     );
+      HighlightJs        := giif.NxD(dst.FieldByName('FldHighlightJs'       ).AsString, HIGHLIGHTJS_THEME_DEFAULT  );
+      Primary60BgColor   := giif.NxD(dst.FieldByName('FldPrimary60BgColor'  ).AsString, PRIMARY60BG_COLOR_DEFAULT  );
+      Secondary30FgColor := giif.NxD(dst.FieldByName('FldSecondary30FgColor').AsString, SECONDARY30FG_COLOR_DEFAULT);
+      Accent10Color      := giif.NxD(dst.FieldByName('FldAccent10Color'     ).AsString, ACCENT10_COLOR_DEFAULT     );
+      ErrorColor         := giif.NxD(dst.FieldByName('FldErrorColor'        ).AsString, ERROR_COLOR_DEFAULT        );
+      DangerColor        := giif.NxD(dst.FieldByName('FldDangerColor'       ).AsString, DANGER_COLOR_DEFAULT       );
+      WarningColor       := giif.NxD(dst.FieldByName('FldWarningColor'      ).AsString, WARNING_COLOR_DEFAULT      );
+      InfoColor          := giif.NxD(dst.FieldByName('FldInfoColor'         ).AsString, INFO_COLOR_DEFAULT         );
+      SuccessColor       := giif.NxD(dst.FieldByName('FldSuccessColor'      ).AsString, SUCCESS_COLOR_DEFAULT      );
     end;
   finally
     dst.Free;
@@ -28347,7 +29273,7 @@ begin
   Result := VecToList(IvStrVec, '');
 end;
 
-class function  TVecRec.VecFromStrCamel(IvStr: string; IvCase: TCaseEnum): TArray<string>;
+class function  TVecRec.VecFromStrCamel(IvStr: string; IvCase: TFontCaseEnum): TArray<string>;
 var
   s: string;
   i: integer;
@@ -28493,26 +29419,26 @@ begin
   Result := '';
   for itm in IvVarRecVector do begin
     case itm.VType of
-      vtInteger      : TCsvRec.CsvRowFieldAppend(Result, itm.VInteger.ToString);
-      vtBoolean      : TCsvRec.CsvRowFieldAppend(Result, BoolToStr(itm.VBoolean, true));
-      vtChar         : TCsvRec.CsvRowFieldAppend(Result, string(itm.VChar));
-      vtExtended     : TCsvRec.CsvRowFieldAppend(Result, FloatToStr(itm.VExtended^));
-      vtString       : TCsvRec.CsvRowFieldAppend(Result, string(itm.VString^));
-      vtPointer      : TCsvRec.CsvRowFieldAppend(Result, IntToHex(NativeInt(itm.VPointer), 8));
-      vtPChar        : TCsvRec.CsvRowFieldAppend(Result, string(itm.VPChar));
-      vtObject       : TCsvRec.CsvRowFieldAppend(Result, itm.VObject.ClassName);
-      vtClass        : TCsvRec.CsvRowFieldAppend(Result, itm.VClass.ClassName);
-      vtAnsiString   : TCsvRec.CsvRowFieldAppend(Result, string(AnsiString(itm.VAnsiString)));
-      vtCurrency     : TCsvRec.CsvRowFieldAppend(Result, FloatToStr(itm.VCurrency^));
-      vtVariant      : TCsvRec.CsvRowFieldAppend(Result, itm.VVariant^);
-    //vtInterface    : TCsvRec.CsvRowFieldAppend(Result, IInterface(itm.VInterface));
-      vtWideChar     : TCsvRec.CsvRowFieldAppend(Result, itm.VWideChar);
-      vtPWideChar    : TCsvRec.CsvRowFieldAppend(Result, itm.VPWideChar);
-      vtWideString   : TCsvRec.CsvRowFieldAppend(Result, WideString(itm.VWideString));
-      vtInt64        : TCsvRec.CsvRowFieldAppend(Result, IntToStr(itm.VInt64^));
-      vtUnicodeString: TCsvRec.CsvRowFieldAppend(Result, UnicodeString(itm.VUnicodeString));
+      vtInteger      : TCsvRec.CsvAppend(Result, itm.VInteger.ToString);
+      vtBoolean      : TCsvRec.CsvAppend(Result, BoolToStr(itm.VBoolean, true));
+      vtChar         : TCsvRec.CsvAppend(Result, string(itm.VChar));
+      vtExtended     : TCsvRec.CsvAppend(Result, FloatToStr(itm.VExtended^));
+      vtString       : TCsvRec.CsvAppend(Result, string(itm.VString^));
+      vtPointer      : TCsvRec.CsvAppend(Result, IntToHex(NativeInt(itm.VPointer), 8));
+      vtPChar        : TCsvRec.CsvAppend(Result, string(itm.VPChar));
+      vtObject       : TCsvRec.CsvAppend(Result, itm.VObject.ClassName);
+      vtClass        : TCsvRec.CsvAppend(Result, itm.VClass.ClassName);
+      vtAnsiString   : TCsvRec.CsvAppend(Result, string(AnsiString(itm.VAnsiString)));
+      vtCurrency     : TCsvRec.CsvAppend(Result, FloatToStr(itm.VCurrency^));
+      vtVariant      : TCsvRec.CsvAppend(Result, itm.VVariant^);
+    //vtInterface    : TCsvRec.CsvAppend(Result, IInterface(itm.VInterface));
+      vtWideChar     : TCsvRec.CsvAppend(Result, itm.VWideChar);
+      vtPWideChar    : TCsvRec.CsvAppend(Result, itm.VPWideChar);
+      vtWideString   : TCsvRec.CsvAppend(Result, WideString(itm.VWideString));
+      vtInt64        : TCsvRec.CsvAppend(Result, IntToStr(itm.VInt64^));
+      vtUnicodeString: TCsvRec.CsvAppend(Result, UnicodeString(itm.VUnicodeString));
     else
-      TCsvRec.CsvRowFieldAppend(Result, 'UnknownType');
+      TCsvRec.CsvAppend(Result, 'UnknownType');
     end;
   end;
 end;
@@ -28681,33 +29607,6 @@ except
 end;
 end;
 
-class procedure TVstRec.OnPaintText(IvVst: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-var
-  idi, pid, azo: integer; nam{, lev}, obj, obk, cok, sta, org, dat: string; // id, pid, ord, name, level, obj, objectkind, contentkind, state, orga, dataslot
-begin
-  // exit
-  if Column > 0 then // -1 = nocolumns, 0 = 1stcol, 1..= 2nd..col
-    Exit;
-
-  // nodeparams
-  NodeParamGet(IvVst, Node, idi, pid, azo, nam, obj, obk, cok, sta, org, dat);
-
-  // colorbystate
-       if sta = TStaRec.UNKNOWN.Name    then       TargetCanvas.Font.Color := TStaRec.UNKNOWN.ColorT
-  else if sta = TStaRec.ACTIVE.Name     then       TargetCanvas.Font.Color := TStaRec.ACTIVE.ColorT  //; TargetCanvas.Brush.Color := clBlue; TargetCanvas.Font.Style := Font.Style + [{fsBold,} fsItalic];
-  else if sta = TStaRec.INACTIVE.Name   then       TargetCanvas.Font.Color := TStaRec.INACTIVE.ColorT
-  else if sta = TStaRec.ONGOING.Name    then       TargetCanvas.Font.Color := TStaRec.ONGOING.ColorT
-  else if sta = TStaRec.ONHOLD.Name     then       TargetCanvas.Font.Color := TStaRec.ONHOLD.ColorT
-  else if sta = TStaRec.DONE.Name       then       TargetCanvas.Font.Color := TStaRec.DONE.ColorT
-  else if sta = TStaRec.COMPLETED.Name  then       TargetCanvas.Font.Color := TStaRec.COMPLETED.ColorT
-  else if sta = TStaRec.CANCELLED.Name  then       TargetCanvas.Font.Color := TStaRec.CANCELLED.ColorT
-  else if sta = TStaRec.NEW.Name        then       TargetCanvas.Font.Color := TStaRec.NEW.ColorT
-  else if sta = TStaRec.TESTING.Name    then begin TargetCanvas.Font.Color := TStaRec.TESTING.ColorT   ; TargetCanvas.Font.Style := TargetCanvas.Font.Style + [{fsBold,} fsItalic]; end
-  else if sta = TStaRec.SYSTEM.Name     then       TargetCanvas.Font.Color := TStaRec.SYSTEM.ColorT
-  else if sta = TStaRec.VALIDATING.Name then       TargetCanvas.Font.Color := TStaRec.VALIDATING.ColorT
-  else if sta = TStaRec.VALIDATED.Name  then       TargetCanvas.Font.Color := TStaRec.VALIDATED.ColorT;
-end;
-
 class procedure TVstRec.OnCompareNodes(IvVst: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: integer);
 var
   m1, m2: PNodeItem;
@@ -28752,6 +29651,33 @@ begin
   end;
 end;
 
+class procedure TVstRec.OnPaintText(IvVst: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+var
+  idi, pid, azo: integer; nam{, lev}, obj, obk, cok, sta, org, dat: string; // id, pid, ord, name, level, obj, objectkind, contentkind, state, orga, dataslot
+begin
+  // exit
+  if Column > 0 then // -1 = nocolumns, 0 = 1stcol, 1..= 2nd..col
+    Exit;
+
+  // nodeparams
+  NodeParamGet(IvVst, Node, idi, pid, azo, nam, obj, obk, cok, sta, org, dat);
+
+  // colorbystate
+       if sta = TStaRec.UNKNOWN.Name    then       TargetCanvas.Font.Color := TStaRec.UNKNOWN.ColorT
+  else if sta = TStaRec.ACTIVE.Name     then       TargetCanvas.Font.Color := TStaRec.ACTIVE.ColorT  //; TargetCanvas.Brush.Color := clBlue; TargetCanvas.Font.Style := Font.Style + [{fsBold,} fsItalic];
+  else if sta = TStaRec.INACTIVE.Name   then       TargetCanvas.Font.Color := TStaRec.INACTIVE.ColorT
+  else if sta = TStaRec.ONGOING.Name    then       TargetCanvas.Font.Color := TStaRec.ONGOING.ColorT
+  else if sta = TStaRec.ONHOLD.Name     then       TargetCanvas.Font.Color := TStaRec.ONHOLD.ColorT
+  else if sta = TStaRec.DONE.Name       then       TargetCanvas.Font.Color := TStaRec.DONE.ColorT
+  else if sta = TStaRec.COMPLETED.Name  then       TargetCanvas.Font.Color := TStaRec.COMPLETED.ColorT
+  else if sta = TStaRec.CANCELLED.Name  then       TargetCanvas.Font.Color := TStaRec.CANCELLED.ColorT
+  else if sta = TStaRec.NEW.Name        then       TargetCanvas.Font.Color := TStaRec.NEW.ColorT
+  else if sta = TStaRec.TESTING.Name    then begin TargetCanvas.Font.Color := TStaRec.TESTING.ColorT   ; TargetCanvas.Font.Style := TargetCanvas.Font.Style + [{fsBold,} fsItalic]; end
+  else if sta = TStaRec.SYSTEM.Name     then       TargetCanvas.Font.Color := TStaRec.SYSTEM.ColorT
+  else if sta = TStaRec.VALIDATING.Name then       TargetCanvas.Font.Color := TStaRec.VALIDATING.ColorT
+  else if sta = TStaRec.VALIDATED.Name  then       TargetCanvas.Font.Color := TStaRec.VALIDATED.ColorT;
+end;
+
 class procedure TVstRec.OnGetImageIndex(IvVst: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: boolean; var ImageIndex: TImageIndex);
 var
   idi, pid, azo: integer; nam{, lev}, obj, obk, cok, sta, org, dat: string; // id, pid, ord, name, level, obj, objectkind, contentkind, state, orga, dataslot
@@ -28769,17 +29695,25 @@ begin
   // params
   NodeParamGet(IvVst, Node, idi, pid, azo, nam, obj, obk, cok, sta, org, dat);
 
-  {$REGION 'direct by id (Root)'}
+  {$REGION 'by id (Root)'}
   if                        idi = 1                      then ImageIndex :=   1
   {$ENDREGION}
 
-  {$REGION 'direct by name'}
-  // 1char: special
+  {$REGION 'by char'}
+  // special
   else if (                 nam = '!'                  ) then ImageIndex :=  56 // !      temp
   else if (                 nam = '_'                  ) then ImageIndex :=  57 // _      others
   else if (                 nam = '$'                  ) then ImageIndex :=  58 // $      important
 
-  // standard 1st level
+  // number
+  else if (Length(nam) = 1) and TStrRec.StrIs09(nam)     then ImageIndex :=  11 // 0..9   numbers
+
+  // letters
+  else if (Length(nam) = 1) and TChaRec.CharIsAZ(nam[1]) then ImageIndex :=  12 // A..Z   letters
+  {$ENDREGION}
+
+  {$REGION 'by name'}
+  // 1st level
   else if SameText(         nam, 'Zzz'                 ) then ImageIndex :=   2
   else if SameText(         nam, 'New'                 ) then ImageIndex :=  72
   else if SameText(         nam, 'Temp'                ) then ImageIndex :=   3
@@ -28792,34 +29726,29 @@ begin
   else if SameText(         nam, 'Stage'               ) then ImageIndex :=  74
   else if SameText(         nam, 'System'              ) then ImageIndex :=   9
   else if TNamRec.IsNameNum(nam, 'Reserved'            ) then ImageIndex :=  10
-
-  // 1char: number or letters
-  else if (Length(nam) = 1) and TStrRec.StrIs09(nam)     then ImageIndex :=  11 // 0..9   numbers
-  else if (Length(nam) = 1) and TChaRec.CharIsAZ(nam[1]) then ImageIndex :=  12 // A..Z   letters
   {$ENDREGION}
 
-  {$REGION 'by objectkind'}
-  // containers library/folder/link
-  else if SameText(         obk, 'Library'             ) then ImageIndex :=  14
-  else if SameText(         obk, 'Folder'              ) then ImageIndex :=  15
-  else if SameText(         obk, 'Link'                ) then ImageIndex :=  16
+  {$REGION 'by object/content kind'}
+  // containers
+  else if SameText(obk         , 'Library'             ) then ImageIndex :=  14
+  else if SameText(obk         , 'Folder'              ) then ImageIndex :=  15
+  else if SameText(obk         , 'Link'                ) then ImageIndex :=  16
 
   // param/switch
-  else if SameText(         obk, 'Param'               ) then ImageIndex :=  17
-  else if SameText(         obk, 'Switch'              ) then ImageIndex :=  18
-  {$ENDREGION}
+  else if SameText(obk         , 'Param'               ) then ImageIndex :=  17
+  else if SameText(obk         , 'Switch'              ) then ImageIndex :=  18
 
-  {$REGION 'by contentkind (mimetypes)'}
-  else if SameText(       cok, TCodRec.BAT.Kind        ) then ImageIndex :=  32 // 0
-  else if SameText(       cok, TCodRec.CSS.Kind        ) then ImageIndex :=  30 // 1
-  else if SameText(       cok, TCodRec.CSV.Kind        ) then ImageIndex :=  31 // 2
-  else if SameText(       cok, TCodRec.DWS.Kind        ) then ImageIndex :=  62 // 3
-  else if SameText(       cok, TCodRec.ETL.Kind        ) then ImageIndex :=  33 // 4
-  else if SameText(       cok, TCodRec.HTML.Kind       ) then ImageIndex :=  34 // 5
-  else if SameText(       cok, TCodRec.INI.Kind        ) then ImageIndex :=  35 // 6
-  else if SameText(       cok, TCodRec.ISS.Kind        ) then ImageIndex :=  63 // 7
-  else if SameText(       cok, TCodRec.JAVA.Kind       ) then ImageIndex :=  36 // 8
-  else if SameText(       cok, TCodRec.JS.Kind         ) then ImageIndex :=  37 // 9
+  // contentkind
+  else if SameText(       cok, TCodRec.BAT.Kind        ) then ImageIndex :=  32 //  0
+  else if SameText(       cok, TCodRec.CSS.Kind        ) then ImageIndex :=  30 //  1
+  else if SameText(       cok, TCodRec.CSV.Kind        ) then ImageIndex :=  31 //  2
+  else if SameText(       cok, TCodRec.DWS.Kind        ) then ImageIndex :=  62 //  3
+  else if SameText(       cok, TCodRec.ETL.Kind        ) then ImageIndex :=  33 //  4
+  else if SameText(       cok, TCodRec.HTML.Kind       ) then ImageIndex :=  34 //  5
+  else if SameText(       cok, TCodRec.INI.Kind        ) then ImageIndex :=  35 //  6
+  else if SameText(       cok, TCodRec.ISS.Kind        ) then ImageIndex :=  63 //  7
+  else if SameText(       cok, TCodRec.JAVA.Kind       ) then ImageIndex :=  36 //  8
+  else if SameText(       cok, TCodRec.JS.Kind         ) then ImageIndex :=  37 //  9
   else if SameText(       cok, TCodRec.JSL.Kind        ) then ImageIndex :=  38 // 10
   else if SameText(       cok, TCodRec.JSON.Kind       ) then ImageIndex :=  39 // 11
   else if SameText(       cok, TCodRec.MD.Kind         ) then ImageIndex :=  61 // 12
@@ -28830,10 +29759,8 @@ begin
   else if SameText(       cok, TCodRec.TXT.Kind        ) then ImageIndex :=  45 // 17
   else if SameText(       cok, TCodRec.XML.Kind        ) then ImageIndex :=  67 // 18
   else if SameText(       cok, TCodRec.YAML.Kind       ) then ImageIndex :=  64 // 19
-  {$ENDREGION}
 
-  {$REGION 'by objectkind (and obj or state)'}
-  // common objects & subobjects
+  // objectkind
   else if giis.Same([obk, obj] , 'Xxx'                 ) then ImageIndex :=  20
   else if giis.Same([obk, obj] , 'Person'              ) then ImageIndex :=  21
   else if giis.Same([obk, obj] ,   'Male'              ) then ImageIndex :=  65
@@ -28848,9 +29775,21 @@ begin
   else if giis.Same([obk, obj] , 'Account'             ) then ImageIndex :=  22
   else if giis.Same([obk, obj] , 'Agent'               ) then ImageIndex :=  68
   else if giis.Same([obk, obj] , 'Code'                ) then ImageIndex :=  69
-  else if giis.Same([obk, obj] , 'Document'            ) then ImageIndex :=  29
+  else if giis.Same([obk, obj] , 'Document'            ) then ImageIndex :=  74
+  else if SameText(obk         ,       'Sensor'        ) then ImageIndex :=  83 // 84, 85
+  else if SameText(obk         ,     'Chamber'         ) then ImageIndex :=  82
+  else if SameText(obk         ,   'Component'         ) then ImageIndex :=  81
+  else if giis.Same([obk, obj] , 'Equipment'           ) then ImageIndex :=  80
+  else if giis.Same([obk, obj] , 'File'                ) then ImageIndex :=  29
+  else if giis.Same([obk, obj] , 'Form'                ) then ImageIndex :=  75
+  else if giis.Same([obk, obj] , 'Image'               ) then ImageIndex :=  76
+  else if giis.Same([obk, obj] , 'Invoice'             ) then ImageIndex :=  77
+  else if giis.Same([obk, obj] , 'Item'                ) then ImageIndex :=  86
   else if giis.Same([obk, obj] , 'Report'              ) then ImageIndex :=  70
   else if giis.Same([obk, obj] , 'Page'                ) then ImageIndex :=  71
+  else if giis.Same([obk, obj] , 'Spc'                 ) then ImageIndex :=  78
+  else if giis.Same([obk, obj] , 'System'              ) then ImageIndex :=   9
+  else if giis.Same([obk, obj] , 'Ticket'              ) then ImageIndex :=  79
   else if giis.Same([obk, obj] , 'Portfolio'           ) then ImageIndex :=  50
   else if giis.Same([obk, obj] ,   'Program'           ) then ImageIndex :=  51
   else if giis.Same([obk, obj] ,     'Package'         ) then ImageIndex :=  52
@@ -28865,7 +29804,6 @@ begin
     else if sta = TStaRec.DONE.Name                      then ImageIndex :=  60 // completed
     else                                                      ImageIndex :=   0
   end
-  else if giis.Same([obk, obj] , 'System'              ) then ImageIndex :=   9
   {$ENDREGION}
 
   {$REGION 'unknown'}
@@ -28978,27 +29916,27 @@ begin
   sbu.Add(' * W3CSS THEME(%s) PRIMARY-COLOR (%s) 60%% - %s'          , [IvTheme, phco, DateTimeToStr(Now)]);
   sbu.Add(' */'                                                                                           );
   sbu.Add(' /* GRADES */'                                                                                 );
-  sbu.Add('.w3-theme-l9        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl9 > K, '#000', '#fff'), phl9, pbl9]);
-  sbu.Add('.w3-theme-l8        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl8 > K, '#000', '#fff'), phl8, pbl8]);
-  sbu.Add('.w3-theme-l7        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl7 > K, '#000', '#fff'), phl7, pbl7]);
-  sbu.Add('.w3-theme-l6        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl6 > K, '#000', '#fff'), phl6, pbl6]);
-//sbu.Add('.w3-theme-light     {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl5 > K, '#000', '#fff'), phl5, pbl5]);
-  sbu.Add('.w3-theme-l5        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl5 > K, '#000', '#fff'), phl5, pbl5]);
-  sbu.Add('.w3-theme-l4        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl4 > K, '#000', '#fff'), phl4, pbl4]);
-  sbu.Add('.w3-theme-l3        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl3 > K, '#000', '#fff'), phl3, pbl3]);
-  sbu.Add('.w3-theme-l2        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl2 > K, '#000', '#fff'), phl2, pbl2]);
-  sbu.Add('.w3-theme-l1        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl1 > K, '#000', '#fff'), phl1, pbl1]);
-  sbu.Add('.w3-theme           {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbco > K, '#000', '#fff'), phco, pbco]);
-  sbu.Add('.w3-theme-d1        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd1 > K, '#000', '#fff'), phd1, pbd1]);
-  sbu.Add('.w3-theme-d2        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd2 > K, '#000', '#fff'), phd2, pbd2]);
-  sbu.Add('.w3-theme-d3        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd3 > K, '#000', '#fff'), phd3, pbd3]);
-  sbu.Add('.w3-theme-d4        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd4 > K, '#000', '#fff'), phd4, pbd4]);
-  sbu.Add('.w3-theme-d5        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd5 > K, '#000', '#fff'), phd5, pbd5]);
-//sbu.Add('.w3-theme-dark      {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd5 > K, '#000', '#fff'), phd5, pbd5]);
-  sbu.Add('.w3-theme-d6        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd6 > K, '#000', '#fff'), phd6, pbd6]);
-  sbu.Add('.w3-theme-d7        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd7 > K, '#000', '#fff'), phd7, pbd7]);
-  sbu.Add('.w3-theme-d8        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd8 > K, '#000', '#fff'), phd8, pbd8]);
-  sbu.Add('.w3-theme-d9        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd9 > K, '#000', '#fff'), phd9, pbd9]);
+  sbu.Add('.w3-theme-l9    {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl9 > K, '#000', '#fff'), phl9, pbl9]);
+  sbu.Add('.w3-theme-l8    {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl8 > K, '#000', '#fff'), phl8, pbl8]);
+  sbu.Add('.w3-theme-l7    {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl7 > K, '#000', '#fff'), phl7, pbl7]);
+  sbu.Add('.w3-theme-l6    {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl6 > K, '#000', '#fff'), phl6, pbl6]);
+//sbu.Add('.w3-theme-light {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl5 > K, '#000', '#fff'), phl5, pbl5]);
+  sbu.Add('.w3-theme-l5    {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl5 > K, '#000', '#fff'), phl5, pbl5]);
+  sbu.Add('.w3-theme-l4    {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl4 > K, '#000', '#fff'), phl4, pbl4]);
+  sbu.Add('.w3-theme-l3    {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl3 > K, '#000', '#fff'), phl3, pbl3]);
+  sbu.Add('.w3-theme-l2    {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl2 > K, '#000', '#fff'), phl2, pbl2]);
+  sbu.Add('.w3-theme-l1    {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbl1 > K, '#000', '#fff'), phl1, pbl1]);
+  sbu.Add('.w3-theme       {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbco > K, '#000', '#fff'), phco, pbco]);
+  sbu.Add('.w3-theme-d1    {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd1 > K, '#000', '#fff'), phd1, pbd1]);
+  sbu.Add('.w3-theme-d2    {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd2 > K, '#000', '#fff'), phd2, pbd2]);
+  sbu.Add('.w3-theme-d3    {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd3 > K, '#000', '#fff'), phd3, pbd3]);
+  sbu.Add('.w3-theme-d4    {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd4 > K, '#000', '#fff'), phd4, pbd4]);
+  sbu.Add('.w3-theme-d5    {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd5 > K, '#000', '#fff'), phd5, pbd5]);
+//sbu.Add('.w3-theme-dark  {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd5 > K, '#000', '#fff'), phd5, pbd5]);
+  sbu.Add('.w3-theme-d6    {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd6 > K, '#000', '#fff'), phd6, pbd6]);
+  sbu.Add('.w3-theme-d7    {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd7 > K, '#000', '#fff'), phd7, pbd7]);
+  sbu.Add('.w3-theme-d8    {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd8 > K, '#000', '#fff'), phd8, pbd8]);
+  sbu.Add('.w3-theme-d9    {color:%s !important; background-color:%s !important} /* %d */', [ifthen(pbd9 > K, '#000', '#fff'), phd9, pbd9]);
   {$ENDREGION}
 
   {$REGION 'w3 theme secondary 30%'}
@@ -29007,9 +29945,9 @@ begin
   sbu.Add(' * W3CSS THEME(%s) SECONDARY-COLOR (%s) 30%%'                                 , [IvTheme, shco]);
   sbu.Add(' */'                                                                                           );
   sbu.Add(' /* GRADES */'                                                                                 );
-  sbu.Add('.w3-theme-s-l      {color:%s !important; background-color:%s !important} /* %d */', [ifthen(sbl5 > K, '#000', '#fff'), shl5, sbl5]);
-  sbu.Add('.w3-theme-s        {color:%s !important; background-color:%s !important} /* %d */', [ifthen(sbco > K, '#000', '#fff'), shco, sbco]);
-  sbu.Add('.w3-theme-s-d      {color:%s !important; background-color:%s !important} /* %d */', [ifthen(sbd5 > K, '#000', '#fff'), shd5, sbd5]);
+  sbu.Add('.w3-theme-s-l   {color:%s !important; background-color:%s !important} /* %d */', [ifthen(sbl5 > K, '#000', '#fff'), shl5, sbl5]);
+  sbu.Add('.w3-theme-s     {color:%s !important; background-color:%s !important} /* %d */', [ifthen(sbco > K, '#000', '#fff'), shco, sbco]);
+  sbu.Add('.w3-theme-s-d   {color:%s !important; background-color:%s !important} /* %d */', [ifthen(sbd5 > K, '#000', '#fff'), shd5, sbd5]);
   {$ENDREGION}
 
   {$REGION 'w3 theme accent 10%'}
@@ -29017,10 +29955,10 @@ begin
   sbu.Add('/***'                                                                                          );
   sbu.Add(' * W3CSS THEME(%s) ACCENT-COLOR (%s) 10%%'                                    , [IvTheme, ahco]);
   sbu.Add(' */'                                                                                           );
-  sbu.Add('.w3-theme-a-l      {color:%s !important; background-color:%s !important} /* %d */', [{ifthen(abl5 > K, '#000', '#fff')}ahd5, ahl5, abl5]); // light
-  sbu.Add('.w3-theme-a        {color:%s !important; background-color:%s !important} /* %d */', [ ifthen(abco > K, '#000', '#fff')     , ahco, abco]); // normal
-  sbu.Add('.w3-theme-a-d      {color:%s !important; background-color:%s !important} /* %d */', [{ifthen(abd5 > K, '#000', '#fff')}ahl5, ahd5, abd5]); // dark
-  sbu.Add('.w3-theme-a-t    {color:%s !important; background-color:%s80 !important} /* %d */', [{ifthen(abco > K, '#000', '#fff')}ahd5, ahco, abco]); // t???
+  sbu.Add('.w3-theme-a-l   {color:%s !important; background-color:%s   !important} /* %d */', [{ifthen(abl5 > K, '#000000', '#ffffff')}ahd5, ahl5, abl5]); // light
+  sbu.Add('.w3-theme-a     {color:%s !important; background-color:%s   !important} /* %d */', [ ifthen(abco > K, '#000000', '#ffffff')     , ahco, abco]); // normal
+  sbu.Add('.w3-theme-a-d   {color:%s !important; background-color:%s   !important} /* %d */', [{ifthen(abd5 > K, '#000000', '#ffffff')}ahl5, ahd5, abd5]); // dark
+  sbu.Add('.w3-theme-a-t   {color:%s !important; background-color:%s80 !important} /* %d */', [{ifthen(abco > K, '#000000', '#ffffff')}ahd5, ahco, abco]); // t???
   {$ENDREGION}
 
   {$REGION 'w3 theme text'}
@@ -29054,11 +29992,11 @@ begin
   sbu.Add('/***'                                                                                          );
   sbu.Add(' * W3CSS THEME(%s) GRADIENT (%s)'                                             , [IvTheme, ahco]);
   sbu.Add(' */'                                                                                           );
-  sbu.Add('.w3-theme-gradient  {color:%s !important; background:-webkit-linear-gradient(top,%s 25%%,%s 75%%)}', [ifthen(pbco > K, '#000', '#fff'), phl2, phd1]);
-  sbu.Add('.w3-theme-gradient  {color:%s !important; background:   -moz-linear-gradient(top,%s 25%%,%s 75%%)}', [ifthen(pbco > K, '#000', '#fff'), phl2, phd1]);
-  sbu.Add('.w3-theme-gradient  {color:%s !important; background:     -o-linear-gradient(top,%s 25%%,%s 75%%)}', [ifthen(pbco > K, '#000', '#fff'), phl2, phd1]);
-  sbu.Add('.w3-theme-gradient  {color:%s !important; background:    -ms-linear-gradient(top,%s 25%%,%s 75%%)}', [ifthen(pbco > K, '#000', '#fff'), phl2, phd1]);
-  sbu.Add('.w3-theme-gradient  {color:%s !important; background:        linear-gradient(top,%s 25%%,%s 75%%)}', [ifthen(pbco > K, '#000', '#fff'), phl2, phd1]);
+  sbu.Add('.w3-theme-gradient {color:%s !important; background:-webkit-linear-gradient(top,%s 25%%,%s 75%%)}', [ifthen(pbco > K, '#000', '#fff'), phl2, phd1]);
+  sbu.Add('.w3-theme-gradient {color:%s !important; background:   -moz-linear-gradient(top,%s 25%%,%s 75%%)}', [ifthen(pbco > K, '#000', '#fff'), phl2, phd1]);
+  sbu.Add('.w3-theme-gradient {color:%s !important; background:     -o-linear-gradient(top,%s 25%%,%s 75%%)}', [ifthen(pbco > K, '#000', '#fff'), phl2, phd1]);
+  sbu.Add('.w3-theme-gradient {color:%s !important; background:    -ms-linear-gradient(top,%s 25%%,%s 75%%)}', [ifthen(pbco > K, '#000', '#fff'), phl2, phd1]);
+  sbu.Add('.w3-theme-gradient {color:%s !important; background:        linear-gradient(top,%s 25%%,%s 75%%)}', [ifthen(pbco > K, '#000', '#fff'), phl2, phd1]);
   {$ENDREGION}
 
   {$REGION 'w3 theme hover'}
@@ -29161,41 +30099,40 @@ begin
   sbu.Add(' * W3CSS ADDINS'                                                                               );
   sbu.Add(' */'                                                                                           );
 
-  sbu.Add('.w3-info        {background-color: %s !important; color: %s !important;}', [INF_BG_H, INF_FG_H]); // botstrap
-  sbu.Add('.w3-success     {background-color: %s !important; color: %s !important;}', [SUC_BG_H, SUC_FG_H]);
-  sbu.Add('.w3-warning     {background-color: %s !important; color: %s !important;}', [WAR_BG_H, WAR_FG_H]);
-  sbu.Add('.w3-critical    {background-color: %s !important; color: %s !important;}', [CRI_BG_H, CRI_FG_H]);
-  sbu.Add('.w3-danger      {background-color: %s !important; color: %s !important;}', [DAN_BG_H, DAN_FG_H]);
+  sbu.Add('.w3-info                   {background-color: %s !important; color: %s !important;}', [INF_BG_H, INF_FG_H]); // botstrap
+  sbu.Add('.w3-success                {background-color: %s !important; color: %s !important;}', [SUC_BG_H, SUC_FG_H]);
+  sbu.Add('.w3-warning                {background-color: %s !important; color: %s !important;}', [WAR_BG_H, WAR_FG_H]);
+  sbu.Add('.w3-critical               {background-color: %s !important; color: %s !important;}', [CRI_BG_H, CRI_FG_H]);
+  sbu.Add('.w3-danger                 {background-color: %s !important; color: %s !important;}', [DAN_BG_H, DAN_FG_H]);
 
-  sbu.Add('.w3-padding-zero     {padding: 0px      !important;}'                                          );
-  sbu.Add('.w3-padding-xsmall   {padding: 2px  4px !important;}'                                          );
-  sbu.Add('.w3-padding-small    {padding: 4px  4px !important;}'                                          );
-  sbu.Add('.w3-padding-medium   {padding: 8px  8px !important;}'                                          );
-  sbu.Add('.w3-padding-large    {padding:12px 12px !important;}'                                          );
-  sbu.Add('.w3-padding-xlarge   {padding:16px 16px !important;}'                                          );
+  sbu.Add('.w3-padding-zero           {padding: 0px      !important;}'                                    );
+  sbu.Add('.w3-padding-xsmall         {padding: 2px  4px !important;}'                                    );
+  sbu.Add('.w3-padding-small          {padding: 4px  4px !important;}'                                    );
+  sbu.Add('.w3-padding-medium         {padding: 8px  8px !important;}'                                    );
+  sbu.Add('.w3-padding-large          {padding:12px 12px !important;}'                                    );
+  sbu.Add('.w3-padding-xlarge         {padding:16px 16px !important;}'                                    );
 
-  sbu.Add('.w3-padding-y-zero   {padding-top: 0px !important; padding-bottom: 0px !important;}'           );
-  sbu.Add('.w3-padding-y-xsmall {padding-top: 2px !important; padding-bottom: 2px !important;}'           );
-  sbu.Add('.w3-padding-y-small  {padding-top: 4px !important; padding-bottom: 4px !important;}'           );
-  sbu.Add('.w3-padding-y-medium {padding-top: 8px !important; padding-bottom: 8px !important;}'           );
-  sbu.Add('.w3-padding-y-large  {padding-top:12px !important; padding-bottom:12px !important;}'           );
-  sbu.Add('.w3-padding-y-xlarge {padding-top:16px !important; padding-bottom:16px !important;}'           );
+  sbu.Add('.w3-padding-y-zero         {padding-top:  0px !important; padding-bottom: 0px !important;}'    );
+  sbu.Add('.w3-padding-y-xsmall       {padding-top:  2px !important; padding-bottom: 2px !important;}'    );
+  sbu.Add('.w3-padding-y-small        {padding-top:  4px !important; padding-bottom: 4px !important;}'    );
+  sbu.Add('.w3-padding-y-medium       {padding-top:  8px !important; padding-bottom: 8px !important;}'    );
+  sbu.Add('.w3-padding-y-large        {padding-top: 12px !important; padding-bottom:12px !important;}'    );
+  sbu.Add('.w3-padding-y-xlarge       {padding-top :16px !important; padding-bottom:16px !important;}'    );
 
-  sbu.Add('.w3-padding-x-zero   {padding-left: 0px !important; padding-right: 0px !important;}'           );
-  sbu.Add('.w3-padding-x-small  {padding-left: 2px !important; padding-right: 2px !important;}'           );
-  sbu.Add('.w3-padding-x-small  {padding-left: 4px !important; padding-right: 4px !important;}'           );
-  sbu.Add('.w3-padding-x-medium {padding-left: 8px !important; padding-right: 8px !important;}'           );
-  sbu.Add('.w3-padding-x-large  {padding-left:12px !important; padding-right:12px !important;}'           );
-  sbu.Add('.w3-padding-x-xlarge {padding-left:16px !important; padding-right:16px !important;}'           );
-
-//sbu.Add('.w3-text-italic            {font-style: italic;}'                                              ); // *** REMOVED, there is w3-cursive! ***
+  sbu.Add('.w3-padding-x-zero         {padding-left: 0px !important; padding-right: 0px !important;}'     );
+  sbu.Add('.w3-padding-x-small        {padding-left: 2px !important; padding-right: 2px !important;}'     );
+  sbu.Add('.w3-padding-x-small        {padding-left: 4px !important; padding-right: 4px !important;}'     );
+  sbu.Add('.w3-padding-x-medium       {padding-left: 8px !important; padding-right: 8px !important;}'     );
+  sbu.Add('.w3-padding-x-large        {padding-left:12px !important; padding-right:12px !important;}'     );
+  sbu.Add('.w3-padding-x-xlarge       {padding-left:16px !important; padding-right:16px !important;}'     );
+  sbu.Add('.w3-text-italic            {font-style: italic;}'                                              ); // *** REMOVE, there is w3-cursive! ***
   sbu.Add('.w3-table-centered         {margin-left: auto;margin-right: auto; display: block;}'            );
   sbu.Add('.w3-table-centered-compact {margin-left: auto;margin-right: auto; display: block;width: 0;}'   );
 
-  sbu.Add('.w3-shadow           {filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.5));}'                   );
-  sbu.Add('.w3-shadow-theme     {filter: drop-shadow(0px 0px 2px rgba(%d, %d, %d, %f));}', [TColRec.R(ptco),TColRec.G(ptco),TColRec.B(ptco), 0.5]);
+  sbu.Add('.w3-shadow                 {filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.5));}'             );
+  sbu.Add('.w3-shadow-theme           {filter: drop-shadow(0px 0px 2px rgba(%d, %d, %d, %f));}', [TColRec.R(ptco),TColRec.G(ptco),TColRec.B(ptco), 0.5]);
 
-  sbu.Add('.w3-torn-bot{'         );
+  sbu.Add('.w3-torn-bot {'        );
   sbu.Add('    clip-path:polygon(');
   sbu.Add('     0% 0%'            );
   sbu.Add('    ,0% 100%'          );
@@ -29205,7 +30142,7 @@ begin
   sbu.Add('    ,0% 0%'            );
   sbu.Add('    )'                 );
   sbu.Add('}'                     );
-  sbu.Add('.w3-torn-top-bot{'     );
+  sbu.Add('.w3-torn-top-bot {'    );
   sbu.Add('    clip-path:polygon(');
   sbu.Add('     0% 10%'           );
   sbu.Add('    ,0% 100%'          );
@@ -29216,7 +30153,7 @@ begin
   sbu.Add('    ,0% 10%'           );
   sbu.Add('    )'                 );
   sbu.Add('}'                     );
-   sbu.Add('.w3-torn-top{'         );
+   sbu.Add('.w3-torn-top {'        );
   sbu.Add('    clip-path:polygon(');
   sbu.Add('     0% 10%'           );
   sbu.Add('    ,0% 100%'          );
@@ -29246,11 +30183,11 @@ begin
   sbu.Add(' */'                                                                                           );
 
     {$REGION 'anchor'}
-  sbu.Add('a:link     {color: %s;background-color: transparent;text-decoration: none;}'           , [ahco]);
-  sbu.Add('a:visited  {color: %s;background-color: transparent;text-decoration: none;}'           , [ahco]);
-  sbu.Add('a:hover    {color: %s;background-color: transparent;text-decoration: underline;}'      , [ahd5]);
-  sbu.Add('a:active   {color: %s;background-color: transparent;text-decoration: underline;}'      , [ahco]);
-  sbu.Add('abbr       {color: %s;font-weight: bold;}'                                             , [ahd5]);
+  sbu.Add('a:link    {color: %s;background-color: transparent;text-decoration: none;}'            , [ahco]);
+  sbu.Add('a:visited {color: %s;background-color: transparent;text-decoration: none;}'            , [ahco]);
+  sbu.Add('a:hover   {color: %s;background-color: transparent;text-decoration: underline;}'       , [ahd5]);
+  sbu.Add('a:active  {color: %s;background-color: transparent;text-decoration: underline;}'       , [ahco]);
+  sbu.Add('abbr      {color: %s;font-weight: bold;}'                                              , [ahd5]);
     {$ENDREGION}
 
     {$REGION 'heading'}
@@ -29324,10 +30261,22 @@ begin
   sbu.Add('  padding: 1px 4px;'                                                                           );
   sbu.Add('  border-radius: 4px;'                                                                         );
   sbu.Add('}'                                                                                             );
+  sbu.Add('pre {'                                                                                         );
+  sbu.Add('  margin: 0;'                                                                                  );
+  sbu.Add('}'                                                                                             );
+  sbu.Add('pre.w3-pre {'                                                                                  );
+//sbu.Add('  margin: 0;'                                                                                  );
+  sbu.Add('  padding: 16px;'                                                                              );
+  sbu.Add('  background-color: #f1f1f1;'                                                                  );
+  sbu.Add('  border-left: 4px solid %s; /* primary-color */'                                      , [phco]);
+  sbu.Add('  overflow-x: auto;'                                                                           );
+  sbu.Add('  font-family: Consolas, Monaco, monospace;'                                                   );
+  sbu.Add('  font-size: 0.9rem;'                                                                          );
+  sbu.Add('}'                                                                                             );
     {$ENDREGION}
 
     {$REGION 'progress'}
-  sbu.Add('progress{'                                                                                     );
+  sbu.Add('progress {'                                                                                    );
   sbu.Add('  -webkit-appearance: none;'                                                                   );
   sbu.Add('  appearance: none;'                                                                           );
   sbu.Add('  width: 5em;'                                                                                 );
@@ -29363,7 +30312,7 @@ begin
     {$REGION 'table'}
   sbu.Add('th {'                                                                                          );
   sbu.Add('  text-align: left;'                                                                           );
-  sbu.Add('  background-color: %s;'                                                                ,[stco]);
+  sbu.Add('/*background-color: %s;*/'                                                             , [phco]);
   sbu.Add('}'                                                                                             );
     {$ENDREGION}
 
@@ -29395,7 +30344,7 @@ begin
 
   {$ENDREGION}
 
-  {$REGION 'w3 theme zzz'}
+  {$REGION 'zzz'}
 //sbu.Anl;
 //sbu.Add('.w3-theme-action             {color:#fff !important; background-color:%s !important}'  , [ahd5]);
 //sbu.Add('.w3-theme-border             {border-color:%s                            !important}'  , [ahco]);
@@ -29461,37 +30410,45 @@ begin
   Result := sbu.Text;
 end;
 
-class procedure TW3fRec.W3WebFilesGenerate;
+class procedure TW3fRec.W3WebFilesGenerate(IvW3Js, IvW3ColorJs, IvW3Css, IvW3ThemeCss: boolean);
 var
   stl: TStrings;
   fna: string; // filename
   i: integer;
 begin
-  if not TDirectory.Exists(TSysRec.INC_PATH + '\w3') then
-    TDirectory.CreateDirectory(TSysRec.INC_PATH + '\w3');
+  if not TDirectory.Exists(TSysRec.INC_PATH + '\W\w3\4.0-new') then
+    TDirectory.CreateDirectory(TSysRec.INC_PATH + '\W\w3\4.0-new');
 
   stl := TStringList.Create;
   try
     // w3.js
-    stl.Text := TDbaRec.ObjFieldGet('Code', 'FldContent', 'Root/Organization/W/w3/4.0/w3.js', '');
-    fna := TSysRec.INC_PATH + '\w3\w3.js';
-    stl.SaveToFile(fna);
+    if IvW3Js then begin
+      stl.Text := TDbaRec.ObjFieldGet('Code', 'FldContent', 'Root/Organization/W/w3/4.0/w3.js', '');
+      fna := TSysRec.INC_PATH + '\W\w3\4.0-new\w3.js';
+      stl.SaveToFile(fna);
+    end;
 
     // w3color.js
-    stl.Text := TDbaRec.ObjFieldGet('Code', 'FldContent', 'Root/Organization/W/w3/4.0/w3color.js', '');
-    fna := TSysRec.INC_PATH + '\w3\w3color.js';
-    stl.SaveToFile(fna);
+    if IvW3ColorJs then begin
+      stl.Text := TDbaRec.ObjFieldGet('Code', 'FldContent', 'Root/Organization/W/w3/4.0/w3color.js', '');
+      fna := TSysRec.INC_PATH + '\W\w3\4.0-new\w3color.js';
+      stl.SaveToFile(fna);
+    end;
 
     // w3.css
-    stl.Text := TDbaRec.ObjFieldGet('Code', 'FldContent', 'Root/Organization/W/w3/4.0/w3.css', '');
-    fna := TSysRec.INC_PATH + '\w3\w3.css';
-    stl.SaveToFile(fna);
+    if IvW3Css then begin
+      stl.Text := TDbaRec.ObjFieldGet('Code', 'FldContent', 'Root/Organization/W/w3/4.0/w3.css', '');
+      fna := TSysRec.INC_PATH + '\W\w3\4.0-new\w3.css';
+      stl.SaveToFile(fna);
+    end;
 
     // w3-theme-xxx.css
-    for i := Low(THEME_NAME_VEC) to High(THEME_NAME_VEC) do begin
-      stl.Text := W3ThemeCssGenerate(THEME_NAME_VEC[i], THEME_PRIMARY_60_COLOR_VEC[i], THEME_SECONDARY_30_COLOR_VEC[i], THEME_ACCENT_10_COLOR_VEC[i]);
-      fna := TSysRec.INC_PATH + Format('\w3\w3-theme-%s.css', [THEME_NAME_VEC[i]]);
-      stl.SaveToFile(fna);
+    if IvW3ThemeCss then begin
+      for i := Low(THEME_NAME_VEC) to High(THEME_NAME_VEC) do begin
+        stl.Text := W3ThemeCssGenerate(THEME_NAME_VEC[i], THEME_PRIMARY_60_COLOR_VEC[i], THEME_SECONDARY_30_COLOR_VEC[i], THEME_ACCENT_10_COLOR_VEC[i]);
+        fna := TSysRec.INC_PATH + Format('\W\w3\4.0-new\w3-theme-%s.css', [THEME_NAME_VEC[i]]);
+        stl.SaveToFile(fna);
+      end;
     end;
   finally
     stl.Free;
@@ -29972,7 +30929,7 @@ begin
 //TWrsRec.ResponseSet(IvWebResponse, THtmRec.PageWarning(IvE.Message, IvE.StackTrace), TCtyRec.CTY_TXT_HTML, THttRec.HTTP_STATUS_400_SERVER_ERROR);
 end;
 
-{class} procedure TWmoRec.BeforeDispatch(IvWebRequest: TWebRequest; IvWebResponse: TWebResponse; var IvWrq: TWrqRec; var IvTic: TTicRec);
+{class} procedure TWmoRec.BeforeDispatch(IvWebRequest: TWebRequest; IvWebResponse: TWebResponse{; var IvWrq: TWrqRec}; var IvTic: TTicRec);
 
   {$REGION 'var'}
 var
@@ -29988,6 +30945,17 @@ var
     if not Result.StartsWith('www.') then
       Result := Format('www.%s', [Result]);
   end;}
+
+  procedure sessionNewSet;
+  begin
+    Randomize();
+    sid := TRndRec.RndInt(10000, 99999);
+    gses.Init('Web', sid, fid, rad, 'Unknown', 'Unknown', 'Unknown', IvWebRequest.UserAgent, 'SeeUserAgent', hos, gses.Organization, gses.Username, fbk);
+    // savetodba
+    gses.Insert(fbk);
+    // savetoclient
+    TWrsRec.FieldCookieSet(IvWebResponse, 'CoSessionId', sid, 1.0, gwsi.Www); // must set also the domain because of https probably otherwise the browser reject the cookie!
+  end;
   {$ENDREGION}
 
   {$REGION 'Help'}
@@ -30019,7 +30987,7 @@ begin
 
   // start
   IvTic.Init;
-//IvWrq.Error := '';
+//{IvWrq}gwrq.Error := '';
 //glog.Log('WebModuleBeforeDispatch');
 
   // fixearly *** impossible ***
@@ -30030,12 +30998,15 @@ begin
   //Exit;
 
   // request i
-  IvWrq.WebRequestOrig := IvWebRequest;
+  {IvWrq}gwrq.WebRequestOrig := IvWebRequest;
 
   // init
   rad := IvWebRequest.RemoteAddr;
   hos := IvWebRequest.Host;
-  hon := TRegEx.Split(hos, '\.')[0];
+  hon := TRegEx.Split(hos, '\.')[0]; // *** DOESN'T WORK IF THE SITE IS CALLED VIA IP LIKE nnn.nnn.nnn.nnn ***
+
+  // website
+  gwsi.Www := hos;
 
   // environment
   if hon.EndsWith('dev') or SameText(hon, 'localhost') or TStrRec.StrIsNumeric(hon) then
@@ -30045,9 +31016,20 @@ begin
   else
     genv.Environment := 'PROD';
 
-  // org
-  gorg.InitByWww(hos, fbk);
-//glog.Dbg('BEFOREDISPATCH', 'organization', org);
+  // organization
+  if not gorg.InitByWww(hos, fbk) then begin
+    {IvWrq}gwrq.Error := fbk;
+    Exit;
+  end;
+
+  // theme
+  gthe.InitDba(gorg.ObjectId, fbk);
+
+  // smtp
+  // nop, hardcoded or loaded when necessary
+
+  // pop3
+  // nop, hardcoded or loaded when necessary
 
   // redirect
   ref := IvWebRequest.Referer; // Referer 'http://www.wks.cloud/Default.htm?CoRedirect=http://www.wks.cloud/WksPageIsapiProject.dll/View?CoId=167&CoDocumentId=129 // *** Wks have to be replaced by TSysRec.PREFIX ***
@@ -30059,7 +31041,7 @@ begin
   end;
 
   // fingerprint
-  fid := IvWrq.FieldCookieGet('CoFingerprintId', 0);
+  fid := {IvWrq}gwrq.FieldCookieGet('CoFingerprintId', 0);
   if fid <= 0 then begin // clienthasnotfingerprintid --> ensureredirectingtodefaulthtmthatwillcalculateandstoreitintoclient
     red := Format('http://%s%s', [hos, IvWebRequest.URL]);
     if not IvWebRequest.PathInfo.IsEmpty then
@@ -30072,61 +31054,59 @@ begin
   end;
 
   // session
-//dab := IvWrq.FieldCookieGet('CoDateTime', 0.0);
-  sid := IvWrq.FieldCookieGet('CoSessionId', 0); // at the very beginning this is hot present in the client, later is present so skip the init/insert process
-  if sid <= 0 then begin                         // clienthasnotsessionid --> create new one then store it in dba and client
+//dab := {IvWrq}gwrq.FieldCookieGet('CoDateTimeBegin', 0.0);
+  sid := {IvWrq}gwrq.FieldCookieGet('CoSessionId', 0); // at the very beginning this is hot present in the client, later is present so skip the init/insert process
+
+  if sid <= 0 then begin                     // clienthasnotsessionid --> create new one then store it in dba and client
     Randomize();
     sid := TRndRec.RndInt(10000, 99999);
     gses.Init('Web', sid, fid, rad, 'Unknown', 'Unknown', 'Unknown', IvWebRequest.UserAgent, 'SeeUserAgent', hos, gses.Organization, gses.Username, fbk);
     // savetodba
     gses.Insert(fbk);
     // savetoclient
-    TWrsRec.FieldCookieSet(IvWebResponse, 'CoSessionId', sid);
+    TWrsRec.FieldCookieSet(IvWebResponse, 'CoSessionId', sid, 1.0, gwsi.Www); // must set also the domain because of https probably otherwise the browser reject the cookie!
   end else begin
     gses.SessionId     := sid;
     gses.FingerprintId := fid;
     gses.IpLan         := rad;
+    gses.Organization  := gorg.Obj.&Object;
     gses.Server        := hos;
     gses.Username      := ''; // this will be resolved like ... where FldUser = null , not elegant!
+
+    if gses.IsClosed then
+      sessionNewSet;
+
     gses.Select(fbk);
   end;
 
-  // request ii                                                                                                 // HTTPHEADER___________________EXAMPLE_____________________________________NOTE__________________________
-//IvWrq.WebRequestOrig := IvWebRequest;                                                                         //                              whole original webrequest
-  IvWrq.FingerprintId  := gses.FingerprintId;                                                                   //                              3681292525                                  IvWebRequest.CookieFields.Values['CoFingerprintId']
-  IvWrq.SessionId      := gses.SessionId;                                                                       //
-  IvWrq.RequestId      := (IvWebRequest as TISAPIRequest).Ecb^.ConnId;                                          // Ecb.ConnId                   095EBA6C
-  IvWrq.PageId         := StrToIntDef(IvWebRequest.QueryFields.Values['CoId'], 0);                              //                              123
-  IvWrq.DateTime       := TDatRec.DatFromIso(IvWebRequest.CookieFields.Values['CoDateTime'], Now);              //                              2019-01-31 12:12:14.377
-  IvWrq.Method         := IvWebRequest.Method;                                                                  // REQUEST_METHOD               GET | POST
-  IvWrq.Protocol       := {IvWebRequest.ProtocolVersion}ifthen(IvWebRequest.ServerPort = 443, 'https', 'http'); //                              {HTTP/1.1} http, https
-//IvWrq.Protocol       := TStrRec.StrLeftOf(':', IvWebRequest.Referer);
-  IvWrq.Host           := {host_mistakes_fix(}hos{)};                                             // SERVER_NAME                  www.wks.cloud *** THE-ONLY-SURE-INFO ***
-  IvWrq.Url            := IvWebRequest.URL;                                                                     //                              /WksXxxIsapiProject.dll // *** Wks have to be replaced by TSysRec.PREFIX ***
-  IvWrq.PathInfo       := IvWebRequest.PathInfo;                                                                // PATH_INFO / Ecb.PathInfo     /Info
-  IvWrq.Query          := IvWebRequest.Query; {WebRequest.QueryFields.CommaText}                                // QUERY_STRING / Ecb.Query     ?CoId=381&CoXxx=2
+  // request ii                                                                                                   // HTTPHEADER___________________EXAMPLE_____________________________________NOTE__________________________
+//{IvWrq}gwrq.WebRequestOrig := IvWebRequest;                                                                     //                              whole original webrequest
+  {IvWrq}gwrq.FingerprintId  := gses.FingerprintId;                                                               //                              3681292525                                  IvWebRequest.CookieFields.Values['CoFingerprintId']
+  {IvWrq}gwrq.SessionId      := gses.SessionId;                                                                   //
+  {IvWrq}gwrq.RequestId      := (IvWebRequest as TISAPIRequest).Ecb^.ConnId;                                      // Ecb.ConnId                   095EBA6C
+  {IvWrq}gwrq.PageId         := StrToIntDef(IvWebRequest.QueryFields.Values['CoId'], 0);                          //                              123
+  {IvWrq}gwrq.DateTime       := TDatRec.DatFromIso(IvWebRequest.CookieFields.Values['CoDateTimeBegin'], Now);     //                              2019-01-31 12:12:14.377
+  {IvWrq}gwrq.Method         := IvWebRequest.Method;                                                              // REQUEST_METHOD               GET | POST
+  {IvWrq}gwrq.Protocol       := {IvWebRequest.ProtocolVersion}ifthen(IvWebRequest.ServerPort = 443, 'https', 'http'); //                              {HTTP/1.1} http, https
+//{IvWrq}gwrq.Protocol       := TStrRec.StrLeftOf(':', IvWebRequest.Referer);                                     //
+  {IvWrq}gwrq.Host           := {host_mistakes_fix(}hos{)};                                                       // SERVER_NAME                  www.wks.cloud *** THE-ONLY-SURE-INFO ***
+  {IvWrq}gwrq.Url            := IvWebRequest.URL;                                                                 //                              /WksXxxIsapiProject.dll // *** Wks have to be replaced by TSysRec.PREFIX ***
+  {IvWrq}gwrq.PathInfo       := IvWebRequest.PathInfo;                                                            // PATH_INFO / Ecb.PathInfo     /Info
+  {IvWrq}gwrq.Query          := IvWebRequest.Query; {WebRequest.QueryFields.CommaText}                            // QUERY_STRING / Ecb.Query     ?CoId=381&CoXxx=2
 
   // someoneusedipaddress (http://51.38.98.160/ --unabletogetorganization--rerouteto--> www.wks.cloud)
 //if SameText(hos, TNetRec.IpLan) then
-  //IvWrq.Host := TSysRec.WWW;
+  //{IvWrq}gwrq.Host := TSysRec.WWW;
+
+  // page
+  if {IvWrq}gwrq.PageId <= 0 then // *** IMPORTANT ***
+    {IvWrq}gwrq.PageId := gorg.HomePageId;
+
+  // webrequest (cagnolina)
+//gwrq := {IvWrq}gwrq; // *** this global var is neeed in the rva function and in other places ***
 
   // system
   // hardcodedin TSysRec ... *** but load from db in module.create ! ***
-
-  // organization *** MOVE BEFORE session ***
-  if not gorg.InitByWww(hos, fbk) then begin
-    IvWrq.Error := fbk;
-    Exit;
-  end;
-
-  // smtp
-  // nop, hardcoded or loaded when necessary
-
-  // pop3
-  // nop, hardcoded or loaded when necessary
-
-  // theme
-  gthe.InitDba(gorg.ObjectId, fbk);
 
   // user
   gusr.Reset;
@@ -30142,16 +31122,6 @@ begin
   gmbr.Reset;
   if not gses.Username.IsEmpty then
     gmbr.InitDba(gses.Organization, gses.Username, fbk);
-
-  // page
-  if IvWrq.PageId <= 0 then // *** IMPORTANT ***
-    IvWrq.PageId := gorg.HomePageId;
-
-  // website
-  gwsi.Www := hos;
-
-  // webrequest cagnolina
-  gwrq := IvWrq;                                                                       // *** this global var is neeed in the rva function and in other places ***
 
   // customheader expire (standard)
 //IvWebResponse.SetCustomHeader('Expires', THttRec.HTTP_HEADER_EXPIRE);
@@ -30218,7 +31188,7 @@ begin
   {...}
 end;
 
-{class} procedure TWmoRec.AfterDispatch(IvWebRequest: TWebRequest; IvWebResponse: TWebResponse; var IvWrq: TWrqRec; var IvTic: TTicRec);
+{class} procedure TWmoRec.AfterDispatch(IvWebRequest: TWebRequest; IvWebResponse: TWebResponse{; var IvWrq: TWrqRec}; var IvTic: TTicRec);
 var
   fbk, www: string;
   ims: integer;
@@ -30285,7 +31255,7 @@ end;
   ims := IvTic.ElapsedMs;
 
   // request
-  IvWrq.DbaInsert(ims, fbk);
+  {IvWrq}gwrq.DbaInsert(ims, fbk);
 
   // lastly
   IvWebResponse.Content := StringReplace(IvWebResponse.Content, '$RvElapsedMs$', ims.ToString, [rfReplaceAll]);
@@ -30608,13 +31578,16 @@ class procedure TWrsRec.FieldCookieSet(IvResponse: TWebResponse; IvCookie: strin
 begin
   try
     with IvResponse.Cookies.Add do begin
-      Name                           := IvCookie; // key
-      Value                          := IvValue;  // value
-      if IvDomain <> '' then Domain  := IvDomain; // wre.Domain
-      Path                           := IvPath;   // '/'
-    //Secure                         := false;    // ???
-      Expires                        := Now + IvExpireInXDay;
+      Name                           := IvCookie;             // key
+      Value                          := IvValue;              // value
+      if IvDomain <> '' then Domain  := IvDomain;             // this way the cookie become a "domain cookie" and the browser store it with a leading dot --> ".www.wks.cloud", a normal cookie is "a host-only cookie" and has no leading dot!
+      Path                           := IvPath;               // '/'
+      Expires                        := Now + IvExpireInXDay; // persistent cookie (x days)
+    //Secure                         := false;                // only https
+    //HttpOnly                       := true;                 // not accessible via JavaScript
     end;
+    // IIS wil send to the client someting like:
+    // Set-Cookie: CoSessionId=abc123; domain=yourdomain.com; path=/; expires=date; secure; httponly
   except
     on e: Exception do begin
       raise e;
@@ -30770,7 +31743,7 @@ end;
 
 {$REGION 'MemoryLeaks'}
 //glog.Log('Set ReportMemoryLeaksOnShutdown to true');
-  ReportMemoryLeaksOnShutdown := true;
+  ReportMemoryLeaksOnShutdown := {DebugHook <> 0}IsDebuggerPresent();
 {$ENDREGION}
 
 finalization

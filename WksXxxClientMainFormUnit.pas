@@ -47,11 +47,13 @@ uses
   , JvScrollMax
   , JvSpin
   , JvThreadTimer
+  , JvDBDateTimePicker
   , SynDBEdit
   , SynEdit
   , VirtualTrees
   , WksLogFrameUnit
   , WksBaseClientMainFormUnit
+  , WksRecordEditCtrlUnit
   ;
 {$ENDREGION}
 
@@ -62,30 +64,13 @@ type
     XxxClientDataSet: TClientDataSet;
     XxxDBNavigator: TDBNavigator;
     XxxDataSource: TDataSource;
-    XxxLocalIdDBEdit: TDBEdit;
-    XxxLocalIdLabel: TLabel;
     XxxImageList24: TImageList;
     XxxJvScrollMaxBand: TJvScrollMaxBand;
-    XxxObjectIdDBEdit: TDBEdit;
-    XxxObjectIdLabel: TLabel;
-    XxxLocalPIdDBEdit: TDBEdit;
-    XxxLocalPIdLabel: TLabel;
     XxxTabSheet: TTabSheet;
     XxxTestAction: TAction;
     XxxTestToolButton: TToolButton;
     XxxToolBar: TToolBar;
-    XxxTextDBEdit: TDBEdit;
-    XxxTextLabel: TLabel;
-    XxxSelectDBEdit: TDBEdit;
-    XxxSelectLabel: TLabel;
-    XxxSelect2Label: TLabel;
-    XxxSelect2DBEdit: TDBEdit;
-    XxxSelect3Label: TLabel;
-    XxxSelect3DBEdit: TDBEdit;
-    XxxMemoLabel: TLabel;
-    XxxMemoDBRichEdit: TDBRichEdit;
-    XxxSqlLabel: TLabel;
-    XxxSqlDBRichEdit: TDBRichEdit;
+    XxxWksRecordEditCtrl: TWksRecordEditCtrl;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
@@ -95,6 +80,7 @@ type
     procedure XxxClientDataSetAfterPost(DataSet: TDataSet);
     procedure XxxClientDataSetReconcileError(DataSet: TCustomClientDataSet; E: EReconcileError; UpdateKind: TUpdateKind; var Action: TReconcileAction);
     procedure XxxTestActionExecute(Sender: TObject);
+    procedure XxxWksRecordEditCtrlDataLoaded(Sender: TObject);
   private
     { Private declarations }
     // winmessages
@@ -164,17 +150,53 @@ end;
 {$ENDREGION}
 
 {$REGION 'Actions'}
+
+  {$REGION 'Object'}
 procedure TXxxMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // detail
-  if XxxClientDataSet.State = dsEdit then
+  {$REGION 'Object'}
+  {$ENDREGION}
+
+  {$REGION 'Detail'}
+  if not (XxxClientDataSet.State = dsBrowse) then
     XxxDBNavigator.BtnClick(nbPost);
+  {$ENDREGION}
+
 end;
+  {$ENDREGION}
+
+  {$REGION 'Detail'}
+procedure TXxxMainForm.XxxTestActionExecute(Sender: TObject);
+begin
+  inherited;
+
+  TMesRec.NI;
+end;
+  {$ENDREGION}
+
 {$ENDREGION}
 
-{$REGION 'ObjectCds'}
+{$REGION 'Property'}
+
+  {$REGION 'Object'}
+  {$ENDREGION}
+
+  {$REGION 'Detail'}
+procedure TXxxMainForm.XxxWksRecordEditCtrlDataLoaded(Sender: TObject);
+begin
+  inherited;
+
+  XxxJvScrollMaxBand.ExpandedHeight := XxxWksRecordEditCtrl.Top + XxxWksRecordEditCtrl.VertScrollBar.Range + 6;
+end;
+  {$ENDREGION}
+
+{$ENDREGION}
+
+{$REGION 'Cds'}
+
+  {$REGION 'Object'}
 procedure TXxxMainForm.ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
 begin
   inherited;
@@ -202,56 +224,39 @@ begin
   {$ENDREGION}
 
 end;
-{$ENDREGION}
+  {$ENDREGION}
 
-{$REGION 'XxxActions'}
-procedure TXxxMainForm.XxxTestActionExecute(Sender: TObject);
-begin
-  inherited;
-
-  TMesRec.NI;
-end;
-{$ENDREGION}
-
-{$REGION 'XxxCds'}
+  {$REGION 'Detail'}
 procedure TXxxMainForm.XxxClientDataSetAfterDelete(DataSet: TDataSet);
 begin
   inherited;
 
-  {$REGION 'detail'}
   if XxxClientDataSet.ApplyUpdates(0) > 0 then
     TMesRec.I('Unable to delete %s detail data from remote server', [FObj])
   else begin
     XxxClientDataSet.Refresh; // IMPORTAN
     LogFrame.Log('%s detail data deleted from remote server', [FObj]);
   end;
-  {$ENDREGION}
-
 end;
 
 procedure TXxxMainForm.XxxClientDataSetAfterInsert(DataSet: TDataSet);
 begin
   inherited;
 
-  {$REGION 'detail'}
   // set
   DataSet.Edit;
 //DataSet.FieldByName('FldObjectId').Value := FId; // automatic
   DataSet.FieldByName('FldLocalId' ).Value := 1;   // tblmax+1           // \
-  DataSet.FieldByName('FldLocalPId').Value := 0;   // ?                  //  |__ need to be removed/updated
-  DataSet.FieldByName('FldValue1'  ).Value := TNamRec.RndInt('Value1');  //  |
-  DataSet.FieldByName('FldValue2'  ).Value := TNamRec.RndInt('Value2');  // /
+  DataSet.FieldByName('FldLocalPId').Value := 0;   // ?                  //  |-- need to be removed/updated
+//DataSet.FieldByName('FldXxx'     ).Value := TNamRec.RndInt('Xxx');     // /
   DataSet.Post;
   LogFrame.Log('%s data initialized', [FObj]);
-  {$ENDREGION}
-
 end;
 
 procedure TXxxMainForm.XxxClientDataSetAfterPost(DataSet: TDataSet);
 begin
   inherited;
 
-  {$REGION 'detail'}
   // applyupdatetoremoteserver
   if XxxClientDataSet.ApplyUpdates(0) > 0 then
     TMesRec.I('Unable to save %s detail to remote server', [FObj])
@@ -259,19 +264,16 @@ begin
     XxxClientDataSet.Refresh; // IMPORTAN
     LogFrame.Log('%s detail data saved to remote server', [FObj]);
   end;
-  {$ENDREGION}
-
 end;
 
 procedure TXxxMainForm.XxxClientDataSetReconcileError(DataSet: TCustomClientDataSet; E: EReconcileError; UpdateKind: TUpdateKind; var Action: TReconcileAction);
 begin
   inherited;
 
-  {$REGION 'detail'}
   Action := HandleReconcileError(DataSet, UpdateKind, E);
+end;
   {$ENDREGION}
 
-end;
 {$ENDREGION}
 
 end.

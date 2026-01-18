@@ -1,7 +1,7 @@
-object SpellcheckForm: TSpellcheckForm
+object SpellcheckDialogForm: TSpellcheckDialogForm
   Left = 0
   Top = 0
-  Caption = 'SpellcheckForm'
+  Caption = 'SpellcheckDialogForm'
   ClientHeight = 602
   ClientWidth = 788
   Color = clBtnFace
@@ -35,9 +35,6 @@ object SpellcheckForm: TSpellcheckForm
     Caption = 'RightPanel'
     ShowCaption = False
     TabOrder = 0
-    ExplicitLeft = 435
-    ExplicitTop = 44
-    ExplicitHeight = 396
     object ErrorListLabel: TLabel
       AlignWithMargins = True
       Left = 3
@@ -56,7 +53,6 @@ object SpellcheckForm: TSpellcheckForm
       Height = 13
       Align = alBottom
       Caption = 'Suggestions'
-      ExplicitTop = 114
       ExplicitWidth = 58
     end
     object LanguageLabel: TLabel
@@ -103,7 +99,6 @@ object SpellcheckForm: TSpellcheckForm
       ItemHeight = 13
       TabOrder = 0
       OnClick = ErrorListBoxClick
-      ExplicitHeight = 39
     end
     object SuggestionListBox: TListBox
       AlignWithMargins = True
@@ -115,7 +110,6 @@ object SpellcheckForm: TSpellcheckForm
       ItemHeight = 13
       TabOrder = 1
       OnClick = SuggestionListBoxClick
-      ExplicitTop = 275
     end
     object LanguageComboBox: TComboBox
       AlignWithMargins = True
@@ -137,7 +131,6 @@ object SpellcheckForm: TSpellcheckForm
       Align = alBottom
       ItemHeight = 13
       TabOrder = 3
-      ExplicitTop = 335
     end
     object CorrectionEdit: TEdit
       AlignWithMargins = True
@@ -149,8 +142,6 @@ object SpellcheckForm: TSpellcheckForm
       Color = clYellow
       TabOrder = 4
       Text = 'CorrectionEdit'
-      ExplicitLeft = 0
-      ExplicitTop = 200
     end
   end
   object MainPanel: TPanel
@@ -165,10 +156,6 @@ object SpellcheckForm: TSpellcheckForm
     Caption = 'MainPanel'
     ShowCaption = False
     TabOrder = 1
-    ExplicitLeft = 0
-    ExplicitTop = 44
-    ExplicitWidth = 432
-    ExplicitHeight = 396
     object TextLabel: TLabel
       AlignWithMargins = True
       Left = 3
@@ -195,8 +182,6 @@ object SpellcheckForm: TSpellcheckForm
         'TextMemo')
       ParentFont = False
       TabOrder = 0
-      ExplicitWidth = 426
-      ExplicitHeight = 371
     end
   end
   object TopPanel: TPanel
@@ -210,9 +195,6 @@ object SpellcheckForm: TSpellcheckForm
     Caption = 'TopPanel'
     ShowCaption = False
     TabOrder = 2
-    ExplicitLeft = 0
-    ExplicitTop = 0
-    ExplicitWidth = 620
     object InfoPanel: TPanel
       AlignWithMargins = True
       Left = 178
@@ -227,8 +209,6 @@ object SpellcheckForm: TSpellcheckForm
       Caption = 'InfoPanel'
       ShowCaption = False
       TabOrder = 0
-      ExplicitLeft = 168
-      ExplicitWidth = 452
       DesignSize = (
         601
         44)
@@ -274,20 +254,20 @@ object SpellcheckForm: TSpellcheckForm
       ShowHint = True
       TabOrder = 1
       Transparent = True
-      object NewToolButton: TToolButton
-        Left = 0
-        Top = 0
-        Action = SpellcheckAction
-      end
       object OpenToolButton: TToolButton
-        Left = 54
+        Left = 0
         Top = 0
         Action = DoneAction
       end
       object RunToolButton: TToolButton
-        Left = 108
+        Left = 54
         Top = 0
         Action = CancelAction
+      end
+      object NewToolButton: TToolButton
+        Left = 108
+        Top = 0
+        Action = SpellcheckAction
       end
     end
   end

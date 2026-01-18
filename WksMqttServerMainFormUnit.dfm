@@ -148,8 +148,8 @@ inherited MainForm: TMainForm
   end
   object MqttADOConnection: TADOConnection
     ConnectionString = 
-      'Provider=MSOLEDBSQL.1;Password=secret@123;Persist Security Info=' +
-      'True;User ID=sa;Initial Catalog=DbaMqtt;Data Source=LOCALHOST'
+      'Provider=MSOLEDBSQL.1;Persist Security Info=True;Data Source=LOC' +
+      'ALHOST;User ID=sa;Password=31316@Wks;Initial Catalog=DbaMqtt'
     LoginPrompt = False
     Provider = 'MSOLEDBSQL.1'
     Left = 280

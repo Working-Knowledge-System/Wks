@@ -96,7 +96,7 @@ type
     // grid
     procedure GridShow(IvShow: boolean);
     procedure GridDs(IvDs: TDataSource; IvFldVec: TArray<string> = []);
-    // effimery
+    // one
     procedure LogOne(IvFbk: TFbkRec); overload;
     procedure LogOne(IvString: string; IvFbkMode: TFbkModeEnum = fmNone; IvPersistMs: integer = 3000; IvTimeShow: boolean = false); overload;
     procedure LogOne(IvFormatString: string; IvVarRecVector: array of TVarRec; IvFbkMode: TFbkModeEnum = fmNone; IvPersistMs: integer = 3000; IvTimeShow: boolean = false); overload;
@@ -154,16 +154,22 @@ procedure TLogFrame.Log(IvString: string; IvColor: TColor);
 var
   str: string;
 begin
-  LogRichEdit.Lines.BeginUpdate;
-  if ClearAutoToolButton.Down then
-    LogRichEdit.Clear;
-  try
-    str := Format('%s %s', [FormatDateTime('yyyy/mm/dd hh:nn:ss.zzz:', Now), IvString]);
-  //LogRichEdit.Lines.Add(str);
-    TRicRec.RowAdd(LogRichEdit, str, IvColor);
-  finally
-    LogRichEdit.Lines.EndUpdate;
+  // clear
+  if ClearAutoToolButton.Down then begin
+    LogRichEdit.Lines.BeginUpdate;
+    try
+      LogRichEdit.Clear;
+    finally
+      LogRichEdit.Lines.EndUpdate;
+    end;
   end;
+
+  // prepare
+  str := Format('%s %s', [FormatDateTime('yyyy/mm/dd hh:nn:ss.zzz:', Now), IvString]);
+
+  // add
+//LogRichEdit.Lines.Add(str);
+  TRicRec.RowAdd(LogRichEdit, str, IvColor); // *** beginupdate/endupdate is done internally but, in long loops, wrap there the logging with BeginUpdate/EndUpdate ***
 end;
 
 procedure TLogFrame.Log(IvString: string; IvSuccess: boolean);
@@ -279,7 +285,7 @@ begin
   row := '';
   for i := 0 to IvDs.FieldCount - 1 do begin
     fld := IvDs.Fields[i];
-    TCsvRec.CsvRowFieldAppend(row, fld.FieldName);
+    TCsvRec.CsvAppend(row, fld.FieldName);
   end;
   Output(row, clRed);
 
@@ -298,7 +304,7 @@ begin
       row := '';
       for i := 0 to IvDs.FieldCount - 1 do begin
         fld := IvDs.Fields[i];
-        TCsvRec.CsvRowFieldAppend(row, fld.AsString);
+        TCsvRec.CsvAppend(row, fld.AsString);
       end;
       Output(row);
     end;

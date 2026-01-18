@@ -107,6 +107,8 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <VerInfo_Build>2</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.2;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
@@ -133,8 +135,20 @@
         </RcCompile>
         <DCCReference Include="Wks000Unit.pas"/>
         <DCCReference Include="WksPythonUnit.pas"/>
-        <DCCReference Include="WksColorFormUnit.pas">
-            <Form>ColorForm</Form>
+        <DCCReference Include="WksBaseClientMainFormUnit.pas">
+            <Form>BaseMainForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="WksColorDialogFormUnit.pas">
+            <Form>ColorDialogForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="WksGenerateDialogFormUnit.pas">
+            <Form>GenerateDialogForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="WksGridDialogFormUnit.pas">
+            <Form>GridDialogForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="WksImageFrameUnit.pas">
@@ -144,6 +158,10 @@
         </DCCReference>
         <DCCReference Include="WksJsonEditorFormUnit.pas">
             <Form>JsonEditorForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="WksListDialogFormUnit.pas">
+            <Form>ListDialogForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="WksLogFrameUnit.pas">
@@ -157,6 +175,14 @@
         </DCCReference>
         <DCCReference Include="WksMemberRoleLevelGradeFormUnit.pas">
             <Form>MemberRoleLevelGradeForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="WksObjectDialogFormUnit.pas">
+            <Form>ObjectDialogForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="WksPasswordGenFormUnit.pas">
+            <Form>PasswordGenForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="WksPythonEditorFormUnit.pas">
@@ -175,20 +201,20 @@
             <Form>SearchForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="WksSpellcheckFormUnit.pas">
-            <Form>SpellcheckForm</Form>
+        <DCCReference Include="WksSpellcheckDialogFormUnit.pas">
+            <Form>SpellcheckDialogForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="WksSqlEditorFormUnit.pas">
             <Form>SqlEditorForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="WksTextEditorFormUnit.pas">
-            <Form>TextEditorForm</Form>
+        <DCCReference Include="WksTextDialogFormUnit.pas">
+            <Form>TextDialogForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="WksBaseClientMainFormUnit.pas">
-            <Form>BaseMainForm</Form>
+        <DCCReference Include="WksTextEditorFormUnit.pas">
+            <Form>TextEditorForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="WksWordFrameUnit.pas">
@@ -196,8 +222,13 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="WksPasswordGenFormUnit.pas">
-            <Form>PasswordGenForm</Form>
+        <DCCReference Include="WksHelpDialogFormUnit.pas">
+            <Form>HelpDialogForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="WksXxxDialogFormUnit.pas"/>
+        <DCCReference Include="WksBaseDialogFormUnit.pas">
+            <Form>BaseDialogForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <None Include="LICENSE"/>
@@ -222,8 +253,8 @@
                     <Source Name="MainSource">WksBaseClientProject.dpr</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k290.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp290.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="4">

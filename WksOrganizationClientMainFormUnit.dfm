@@ -1,7 +1,6 @@
 inherited OrganizationMainForm: TOrganizationMainForm
   Caption = 'OrganizationMainForm'
   StyleElements = [seFont, seClient, seBorder]
-  ExplicitLeft = -48
   TextHeight = 15
   inherited LeftJvNetscapeSplitter: TJvNetscapeSplitter
     ExplicitHeight = 696
@@ -135,8 +134,8 @@ inherited OrganizationMainForm: TOrganizationMainForm
     inherited LeftPageControl: TPageControl
       inherited ObjectTreeTabSheet: TTabSheet
         inherited ObjectNodeInfoLabel: TLabel
+          Width = 292
           StyleElements = [seFont, seClient, seBorder]
-          ExplicitTop = 550
         end
         inherited ObjectDBNavigator: TDBNavigator
           Hints.Strings = ()
@@ -219,8 +218,6 @@ inherited OrganizationMainForm: TOrganizationMainForm
       inherited PropertyTabSheet: TTabSheet
         inherited ObjectJvScrollMax: TJvScrollMax
           StyleElements = [seFont, seClient, seBorder]
-          ExplicitLeft = 2
-          ExplicitTop = 48
           inherited ObjectIdJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectOrderLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
@@ -235,6 +232,9 @@ inherited OrganizationMainForm: TOrganizationMainForm
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectId8Label: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectRouteIdCsvLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectOrderDBEdit: TDBEdit
@@ -252,56 +252,44 @@ inherited OrganizationMainForm: TOrganizationMainForm
             inherited ObjectId8DBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectRouteIdCsvDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
           end
           inherited ObjectDateJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectCreatedLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectCreatedDBText: TDBText
-              StyleElements = [seFont, seClient, seBorder]
-            end
             inherited ObjectUpdatedLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectUpdatedDBText: TDBText
+            inherited ObjectExpireLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectUpdatedByDBText: TDBText
+            inherited ObjectUpdatedDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectCreatedDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectPersonJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectAuthorLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectOwnerCsvLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectUpdatedByLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-          end
-          inherited ObjectFromJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectFromOrganizationLabel: TLabel
+            inherited ObjectOwnerCsvDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectFromMemberLabel: TLabel
+            inherited ObjectAuthorDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectFromTeamLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromAreaLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromDepartmentLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromOrganizationDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromMemberDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromTeamDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromAreaDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromDepartmentDBEdit: TDBEdit
+            inherited ObjectUpdatedByDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -321,7 +309,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
             inherited ObjectToDepartmentLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectJobGradeMinLabel: TLabel
+            inherited ObjectToJobGradeMinLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectJobGradeCalculateLabel: TLabel
@@ -342,15 +330,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
             inherited ObjectToDepartmentDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectJobGradeMinDBComboBox: TDBComboBox
-              StyleElements = [seFont, seClient, seBorder]
-            end
-          end
-          inherited ObjectApprovalJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectRouteLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectRouteDBEdit: TDBEdit
+            inherited ObjectToJobGradeMinDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -370,6 +350,9 @@ inherited OrganizationMainForm: TOrganizationMainForm
             inherited ObjectImageClearLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectImageDBImage: TDBImage
+              Height = 0
+            end
           end
           inherited ObjectTypeJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectContentKindLabel: TLabel
@@ -381,6 +364,9 @@ inherited OrganizationMainForm: TOrganizationMainForm
             inherited ObjectDataKindLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectGroupLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited ObjectContentKindDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
@@ -390,41 +376,32 @@ inherited OrganizationMainForm: TOrganizationMainForm
             inherited ObjectDataKindDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectGroupDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
           end
           inherited ObjectGeneralJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectStateLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectSpareLabel: TLabel
+            inherited ObjectBgColorLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectDescriptionLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectTitleLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectSubtitleLabel: TLabel
+            inherited ObjectFgColorLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectStateDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectSpareDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
+            inherited ObjectBgColorDBEdit: TDBEdit
+              StyleElements = [seFont, seClient]
             end
-            inherited ObjectDescriptionDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectTitleDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectSubtitleDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
+            inherited ObjectFgColorDBEdit: TDBEdit
+              StyleElements = [seFont, seClient]
             end
           end
-          object OrganizationJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+          object OrganizationJvScrollMaxBand: TJvScrollMaxBand [7]
+            Width = 292
             Height = 21
             Expanded = False
             Caption = 'Organization'
@@ -440,7 +417,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 53
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -452,33 +429,31 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 353
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Slogan'
-              ExplicitTop = 303
               ExplicitWidth = 36
             end
             object OrganizationAboutLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 303
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'About'
-              ExplicitTop = 253
               ExplicitWidth = 33
             end
             object OrganizationWwwLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 103
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -490,33 +465,31 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 203
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Phone'
-              ExplicitTop = 153
               ExplicitWidth = 34
             end
             object OrganizationEmailLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 253
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Email'
-              ExplicitTop = 203
               ExplicitWidth = 29
             end
             object OrganizationWwwAltLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 153
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -528,7 +501,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 74
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -545,7 +518,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 374
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -553,13 +526,12 @@ inherited OrganizationMainForm: TOrganizationMainForm
               DataField = 'FldSlogan'
               DataSource = OrganizationDataSource
               TabOrder = 1
-              ExplicitTop = 324
             end
             object OrganizationAboutDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
               Top = 324
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -569,13 +541,12 @@ inherited OrganizationMainForm: TOrganizationMainForm
               ParentShowHint = False
               ShowHint = True
               TabOrder = 2
-              ExplicitTop = 274
             end
             object OrganizationWwwDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
               Top = 124
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -589,7 +560,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 3
               Top = 22
-              Width = 275
+              Width = 286
               Height = 25
               DataSource = OrganizationDataSource
               VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
@@ -601,7 +572,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 224
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -609,13 +580,12 @@ inherited OrganizationMainForm: TOrganizationMainForm
               DataField = 'FldPhone'
               DataSource = OrganizationDataSource
               TabOrder = 5
-              ExplicitTop = 174
             end
             object OrganizationEmailDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
               Top = 274
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -623,13 +593,12 @@ inherited OrganizationMainForm: TOrganizationMainForm
               DataField = 'FldEmail'
               DataSource = OrganizationDataSource
               TabOrder = 6
-              ExplicitTop = 224
             end
             object OrganizationWwwAltDBEdit: TDBEdit
               AlignWithMargins = True
               Left = 16
               Top = 174
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -639,8 +608,8 @@ inherited OrganizationMainForm: TOrganizationMainForm
               TabOrder = 7
             end
           end
-          object OrganizationLogoJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+          object OrganizationLogoJvScrollMaxBand: TJvScrollMaxBand [8]
+            Width = 292
             Height = 21
             Expanded = False
             Caption = 'Logo'
@@ -653,31 +622,31 @@ inherited OrganizationMainForm: TOrganizationMainForm
             Beveled = False
             ParentButtonFont = False
             DesignSize = (
-              281
+              292
               21)
             object OrganizationLogoLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 53
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Logo (200x200)'
-              ExplicitWidth = 80
+              ExplicitWidth = 79
             end
             object OrganizationLogoLongLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 288
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Logo Long (240x80)'
-              ExplicitWidth = 104
+              ExplicitWidth = 103
             end
             object OrganizationLogoSaveLabel: TLabel
               Left = 242
@@ -745,7 +714,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 74
-              Width = 249
+              Width = 260
               Height = 208
               Margins.Left = 16
               Margins.Right = 16
@@ -759,7 +728,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 309
-              Width = 249
+              Width = 260
               Height = 88
               Margins.Left = 16
               Margins.Right = 16
@@ -773,7 +742,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 3
               Top = 22
-              Width = 275
+              Width = 286
               Height = 25
               DataSource = OrganizationDataSource
               VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
@@ -782,8 +751,8 @@ inherited OrganizationMainForm: TOrganizationMainForm
               TabOrder = 2
             end
           end
-          object OrganizationThemeJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+          object OrganizationThemeJvScrollMaxBand: TJvScrollMaxBand [9]
+            Width = 292
             Height = 21
             Expanded = False
             Caption = 'Theme'
@@ -799,7 +768,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 53
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -811,110 +780,103 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 103
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Theme'
-              ExplicitWidth = 36
+              ExplicitWidth = 37
             end
             object ThemeGradeLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 203
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Grade'
-              ExplicitTop = 153
               ExplicitWidth = 31
             end
             object ThemeHighlightJsLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 503
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'HighlightJs'
-              ExplicitTop = 453
               ExplicitWidth = 59
             end
             object ThemeBorderedClassLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 453
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Bordered Class'
-              ExplicitTop = 403
               ExplicitWidth = 78
             end
             object ThemePaddingClassLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 403
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Padding Class'
-              ExplicitTop = 353
               ExplicitWidth = 74
             end
             object ThemeSizeClassLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 353
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Size Class'
-              ExplicitTop = 303
               ExplicitWidth = 50
             end
             object ThemeFontFamilyLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 253
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Font Family'
-              ExplicitTop = 203
               ExplicitWidth = 62
             end
             object ThemeFontWeightLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 303
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Font Weight'
-              ExplicitTop = 253
               ExplicitWidth = 65
             end
             object ThemeStateLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 153
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -926,7 +888,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 74
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -943,7 +905,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 124
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -956,7 +918,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 224
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -964,13 +926,12 @@ inherited OrganizationMainForm: TOrganizationMainForm
               DataField = 'FldGrade'
               DataSource = ThemeDataSource
               TabOrder = 2
-              ExplicitTop = 174
             end
             object ThemeHighlightJsDBComboBox: TDBComboBox
               AlignWithMargins = True
               Left = 16
               Top = 524
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -978,13 +939,12 @@ inherited OrganizationMainForm: TOrganizationMainForm
               DataField = 'FldHighlightJs'
               DataSource = ThemeDataSource
               TabOrder = 3
-              ExplicitTop = 474
             end
             object ThemeBorderedClassDBComboBox: TDBComboBox
               AlignWithMargins = True
               Left = 16
               Top = 474
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -992,13 +952,12 @@ inherited OrganizationMainForm: TOrganizationMainForm
               DataField = 'FldBorderedClass'
               DataSource = ThemeDataSource
               TabOrder = 4
-              ExplicitTop = 424
             end
             object ThemePaddingClassDBComboBox: TDBComboBox
               AlignWithMargins = True
               Left = 16
               Top = 424
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1006,13 +965,12 @@ inherited OrganizationMainForm: TOrganizationMainForm
               DataField = 'FldPaddingClass'
               DataSource = ThemeDataSource
               TabOrder = 5
-              ExplicitTop = 374
             end
             object ThemeSizeClassDBComboBox: TDBComboBox
               AlignWithMargins = True
               Left = 16
               Top = 374
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1020,13 +978,12 @@ inherited OrganizationMainForm: TOrganizationMainForm
               DataField = 'FldSizeClass'
               DataSource = ThemeDataSource
               TabOrder = 6
-              ExplicitTop = 324
             end
             object ThemeFontFamilyDBComboBox: TDBComboBox
               AlignWithMargins = True
               Left = 16
               Top = 274
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1034,13 +991,12 @@ inherited OrganizationMainForm: TOrganizationMainForm
               DataField = 'FldFontFamily'
               DataSource = ThemeDataSource
               TabOrder = 7
-              ExplicitTop = 224
             end
             object ThemeDBNavigator: TDBNavigator
               AlignWithMargins = True
               Left = 3
               Top = 22
-              Width = 275
+              Width = 286
               Height = 25
               DataSource = ThemeDataSource
               VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
@@ -1052,7 +1008,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 324
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1060,13 +1016,12 @@ inherited OrganizationMainForm: TOrganizationMainForm
               DataField = 'FldFontWeight'
               DataSource = ThemeDataSource
               TabOrder = 9
-              ExplicitTop = 274
             end
             object ThemeStateDBComboBox: TDBComboBox
               AlignWithMargins = True
               Left = 16
               Top = 174
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1078,12 +1033,10 @@ inherited OrganizationMainForm: TOrganizationMainForm
                 'Active'
                 'Inactive')
               TabOrder = 10
-              ExplicitLeft = 24
-              ExplicitTop = 190
             end
           end
-          object ThemeColorJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+          object ThemeColorJvScrollMaxBand: TJvScrollMaxBand [10]
+            Width = 292
             Height = 21
             Expanded = False
             Caption = 'Colors'
@@ -1100,7 +1053,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 377
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1120,7 +1073,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 327
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1140,7 +1093,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 227
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1160,7 +1113,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 277
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1180,7 +1133,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 127
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1200,7 +1153,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 177
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1219,7 +1172,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 27
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Top = 8
@@ -1240,7 +1193,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 77
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1273,7 +1226,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 398
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1294,7 +1247,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 348
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1315,7 +1268,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 248
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1336,7 +1289,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 298
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1357,7 +1310,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 148
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1378,7 +1331,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 198
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1399,7 +1352,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 48
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1420,7 +1373,7 @@ inherited OrganizationMainForm: TOrganizationMainForm
               AlignWithMargins = True
               Left = 16
               Top = 98
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1436,6 +1389,33 @@ inherited OrganizationMainForm: TOrganizationMainForm
               TabOrder = 7
               StyleElements = [seFont, seClient]
               OnChange = ThemePrimary60BgColorDBEditChange
+            end
+          end
+          inherited ObjectDataJvScrollMaxBand: TJvScrollMaxBand
+            ExplicitTop = 231
+            inherited ObjectData2Label: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData3Label: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData4Label: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData1Label: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData2DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData3DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData4DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData1DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
             end
           end
         end
@@ -1496,6 +1476,9 @@ inherited OrganizationMainForm: TOrganizationMainForm
             inherited OptionFontSizeLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited OptionTextRightEdgeLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited OptionTabWidthJvSpinEdit: TJvSpinEdit
               StyleElements = [seFont, seClient, seBorder]
             end
@@ -1503,6 +1486,9 @@ inherited OrganizationMainForm: TOrganizationMainForm
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited OptionFontSizeJvSpinEdit: TJvSpinEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTextRightEdgeComboBox: TComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -1542,20 +1528,20 @@ inherited OrganizationMainForm: TOrganizationMainForm
               StyleElements = [seFont, seClient, seBorder]
             end
           end
-          inherited OptionFilesJvScrollMaxBand: TJvScrollMaxBand
-            inherited OptionFilesWorkingFolderLabel: TLabel
+          inherited OptionFileJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionFileWorkingFolderLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesOnDoubleClickLabel: TLabel
+            inherited OptionFileOnDoubleClickLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesWorkingFolderClearLabel: TLabel
+            inherited OptionFileWorkingFolderClearLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesOnDoubleClickComboBox: TComboBox
+            inherited OptionFileOnDoubleClickComboBox: TComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesWorkingFolderSelectButtonedEdit: TButtonedEdit
+            inherited OptionFileWorkingFolderSelectButtonedEdit: TButtonedEdit
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -1566,12 +1552,58 @@ inherited OrganizationMainForm: TOrganizationMainForm
   inherited MainPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited MainPageControl: TPageControl
+      inherited ObjectContentPrevTabSheet: TTabSheet
+        inherited ObjectContentPrevTopPanel: TPanel
+          inherited ObjectContentPrevCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
       inherited ObjectContentTabSheet: TTabSheet
         inherited ObjectContentSplitter: TSplitter
           ExplicitHeight = 536
         end
+        inherited ObjectContentTopPanel: TPanel
+          inherited ObjectContentCharCountLabel: TLabel
+            Height = 22
+          end
+        end
         inherited ObjectContentSplitView: TSplitView
           DoubleBuffered = True
+        end
+        inherited ObjectContentLeftPanel: TPanel
+          inherited ObjectContentTopPanel2: TPanel
+            inherited ObjectTitleLabel: TLabel
+              Width = 638
+            end
+            inherited ObjectSubtitleLabel: TLabel
+              Width = 638
+            end
+            inherited ObjectDescriptionLabel: TLabel
+              Width = 638
+            end
+          end
+        end
+      end
+      inherited ObjectDataTabSheet: TTabSheet
+        inherited ObjectDataTopPanel: TPanel
+          inherited ObjectDataCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited ObjectNoteTabSheet: TTabSheet
+        inherited ObjectNoteTopPanel: TPanel
+          inherited ObjectNoteCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited FilesRioTabSheet: TTabSheet
+        inherited FilesRioTopPanel: TPanel
+          inherited FilesRioInfoLabel: TLabel
+            Height = 31
+          end
         end
       end
     end
@@ -1596,6 +1628,9 @@ inherited OrganizationMainForm: TOrganizationMainForm
     DataSet = OrganizationClientDataSet
     Left = 208
     Top = 432
+  end
+  inherited MainSoapConnection: TSoapConnection
+    URL = 'http://localhost/WksOrganizationSoapProject.dll/soap'
   end
   object OrganizationImageList24: TImageList [24]
     ColorDepth = cd32Bit

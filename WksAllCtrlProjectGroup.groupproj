@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{DE2B0051-B4AB-4650-BCFB-AE889AE05EF7}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="WksAllCtrlPackage.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksAllCtrlTestProject.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="WksAllCtrlPackage">
+        <MSBuild Projects="WksAllCtrlPackage.dproj"/>
+    </Target>
+    <Target Name="WksAllCtrlPackage:Clean">
+        <MSBuild Projects="WksAllCtrlPackage.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksAllCtrlPackage:Make">
+        <MSBuild Projects="WksAllCtrlPackage.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksAllCtrlTestProject">
+        <MSBuild Projects="WksAllCtrlTestProject.dproj"/>
+    </Target>
+    <Target Name="WksAllCtrlTestProject:Clean">
+        <MSBuild Projects="WksAllCtrlTestProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksAllCtrlTestProject:Make">
+        <MSBuild Projects="WksAllCtrlTestProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="WksAllCtrlPackage;WksAllCtrlTestProject"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="WksAllCtrlPackage:Clean;WksAllCtrlTestProject:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="WksAllCtrlPackage:Make;WksAllCtrlTestProject:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

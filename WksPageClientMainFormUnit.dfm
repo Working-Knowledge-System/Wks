@@ -146,11 +146,16 @@ inherited PageMainForm: TPageMainForm
   end
   inherited BottomPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
+    ExplicitTop = 680
+    ExplicitWidth = 1580
     inherited LogFrame: TLogFrame
+      ExplicitWidth = 1580
       inherited LogPageControl: TPageControl
+        ExplicitWidth = 1580
         inherited OutputTabSheet: TTabSheet
           inherited OutputRichEdit: TRichEdit
             StyleElements = [seFont, seClient, seBorder]
+            ExplicitWidth = 1570
           end
         end
         inherited LogTabSheet: TTabSheet
@@ -216,7 +221,6 @@ inherited PageMainForm: TPageMainForm
   inherited RightPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited RightPageControl: TPageControl
-      ExplicitTop = 51
       inherited PropertyTabSheet: TTabSheet
         inherited ObjectJvScrollMax: TJvScrollMax
           StyleElements = [seFont, seClient, seBorder]
@@ -236,6 +240,9 @@ inherited PageMainForm: TPageMainForm
             inherited ObjectId8Label: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectRouteIdCsvLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited ObjectOrderDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
@@ -251,56 +258,47 @@ inherited PageMainForm: TPageMainForm
             inherited ObjectId8DBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectRouteIdCsvDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
           end
           inherited ObjectDateJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectCreatedLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectCreatedDBText: TDBText
-              StyleElements = [seFont, seClient, seBorder]
-            end
             inherited ObjectUpdatedLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectUpdatedDBText: TDBText
+            inherited ObjectExpireLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectUpdatedByDBText: TDBText
+            inherited ObjectExpireJvDBDateTimePicker: TJvDBDateTimePicker
+              MinDate = 1.000000000000000000
+            end
+            inherited ObjectUpdatedDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectCreatedDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectPersonJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectAuthorLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectOwnerCsvLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectUpdatedByLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-          end
-          inherited ObjectFromJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectFromOrganizationLabel: TLabel
+            inherited ObjectOwnerCsvDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectFromMemberLabel: TLabel
+            inherited ObjectAuthorDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectFromTeamLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromAreaLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromDepartmentLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromOrganizationDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromMemberDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromTeamDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromAreaDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromDepartmentDBEdit: TDBEdit
+            inherited ObjectUpdatedByDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -320,7 +318,7 @@ inherited PageMainForm: TPageMainForm
             inherited ObjectToDepartmentLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectJobGradeMinLabel: TLabel
+            inherited ObjectToJobGradeMinLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectJobGradeCalculateLabel: TLabel
@@ -341,15 +339,7 @@ inherited PageMainForm: TPageMainForm
             inherited ObjectToDepartmentDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectJobGradeMinDBComboBox: TDBComboBox
-              StyleElements = [seFont, seClient, seBorder]
-            end
-          end
-          inherited ObjectApprovalJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectRouteLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectRouteDBEdit: TDBEdit
+            inherited ObjectToJobGradeMinDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -383,6 +373,9 @@ inherited PageMainForm: TPageMainForm
             inherited ObjectDataKindLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectGroupLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited ObjectContentKindDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
@@ -392,41 +385,58 @@ inherited PageMainForm: TPageMainForm
             inherited ObjectDataKindDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectGroupDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
           end
           inherited ObjectGeneralJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectStateLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectSpareLabel: TLabel
+            inherited ObjectBgColorLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectDescriptionLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectTitleLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectSubtitleLabel: TLabel
+            inherited ObjectFgColorLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectStateDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectSpareDBEdit: TDBEdit
+            inherited ObjectBgColorDBEdit: TDBEdit
+              StyleElements = [seFont, seClient]
+            end
+            inherited ObjectFgColorDBEdit: TDBEdit
+              StyleElements = [seFont, seClient]
+            end
+          end
+          inherited ObjectDataJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectData2Label: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectDescriptionDBEdit: TDBEdit
+            inherited ObjectData3Label: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectTitleDBEdit: TDBEdit
+            inherited ObjectData4Label: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectSubtitleDBEdit: TDBEdit
+            inherited ObjectData1Label: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData2DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData3DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData4DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData1DBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
           end
           object PageJvScrollMaxBand: TJvScrollMaxBand
-            Width = 279
+            Width = 292
             Height = 21
             Expanded = False
             Caption = 'Page'
@@ -442,7 +452,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 53
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -454,7 +464,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 153
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -466,7 +476,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 103
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -478,7 +488,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 203
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -490,7 +500,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 253
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -502,7 +512,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 303
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -514,7 +524,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 74
-              Width = 247
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -531,7 +541,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 174
-              Width = 247
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -544,7 +554,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 124
-              Width = 247
+              Width = 260
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -560,7 +570,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 224
-              Width = 247
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -573,7 +583,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 3
               Top = 22
-              Width = 273
+              Width = 286
               Height = 25
               DataSource = PageDataSource
               VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
@@ -585,7 +595,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 274
-              Width = 247
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -598,7 +608,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 324
-              Width = 247
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -609,7 +619,7 @@ inherited PageMainForm: TPageMainForm
             end
           end
           object PageFlagsJvScrollMaxBand1: TJvScrollMaxBand
-            Width = 279
+            Width = 292
             Height = 21
             Expanded = False
             Caption = 'Flags'
@@ -625,7 +635,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 68
-              Width = 247
+              Width = 260
               Height = 17
               Margins.Left = 16
               Margins.Top = 13
@@ -635,13 +645,12 @@ inherited PageMainForm: TPageMainForm
               DataField = 'FldContainerOn'
               DataSource = PageDataSource
               TabOrder = 0
-              ExplicitTop = 35
             end
             object PageContentFixedDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
               Top = 91
-              Width = 247
+              Width = 260
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -650,13 +659,12 @@ inherited PageMainForm: TPageMainForm
               DataField = 'FldContentFixed'
               DataSource = PageDataSource
               TabOrder = 1
-              ExplicitTop = 63
             end
             object PageCenteredDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
               Top = 114
-              Width = 247
+              Width = 260
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -665,13 +673,12 @@ inherited PageMainForm: TPageMainForm
               DataField = 'FldCentered'
               DataSource = PageDataSource
               TabOrder = 2
-              ExplicitTop = 86
             end
             object PageTitleShowDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
               Top = 146
-              Width = 247
+              Width = 260
               Height = 17
               Margins.Left = 16
               Margins.Top = 12
@@ -681,13 +688,12 @@ inherited PageMainForm: TPageMainForm
               DataField = 'FldTitleShow'
               DataSource = PageDataSource
               TabOrder = 3
-              ExplicitTop = 114
             end
             object PageSubtitleShowDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
               Top = 169
-              Width = 247
+              Width = 260
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -696,13 +702,12 @@ inherited PageMainForm: TPageMainForm
               DataField = 'FldSubtitleShow'
               DataSource = PageDataSource
               TabOrder = 4
-              ExplicitTop = 137
             end
             object PageTopNavOffDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
               Top = 224
-              Width = 247
+              Width = 260
               Height = 17
               Margins.Left = 16
               Margins.Top = 12
@@ -712,13 +717,12 @@ inherited PageMainForm: TPageMainForm
               DataField = 'FldTopNavOff'
               DataSource = PageDataSource
               TabOrder = 5
-              ExplicitTop = 188
             end
             object PageSystemInfoOffDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
               Top = 247
-              Width = 247
+              Width = 260
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -727,13 +731,12 @@ inherited PageMainForm: TPageMainForm
               DataField = 'FldSystemInfoOff'
               DataSource = PageDataSource
               TabOrder = 6
-              ExplicitTop = 211
             end
             object PageImageShowDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
               Top = 192
-              Width = 247
+              Width = 260
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -742,13 +745,12 @@ inherited PageMainForm: TPageMainForm
               DataField = 'FldImageShow'
               DataSource = PageDataSource
               TabOrder = 7
-              ExplicitTop = 160
             end
             object PageAuthenticationNeededDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
               Top = 35
-              Width = 247
+              Width = 260
               Height = 17
               Margins.Left = 16
               Margins.Top = 16
@@ -758,11 +760,10 @@ inherited PageMainForm: TPageMainForm
               DataField = 'FldAuthenticationNeeded'
               DataSource = PageDataSource
               TabOrder = 8
-              ExplicitTop = 27
             end
           end
           object PageMarginJvScrollMaxBand: TJvScrollMaxBand
-            Width = 279
+            Width = 292
             Height = 21
             Expanded = False
             Caption = 'Margins'
@@ -778,7 +779,7 @@ inherited PageMainForm: TPageMainForm
               AlignWithMargins = True
               Left = 16
               Top = 22
-              Width = 247
+              Width = 260
               Height = 13
               Margins.Left = 16
               Margins.Right = 16
@@ -805,7 +806,7 @@ inherited PageMainForm: TPageMainForm
             object PageTopSpaceLabel: TLabel
               Left = 130
               Top = 35
-              Width = 19
+              Width = 20
               Height = 15
               Caption = 'Top'
             end
@@ -974,20 +975,20 @@ inherited PageMainForm: TPageMainForm
               StyleElements = [seFont, seClient, seBorder]
             end
           end
-          inherited OptionFilesJvScrollMaxBand: TJvScrollMaxBand
-            inherited OptionFilesWorkingFolderLabel: TLabel
+          inherited OptionFileJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionFileWorkingFolderLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesOnDoubleClickLabel: TLabel
+            inherited OptionFileOnDoubleClickLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesWorkingFolderClearLabel: TLabel
+            inherited OptionFileWorkingFolderClearLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesOnDoubleClickComboBox: TComboBox
+            inherited OptionFileOnDoubleClickComboBox: TComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesWorkingFolderSelectButtonedEdit: TButtonedEdit
+            inherited OptionFileWorkingFolderSelectButtonedEdit: TButtonedEdit
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -1013,6 +1014,19 @@ inherited PageMainForm: TPageMainForm
         end
         inherited ObjectContentSplitView: TSplitView
           DoubleBuffered = True
+        end
+        inherited ObjectContentLeftPanel: TPanel
+          inherited ObjectContentTopPanel2: TPanel
+            inherited ObjectTitleLabel: TLabel
+              Width = 638
+            end
+            inherited ObjectSubtitleLabel: TLabel
+              Width = 638
+            end
+            inherited ObjectDescriptionLabel: TLabel
+              Width = 638
+            end
+          end
         end
       end
       inherited ObjectDataTabSheet: TTabSheet
@@ -1395,7 +1409,6 @@ inherited PageMainForm: TPageMainForm
             Alignment = taCenter
             Caption = 'javascript before page loading'
             Layout = tlCenter
-            ExplicitLeft = 782
             ExplicitHeight = 15
           end
         end
@@ -1428,7 +1441,6 @@ inherited PageMainForm: TPageMainForm
             Alignment = taCenter
             Caption = 'javascript after page loading'
             Layout = tlCenter
-            ExplicitLeft = 792
             ExplicitHeight = 15
           end
         end
@@ -1511,6 +1523,9 @@ inherited PageMainForm: TPageMainForm
     DataSet = PageClientDataSet
     Left = 208
     Top = 432
+  end
+  inherited MainSoapConnection: TSoapConnection
+    URL = 'http://localhost/WksPageSoapProject.dll/soap'
   end
   object PageImageList24: TImageList [19]
     ColorDepth = cd32Bit

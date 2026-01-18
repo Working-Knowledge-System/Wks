@@ -1,4 +1,4 @@
-unit WksColorFormUnit;
+unit WksColorDialogFormUnit;
 
 interface
 
@@ -24,7 +24,7 @@ uses
 
 {$REGION 'Type'}
 type
-  TColorForm = class(TForm)
+  TColorDialogForm = class(TForm)
     ColorSelectedTrackBar: TTrackBar;
     ColorPreviewLabel: TLabel;
     ColorSelectedLabel: TLabel;
@@ -34,19 +34,19 @@ type
     ColorUseHtmlEdit: TEdit;
     ColorUseRgbEdit: TEdit;
     ColorNamedLabel: TLabel;
-    ColorHexaColorPicker: THexaColorPicker;
-    ColorPreviewMbColorPreview: TmbColorPreview;
-    ColorSelectedMbColorPreview: TmbColorPreview;
     ColorPageControl: TPageControl;
     ColorHexTabSheet: TTabSheet;
     ColorWebTabSheet: TTabSheet;
     ColorHSLTabSheet: TTabSheet;
-    ColorHSLColorPicker: THSLColorPicker;
     ColorHSLRingTabSheet: TTabSheet;
-    ColorHSLRingPicker: THSLRingPicker;
-    ColorNamedMbColorList: TmbColorList;
     ColorNamedSortByRadioGroup: TRadioGroup;
     ColorNamedSortByReversedCheckBox: TCheckBox;
+    ColorHSLRingPicker: THSLRingPicker;
+    ColorHexaColorPicker: THexaColorPicker;
+    ColorHSLColorPicker: THSLColorPicker;
+    ColorNamedMbColorList: TmbColorList;
+    ColorPreviewMbColorPreview: TmbColorPreview;
+    ColorSelectedMbColorPreview: TmbColorPreview;
     procedure OkButtonClick(Sender: TObject);
     procedure CancelButtonClick(Sender: TObject);
     procedure ColorHexaColorPickerChange(Sender: TObject);
@@ -78,7 +78,7 @@ type
 
 {$REGION 'Var'}
 //var
-  //ColorForm: TColorForm; // force to create, use and dispose
+  //ColorDialogForm: TColorDialogForm; // force to create, use and dispose
 {$ENDREGION}
 
 implementation
@@ -94,19 +94,19 @@ uses
 {$ENDREGION}
 
 {$REGION 'Routine'}
-procedure TColorForm.GuiOnMoveUpdate(IvColor: TColor);
+procedure TColorDialogForm.GuiOnMoveUpdate(IvColor: TColor);
 begin
   ColorPreviewMbColorPreview.Color := IvColor;
 end;
 
-procedure TColorForm.GuiOutputUpdate;
+procedure TColorDialogForm.GuiOutputUpdate;
 begin
   ColorSelectedMbColorPreview.Color := FColor;
   ColorUseRgbEdit.Text              := FColor.ToHexString;
   ColorUseHtmlEdit.Text             := FColor.ToHtmlString;
 end;
 
-procedure TColorForm.GuiInputUpdate;
+procedure TColorDialogForm.GuiInputUpdate;
 begin
   ColorHSLColorPicker.SelectedColor  := FColor;
   ColorHSLRingPicker.SelectedColor   := FColor;
@@ -114,7 +114,7 @@ begin
   ColorNamedMbColorList.ItemIndex    := ColorNamedMbColorList.Items.IndexOf(FWebColor);
 end;
 
-procedure TColorForm.GuiColorNamedLoad(IvSortIdx: integer; IvColorSelect: string; IvReversed: boolean);
+procedure TColorDialogForm.GuiColorNamedLoad(IvSortIdx: integer; IvColorSelect: string; IvReversed: boolean);
 var
   i: integer;
   sty: TColorArraySortType;
@@ -154,9 +154,9 @@ end;
 {$ENDREGION}
 
 {$REGION 'Static'}
-class function  TColorForm.Execute(var IvColor, IvFbk: string): boolean;
+class function  TColorDialogForm.Execute(var IvColor, IvFbk: string): boolean;
 var
-  frm: TColorForm;
+  frm: TColorDialogForm;
   mre: integer; // modalresult
 begin
   // exit
@@ -167,7 +167,7 @@ begin
   end;
 
   // form
-  frm := TColorForm.Create(nil);
+  frm := TColorDialogForm.Create(nil);
   try
     // color
     frm.FHexColor := TStrRec.StrRight(IvColor, 6); // input: rrggbb, #rrggbb
@@ -205,72 +205,72 @@ end;
 {$ENDREGION}
 
 {$REGION 'Form'}
-procedure TColorForm.FormCreate(Sender: TObject);
+procedure TColorDialogForm.FormCreate(Sender: TObject);
 var
   i: integer;
 begin
   // webcolorsclone
   SetLength(FWebColorVec, WebNamedColorsCount);
   for i := Low(WebNamedColors) to High(WebNamedColors) do begin
-   FWebColorVec[i].Name  := WebNamedColors[i].Name;
-   FWebColorVec[i].Value := WebNamedColors[i].Value;
+    FWebColorVec[i].Name  := WebNamedColors[i].Name;
+    FWebColorVec[i].Value := WebNamedColors[i].Value;
   end;
 end;
 {$ENDREGION}
 
 {$REGION 'Action'}
-procedure TColorForm.OkButtonClick(Sender: TObject);
+procedure TColorDialogForm.OkButtonClick(Sender: TObject);
 begin
   ModalResult := mrOK; // this will close the form
 end;
 
-procedure TColorForm.CancelButtonClick(Sender: TObject);
+procedure TColorDialogForm.CancelButtonClick(Sender: TObject);
 begin
   ModalResult := mrCancel; // this will close the form
 end;
 {$ENDREGION}
 
 {$REGION 'HSL'}
-procedure TColorForm.ColorHSLColorPickerChange(Sender: TObject);
+procedure TColorDialogForm.ColorHSLColorPickerChange(Sender: TObject);
 begin
   FColor := ColorHSLColorPicker.SelectedColor;
   GuiOutputUpdate;
 end;
 
-procedure TColorForm.ColorHSLColorPickerMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+procedure TColorDialogForm.ColorHSLColorPickerMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 begin
   GuiOnMoveUpdate(ColorHSLColorPicker.ColorUnderCursor);
 end;
 {$ENDREGION}
 
 {$REGION 'HSLRing'}
-procedure TColorForm.ColorHSLRingPickerChange(Sender: TObject);
+procedure TColorDialogForm.ColorHSLRingPickerChange(Sender: TObject);
 begin
   FColor := ColorHSLRingPicker.SelectedColor;
   GuiOutputUpdate;
 end;
 
-procedure TColorForm.ColorHSLRingPickerMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+procedure TColorDialogForm.ColorHSLRingPickerMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 begin
   GuiOnMoveUpdate(ColorHSLRingPicker.ColorUnderCursor);
 end;
 {$ENDREGION}
 
 {$REGION 'Hexagon'}
-procedure TColorForm.ColorHexaColorPickerChange(Sender: TObject);
+procedure TColorDialogForm.ColorHexaColorPickerChange(Sender: TObject);
 begin
   FColor := ColorHexaColorPicker.SelectedColor;
   GuiOutputUpdate;
 end;
 
-procedure TColorForm.ColorHexaColorPickerMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+procedure TColorDialogForm.ColorHexaColorPickerMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
 begin
   GuiOnMoveUpdate(ColorHexaColorPicker.ColorUnderCursor);
 end;
 {$ENDREGION}
 
 {$REGION 'Web'}
-procedure TColorForm.ColorNamedMbColorListMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TColorDialogForm.ColorNamedMbColorListMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
   FColor := ColorNamedMbColorList.Colors[ColorNamedMbColorList.ItemIndex].Value;
   FWebColor := ColorNamedMbColorList.Colors[ColorNamedMbColorList.ItemIndex].Name;
@@ -278,12 +278,12 @@ begin
   GuiOutputUpdate;
 end;
 
-procedure TColorForm.ColorNamedSortByRadioGroupClick(Sender: TObject);
+procedure TColorDialogForm.ColorNamedSortByRadioGroupClick(Sender: TObject);
 begin
   GuiColorNamedLoad(ColorNamedSortByRadioGroup.ItemIndex, FWebColor, ColorNamedSortByReversedCheckBox.Checked);
 end;
 
-procedure TColorForm.ColorNamedSortByReversedCheckBoxClick(Sender: TObject);
+procedure TColorDialogForm.ColorNamedSortByReversedCheckBoxClick(Sender: TObject);
 begin
   ColorNamedSortByRadioGroupClick(nil);
 end;
@@ -293,7 +293,7 @@ end;
 {$ENDREGION}
 
 {$REGION 'Selected'}
-procedure TColorForm.ColorSelectedTrackBarChange(Sender: TObject);
+procedure TColorDialogForm.ColorSelectedTrackBarChange(Sender: TObject);
 begin
   ColorSelectedMbColorPreview.Opacity := ColorSelectedTrackBar.Position;
   FColor := ColorSelectedMbColorPreview.Color;

@@ -2652,7 +2652,7 @@ object LoginForm: TLoginForm
       Left = 752
       Top = 3
       Width = 40
-      Height = 15
+      Height = 26
       Cursor = crHandPoint
       Margins.Right = 8
       Align = alRight
@@ -2671,6 +2671,7 @@ object LoginForm: TLoginForm
       OnClick = ExitLabelClick
       OnMouseEnter = ExitLabelMouseEnter
       OnMouseLeave = ExitLabelMouseLeave
+      ExplicitHeight = 15
     end
   end
 end

@@ -5,7 +5,7 @@
         <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
-        <Platform Condition="'$(Platform)'==''">Win64</Platform>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Application</AppType>
         <MainSource>WksXxxClientProject.dpr</MainSource>
@@ -164,6 +164,12 @@
             <Deployment Version="4">
                 <DeployFile LocalName="..\..\X\Win32\Debug\WksXxxClientProject.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
+                        <RemoteName>WksXxxClientProject.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\X\Win64\Debug\WksXxxClientProject.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win64">
                         <RemoteName>WksXxxClientProject.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>

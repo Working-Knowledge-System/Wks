@@ -3,7 +3,7 @@
         <ProjectGuid>{2A50B405-BF48-4007-AEE8-CB7B03904A7A}</ProjectGuid>
         <MainSource>WksInvoiceClientProject.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>

@@ -3,7 +3,7 @@
         <ProjectGuid>{75067B61-6CB7-40AA-A903-C6837E1B2107}</ProjectGuid>
         <MainSource>WksMemberClientProject.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>

@@ -11,7 +11,7 @@ uses
 {$I Wks000Inc.inc}
 
 begin
-  ReportMemoryLeaksOnShutdown := DebugHook <> 0;
+  ReportMemoryLeaksOnShutdown := IsDebuggerPresent();
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TSqlEditorForm, SqlEditorForm);

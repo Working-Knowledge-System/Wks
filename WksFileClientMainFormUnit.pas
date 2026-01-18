@@ -38,6 +38,7 @@ uses
   , JvClock
   , JvComponentBase
   , JvDateTimePicker
+  , JvDBDateTimePicker
   , JvExComCtrls
   , JvExControls
   , JvExExtCtrls
@@ -154,9 +155,14 @@ procedure TFileMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // detail
-//  if FileClientDataSet.State = dsEdit then
-//    FileDBNavigator.BtnClick(nbPost);
+  {$REGION 'Object'}
+  {$ENDREGION}
+
+  {$REGION 'Detail'}
+  if not (FileClientDataSet.State = dsBrowse) then
+    FileDBNavigator.BtnClick(nbPost);
+  {$ENDREGION}
+
 end;
 {$ENDREGION}
 
@@ -226,8 +232,7 @@ procedure TFileMainForm.FileClientDataSetAfterPost(DataSet: TDataSet);
 begin
   inherited;
 
-  {$REGION 'detail'}
-  // applyupdatetoremoteserver
+  {$REGION 'applyupdatetoremoteserver'}
 //  if FileClientDataSet.ApplyUpdates(0) > 0 then
 //    TMesRec.I('Unable to save %s detail to remote server', [FObj])
 //  else begin
@@ -242,7 +247,7 @@ procedure TFileMainForm.FileClientDataSetReconcileError(DataSet: TCustomClientDa
 begin
   inherited;
 
-  {$REGION 'detail'}
+  {$REGION 'reconcileerror'}
   Action := HandleReconcileError(DataSet, UpdateKind, E);
   {$ENDREGION}
 

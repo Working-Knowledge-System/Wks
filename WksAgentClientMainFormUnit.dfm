@@ -18,7 +18,6 @@ inherited AgentMainForm: TAgentMainForm
   inherited TopPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited TopPageControl: TPageControl
-      ActivePage = AgentTabSheet
       inherited TopSearchTabSheet: TTabSheet
         inherited SearchReplaceOutLabel: TLabel
           StyleElements = [seFont, seClient, seBorder]
@@ -34,14 +33,6 @@ inherited AgentMainForm: TAgentMainForm
         end
         inherited SearchReplaceInEdit: TEdit
           StyleElements = [seFont, seClient, seBorder]
-        end
-      end
-      inherited TopUtilsTabSheet: TTabSheet
-        inherited UtilsToolBar: TToolBar
-          ButtonWidth = 46
-          inherited UtilsPythonExecToolButton: TToolButton
-            ExplicitWidth = 46
-          end
         end
       end
       object AgentTabSheet: TTabSheet
@@ -265,7 +256,7 @@ inherited AgentMainForm: TAgentMainForm
     StyleElements = [seFont, seClient, seBorder]
     OnResize = LeftPanelResize
     inherited LeftPageControl: TPageControl
-      ActivePage = RunningTabSheet
+      ActivePage = RunListTabSheet
       inherited ObjectTreeTabSheet: TTabSheet
         inherited ObjectNodeInfoLabel: TLabel
           StyleElements = [seFont, seClient, seBorder]
@@ -279,6 +270,16 @@ inherited AgentMainForm: TAgentMainForm
         Caption = 'Active'
         ImageIndex = 2
         OnShow = AgentActiveTabSheetShow
+        object AgentActiveListEmptyInfoLabel: TLabel
+          Left = 0
+          Top = 551
+          Width = 90
+          Height = 15
+          Align = alBottom
+          Alignment = taCenter
+          Caption = 'No active Agents'
+          Layout = tlCenter
+        end
         object AgentActiveDBNavigator: TDBNavigator
           Left = 0
           Top = 0
@@ -296,7 +297,7 @@ inherited AgentMainForm: TAgentMainForm
           Left = 0
           Top = 25
           Width = 292
-          Height = 537
+          Height = 517
           Align = alClient
           AllowDelete = False
           AllowInsert = False
@@ -304,14 +305,14 @@ inherited AgentMainForm: TAgentMainForm
           DataSource = AgentActiveDataSource
           Orientation = goHorizontal
           PanelBorder = gbNone
-          PanelHeight = 52
+          PanelHeight = 50
           PanelWidth = 292
           ParentColor = False
           TabOrder = 1
           RowCount = 10
           SelectedColor = clYellow
           ShowFocus = False
-          ExplicitHeight = 541
+          ExplicitHeight = 526
           object AgentActiveObjectIdDBText: TDBText
             AlignWithMargins = True
             Left = 8
@@ -415,23 +416,34 @@ inherited AgentMainForm: TAgentMainForm
       object RunningTabSheet: TTabSheet
         Caption = 'Running'
         ImageIndex = 3
-        object RunningPanel: TPanel
+        OnShow = RunningTabSheetShow
+        object AgentRunningListEmptyInfoLabel: TLabel
+          Left = 0
+          Top = 551
+          Width = 101
+          Height = 15
+          Align = alBottom
+          Alignment = taCenter
+          Caption = 'No running Agents'
+          Layout = tlCenter
+        end
+        object RunningListPanel: TPanel
           Left = 0
           Top = 0
           Width = 292
           Height = 25
           Align = alTop
           BevelOuter = bvNone
-          Caption = 'RunListPanel'
+          Caption = 'RunningListPanel'
           ShowCaption = False
           TabOrder = 0
-          ExplicitTop = 8
           object RunningPauseLabel: TLabel
             Left = 8
             Top = 6
             Width = 31
             Height = 15
             Cursor = crHandPoint
+            Hint = 'Pause the current agent'
             Caption = 'Pause'
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clBlue
@@ -441,20 +453,21 @@ inherited AgentMainForm: TAgentMainForm
             ParentFont = False
             OnClick = RunningPauseLabelClick
           end
-          object RunningStopLabel: TLabel
+          object RunningAbortLabel: TLabel
             Left = 120
             Top = 6
-            Width = 24
+            Width = 30
             Height = 15
             Cursor = crHandPoint
-            Caption = 'Stop'
+            Hint = 'Abort the current agent'
+            Caption = 'Abort'
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clBlue
             Font.Height = -12
             Font.Name = 'Segoe UI'
             Font.Style = [fsUnderline]
             ParentFont = False
-            OnClick = RunningStopLabelClick
+            OnClick = RunningAbortLabelClick
           end
           object RunningContinueLabel: TLabel
             Left = 56
@@ -462,6 +475,7 @@ inherited AgentMainForm: TAgentMainForm
             Width = 49
             Height = 15
             Cursor = crHandPoint
+            Hint = 'Resume the paused agent'
             Caption = 'Continue'
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clBlue
@@ -477,7 +491,7 @@ inherited AgentMainForm: TAgentMainForm
           Left = 3
           Top = 33
           Width = 286
-          Height = 530
+          Height = 515
           Margins.Top = 8
           Align = alClient
           BorderStyle = bsNone
@@ -489,12 +503,24 @@ inherited AgentMainForm: TAgentMainForm
       object RunListTabSheet: TTabSheet
         Caption = '  Runs'
         ImageIndex = 2
+        OnShow = RunListTabSheetShow
+        object AgentRunListEmptyInfoLabel: TLabel
+          Left = 0
+          Top = 551
+          Width = 292
+          Height = 15
+          Align = alBottom
+          Alignment = taCenter
+          Caption = 'No completed Runs'
+          Layout = tlCenter
+          ExplicitWidth = 105
+        end
         object RunListBox: TListBox
           AlignWithMargins = True
           Left = 3
           Top = 33
           Width = 286
-          Height = 530
+          Height = 515
           Margins.Top = 8
           Align = alClient
           BorderStyle = bsNone
@@ -621,6 +647,9 @@ inherited AgentMainForm: TAgentMainForm
             inherited ObjectId8Label: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectRouteIdCsvLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited ObjectOrderDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
@@ -636,56 +665,44 @@ inherited AgentMainForm: TAgentMainForm
             inherited ObjectId8DBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectRouteIdCsvDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
           end
           inherited ObjectDateJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectCreatedLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectCreatedDBText: TDBText
-              StyleElements = [seFont, seClient, seBorder]
-            end
             inherited ObjectUpdatedLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectUpdatedDBText: TDBText
+            inherited ObjectExpireLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectUpdatedByDBText: TDBText
+            inherited ObjectUpdatedDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectCreatedDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectPersonJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectAuthorLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectOwnerCsvLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectUpdatedByLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-          end
-          inherited ObjectFromJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectFromOrganizationLabel: TLabel
+            inherited ObjectOwnerCsvDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectFromMemberLabel: TLabel
+            inherited ObjectAuthorDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectFromTeamLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromAreaLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromDepartmentLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromOrganizationDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromMemberDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromTeamDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromAreaDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromDepartmentDBEdit: TDBEdit
+            inherited ObjectUpdatedByDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -705,7 +722,7 @@ inherited AgentMainForm: TAgentMainForm
             inherited ObjectToDepartmentLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectJobGradeMinLabel: TLabel
+            inherited ObjectToJobGradeMinLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectJobGradeCalculateLabel: TLabel
@@ -726,15 +743,7 @@ inherited AgentMainForm: TAgentMainForm
             inherited ObjectToDepartmentDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectJobGradeMinDBComboBox: TDBComboBox
-              StyleElements = [seFont, seClient, seBorder]
-            end
-          end
-          inherited ObjectApprovalJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectRouteLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectRouteDBEdit: TDBEdit
+            inherited ObjectToJobGradeMinDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -754,6 +763,9 @@ inherited AgentMainForm: TAgentMainForm
             inherited ObjectImageClearLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectImageDBImage: TDBImage
+              Height = 0
+            end
           end
           inherited ObjectTypeJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectContentKindLabel: TLabel
@@ -765,6 +777,9 @@ inherited AgentMainForm: TAgentMainForm
             inherited ObjectDataKindLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectGroupLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited ObjectContentKindDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
@@ -774,41 +789,32 @@ inherited AgentMainForm: TAgentMainForm
             inherited ObjectDataKindDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectGroupDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
           end
           inherited ObjectGeneralJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectStateLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectSpareLabel: TLabel
+            inherited ObjectBgColorLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectDescriptionLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectTitleLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectSubtitleLabel: TLabel
+            inherited ObjectFgColorLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectStateDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectSpareDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
+            inherited ObjectBgColorDBEdit: TDBEdit
+              StyleElements = [seFont, seClient]
             end
-            inherited ObjectDescriptionDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectTitleDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectSubtitleDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
+            inherited ObjectFgColorDBEdit: TDBEdit
+              StyleElements = [seFont, seClient]
             end
           end
           object AgentJvScrollMaxBand: TJvScrollMaxBand
-            Width = 279
+            Width = 292
             Height = 21
             Expanded = False
             Caption = 'Agent'
@@ -824,7 +830,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 53
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -836,7 +842,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 74
-              Width = 247
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -853,7 +859,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 3
               Top = 22
-              Width = 273
+              Width = 286
               Height = 25
               DataSource = AgentDataSource
               VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
@@ -863,7 +869,7 @@ inherited AgentMainForm: TAgentMainForm
             end
           end
           object AgentRunAtJvScrollMaxBand: TJvScrollMaxBand
-            Width = 279
+            Width = 292
             Height = 21
             Expanded = False
             Caption = 'RunAt'
@@ -879,7 +885,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 35
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Top = 16
@@ -892,7 +898,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 85
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -904,7 +910,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 135
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -916,7 +922,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 185
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -928,7 +934,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 235
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -940,7 +946,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 398
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -952,7 +958,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 348
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -964,7 +970,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 298
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Top = 16
@@ -977,7 +983,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 56
-              Width = 247
+              Width = 260
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -993,7 +999,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 106
-              Width = 247
+              Width = 260
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -1009,7 +1015,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 156
-              Width = 247
+              Width = 260
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -1025,7 +1031,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 206
-              Width = 247
+              Width = 260
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -1041,7 +1047,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 256
-              Width = 247
+              Width = 260
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -1057,7 +1063,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 419
-              Width = 247
+              Width = 260
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -1073,7 +1079,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 369
-              Width = 247
+              Width = 260
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -1089,7 +1095,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 319
-              Width = 247
+              Width = 260
               Height = 23
               Hint = 'Id'
               Margins.Left = 16
@@ -1103,7 +1109,7 @@ inherited AgentMainForm: TAgentMainForm
             end
           end
           object AgentEventsJvScrollMaxBand: TJvScrollMaxBand
-            Width = 279
+            Width = 292
             Height = 21
             Expanded = False
             Caption = 'Events'
@@ -1119,7 +1125,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 35
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Top = 16
@@ -1132,7 +1138,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 85
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1144,7 +1150,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 135
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -1156,7 +1162,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 56
-              Width = 247
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1169,7 +1175,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 106
-              Width = 247
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1182,7 +1188,7 @@ inherited AgentMainForm: TAgentMainForm
               AlignWithMargins = True
               Left = 16
               Top = 156
-              Width = 247
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1302,20 +1308,20 @@ inherited AgentMainForm: TAgentMainForm
               StyleElements = [seFont, seClient, seBorder]
             end
           end
-          inherited OptionFilesJvScrollMaxBand: TJvScrollMaxBand
-            inherited OptionFilesWorkingFolderLabel: TLabel
+          inherited OptionFileJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionFileWorkingFolderLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesOnDoubleClickLabel: TLabel
+            inherited OptionFileOnDoubleClickLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesWorkingFolderClearLabel: TLabel
+            inherited OptionFileWorkingFolderClearLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesOnDoubleClickComboBox: TComboBox
+            inherited OptionFileOnDoubleClickComboBox: TComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesWorkingFolderSelectButtonedEdit: TButtonedEdit
+            inherited OptionFileWorkingFolderSelectButtonedEdit: TButtonedEdit
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -1332,7 +1338,7 @@ inherited AgentMainForm: TAgentMainForm
             object OptionJmpExePathLabel: TLabel
               Left = 16
               Top = 36
-              Width = 82
+              Width = 81
               Height = 15
               Hint = 'JMP Executable path'
               Caption = 'JMP Executable'
@@ -1354,13 +1360,30 @@ inherited AgentMainForm: TAgentMainForm
   inherited MainPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited MainPageControl: TPageControl
-      ActivePage = ObjectContentTabSheet
       inherited ObjectContentTabSheet: TTabSheet
         inherited ObjectContentSplitter: TSplitter
           ExplicitHeight = 536
         end
+        inherited ObjectContentTopPanel: TPanel
+          inherited ObjectContentCharCountLabel: TLabel
+            Height = 22
+          end
+        end
         inherited ObjectContentSplitView: TSplitView
           DoubleBuffered = True
+        end
+        inherited ObjectContentLeftPanel: TPanel
+          inherited ObjectContentTopPanel2: TPanel
+            inherited ObjectTitleLabel: TLabel
+              Width = 638
+            end
+            inherited ObjectSubtitleLabel: TLabel
+              Width = 638
+            end
+            inherited ObjectDescriptionLabel: TLabel
+              Width = 638
+            end
+          end
         end
       end
       inherited ObjectDataTabSheet: TTabSheet

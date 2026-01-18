@@ -26,7 +26,6 @@ exports
   TerminateExtension;
 
 begin
-  ReportMemoryLeaksOnShutdown := true;
   IsMultiThread := true;                                   // default is false (single thread) it should be already present in ...
   CoInitFlags := COINIT_MULTITHREADED;                     // must be called before Application.Initialize. Use multithreaded COM apartment model (important to interacts with COM objects like ADO, Excel, MSXML)
   Application.Initialize;                                  // setsup the internal server environment

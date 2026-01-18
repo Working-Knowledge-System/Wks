@@ -4,8 +4,8 @@ object ReportMainDataModule: TReportMainDataModule
   Width = 1295
   object ReportADOConnection: TADOConnection
     ConnectionString = 
-      'Provider=MSOLEDBSQL.1;Password=secret@123;Persist Security Info=' +
-      'True;User ID=sa;Initial Catalog=DbaReport;Data Source=LOCALHOST'
+      'Provider=MSOLEDBSQL.1;Persist Security Info=True;Data Source=LOC' +
+      'ALHOST;User ID=sa;Password=31316@Wks;Initial Catalog=DbaReport'
     DefaultDatabase = 'DbaReport'
     LoginPrompt = False
     Provider = 'MSOLEDBSQL.1'

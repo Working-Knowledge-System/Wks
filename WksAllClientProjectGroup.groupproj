@@ -30,6 +30,9 @@
         <Projects Include="WksDocumentClientProject.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="WksEquipmentClientProject.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="WksFileClientProject.dproj">
             <Dependencies/>
         </Projects>
@@ -37,6 +40,9 @@
             <Dependencies/>
         </Projects>
         <Projects Include="WksInvoiceClientProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksItemClientProject.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="WksPageClientProject.dproj">
@@ -52,6 +58,9 @@
             <Dependencies/>
         </Projects>
         <Projects Include="WksVfsServerProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WksSpcClientProject.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -143,6 +152,15 @@
     <Target Name="WksDocumentClientProject:Make">
         <MSBuild Projects="WksDocumentClientProject.dproj" Targets="Make"/>
     </Target>
+    <Target Name="WksEquipmentClientProject">
+        <MSBuild Projects="WksEquipmentClientProject.dproj"/>
+    </Target>
+    <Target Name="WksEquipmentClientProject:Clean">
+        <MSBuild Projects="WksEquipmentClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksEquipmentClientProject:Make">
+        <MSBuild Projects="WksEquipmentClientProject.dproj" Targets="Make"/>
+    </Target>
     <Target Name="WksFileClientProject">
         <MSBuild Projects="WksFileClientProject.dproj"/>
     </Target>
@@ -169,6 +187,15 @@
     </Target>
     <Target Name="WksInvoiceClientProject:Make">
         <MSBuild Projects="WksInvoiceClientProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WksItemClientProject">
+        <MSBuild Projects="WksItemClientProject.dproj"/>
+    </Target>
+    <Target Name="WksItemClientProject:Clean">
+        <MSBuild Projects="WksItemClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksItemClientProject:Make">
+        <MSBuild Projects="WksItemClientProject.dproj" Targets="Make"/>
     </Target>
     <Target Name="WksPageClientProject">
         <MSBuild Projects="WksPageClientProject.dproj"/>
@@ -215,14 +242,23 @@
     <Target Name="WksVfsServerProject:Make">
         <MSBuild Projects="WksVfsServerProject.dproj" Targets="Make"/>
     </Target>
+    <Target Name="WksSpcClientProject">
+        <MSBuild Projects="WksSpcClientProject.dproj"/>
+    </Target>
+    <Target Name="WksSpcClientProject:Clean">
+        <MSBuild Projects="WksSpcClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WksSpcClientProject:Make">
+        <MSBuild Projects="WksSpcClientProject.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="WksBaseClientProject;WksXxxClientProject;WksPersonClientProject;WksOrganizationClientProject;WksMemberClientProject;WksAccountClientProject;WksAgentClientProject;WksCodeClientProject;WksDocumentClientProject;WksFileClientProject;WksFormClientProject;WksInvoiceClientProject;WksPageClientProject;WksReportClientProject;WksSystemClientProject;WksTaskClientProject;WksVfsServerProject"/>
+        <CallTarget Targets="WksBaseClientProject;WksXxxClientProject;WksPersonClientProject;WksOrganizationClientProject;WksMemberClientProject;WksAccountClientProject;WksAgentClientProject;WksCodeClientProject;WksDocumentClientProject;WksEquipmentClientProject;WksFileClientProject;WksFormClientProject;WksInvoiceClientProject;WksItemClientProject;WksPageClientProject;WksReportClientProject;WksSystemClientProject;WksTaskClientProject;WksVfsServerProject;WksSpcClientProject"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="WksBaseClientProject:Clean;WksXxxClientProject:Clean;WksPersonClientProject:Clean;WksOrganizationClientProject:Clean;WksMemberClientProject:Clean;WksAccountClientProject:Clean;WksAgentClientProject:Clean;WksCodeClientProject:Clean;WksDocumentClientProject:Clean;WksFileClientProject:Clean;WksFormClientProject:Clean;WksInvoiceClientProject:Clean;WksPageClientProject:Clean;WksReportClientProject:Clean;WksSystemClientProject:Clean;WksTaskClientProject:Clean;WksVfsServerProject:Clean"/>
+        <CallTarget Targets="WksBaseClientProject:Clean;WksXxxClientProject:Clean;WksPersonClientProject:Clean;WksOrganizationClientProject:Clean;WksMemberClientProject:Clean;WksAccountClientProject:Clean;WksAgentClientProject:Clean;WksCodeClientProject:Clean;WksDocumentClientProject:Clean;WksEquipmentClientProject:Clean;WksFileClientProject:Clean;WksFormClientProject:Clean;WksInvoiceClientProject:Clean;WksItemClientProject:Clean;WksPageClientProject:Clean;WksReportClientProject:Clean;WksSystemClientProject:Clean;WksTaskClientProject:Clean;WksVfsServerProject:Clean;WksSpcClientProject:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="WksBaseClientProject:Make;WksXxxClientProject:Make;WksPersonClientProject:Make;WksOrganizationClientProject:Make;WksMemberClientProject:Make;WksAccountClientProject:Make;WksAgentClientProject:Make;WksCodeClientProject:Make;WksDocumentClientProject:Make;WksFileClientProject:Make;WksFormClientProject:Make;WksInvoiceClientProject:Make;WksPageClientProject:Make;WksReportClientProject:Make;WksSystemClientProject:Make;WksTaskClientProject:Make;WksVfsServerProject:Make"/>
+        <CallTarget Targets="WksBaseClientProject:Make;WksXxxClientProject:Make;WksPersonClientProject:Make;WksOrganizationClientProject:Make;WksMemberClientProject:Make;WksAccountClientProject:Make;WksAgentClientProject:Make;WksCodeClientProject:Make;WksDocumentClientProject:Make;WksEquipmentClientProject:Make;WksFileClientProject:Make;WksFormClientProject:Make;WksInvoiceClientProject:Make;WksItemClientProject:Make;WksPageClientProject:Make;WksReportClientProject:Make;WksSystemClientProject:Make;WksTaskClientProject:Make;WksVfsServerProject:Make;WksSpcClientProject:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

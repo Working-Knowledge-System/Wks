@@ -38,5 +38,4 @@ initialization
 finalization
   CoUninitialize;
 
-
 end.
