@@ -18,7 +18,7 @@ type
   ['{6C616E29-F6A9-492E-AB57-2F0C7C0BD712}']
     // system methods
     function  SystemInfoSoap                (var IvFbk: string): boolean; stdcall;
-    function  SystemOutlineSoap             (var IvOutline: string; var IvFbk: string): boolean; stdcall;
+    function  SystemDescriptionSoap         (var IvDescription: string; var IvFbk: string): boolean; stdcall;
     function  SystemPrivacySoap             (var IvPrivacy: string; var IvFbk: string): boolean; stdcall;
     function  SystemLicenseSoap             (var IvLicense: string; var IvFbk: string): boolean; stdcall;
     function  SystemCopyrightSoap           (var IvCopyright: string; var IvFbk: string): boolean; stdcall;
@@ -43,16 +43,18 @@ type
     function  SystemSessionInsertSoap       (const IvDateTimeBegin: TDateTime               ; const IvKind: string; const IvSessionId, IvFingerprintId: cardinal; const IvIpLan, IvDomain, IvComputer, IvOsLogin, IvClient, IvVersion, IvServer, IvOrganization, IvUsername: string; var IvFbk: string): boolean; stdcall;
     function  SystemSessionCloseSoap        (const IvDateTimeBegin, IvDateTimeEnd: TDateTime; const IvKind: string; const IvSessionId, IvFingerprintId: cardinal; const IvIpLan, IvDomain, IvComputer, IvOsLogin, IvClient, IvVersion, IvServer, IvOrganization, IvUsername: string; var IvFbk: string): boolean; stdcall;
     // object methods
-    function  SystemObjectIdNextSoap        (const IvObj: string; var IvIdNext: integer; var IvFbk: string): boolean; stdcall;
-    function  SystemObjectNewRio            (const IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvFromOrganization, IvFromMember: string; var IvIdNew: integer): boolean; stdcall;
-    function  SystemObjectTreeContent       (const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean                          ; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; stdcall;
-    function  SystemObjectTreeContentSave   (const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean; IvRemoteFileSpec: string; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; stdcall;
-    function  SystemObjSoapFieldGet         (const IvObj, IvIdOrPath, IvField: string;   var IvValue: variant; const IvDefault: variant): boolean; stdcall;
-    function  SystemObjSoapFieldSet         (const IvObj, IvIdOrPath, IvField: string; const IvValue: variant): boolean; stdcall;
+    function  SystemObjIdNextSoap           (const IvObj: string; var IvIdNext: integer; var IvFbk: string): boolean; stdcall;
+    function  SystemObjNewSoap              (const IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvOrganization, IvAuthor: string; var IvIdNew: integer): boolean; stdcall;
+    function  SystemObjTreeContentSoap      (const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterAdd, IvCommentRemove, IvLinesEmptyRemove: boolean                          ; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; stdcall;
+    function  SystemObjTreeContentSaveSoap  (const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterAdd, IvCommentRemove, IvLinesEmptyRemove: boolean; IvRemoteFileSpec: string; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; stdcall;
+    function  SystemObjFieldGetSoap         (const IvObj, IvIdOrPath, IvField: string;   var IvValue: variant; const IvDefault: variant): boolean; stdcall;
+    function  SystemObjFieldSetSoap         (const IvObj, IvIdOrPath, IvField: string; const IvValue: variant): boolean; stdcall;
+    // dbacmd methods
+    function  SystemDbaCmdExecSoap          (const IvSql: string; var IvAffected: integer; var IvFbk: string; IvTimeoutSec: integer): boolean; stdcall;
     // dba methods
     function  SystemDbaInfosSoap            (var IvBuild, IvMajorVersion, IvMinorVersion, IvBuildType, IvUpdateLevel, IvUpdateReference, IvFbk: string): boolean; stdcall;
     function  SystemDbaFilesPathsSoap       (var IvDataPath, IvLogPath, IvBackupPath, IvFbk: string): boolean; stdcall;
-    function  SystemDbaDatabaseRebuildSoap  (var IvFbk: string): boolean; stdcall;
+    function  SystemDbaRebuildSoap          (var IvFbk: string; IvReset: boolean = false): boolean; stdcall;
     function  SystemDbaCreateDdlSoap        (var IvHost, IvDateTimeCode, IvDdl, IvFbk: string): boolean; stdcall;
     function  SystemDbaDeleteDdlSoap        (var IvHost, IvDateTimeCode, IvDdl, IvFbk: string): boolean; stdcall;
     function  SystemDbaBackupDdlSoap        (var IvHost, IvDateTimeCode, IvDdl, IvFbk: string): boolean; stdcall;
@@ -63,6 +65,7 @@ type
     function  SystemTblIdMaxSoap            (const IvTbl, IvWhere: string): integer; stdcall;
     function  SystemTblIdAvailableSoap      (const IvTbl, IvWhere: string): integer; stdcall;
     function  SystemTblIdNextSoap           (const IvTbl: string; IvUseIdAvailable: boolean): integer; stdcall;
+    function  SystemTblCheckSoap            (const IvSys, IvDba, IvTbl: string; var IvFbk: string): boolean; stdcall;
     // rec methods
     function  SystemRecInsertSoap           (const IvTbl: string; const IvValueVec: {TVariantVector}TArray<variant>; var IvFbk: string): boolean; stdcall;
     // fld methods

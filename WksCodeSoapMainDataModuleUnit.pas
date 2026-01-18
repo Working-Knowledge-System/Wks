@@ -29,6 +29,8 @@ type
     ObjectDataSetProvider: TDataSetProvider;
     CodeADOTable: TADOTable;
     CodeDataSetProvider: TDataSetProvider;
+    CodeSqlResultADOQuery: TADOQuery;
+    CodeSqlResultDataSetProvider: TDataSetProvider;
     procedure SoapDataModuleCreate(Sender: TObject);
   private
     { Private declarations }

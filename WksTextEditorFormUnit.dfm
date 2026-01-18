@@ -439,7 +439,7 @@ object TextEditorForm: TTextEditorForm
               AlignWithMargins = True
               Left = 19
               Top = 80
-              Width = 51
+              Width = 52
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -697,17 +697,6 @@ object TextEditorForm: TTextEditorForm
           inherited OptionOutputLinesMaxEdit: TEdit
             StyleElements = [seFont, seClient, seBorder]
           end
-        end
-      end
-      inherited LogToolBar: TToolBar
-        inherited ClearToolButton: TToolButton
-          ExplicitWidth = 43
-        end
-        inherited ClearAutoToolButton: TToolButton
-          ExplicitWidth = 42
-        end
-        inherited WrapToolButton: TToolButton
-          ExplicitWidth = 44
         end
       end
     end
@@ -4510,17 +4499,17 @@ object TextEditorForm: TTextEditorForm
       ImageIndex = 33
       OnExecute = SpacesToTabsActionExecute
     end
-    object LinesBeginWithAction: TAction
+    object LineBeginWithAction: TAction
       Caption = 'Lines begin with ...'
       Hint = 'Prefix with something all lines of a given string'
       ImageIndex = 35
-      OnExecute = LinesBeginWithActionExecute
+      OnExecute = LineBeginWithActionExecute
     end
-    object LinesNumberingAction: TAction
+    object LineNumberingAction: TAction
       Caption = 'Lines numbering ...'
       Hint = 'Prefix with numbers all lines of a given string'
       ImageIndex = 34
-      OnExecute = LinesNumberingActionExecute
+      OnExecute = LineNumberingActionExecute
     end
     object SynEditInsertHeaderAction: TAction
       Caption = 'Insert header'
@@ -4767,10 +4756,10 @@ object TextEditorForm: TTextEditorForm
       Action = SpacesToTabsAction
     end
     object UtilLineBeginWithPopup: TMenuItem
-      Action = LinesBeginWithAction
+      Action = LineBeginWithAction
     end
     object UtilLineNumberingPopup: TMenuItem
-      Action = LinesNumberingAction
+      Action = LineNumberingAction
     end
   end
 end

@@ -234,6 +234,9 @@ inherited PersonMainForm: TPersonMainForm
             inherited ObjectId8Label: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectRouteIdCsvLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited ObjectOrderDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
@@ -249,56 +252,44 @@ inherited PersonMainForm: TPersonMainForm
             inherited ObjectId8DBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectRouteIdCsvDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
           end
           inherited ObjectDateJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectCreatedLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectCreatedDBText: TDBText
-              StyleElements = [seFont, seClient, seBorder]
-            end
             inherited ObjectUpdatedLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectUpdatedDBText: TDBText
+            inherited ObjectExpireLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectUpdatedByDBText: TDBText
+            inherited ObjectUpdatedDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectCreatedDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectPersonJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectAuthorLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectOwnerCsvLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectUpdatedByLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-          end
-          inherited ObjectFromJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectFromOrganizationLabel: TLabel
+            inherited ObjectOwnerCsvDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectFromMemberLabel: TLabel
+            inherited ObjectAuthorDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectFromTeamLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromAreaLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromDepartmentLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromOrganizationDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromMemberDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromTeamDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromAreaDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromDepartmentDBEdit: TDBEdit
+            inherited ObjectUpdatedByDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -318,7 +309,7 @@ inherited PersonMainForm: TPersonMainForm
             inherited ObjectToDepartmentLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectJobGradeMinLabel: TLabel
+            inherited ObjectToJobGradeMinLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectJobGradeCalculateLabel: TLabel
@@ -339,15 +330,7 @@ inherited PersonMainForm: TPersonMainForm
             inherited ObjectToDepartmentDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectJobGradeMinDBComboBox: TDBComboBox
-              StyleElements = [seFont, seClient, seBorder]
-            end
-          end
-          inherited ObjectApprovalJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectRouteLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectRouteDBEdit: TDBEdit
+            inherited ObjectToJobGradeMinDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -381,6 +364,9 @@ inherited PersonMainForm: TPersonMainForm
             inherited ObjectDataKindLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectGroupLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited ObjectContentKindDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
@@ -390,41 +376,58 @@ inherited PersonMainForm: TPersonMainForm
             inherited ObjectDataKindDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectGroupDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
           end
           inherited ObjectGeneralJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectStateLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectSpareLabel: TLabel
+            inherited ObjectBgColorLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectDescriptionLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectTitleLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectSubtitleLabel: TLabel
+            inherited ObjectFgColorLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectStateDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectSpareDBEdit: TDBEdit
+            inherited ObjectBgColorDBEdit: TDBEdit
+              StyleElements = [seFont, seClient]
+            end
+            inherited ObjectFgColorDBEdit: TDBEdit
+              StyleElements = [seFont, seClient]
+            end
+          end
+          inherited ObjectDataJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectData2Label: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectDescriptionDBEdit: TDBEdit
+            inherited ObjectData3Label: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectTitleDBEdit: TDBEdit
+            inherited ObjectData4Label: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectSubtitleDBEdit: TDBEdit
+            inherited ObjectData1Label: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData2DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData3DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData4DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData1DBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
           end
           object PersonJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 292
             Height = 21
             Expanded = False
             Caption = 'Person'
@@ -437,13 +440,13 @@ inherited PersonMainForm: TPersonMainForm
             Beveled = False
             ParentButtonFont = False
             DesignSize = (
-              281
+              292
               21)
             object PersonObjectIdLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 53
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -455,7 +458,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 203
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -467,7 +470,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 103
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -487,7 +490,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 353
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -514,7 +517,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 253
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -541,7 +544,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 303
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -600,7 +603,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 153
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -612,7 +615,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 74
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -629,7 +632,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 224
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -642,7 +645,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 124
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -656,7 +659,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 174
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -669,7 +672,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 3
               Top = 22
-              Width = 275
+              Width = 286
               Height = 25
               DataSource = PersonDataSource
               VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
@@ -681,7 +684,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 374
-              Width = 249
+              Width = 260
               Height = 208
               Margins.Left = 16
               Margins.Right = 16
@@ -695,7 +698,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 274
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -709,7 +712,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 324
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -720,7 +723,7 @@ inherited PersonMainForm: TPersonMainForm
             end
           end
           object UserJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 292
             Height = 21
             Expanded = False
             Caption = 'User'
@@ -739,13 +742,13 @@ inherited PersonMainForm: TPersonMainForm
             Font.Style = []
             ParentFont = False
             DesignSize = (
-              281
+              292
               21)
             object UserPersonIdLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 53
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -757,7 +760,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 103
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -775,7 +778,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 153
-              Width = 249
+              Width = 260
               Height = 15
               Cursor = crHandPoint
               Margins.Left = 16
@@ -794,7 +797,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 303
-              Width = 249
+              Width = 260
               Height = 15
               Cursor = crHandPoint
               Margins.Left = 16
@@ -813,7 +816,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 203
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -902,7 +905,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 253
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -920,7 +923,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 3
               Top = 22
-              Width = 275
+              Width = 286
               Height = 25
               DataSource = UserDataSource
               VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
@@ -932,7 +935,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 74
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -949,7 +952,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 124
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -963,7 +966,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 174
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -977,7 +980,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 324
-              Width = 249
+              Width = 260
               Height = 208
               Margins.Left = 16
               Margins.Right = 16
@@ -991,7 +994,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 224
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1008,7 +1011,7 @@ inherited PersonMainForm: TPersonMainForm
               AlignWithMargins = True
               Left = 16
               Top = 274
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -1077,6 +1080,9 @@ inherited PersonMainForm: TPersonMainForm
             inherited OptionFontSizeLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited OptionTextRightEdgeLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited OptionTabWidthJvSpinEdit: TJvSpinEdit
               StyleElements = [seFont, seClient, seBorder]
             end
@@ -1084,6 +1090,9 @@ inherited PersonMainForm: TPersonMainForm
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited OptionFontSizeJvSpinEdit: TJvSpinEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited OptionTextRightEdgeComboBox: TComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -1123,20 +1132,20 @@ inherited PersonMainForm: TPersonMainForm
               StyleElements = [seFont, seClient, seBorder]
             end
           end
-          inherited OptionFilesJvScrollMaxBand: TJvScrollMaxBand
-            inherited OptionFilesWorkingFolderLabel: TLabel
+          inherited OptionFileJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionFileWorkingFolderLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesOnDoubleClickLabel: TLabel
+            inherited OptionFileOnDoubleClickLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesWorkingFolderClearLabel: TLabel
+            inherited OptionFileWorkingFolderClearLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesOnDoubleClickComboBox: TComboBox
+            inherited OptionFileOnDoubleClickComboBox: TComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesWorkingFolderSelectButtonedEdit: TButtonedEdit
+            inherited OptionFileWorkingFolderSelectButtonedEdit: TButtonedEdit
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -1147,6 +1156,13 @@ inherited PersonMainForm: TPersonMainForm
   inherited MainPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited MainPageControl: TPageControl
+      inherited ObjectContentPrevTabSheet: TTabSheet
+        inherited ObjectContentPrevTopPanel: TPanel
+          inherited ObjectContentPrevCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
       inherited ObjectContentTabSheet: TTabSheet
         inherited ObjectContentSplitter: TSplitter
           ExplicitHeight = 536
@@ -1158,6 +1174,40 @@ inherited PersonMainForm: TPersonMainForm
         end
         inherited ObjectContentSplitView: TSplitView
           DoubleBuffered = True
+        end
+        inherited ObjectContentLeftPanel: TPanel
+          inherited ObjectContentTopPanel2: TPanel
+            inherited ObjectTitleLabel: TLabel
+              Width = 638
+            end
+            inherited ObjectSubtitleLabel: TLabel
+              Width = 638
+            end
+            inherited ObjectDescriptionLabel: TLabel
+              Width = 638
+            end
+          end
+        end
+      end
+      inherited ObjectDataTabSheet: TTabSheet
+        inherited ObjectDataTopPanel: TPanel
+          inherited ObjectDataCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited ObjectNoteTabSheet: TTabSheet
+        inherited ObjectNoteTopPanel: TPanel
+          inherited ObjectNoteCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited FilesRioTabSheet: TTabSheet
+        inherited FilesRioTopPanel: TPanel
+          inherited FilesRioInfoLabel: TLabel
+            Height = 31
+          end
         end
       end
     end
@@ -1182,6 +1232,9 @@ inherited PersonMainForm: TPersonMainForm
     DataSet = PersonClientDataSet
     Left = 208
     Top = 432
+  end
+  inherited MainSoapConnection: TSoapConnection
+    URL = 'http://localhost/WksPersonSoapProject.dll/soap'
   end
   object UserDataSource: TDataSource [26]
     DataSet = UserClientDataSet

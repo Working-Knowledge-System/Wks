@@ -1,4 +1,4 @@
-unit WksSpellcheckFormUnit;
+unit WksSpellcheckDialogFormUnit;
 
 interface
 
@@ -15,7 +15,7 @@ uses
 
 {$REGION 'Type'}
 type
-  TSpellcheckForm = class(TForm)
+  TSpellcheckDialogForm = class(TForm)
     TextMemo: TMemo;
     TextImageList24: TImageList;
     TextActionList: TActionList;
@@ -68,7 +68,7 @@ type
 
 {$REGION 'Var'}
 //var
-//  SpellcheckForm: TSpellcheckForm;
+//  SpellcheckDialogForm: TSpellcheckDialogForm;
 {$ENDREGION}
 
 implementation
@@ -83,11 +83,11 @@ uses
 {$ENDREGION}
 
 {$REGION 'Routine'}
-class function TSpellcheckForm.Execute(var IvText: string): boolean;
+class function TSpellcheckDialogForm.Execute(var IvText: string): boolean;
 var
-  frm: TSpellcheckForm;
+  frm: TSpellcheckDialogForm;
 begin
-  frm := TSpellcheckForm.Create(nil);
+  frm := TSpellcheckDialogForm.Create(nil);
   try
     frm.TextMemo.Text := IvText;
     Result := frm.ShowModal = mrOk;
@@ -98,7 +98,7 @@ begin
   end;
 end;
 
-procedure TSpellcheckForm.SpellCheckerCreate;
+procedure TSpellcheckDialogForm.SpellCheckerCreate;
 var
   PWC, PWC1: PWideChar;
   Options: IEnumString;
@@ -126,7 +126,7 @@ end;
 {$ENDREGION}
 
 {$REGION 'Form'}
-procedure TSpellcheckForm.FormCreate(Sender: TObject);
+procedure TSpellcheckDialogForm.FormCreate(Sender: TObject);
 var
   Languages: IEnumString;
   lang: PChar;
@@ -156,24 +156,24 @@ begin
   end;
 end;
 
-procedure TSpellcheckForm.FormDestroy(Sender: TObject);
+procedure TSpellcheckDialogForm.FormDestroy(Sender: TObject);
 begin
   SpellErrorList.Destroy;
 end;
 {$ENDREGION}
 
 {$REGION 'Action'}
-procedure TSpellcheckForm.CancelActionExecute(Sender: TObject);
+procedure TSpellcheckDialogForm.CancelActionExecute(Sender: TObject);
 begin
   ModalResult := mrCancel;
 end;
 
-procedure TSpellcheckForm.DoneActionExecute(Sender: TObject);
+procedure TSpellcheckDialogForm.DoneActionExecute(Sender: TObject);
 begin
   ModalResult := mrOk;
 end;
 
-procedure TSpellcheckForm.SpellcheckActionExecute(Sender: TObject);
+procedure TSpellcheckDialogForm.SpellcheckActionExecute(Sender: TObject);
 var
   errs: IEnumSpellingError;
   err: ISpellingError;
@@ -192,7 +192,7 @@ begin
   end;
 end;
 
-procedure TSpellcheckForm.CorrectSpeedButtonClick(Sender: TObject);
+procedure TSpellcheckDialogForm.CorrectSpeedButtonClick(Sender: TObject);
 var
   err, cor: string;
 begin
@@ -207,12 +207,12 @@ end;
 {$ENDREGION}
 
 {$REGION 'Gui'}
-procedure TSpellcheckForm.LanguageComboBoxChange(Sender: TObject);
+procedure TSpellcheckDialogForm.LanguageComboBoxChange(Sender: TObject);
 begin
   SpellCheckerCreate;
 end;
 
-procedure TSpellcheckForm.ErrorListBoxClick(Sender: TObject);
+procedure TSpellcheckDialogForm.ErrorListBoxClick(Sender: TObject);
 var
   err: ISpellingError;
   act: CORRECTIVE_ACTION;
@@ -236,7 +236,7 @@ begin
   end;
 end;
 
-procedure TSpellcheckForm.SuggestionListBoxClick(Sender: TObject);
+procedure TSpellcheckDialogForm.SuggestionListBoxClick(Sender: TObject);
 begin
   CorrectionEdit.Text := SuggestionListBox.Items[SuggestionListBox.ItemIndex];
 end;

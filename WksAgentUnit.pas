@@ -36,7 +36,7 @@ uses
   , FireDAC.Phys.SQLiteDef, FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteWrapper.Stat
   , FireDAC.Comp.BatchMove
   , FireDAC.Comp.BatchMove.SQL
-  , FireDAC.Comp.BatchMove.Dataset
+//, FireDAC.Comp.BatchMove.Dataset
   , Superobject
   , Wks000Unit
   ;
@@ -78,37 +78,55 @@ type
 
   {$REGION 'TAgentThread'}
   PAgentThreadInfoRec = ^TAgentThreadInfoRec; // *** this is the packet saved in the executed agents list ***
-  TAgentThreadInfoRec = record // --> TAgentThreadReportRec
+  TAgentThreadInfoRec = record // *** --> TAgentThreadReportRec ***
     Started  : TDateTime; //
     Ended    : TDateTime; // the finish is not needed
     Success  : boolean  ; //
     Affected : integer  ; // processed items (if the case)
     ElapsedMs: integer  ; // thread lifetime in ms
-    Report   : TSbuRec  ; // thread activities *** rename to simple Log ***
+    Report   : TSbuRec  ; // thread activities *** --> Log ***
     Output   : TSbuRec  ; // script output
-    Message  : string   ; // 1line log message (ok, error, ...)
+    Message : string    ; // 1line log message (ok, error, ...)
+  end;
+
+  TAgentThreadProgressRec = record // info of progress steps
+    Id         : integer;
+    Dt         : TDateTime;
+    ReadCount  : integer;
+    WriteCount : integer;
+    InsertCount: integer;
+    UpdateCount: integer;
+    DeleteCount: integer;
+    CommitCount: integer;
+  public
+    procedure Init(IvId: integer; IvDt: TDateTime; IvReadCount, IvWriteCount, IvInsertCount, IvUpdateCount, IvDeleteCount, IvCommitCount: integer);
   end;
 
   TAgentThread = class(TThread)
   private
     FAgentRec      : TAgentRec;           // agent
-    FInfoRec       : TAgentThreadInfoRec; // thread info report
+    FInfoRec       : TAgentThreadInfoRec; // thread whole info report
+    FProgressRec   : TAgentThreadProgressRec;   // progress last info
     FWatch         : TStopWatch;          // internal watch
     FRunningId     : integer;             // the id in the runninglistbox
-    FPauseRequested: boolean;
-    FStopRequested : boolean;
-    FOnUIUpdate    : TProc<integer, string>;
-    FLastProgressDt: TDateTime;
-    FLastProgressWrittenRows: int64;
-    FLastSleepCount: int64;          // used if the thread performs in batches and need to sleep between each batch
+    FPauseRequested: boolean;             // pause the thread
+    FAbortRequested: Boolean;             // completely stop the thread and return wit an exception
+    FUIUpdate      : TProc<integer, string>;
+    FLastSleepCount: int64;               // used if the thread performs in batches and need to sleep between each batch
+    FAgentLogFile: TextFile;
+    FAgentLogFileSpec: string;
+    FAgentLogFileOpened: boolean;
   public
-    constructor Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean = true}; IvOnUIUpdate: TProc<integer, string>);
+    constructor Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean = true}; IvUIUpdate: TProc<integer, string>);
     destructor Destroy; override;
     procedure Execute; override;
-    procedure UIUpdate(IvString: string);
-    procedure StopRequest;      // from UI thread
+    procedure Feedback(IvString: string); overload;
+    procedure Feedback(IvFormat: string; IvVarRecVector: array of TVarRec); overload;
+    procedure UIUpdate(IvString: string); overload;
+    procedure UIUpdate(IvFormat: string; IvVarRecVector: array of TVarRec); overload;
     procedure PauseRequest;     // from UI thread
     procedure ContinueRequest;  // from UI thread
+    procedure AbortRequest;     // from UI thread
     property RunningId: integer             read FRunningId write FRunningId;
     property AgentRec : TAgentRec           read FAgentRec;
     property InfoRec  : TAgentThreadInfoRec read FInfoRec ;
@@ -118,7 +136,7 @@ type
   {$REGION 'TAgentDosThread'}
   TAgentDosThread = class(TAgentThread)
   public
-    constructor Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean = true}; IvOnUIUpdate: TProc<integer, string>);
+    constructor Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean = true}; IvUIUpdate: TProc<integer, string>);
     destructor Destroy; override;
     procedure Execute; override;
   end;
@@ -127,7 +145,7 @@ type
   {$REGION 'TAgentJslThread'}
   TAgentJslThread = class(TAgentThread)
   public
-    constructor Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean = true}; IvOnUIUpdate: TProc<integer, string>);
+    constructor Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean = true}; IvUIUpdate: TProc<integer, string>);
     destructor Destroy; override;
     procedure Execute; override;
   end;
@@ -136,7 +154,7 @@ type
   {$REGION 'TAgentPythonThread'}
   TAgentPythonThread = class(TAgentThread)
   public
-    constructor Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean = true}; IvOnUIUpdate: TProc<integer, string>);
+    constructor Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean = true}; IvUIUpdate: TProc<integer, string>);
     destructor Destroy; override;
     procedure Execute; override;
   end;
@@ -145,26 +163,14 @@ type
   {$REGION 'TAgentSqlThread'}
   TAgentSqlThread = class(TAgentThread)
   public
-    constructor Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean = true}; IvOnUIUpdate: TProc<integer, string>);
+    constructor Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean = true}; IvUIUpdate: TProc<integer, string>);
     destructor Destroy; override;
     procedure Execute; override;
   end;
   {$ENDREGION}
 
-  {$REGION 'TAgentEtlThread'}
-  TAgentEtlThread = class(TAgentThread)
-//private
-  //FSourceFDConnStr: string;
-  //FTargetFDConnStr: string;
-  public
-    constructor Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean = true}; IvOnUIUpdate: TProc<integer, string>);
-    destructor Destroy; override;
-    procedure Execute; override;
-  //property SourceFDConnStr: string read FSourceFDConnStr write FSourceFDConnStr;
-  //property TargetFDConnStr: string read FTargetFDConnStr write FTargetFDConnStr;
-  end;
-
-  TAgentEtlThread2 = class(TAgentThread)
+  {$REGION 'TAgentEtlTableToTableThread'}
+  TAgentEtlTableToTableThread = class(TAgentThread) // table to table
   private
     FSourceConn: TFDConnection;
     FTargetConn: TFDConnection;
@@ -172,17 +178,35 @@ type
     FWriter: TFDBatchMoveSQLWriter;
     FMover: TFDBatchMove;
     FBatchDelayMs: integer;
+    FMoverMaxErrors: integer;
+    FMoverLogFileSpec: string;
+  //FCheckpointIniSpec: string;
     procedure SourceConnectionsSetup(IvConnStr: string; IvRowsetSize: integer);
     procedure TargetConnectionsSetup(IvConnStr: string);
-    procedure MoverSetup(IvReadSql, IvTargetTable, IvOptionCsv, IvMode: string; IvStatisticsInterval, IvCommitCount: integer);
-    procedure MoverProgress(ASender: TObject; APhase: TFDBatchMovePhase);
-    procedure Preprocess(IvTargetDdl, IvTargetTable: string);
+    procedure ReaderSetup(IvReadSql: string);
+    procedure WriterSetup(IvTargetTable: string);
+    procedure MoverSetup(IvOptionCsv, IvMode: string; IvStatisticsInterval, IvCommitCount: integer; IvOnceSetup: boolean);
+    procedure MoverOnProgress(ASender: TObject; APhase: TFDBatchMovePhase);
+    procedure MoverOnError(ASender: TObject; AException: Exception; var AAction: TFDErrorAction);
+    procedure Preprocess(IvTargetDdl, IvTargetTable: string; var IvOptionCsv: string);
+  //function  CheckpointLoad: int64;
+  //procedure CheckpointSave(IvLastHi: int64);
+  //function  SourceQueryMake(const IvLo, IvHi: int64): TFDQuery;
   protected
     procedure Execute; override;
   public
-    constructor Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean = true}; IvOnUIUpdate: TProc<integer, string>); reintroduce;
+    constructor Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean = true}; IvUIUpdate: TProc<integer, string>); reintroduce;
     destructor Destroy; override;
   end;
+  {$ENDREGION}
+
+  {$REGION 'TAgentEtlTableToTextThread'}
+  {$ENDREGION}
+
+  {$REGION 'TAgentEtlTextToTableThread'}
+  {$ENDREGION}
+
+  {$REGION 'TAgentEtlTableToMongodbThread'}
   {$ENDREGION}
 
 {$ENDREGION}
@@ -204,53 +228,57 @@ const
   ;
   AGENT_DATA_SOURCE_JSON_TEMPLATE
                = '  , "DataSource": {'
-  + sLineBreak + '        "Name"                : "<Name>"                 -- MSSQL|ORACLE|MONGODB'
-  + sLineBreak + '      , "ConnLib"             : "<ConnLib>"              -- ADO|FD, if not defined ADO will be used' // for ETL only FD can be used
-  + sLineBreak + '      , "ConnStr"             : "<ConnStr>"              -- if not defined the default System mssql connstr will be used'
-//+ sLineBreak + '    --, "ConnTimeoutSec"      : 10                       -- timeout for the connection'
-//+ sLineBreak + '    --, "QueryTimeoutSec"     : 30                       -- timeout for the sql query or command'
+  + sLineBreak + '        "Name"                 : "<Name>"                 -- MSSQL|ORACLE|MONGODB'
+  + sLineBreak + '      , "ConnLib"              : "<ConnLib>"              -- ADO|FD, if not defined ADO will be used' // for ETL only FD can be used
+  + sLineBreak + '      , "ConnStr"              : "<ConnStr>"              -- if not defined the default System mssql connstr will be used'
+//+ sLineBreak + '    --, "ConnTimeoutSec"       : 10                       -- timeout for the connection'
+//+ sLineBreak + '    --, "QueryTimeoutSec"      : 30                       -- timeout for the sql query or command'
   + sLineBreak + '    }'
   ;
   AGENT_DATA_TARGET_JSON_TEMPLATE
                = '  , "DataTarget": {'
-  + sLineBreak + '        "Name"                : "<Name>"                 -- MSSQL|ORACLE|MONGODB'
-  + sLineBreak + '      , "ConnLib"             : "<ConnLib>"              -- ADO|FD, if not defined ADO will be used' //, for ETL only FD can be used
-  + sLineBreak + '      , "ConnStr"             : "<ConnStr>"              -- if not defined the default System mssql connstr will be used'
-//+ sLineBreak + '    --, "ConnTimeoutSec"      : 10                       -- timeout for the connection'
-//+ sLineBreak + '    --, "QueryTimeoutSec"     : 30                       -- timeout for the sql query or command'
-//+ sLineBreak + '    --, "MongodbDatabase"     : "<Dba>"                  -- only for mongodb destination database in the format DbaAaa'
-//+ sLineBreak + '    --, "MongodbCollection"   : "<Collection>"           -- only for mongodb destination collection in the format ColAaa'
-//+ sLineBreak + '    --, "MongodbRecordLayout" : "{\"FldAaa\":\"%s\", \"FldBbb\":\"%s\", ...}" -- only for mongodb destination document'
+  + sLineBreak + '        "Name"                 : "<Name>"                 -- MSSQL|ORACLE|MONGODB'
+  + sLineBreak + '      , "ConnLib"              : "<ConnLib>"              -- ADO|FD, if not defined ADO will be used' //, for ETL only FD can be used
+  + sLineBreak + '      , "ConnStr"              : "<ConnStr>"              -- if not defined the default System mssql connstr will be used'
+//+ sLineBreak + '    --, "ConnTimeoutSec"       : 10                       -- timeout for the connection'
+//+ sLineBreak + '    --, "QueryTimeoutSec"      : 30                       -- timeout for the sql query or command'
+//+ sLineBreak + '    --, "MongodbDatabase"      : "<Dba>"                  -- only for mongodb destination database in the format DbaAaa'
+//+ sLineBreak + '    --, "MongodbCollection"    : "<Collection>"           -- only for mongodb destination collection in the format ColAaa'
+//+ sLineBreak + '    --, "MongodbRecordLayout"  : "{\"FldAaa\":\"%s\", \"FldBbb\":\"%s\", ...}" -- only for mongodb destination document'
   + sLineBreak + '    }'
   ;
   AGENT_ETL_JSON_TEMPLATE
                = '  , "Etl": {'
-  + sLineBreak + '        "Type"                : "TableToTable"           -- use: TableToTable|NA TextToTable|NA TableToText, if not defined TableToTable will be used'
-  + sLineBreak + '      , "TargetTable"         : "<Table>"                -- destination table in the format DbaAaa.dbo.TblBbb'
-  + sLineBreak + '      , "BatchDelayMs"        : 10                       -- ms to wait before each batch start'
-  + sLineBreak + '      , "RowsetSize"          : 1000                     -- records extracted from the source table in a single operation'
-  + sLineBreak + '      , "BulkInsertSize"      : 1000                     -- records inserted in bulk into the target table in a single operation'
-  + sLineBreak + '      , "StatisticsCountRows" : 1000                     -- trigger onprogress event every n records'
-  + sLineBreak + '      , "CommitCountRows"     : 1000                     -- starttransaction/commit every n records'
-  + sLineBreak + '      , "OptionCsv"           : "poClearDestNoUndo"'
-//+ sLineBreak + '                              -- poIdentityInsert"       -- if specified the primarykey matching is enabled'
-//+ sLineBreak + '                              -- poClearDest                deletes the content of the destination table before data movement performing a transactional DELETE (slow, log will explode)'
-//+ sLineBreak + '                              -- poClearDestNoUndo          deletes the content of the destination table before data movement performing a non-transactional TRUNCATE (fast, no logging)'
-//+ sLineBreak + '                              -- poCreateDest               creates the destination table if it does not exist before data movement, DDL is required in Note tab'
-//+ sLineBreak + '                              -- poSkipUnmatchedDestFields  if specified then unmatched rows will be excluded from movement'
-//+ sLineBreak + '                              -- poUseTransactions          if specified then each batch will be surrounded by starttransaction/commit, a batch happens every CommitCount rows'
-//+ sLineBreak + '      , "Mode"                : "dmAlwaysInsert"'
-//+ sLineBreak + '                              -- dmAlwaysInsert             insert records from source to destination, matching using primarykey in destination table is no performed, default mode'
-//+ sLineBreak + '                              -- dmAppend                   insert records from source to destination when no matching is found, require primarykey in destination'
-//+ sLineBreak + '                              -- dmAppendUpdate             insert records from source to destination when no matching is found, update updates records when matching is found, require primarykey in destination'
-//+ sLineBreak + '                              -- dmDelete                   delete records in destination when matching is found, require primarykey in destination'
-//+ sLineBreak + '      , "DateTimeFormat"      : "yyyy-mm-dd hh:nn:ss"    -- delphi format to obtain --> 2020-01-01 00:00:00'
-//+ sLineBreak + '    --, "KeyBegin"            : "1"                      -- range: beginning PK if an integer'
-//+ sLineBreak + '    --, "KeyEnd"              : "1000000000"             -- range: ending PK if an integer'
-//+ sLineBreak + '    --, "SliceSize"           :  1000000                 -- subraange: number of rows if the PK is an integer (used to calculate $SliceBegin$ and $SliceEnd$)'
-//+ sLineBreak + '    --, "KeyBegin"            : "2020-01-01 00:00:00"    -- range: beginning PK if datetime'
-//+ sLineBreak + '    --, "KeyEnd"              : "2025-02-01 00:00:00"    -- range: ending PK if datetime'
-//+ sLineBreak + '    --, "SliceSize"           : 2592000                  -- subrange: number of seconds (30*24*60*60) if PK is a datetime (used to calculate $SliceBegin$ and $SliceEnd$)'
+  + sLineBreak + '        "Type"                 : "TableToTable"              -- use: TableToTable|NA TextToTable|NA TableToText, if not defined TableToTable will be used'
+  + sLineBreak + '      , "TargetTable"          : "<Table>"                   -- destination table in the format DbaAaa.dbo.TblBbb'
+  + sLineBreak + '      , "BatchDelayMs"         : 10                          -- ms to wait before each batch start'
+  + sLineBreak + '      , "RowsetSize"           : 10000                       -- records extracted from the source table in a single operation'
+  + sLineBreak + '  --  , "BulkInsertSize"       : 10000                       -- records inserted in bulk into the target table in a single operation'
+  + sLineBreak + '      , "StatisticsCountRows"  : 10000                       -- trigger onprogress event every n records'
+  + sLineBreak + '      , "CommitCountRows"      : 10000                       -- starttransaction/commit every n records'
+  + sLineBreak + '      , "OptionCsv"            : ""                          -- if empty defaults to: poIdentityInsert,poCreateDest,poSkipUnmatchedDestFields,poUseTransactions (more: poClearDest,poClearDestNoUndo)'
+//+ sLineBreak + '                               -- poIdentityIn-- poCreateDest,poClearDestNoUndo,poIdentityInsert,poSkipUnmatchedDestFields,poUseTransactionssert"       -- if specified the primarykey matching is enabled'
+//+ sLineBreak + '                               -- poClearDest                   deletes the content of the destination table before data movement performing a transactional DELETE (slow, log will explode)'
+//+ sLineBreak + '                               -- poClearDestNoUndo             deletes the content of the destination table before data movement performing a non-transactional TRUNCATE (fast, no logging)'
+//+ sLineBreak + '                               -- poCreateDest                  creates the destination table if it does not exist before data movement, DDL is required in Note tab'
+//+ sLineBreak + '                               -- poSkipUnmatchedDestFields     if specified then unmatched rows will be excluded from movement'
+//+ sLineBreak + '                               -- poUseTransactions             if specified then each batch will be surrounded by starttransaction/commit, a batch happens every CommitCount rows'
+  + sLineBreak + '      , "Mode"                 : ""                          -- if empty defaults to: dmAlwaysInsert (more: dmAppend,dmAppendUpdate,dmDelete) '
+//+ sLineBreak + '                               -- dmAlwaysInsert                insert records from source to destination, matching using primarykey in destination table is no performed, default mode'
+//+ sLineBreak + '                               -- dmAppend                      insert records from source to destination when no matching is found, require primarykey in destination'
+//+ sLineBreak + '                               -- dmAppendUpdate                insert records from source to destination when no matching is found, update updates records when matching is found, require primarykey in destination'
+//+ sLineBreak + '                               -- dmDelete                      delete records in destination when matching is found, require primarykey in destination'
+  + sLineBreak + '      , "MoverMaxErrors"       : 0                           -- TFDBatchMove will abort after N errors, if not defined will abort at first error'
+  + sLineBreak + '      , "MoverLogFileSpec"     : "C:\Temp\WksMoverLog.txt"   -- if not defined no error logging is performed'
+  + sLineBreak + '      , "AgentLogFileSpec"     : "C:\Temp\WksAgentLog.txt"   -- if not defined no error logging is performed'
+  + sLineBreak + '    }'
+  ;
+  AGENT_RUNS_JSON_TEMPLATE
+               = '  , "Runs": {'
+  + sLineBreak + '        "PkMinId"              : ""                          -- PK minimun value from yourtable (int/bigint included)'     // select min(pkfld)
+  + sLineBreak + '      , "PkMaxId"              : ""                          -- PK maximun value from yourtable (int/bigint NOT included)' // select max(pkfld)
+//+ sLineBreak + '      , "RowsInMinMaxRange"    : ""                          -- total rows in the [PkMinId..PkMaxId) range'                // estimated with PkMaxId - PkMinId
+  + sLineBreak + '      , "RowsPerRun"           : ""                          -- number of rows per single run *** MAX 2147483647 ***'
   + sLineBreak + '    }'
   ;
 //AGENT_TIMEFRAME_JSON_TEMPLATE
@@ -259,60 +287,60 @@ const
 //;
 //AGENT_SAVE_JSON_TEMPLATE
 //             = '  , "Save": {'
-//+ sLineBreak + '        "Active"              : false'
-//+ sLineBreak + '      , "ToOutputTab"         : false'
-//+ sLineBreak + '      , "ToFile"              : false'
-//+ sLineBreak + '      , "Path"                : "C:\\Temp"'
-//+ sLineBreak + '      , "File"                : "Test.csv"'
-//+ sLineBreak + '      , "Type"                : "Csv" -- Txt, Json, Html'
+//+ sLineBreak + '        "Active"               : false'
+//+ sLineBreak + '      , "ToOutputTab"          : false'
+//+ sLineBreak + '      , "ToFile"               : false'
+//+ sLineBreak + '      , "Path"                 : "C:\\Temp"'
+//+ sLineBreak + '      , "File"                 : "Test.csv"'
+//+ sLineBreak + '      , "Type"                 : "Csv" -- Txt, Json, Html'
 //+ sLineBreak + '    }'
 //;
 //AGENT_EMAIL_JSON_TEMPLATE
 //             = '  , "Email": {'
-//+ sLineBreak + '        "Active"              : false'
-//+ sLineBreak + '      , "Priority"            : ""          -- |Info|Success|Warning|Danger|Error'
-//+ sLineBreak + '      , "From"                : "<From>"    -- if empty will use organization email'
-//+ sLineBreak + '      , "To"                  : "<To>"'
-//+ sLineBreak + '      , "Copy"                : "<Copy>"'
-//+ sLineBreak + '      , "Bc"                  : ""'
-//+ sLineBreak + '      , "Subject"             : "<Subject>"'
-//+ sLineBreak + '      , "Title"               : "<Title>"'
-//+ sLineBreak + '      , "Content"             : "<Content>" -- here variables like $Dataset(0)$ can be used'
-//+ sLineBreak + '      , "OrganizationLogoShow": true'
-//+ sLineBreak + '      , "SystemLogoShow"      : true'
-//+ sLineBreak + '      , "SaveToDba"           : false'
+//+ sLineBreak + '        "Active"               : false'
+//+ sLineBreak + '      , "Priority"             : ""          -- |Info|Success|Warning|Danger|Error'
+//+ sLineBreak + '      , "From"                 : "<From>"    -- if empty will use organization email'
+//+ sLineBreak + '      , "To"                   : "<To>"'
+//+ sLineBreak + '      , "Copy"                 : "<Copy>"'
+//+ sLineBreak + '      , "Bc"                   : ""'
+//+ sLineBreak + '      , "Subject"              : "<Subject>"'
+//+ sLineBreak + '      , "Title"                : "<Title>"'
+//+ sLineBreak + '      , "Content"              : "<Content>" -- here variables like $Dataset(0)$ can be used'
+//+ sLineBreak + '      , "OrganizationLogoShow" : true'
+//+ sLineBreak + '      , "SystemLogoShow"       : true'
+//+ sLineBreak + '      , "SaveToDba"            : false'
 //+ sLineBreak + '    }'
 //;
 //AGENT_PARAMS_JSON_TEMPLATE
 //             = '  , "Params": {'
-//+ sLineBreak + '        "Param0"              : null'
-//+ sLineBreak + '      , "Param1"              : false'
-//+ sLineBreak + '      , "Param2"              : 123'
-//+ sLineBreak + '      , "Param3"              : "abc"'
+//+ sLineBreak + '        "Param0"               : null'
+//+ sLineBreak + '      , "Param1"               : false'
+//+ sLineBreak + '      , "Param2"               : 123'
+//+ sLineBreak + '      , "Param3"               : "abc"'
 //+ sLineBreak + '    }'
 //;
 //AGENT_OPTION_JSON_TEMPLATE
 //             = '  , "Option": {'
-//+ sLineBreak + '        "LogOn"               : true'
-//+ sLineBreak + '      , "ReportOn"            : true'
-//+ sLineBreak + '      , "OutputOn"            : true'
-//+ sLineBreak + '      , "Verbose"             : false'
-//+ sLineBreak + '      , "LogFile"             : "[RvPathCurrent()]\WksAgent[RvAgentId()].txt"'
-//+ sLineBreak + '      , "ComInitialize"       : false'
-//+ sLineBreak + '      , "GridOn"              : false' // challenge! we need to update a grid in the main thred from a worker thred
+//+ sLineBreak + '        "LogOn"                : true'
+//+ sLineBreak + '      , "ReportOn"             : true'
+//+ sLineBreak + '      , "OutputOn"             : true'
+//+ sLineBreak + '      , "Verbose"              : false'
+//+ sLineBreak + '      , "LogFile"              : "[RvPathCurrent()]\WksAgent[RvAgentId()].txt"'
+//+ sLineBreak + '      , "ComInitialize"        : false'
+//+ sLineBreak + '      , "GridOn"               : false' // challenge! we need to update a grid in the main thred from a worker thred
 //+ sLineBreak + '    }'
 //;
 //AGENT_RUNAT_JSON_TEMPLATE
 //             = '  , "RunAt": {'
-//+ sLineBreak + '        "Year"                : "*|2000,2001|[RvDtYearNow()]"'
-//+ sLineBreak + '      , "Quarter"             : "*|1,2,3,4"'
-//+ sLineBreak + '      , "Month"               : "*|Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec|1,2,3,4,5,6,7,8,9,10,11,12"'
-//+ sLineBreak + '      , "Week"                : "*|1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53"'
-//+ sLineBreak + '      , "WeekMode"            : "*|Iso" -- Iso|Working'
-//+ sLineBreak + '      , "Day"                 : "*|Mon,Tue,Wed,Thu,Fri,Sat,Sun|1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31"'
-//+ sLineBreak + '      , "Hour"                : "*|0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23"'
-//+ sLineBreak + '      , "Minute"              : "*|0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59"'
-//+ sLineBreak + '      , "Second"              : "*|0,10,20,30,40,50"'
+//+ sLineBreak + '        "Year"                 : "*|2000,2001|[RvDtYearNow()]"'
+//+ sLineBreak + '      , "Quarter"              : "*|1,2,3,4"'
+//+ sLineBreak + '      , "Month"                : "*|Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec|1,2,3,4,5,6,7,8,9,10,11,12"'
+//+ sLineBreak + '      , "Week"                 : "*|1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53"'
+//+ sLineBreak + '      , "WeekMode"             : "*|Iso" -- Iso|Working'
+//+ sLineBreak + '      , "Day"                  : "*|Mon,Tue,Wed,Thu,Fri,Sat,Sun|1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31"'
+//+ sLineBreak + '      , "Hour"                 : "*|0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23"'
+//+ sLineBreak + '      , "Minute"               : "*|0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59"'
+//+ sLineBreak + '      , "Second"               : "*|0,10,20,30,40,50"'
 //+ sLineBreak + '    }'
 //;
 {$ENDREGION}
@@ -321,7 +349,10 @@ implementation
 
 {$REGION 'Use'}
 uses
-    Winapi.ActiveX // coinitialize
+    System.Math
+  , System.IniFiles
+  , System.DateUtils
+  , Winapi.ActiveX // coinitialize
   , WksJslUnit
   , WksPythonUnit
   , WksSqlUnit
@@ -410,8 +441,22 @@ begin
 end;
 {$ENDREGION}
 
+{$REGION 'TAgentProgressRec'}
+procedure TAgentThreadProgressRec.Init(IvId: integer; IvDt: TDateTime; IvReadCount, IvWriteCount, IvInsertCount, IvUpdateCount, IvDeleteCount, IvCommitCount: integer);
+begin
+  Id          := IvId         ;
+  Dt          := IvDt         ;
+  ReadCount   := IvReadCount  ;
+  WriteCount  := IvWriteCount ;
+  InsertCount := IvInsertCount;
+  UpdateCount := IvUpdateCount;
+  DeleteCount := IvDeleteCount;
+  CommitCount := IvCommitCount;
+end;
+{$ENDREGION}
+
 {$REGION 'TAgentThread'}
-constructor TAgentThread.Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean}; IvOnUIUpdate: TProc<integer, string>);
+constructor TAgentThread.Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean}; IvUIUpdate: TProc<integer, string>);
 begin
   inherited Create({IvCreateSuspended}true); // if false the thread start immediately without .Resume
 
@@ -425,17 +470,17 @@ begin
   FInfoRec.Report.Clr;
   FInfoRec.Output.Clr;
   FPauseRequested  := false;
-  FStopRequested   := false;
-  FOnUIUpdate      := IvOnUIUpdate;
+  FAbortRequested  := false;
+  FUIUpdate        := IvUIUpdate;
 
   // com
 //CoInitializeEx(nil, COINIT_MULTITHREADED);
 
   // output(dbg)
-//FInfoRec.Report.Add('thread(%d) for "%s" begin', [ThreadId, FAgentRec.Agent], true, 0);
+//Feedback('thread(%d) for "%s" begin', [ThreadId, FAgentRec.Agent], true, 0);
 
   // report(dbg)
-//FInfoRec.Output.Add('output of "%s" begin'     , [FAgentRec.Agent]          , true, 0);
+//Feedback('output of "%s" begin'     , [FAgentRec.Agent]          , true, 0);
 end;
 
 destructor TAgentThread.Destroy;
@@ -453,26 +498,37 @@ begin
   inherited;
 end;
 
-procedure TAgentThread.Execute;
+procedure TAgentThread.Feedback(IvString: string);
 begin
-  // output(dbg)
-//FInfoRec.Output.Add('output of "%s" end'       , [FAgentRec.Agent]          );
+  // to report
+  FInfoRec.Report.Add(IvString);
 
-  // report(dbg)
-//FInfoRec.Report.Add('thread(%d) terminating'   , [ThreadId]                 );
-//FInfoRec.Report.Add('thread(%d) for "%s" end'  , [ThreadId, FAgentRec.Agent]);
+  // to file
+  if FAgentLogFileOpened then begin
+    Writeln(FAgentLogFile, IvString);
+    Flush(FAgentLogFile);
+  end;
+end;
 
-  // info
-  FWatch.Stop;
-  FInfoRec.ElapsedMs := FWatch.ElapsedMilliseconds;
-  FInfoRec.Ended := Now;
+procedure TAgentThread.Feedback(IvFormat: string; IvVarRecVector: array of TVarRec);
+begin
+  Feedback(Format(IvFormat, IvVarRecVector));
+end;
 
-  // uiupdate
-  UIUpdate('Done');
-  sleep(1000);
+procedure TAgentThread.UIUpdate(IvString: string);
+begin
+  if Assigned(FUIUpdate) then
+    TThread.Queue(nil,
+      procedure
+      begin
+        FUIUpdate(RunningId, IvString);
+      end
+    );
+end;
 
-  // ancestor
-//inherited;
+procedure TAgentThread.UIUpdate(IvFormat: string; IvVarRecVector: array of TVarRec);
+begin
+  UIUpdate(Format(IvFormat, IvVarRecVector));
 end;
 
 procedure TAgentThread.PauseRequest;
@@ -487,28 +543,43 @@ begin
   UIUpdate('continue');
 end;
 
-procedure TAgentThread.StopRequest;
+procedure TAgentThread.AbortRequest;
 begin
-  FStopRequested := true;
+  FAbortRequested := true;
   UIUpdate('stopped');
 end;
 
-procedure TAgentThread.UIUpdate(IvString: string);
+procedure TAgentThread.Execute;
 begin
-  if Assigned(FOnUIUpdate) then
-    TThread.Queue(nil,
-      procedure
-      begin
-        FOnUiUpdate(RunningId, IvString);
-      end
-    );
+  // *** this is inherited at the end of Execute of each specialized thread ***
+
+  // output(dbg)
+//FInfoRec.Output.Add('output of "%s" end'       , [FAgentRec.Agent]          );
+
+  // report(dbg)
+//Feedback('thread(%d) terminating'   , [ThreadId]                 );
+//Feedback('thread(%d) for "%s" end'  , [ThreadId, FAgentRec.Agent]);
+
+  // info
+  FWatch.Stop;
+  FInfoRec.ElapsedMs := FWatch.ElapsedMilliseconds;
+  FInfoRec.Ended := Now;
+
+  // uiupdate
+  UIUpdate('Done in %d ms', [FInfoRec.ElapsedMs]);
+  sleep(1000); // wait a little before the message is removed from the RunningListItemBox
+
+  // ancestor
+//inherited;
+
+  // *** NOW THE THREAD ENDS AND WE GO TO ONTERMINATE ROUTINE ***
 end;
 {$ENDREGION}
 
 {$REGION 'TAgentDosThread'}
-constructor TAgentDosThread.Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean}; IvOnUIUpdate: TProc<integer, string>);
+constructor TAgentDosThread.Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean}; IvUIUpdate: TProc<integer, string>);
 begin
-  inherited Create(IvAgentRec{, IvCreateSuspended}, IvOnUIUpdate);
+  inherited Create(IvAgentRec{, IvCreateSuspended}, IvUIUpdate);
 end;
 
 destructor TAgentDosThread.Destroy;
@@ -527,15 +598,15 @@ var
 begin
   // nop
   if Terminated then begin
-    FInfoRec.Report.Add('terminated', true, 0);
+    {FInfoRec.Report.Add}Feedback('terminated'{, true, 0});
     UIUpdate('terminated');
     Exit;
   end;
 
   // naming
   NameThreadForDebugging(FAgentRec.Agent);
-  FInfoRec.Report.Add('running', true, 0);
-  UIUpdate('running');
+  {FInfoRec.Report.Add}Feedback('starting'{, true, 0});
+  UIUpdate('starting');
 
   // data
   jso := FAgentRec.JsonCompiledSO;
@@ -543,14 +614,14 @@ begin
   // workingdir
   if not Assigned(jso.O['WorkingDir']) then begin
     wdi := {TEMP_PATH} TBynRec.BinaryDir;
-    FInfoRec.Report.Add('WorkingDir not defined, using: %s', [wdi]);
+    Feedback('WorkingDir not defined, using: %s', [wdi]);
   end else
     wdi := jso.S['WorkingDir'];
 
   // force
   if not DirectoryExists(wdi) then begin
     ForceDirectories(wdi);
-    FInfoRec.Report.Add('WorkingDir %s not exist, created', [wdi]);
+    Feedback('WorkingDir %s not exist, created', [wdi]);
   end;
 
   // exec
@@ -561,7 +632,7 @@ begin
 
     // has errors, warnings, hints
     if not TDosRec.IsValid(con.Text, fbk) then begin
-      FInfoRec.Report.Add('FAILED, msg: ' + fbk);
+      Feedback('FAILED, msg: ' + fbk);
 
     // is ok
     end else begin
@@ -579,11 +650,11 @@ begin
         // exec
         try
           TDosRec.Exec(lin, oup, wdi);
-          FInfoRec.Report.Add('%d) cmd: %s (executed in %d ms)', [i+1, lin, FWatch.ElapsedMilliseconds]);
+          {FInfoRec.Report.Add}Feedback('%d) cmd: %s (executed in %d ms)', [i+1, lin, FWatch.ElapsedMilliseconds]);
           FInfoRec.Output.Add(oup);
         except
           on e: Exception do begin
-            FInfoRec.Report.Add(e.Message);
+            {FInfoRec.Report.Add}Feedback(e.Message);
             FInfoRec.Message := e.Message;
           end;
         end;
@@ -595,17 +666,15 @@ begin
     con.Free;
   end;
 
-  // ancestor
+  // ancestor then ends
   inherited;
-
-  // now the thread ends and we go to OnTerminate routine
 end;
 {$ENDREGION}
 
 {$REGION 'TAgentJslThread'}
-constructor TAgentJslThread.Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean}; IvOnUIUpdate: TProc<integer, string>);
+constructor TAgentJslThread.Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean}; IvUIUpdate: TProc<integer, string>);
 begin
-  inherited Create(IvAgentRec{, IvCreateSuspended}, IvOnUIUpdate);
+  inherited Create(IvAgentRec{, IvCreateSuspended}, IvUIUpdate);
 end;
 
 destructor TAgentJslThread.Destroy;
@@ -624,15 +693,15 @@ var
 begin
   // nop
   if Terminated then begin
-    FInfoRec.Report.Add('terminated', true, 0);
+    {FInfoRec.Report.Add}Feedback('terminated'{, true, 0});
     UIUpdate('terminated');
     Exit;
   end;
 
   // naming
   NameThreadForDebugging(FAgentRec.Agent);
-  FInfoRec.Report.Add('running', true, 0);
-  UIUpdate('running');
+  {FInfoRec.Report.Add}Feedback('starting'{, true, 0});
+  UIUpdate('starting');
 
   // data
   jso := FAgentRec.JsonCompiledSO;
@@ -649,7 +718,7 @@ begin
     // do
     FInfoRec.Success := eng.RunCode(con.Text, {wdi}'');
     FInfoRec.Output.Text := oup.Text;
-    FInfoRec.Report.Text := rep.Text;
+    {FInfoRec.Report.Add}Feedback(rep.Text);
     FInfoRec.Affected := aff;
     FInfoRec.Message := msg;
   finally
@@ -659,17 +728,15 @@ begin
     con.Free;
   end;
 
-  // ancestor
+  // ancestor then ends
   inherited;
-
-  // now the thread ends and we go to OnTerminate routine
 end;
 {$ENDREGION}
 
 {$REGION 'TAgentPythonThread'}
-constructor TAgentPythonThread.Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean}; IvOnUIUpdate: TProc<integer, string>);
+constructor TAgentPythonThread.Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean}; IvUIUpdate: TProc<integer, string>);
 begin
-  inherited Create(IvAgentRec{, IvCreateSuspended}, IvOnUIUpdate);
+  inherited Create(IvAgentRec{, IvCreateSuspended}, IvUIUpdate);
 end;
 
 destructor TAgentPythonThread.Destroy;
@@ -686,15 +753,15 @@ var
 begin
   // nop
   if Terminated then begin
-    FInfoRec.Report.Add('terminated', true, 0);
+    {FInfoRec.Report.Add}Feedback('terminated'{, true, 0});
     UIUpdate('terminated');
     Exit;
   end;
 
   // naming
   NameThreadForDebugging(FAgentRec.Agent);
-  FInfoRec.Report.Add('running', true, 0);
-  UIUpdate('running');
+  {FInfoRec.Report.Add}Feedback('starting'{, true, 0});
+  UIUpdate('starting');
 
   // data
   jso := FAgentRec.JsonCompiledSO;
@@ -708,17 +775,15 @@ begin
   FInfoRec.Affected := aff;
   FInfoRec.Message := msg;
 
-  // ancestor
+  // ancestor then ends
   inherited;
-
-  // now the thread ends and we go to OnTerminate routine
 end;
 {$ENDREGION}
 
 {$REGION 'TAgentSqlThread'}
-constructor TAgentSqlThread.Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean}; IvOnUIUpdate: TProc<integer, string>);
+constructor TAgentSqlThread.Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean}; IvUIUpdate: TProc<integer, string>);
 begin
-  inherited Create(IvAgentRec{, IvCreateSuspended}, IvOnUIUpdate);
+  inherited Create(IvAgentRec{, IvCreateSuspended}, IvUIUpdate);
 end;
 
 destructor TAgentSqlThread.Destroy;
@@ -739,73 +804,73 @@ var
 begin
   // nop
   if Terminated then begin
-    FInfoRec.Report.Add('terminated', true, 0);
+    {FInfoRec.Report.Add}Feedback('terminated'{, true, 0});
     UIUpdate('terminated');
     Exit;
   end;
 
   // naming
   NameThreadForDebugging(FAgentRec.Agent);
-  FInfoRec.Report.Add('running', true, 0);
-  UIUpdate('running');
+  {FInfoRec.Report.Add}Feedback('starting'{, true, 0});
+  UIUpdate('starting');
 
   // data
   jso := FAgentRec.JsonCompiledSO;
 
   // datasource
   if not Assigned(jso.O['DataSource']) then begin
-    FInfoRec.Report.Add('Json DataSource block is not present');
+    Feedback('Json DataSource block is not present');
     Exit;
   end;
 
   // connstr
   if Assigned(jso.O['DataSource.ConnStr']) then begin
     cst := jso.S['DataSource.ConnStr'];
-    FInfoRec.Report.Add('use connection string: %s', [cst]);
+    Feedback('use connection string: %s', [cst]);
   end else begin
     cst := DBA_CONNECTION_STR;
-    FInfoRec.Report.Add('DataSource.ConnStr not defined, use default connection string: %s', [cst]);
+    Feedback('DataSource.ConnStr not defined, use default connection string: %s', [cst]);
   end;
 
   // connlib
   if Assigned(jso.O['DataSource.ConnLib']) then begin
     clb := jso.S['DataSource.ConnLib'];
-    FInfoRec.Report.Add('use connection library: %s', [clb]);
+    Feedback('use connection library: %s', [clb]);
   end else begin
     clb := 'ADO';
-    FInfoRec.Report.Add('DataSource.ConnLib not defined, use default connection library: %s', [clb]);
+    Feedback('DataSource.ConnLib not defined, use default connection library: %s', [clb]);
   end;
 
   // cmdtimeout
   if Assigned(jso.O['DataSource.TimeoutSec']) then begin
     tos := jso.I['DataSource.TimeoutSec'];
-    FInfoRec.Report.Add('use timeout string: %d s', [tos]);
+    Feedback('use timeout string: %d s', [tos]);
   end else begin
     tos := DBA_COMMAND_TIMEOUT_SEC;
-    FInfoRec.Report.Add('DataSource.TimeoutSec not defined, use default timeout: %d s', [tos]);
+    Feedback('DataSource.TimeoutSec not defined, use default timeout: %d s', [tos]);
   end;
 
   // timeframe
   if Assigned(jso.O['TimeFrame']) then begin // maybe use directly the "Params: {}" block to define any other puseful parameters
-    FInfoRec.Report.Add('TimeFrame defined');
+    Feedback('TimeFrame defined');
 
     // format
     if giis.Nx(jso.S['TimeFrame.Format']) then begin
-      FInfoRec.Report.Add('TimeFrame.Format is not present');
+      Feedback('TimeFrame.Format is not present');
       Exit;
     end;
     tfm := jso.S['TimeFrame.Format'];
 
     // begin
     if not TryStrToDateTime(jso.S['TimeFrame.Begin'], taa) then begin
-      FInfoRec.Report.Add('TimeFrame.Begin is not a valid datetime');
+      Feedback('TimeFrame.Begin is not a valid datetime');
       Exit;
     end;
     tas := FormatDateTime(tfm, taa);
 
     // end
     if not TryStrToDateTime(jso.S['TimeFrame.End'], tzz) then begin
-      FInfoRec.Report.Add('TimeFrame.End is not a valid datetime');
+      Feedback('TimeFrame.End is not a valid datetime');
       Exit;
     end;
     tzs := FormatDateTime(tfm, tzz);
@@ -827,7 +892,7 @@ begin
     // exec
     FInfoRec.Success := eng.CodeRun(con.Text, cst, clb, msg, aff, tos{, false, false, jso});
     FInfoRec.Output.Text := oup.Text;
-    FInfoRec.Report.Text := rep.Text;
+    {FInfoRec.Report.Add}Feedback(rep.Text);
     FInfoRec.Affected := aff;
     FInfoRec.Message := msg;
 
@@ -861,314 +926,490 @@ begin
     con.Free;
   end;
 
-  // ancestor
+  // ancestor then ends
   inherited;
-
-  // now the thread ends and we go to OnTerminate routine
 end;
 {$ENDREGION}
 
-{$REGION 'TAgentEtlThread *** merge to TAgentEtlThread2 ***'}
-constructor TAgentEtlThread.Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean}; IvOnUIUpdate: TProc<integer, string>);
+{$REGION 'TAgentEtlTableToTableThread'}
+constructor TAgentEtlTableToTableThread.Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean}; IvUIUpdate: TProc<integer, string>);
 begin
-  inherited Create(IvAgentRec{, IvCreateSuspended}, IvOnUIUpdate);
+  inherited Create(IvAgentRec{, IvCreateSuspended}, IvUIUpdate);
+
+  // com
+  CoInitializeEx(nil, COINIT_MULTITHREADED);
+
+  // checkpoint ini file
+//FCheckpointIniSpec := Format('C:\$\Temp\WksAgentClientProject_%d_Etl_Checkpoint.ini', [IvAgentRec.Id]);
 end;
 
-destructor TAgentEtlThread.Destroy;
+destructor TAgentEtlTableToTableThread.Destroy;
 begin
+  // com
+  CoUninitialize;
+
+  // objects
+  FMover.Free;
+  FWriter.Free;
+  FReader.Free;
+  FTargetConn.Free;
+  FSourceConn.Free;
+//FreeAndNil(FMover);
+//FreeAndNil(FWriter);
+//FreeAndNil(FReader);
+//FreeAndNil(FTargetConn);
+//FreeAndNil(FSourceConn);
 
   inherited;
 end;
 
-procedure TAgentEtlThread.Execute;
-
-  {$REGION 'var'}
-var
-//fbk: string;
-//swa: TStopwatch;
-  jso: ISuperObject;
-  tot, sli, aff: uint64;            // totalrowsinrange, slices, affected
-
-  // source
-  sna, scs, scl, sqy: string;       // name, connstr, connlib, query
-  srz, sct, sqt: integer;           // rowsetsize, conntimeout, querytimeout
-  sco: TFDConnection;               // conn
-
-  // target
-  tna, tcs, tcl, tdl: string;       // name, connstr, connlib, table, ddl
- {trz,}tct, tqt: integer;           // rowsetsize(not needed), conntimeout, querytimeout
-  tco: TFDConnection;               // conn
-
-  // etl
-  eib: boolean;                     // isbatched
-  ety, ett, edf, ekb, eke: string;  // type, targettable, datetimeformat, pkbegin int/datetime, pkend int/datetime
-  esz, ebd, ecc, esc, eiz: integer; // slicesize(rows/seconds), batchdelayms, commitcountrows, statisticintervalcountrows, bulkinsertsize
-  edb, ede: TDateTime;              // pkdatetime begin, end
-  eop, emo: string;                 // options, mode
-  ebb, ebe: string;                 // batch begin, end
-  {$ENDREGION}
-
-  {$REGION 'routine'}
-procedure FdEtlTextToTable(IvCode: string; IvdelayMs: integer; var IvAffected: uint64);
+procedure TAgentEtlTableToTableThread.SourceConnectionsSetup(IvConnStr: string; IvRowsetSize: integer);
 begin
-  IvAffected := 0;
-  raise Exception.Create('TextToTable not implemented');
+  FSourceConn := TFDConnection.Create(nil);
+//FSourceConn.Params.Clear;
+  FSourceConn.LoginPrompt                  := false;
+  FSourceConn.ConnectionString             := IvConnStr;
+//FSourceConn.FetchOptions.CursorKind      := ckForwardOnly;
+//FSourceConn.FetchOptions.Unidirectional  := true;
+//FSourceConn.FetchOptions.Mode            := fmOnDemand; // will request RowsetSize rows per fetch (RowsetSize), when it is needed, in streaming
+
+  // options per-thread
+  FSourceConn.FetchOptions.RowsetSize      := IvRowsetSize;
+
+//FDPhysOracleDriverLink1.VendorHome       := 'C:\$\Oracle\instantclient64_23_9';
+//FDPhysOracleDriverLink1.VendorLib        := 'C:\$\Oracle\instantclient64_23_9\oci.dll';
+//FDPhysOracleDriverLink1.OCICompatibility := '19';  // or '21' – not mandatory
+
+  // allow full Oracle NUMBER(38, s) range
+//FSourceConn.FormatOptions.MaxBcdPrecision := 38;
+//FSourceConn.FormatOptions.MaxBcdScale     := 18;   // or what you need
+
+  // map integer-like NUMBERs to Int64 instead of BCD dtFmtBCD/dtBCD -> dtInt64 is usually safe for PKs, IDs, counters
+  // if you have high-precision decimals you REALLY need, map those specific columns with CAST in SQL or to dtDouble instead
+//FSourceConn.FormatOptions.OwnMapRules := true;
+//FSourceConn.FormatOptions.MapRules.Clear;
+//with FSourceConn.FormatOptions.MapRules.Add do begin
+//  SourceDataType := dtBCD;
+//  TargetDataType := dtInt64;
+//end;
+//with FSourceConn.FormatOptions.MapRules.Add do begin
+//  SourceDataType := dtFmtBCD;
+//  TargetDataType := dtInt64;
+//end;
+
+  FSourceConn.Connected := true; // will load the OCI from VendorLib
 end;
 
-procedure FdEtlTableToText(IvCode: string; IvdelayMs: integer; var IvAffected: uint64);
+procedure TAgentEtlTableToTableThread.TargetConnectionsSetup(IvConnStr: string);
 begin
-  IvAffected := 0;
-  raise Exception.Create('TableToText not implemented');
+  FTargetConn := TFDConnection.Create(nil);
+//FSourceConn.Params.Clear;
+  FTargetConn.LoginPrompt                       := false;
+  FTargetConn.ConnectionString                  := IvConnStr;
+//FTargetConn.FetchOptions.CursorKind           := ckForwardOnly;
+//FTargetConn.FetchOptions.Unidirectional       := true;
+//FTargetConn.FetchOptions.Mode                 := fmOnDemand; // will request RowsetSize rows every fetch, when it is needed
+
+  // options per-thread tuning
+//FTargetConn.FetchOptions.RowsetSize           := trz;
+//FTargetConn.ResourceOptions.SilentMode        := true;    // useful for bulk etl
+//FTargetConn.Params.Values['PacketSize']       := '32767'; // to avoid truncation
+//FTargetConn.ResourceOptions.DirectExecute     := True;
+//FTargetConn.UpdateOptions.CountUpdatedRecords := False;
+
+  FTargetConn.Connected                         := true;
 end;
 
-procedure FdEtlTableToTable(IvCode: string; IvDelayMs: integer; var IvAffected: uint64);
-var
-
-  {$REGION 'var'}
-  i: integer;
-  swa: TStopwatch;
-  bsr: TFDBatchMoveSQLReader;  // reader
-  bsw: TFDBatchMoveSQLWriter;  // writer
-  bmv: TFDBatchMove;           // mover
-  mde, opt, sql, tmp: string;  // mode, optioncsv
-  bno, bto, bdu, bin: integer; // batchnumber batchtotal, durationms, batchinserts
-  bbe, ben: string;            // batchbegin, batchend
-  tcd, tcc: boolean;           // target custom DROP, CREATE
-  {$ENDREGION}
-
+procedure TAgentEtlTableToTableThread.ReaderSetup(IvReadSql: string);
 begin
-  // zip
-  sql := IvCode; // should arrive with $SliceBegin$ and $SliceEnd$ already replaced
+  // fresh components so counters reset (they are max 2B)
+  FreeAndNil(FReader);
 
-  {$REGION 'objs'}
-  bsr := TFDBatchMoveSQLReader.Create(nil);
-  bsw := TFDBatchMoveSQLWriter.Create(nil);
-  bmv := TFDBatchMove.Create(nil);
-  {$ENDREGION}
+  // reader (generates data)
+  FReader := TFDBatchMoveSQLReader.Create(nil);
+  FReader.Connection := FSourceConn;
+  FReader.ReadSQL := IvReadSql;
+end;
 
-  try
+procedure TAgentEtlTableToTableThread.WriterSetup(IvTargetTable: string);
+begin
+  // fresh components so counters reset (they are max 2B)
+  FreeAndNil(FWriter);
 
-    {$REGION 'sourcereader'}
-    bsr.Connection := sco;
-    bsr.ReadSQL    := sql;
-  //sco.Connected  := true; // should be already done
+  // writer (generates inserts)
+  FWriter := TFDBatchMoveSQLWriter.Create(nil);
+  FWriter.Connection := FTargetConn;
+  FWriter.TableName  := IvTargetTable;
+end;
+
+procedure TAgentEtlTableToTableThread.MoverSetup(IvOptionCsv, IvMode: string; IvStatisticsInterval, IvCommitCount: integer; IvOnceSetup: boolean);
+var
+  opv: TArray<string>;
+//i: integer;
+begin
+  // fresh components so counters reset (they are max 2B)
+  FreeAndNil(FMover);
+
+  // mover
+  FMover := TFDBatchMove.Create(nil);
+  FMover.Reader := FReader;
+  FMover.Writer := FWriter;
+  FMover.StatisticsInterval := IvStatisticsInterval; // if greater than zero will trigger the onprogress event
+  FMover.CommitCount        := IvCommitCount;        // if greater than zero wraps in a transaction commiting every N rows
+  FMover.OnProgress         := MoverOnProgress;      // metrics and sleep procedure
+  FMover.OnError            := MoverOnError;         //
+  FMover.MaxErrors          := FMoverMaxErrors;      // aborts after 10 errors
+
+  // moverlog
+  if not FMoverLogFileSpec.Trim.IsEmpty then begin
+    FMover.LogFileName        := FMoverLogFileSpec;  // log here                   default is: 'Data.log'
+    FMover.LogFileAction      := laAppend;           // or laCreate, laOverwrite   default is: laNone
+  //FMover.LogStream          := nil;                // complex
+  end;
+
+  // only once setup
+  if IvOnceSetup then begin
+
+    {$REGION 'options'}
+    opv := TVecRec.VecFromStr(IvOptionCsv);
+
+    FMover.Options := [];
+
+    if TVecRec.VecHas('poCreateDest', opv) then
+      FMover.Options := FMover.Options + [poCreateDest];              // creates the destination table before data movement, if it does not exist, FireDAC will use the data reader provided for field definitions
+
+    if TVecRec.VecHas('poClearDest', opv) then                        // *** DO NOT USE IF BATCHED/SLICED OR FOR BIG TABLES delete must be done in batches!!! *** (we will not implement batched/sliced!)
+      FMover.Options := FMover.Options + [poClearDest];               // deletes the content of the destination table before data movement, performing a transactional operation like SQL DELETE
+
+    if TVecRec.VecHas('poClearDestNoUndo', opv) then                  // *** DO NOT USE IF BATCHED/SLICED ***
+      FMover.Options := FMover.Options + [poClearDestNoUndo];         // deletes the content of the destination table before data movement, performing a non-transactional fast operation like SQL TRUNCATE
+
+    if TVecRec.VecHas('poIdentityInsert', opv) then
+      FMover.Options := FMover.Options + [poIdentityInsert];          // when destination table has an identity columns, enabled for inserts/updates
+
+    if TVecRec.VecHas('poSkipUnmatchedDestFields', opv) then
+      FMover.Options := FMover.Options + [poSkipUnmatchedDestFields]; // ?
+
+    if TVecRec.VecHas('poUseTransactions', opv) then
+      FMover.Options := FMover.Options + [poUseTransactions];         // ?
     {$ENDREGION}
 
-    {$REGION 'targetwriter'}
-    bsw.Connection := tco;
-    bsw.TableName  := ett;
-  //tco.Connected  := true; // should be already done
+    {$REGION 'mode'}
+         if IvMode.Equals('dmAppend') then       // appends records from source to destination, when they have no matching records in destination table (the matching is performed using primary key fields)
+      FMover.Mode := dmAppend
+
+    else if IvMode.Equals('dmUpdate') then       // updates records in destination table that matches records in source table
+      FMover.Mode := dmUpdate
+
+    else if IvMode.Equals('dmAppendUpdate') then // appends records from source to destination, when they have no matching records in destination table
+      FMover.Mode := dmAppendUpdate              // it also updates records in destination table that matches records in source table (the matching is performed using primary key fields)
+
+    else if IvMode.Equals('dmDelete') then       // deletes records in destination that matches records in source table (the matching is performed using primary key fields)
+      FMover.Mode := dmDelete
+
+    else                                         // appends the records from the source to the destination. No content matching is performed. default mode
+      FMover.Mode := dmAlwaysInsert;
     {$ENDREGION}
 
-    {$REGION 'batchmover'}
-    // options
-    if eop.Contains('poClearDestNoUndo'        ) then
-      bmv.Options := bmv.Options + [poClearDestNoUndo]              // deletes the content of the destination table before data movement, performing a non-transactional fast operation like SQL TRUNCATE command (DO NOT USE IF BATCHED/SLICED)
-    else if eop.Contains('poClearDest'         ) then
-      bmv.Options := bmv.Options + [poClearDest];                   // deletes the content of the destination table before data movement, performing a transactional operation like SQL DELETE command (DO NOT USE IF BATCHED/SLICED, DO TO USE AT ALL: delete must be done in batches!!!)
+    {$REGION 'mapping'}
+    if false then begin
+      // analyze                                                       // when Analyze is not empty, then the batch move component tries to automatically recognize the
+    //FMover.Analyze := [taDelimSep, taFormatSet, taHeader, taFields]; // data source format by calling the GuessFormat method as part of the Execute method call
 
-    if eop.Contains('poIdentityInsert'         ) then
-      bmv.Options := bmv.Options + [poIdentityInsert]               // when destination table has an identity columns, enabled for inserts/updates'
-    {else
-      bmv.Options := bmv.Options - [poIdentityInsert]};
+      // guess
+    //FMover.GuessFormat;                                              // this will use [taDelimSep, taHeader, taFields] as a deault
 
-    if eop.Contains('poCreateDest'             ) then
-      bmv.Options := bmv.Options + [poCreateDest];                  // creates the destination table before data movement, if it does not exist, FireDAC will use the data reader provided for field definitions
+      // mapping-keyfields
+    //FMover.Mappings.KeyFields := 'FldSpc;FldStageMetro;FldStepMetro'; // nop, readonly !!!
 
-    {$IF CompilerVersion > 31} // compiler above Delphi 10.1 Berlin
-    if eop.Contains('poSkipUnmatchedDestFields') then
-      bmv.Options := bmv.Options + [poSkipUnmatchedDestFields];     // ?
+      // mapping-auto   fix error: [FireDAC][Comp][DM]-608. Undefined source field or expression for destination field
+    //FMover.Mappings.AddAll;
+    //i := 0;
+    //while i < FMover.Mappings.Count do begin
+    //  if (FMover.Mappings[i].SourceFieldName = EmptyStr) then
+    //    FMover.Mappings.Delete(i)
+    //  else
+    //    Inc(i);
+    //end;
 
-    if eop.Contains('poUseTransactions'        ) then
-      bmv.Options := bmv.Options + [poUseTransactions];             // ?
-    {$ENDIF}
-
-    // clear-custom (FD try to drop alsi if the table does not exists!)
-    if (poClearDest in bmv.Options) or (poClearDestNoUndo in bmv.Options) then begin
-      // FD disable
-      bmv.Options := bmv.Options - [poClearDestNoUndo];
-      bmv.Options := bmv.Options - [poClearDest];
-
-      // custom
-      tco.ExecSQL(Format('if object_id(''%s'', ''U'') is not null truncate table %s;', [ett, ett]));
-    //tco.ExecSQL(Format('if object_id(''%s'', ''U'') is not null drop table %s;'    , [ett, ett]));
+    // mapping-explicit
+    //FMover.Mappings.Add('FldSpc=FldSpc');
+    //FMover.Mappings.Add('FldStageMetro=FldStageMetro');
+    //FMover.Mappings.Add('FldStepMetro=FldStepMetro');
+    //FMover.Mappings[i].SourceExpression := FMover.Mappings[i].SourceFieldName;
     end;
-
-    // create-custom (FD field data-type geussing is unreliable)
-    if poCreateDest in bmv.Options then begin
-      // FD disable
-      bmv.Options := bmv.Options - [poCreateDest];
-
-      // custom
-      if tdl.Trim.IsEmpty then
-        raise Exception.Create('Unable to create the table on the target database, DDL script (in the Note tab) is empty')
-      else begin
-        tmp         := 'if object_id(''' + ett + ''', ''U'') is null begin'
-        + sLineBreak + tdl
-        + sLineBreak + 'end;';
-        tco.ExecSQL(tmp);
-      end;
-    end;
-
-    // mode
-    if      emo = 'dmAppend'       then bmv.Mode := dmAppend        // appends the records from the source to the destination, when the records have no matching records in the destination table. The matching is performed using primary key fields
-    else if emo = 'dmUpdate'       then bmv.Mode := dmUpdate        // updates records in the destination table that matches records in the source table
-    else if emo = 'dmAppendUpdate' then bmv.Mode := dmAppendUpdate  // appends the records from the source to the destination, when the records have no matching records in the destination table. It also updates records in the destination table that matches records in the source table. The matching is performed using primary key fields
-    else if emo = 'dmDelete'       then bmv.Mode := dmDelete        // deletes records in the destination that matches records in the source table. The matching is performed using primary key fields
-    else                                bmv.Mode := dmAlwaysInsert; // appends the records from the source to the destination. No content matching is performed. default mode
-
-    // other
-    bmv.Reader             := bsr;
-    bmv.Writer             := bsw;
-
-    // onprogress
-    bmv.StatisticsInterval := esc; // if greater than zero will trigger the onprogress event
-  //bmv.OnProgress := procedure();
-
-    // commit
-    bmv.CommitCount        := ecc; // if greater than zero will wrap in a transaction
-    {$ENDREGION}
-
-    {$REGION 'analyze&mapping'}
-    // analyze
-  //bmv.Analyze := [taDelimSep, taFormatSet, taHeader, taFields]; // when Analyze is not empty, then the batch move component tries to automatically recognize the data source format by calling the GuessFormat method as part of the Execute method call
-    bmv.GuessFormat;                                              // this will use [taDelimSep, taHeader, taFields] as a deault
-
-    // mapping-keyfields
-  //bmv.Mappings.KeyFields := 'FldSpc;FldStageMetro;FldStepMetro'; // nop, readonly !!!
-
-    // mapping-auto   fix error: [FireDAC][Comp][DM]-608. Undefined source field or expression for destination field
-    bmv.Mappings.AddAll;
-    i := 0;
-    while i < bmv.Mappings.Count do begin
-      if (bmv.Mappings[i].SourceFieldName = EmptyStr) then
-        bmv.Mappings.Delete(i)
-      else
-        Inc(i);
-    end;
-
-  // mapping-explicit
-  //bmv.Mappings.Add('FldSpc=FldSpc');
-  //bmv.Mappings.Add('FldStageMetro=FldStageMetro');
-  //bmv.Mappings.Add('FldStepMetro=FldStepMetro');
-  //bmv.Mappings[i].SourceExpression := bmv.Mappings[i].SourceFieldName;
-    {$ENDREGION}
-
-    {$REGION 'do'}
-    try
-      // exec
-      bmv.Execute;
-    except
-      on e: EFDDBEngineException do begin
-        FInfoRec.Report.Add(e.Message);
-        FInfoRec.Report.Add(e.SQL);
-      end;
-    end;
-    {$ENDREGION}
-
-    {$REGION 'report'}
-//    swa.Stop;
-//    bno := 1;
-//    bto := 1;
-//    bbe := 'na';
-//    ben := 'na';
-//    bdu := swa.ElapsedMilliseconds;
-//    bin := bmv.InsertCount;
-//    ReportAddBatch(ThreadID, bno, bto, bbe, ben, bdu, bin);
-//
-//    IvAffected := bin;
-//    FInfoRec.Report.Add('');
-    {$ENDREGION}
-
-  finally
-
-    {$REGION 'free'}
-    bmv.Free;
-    bsw.Free;
-    bsr.Free;
     {$ENDREGION}
 
   end;
 end;
+
+procedure TAgentEtlTableToTableThread.MoverOnError(ASender: TObject; AException: Exception; var AAction: TFDErrorAction);
+var
+  //reader: TFDBatchMoveDataSetReader;
+  dst: TFDDataSet; // sourceds
+  pkv: variant;
+  line: string;
+  i: integer;
+begin
+  // access the current source row via the Reader’s DataSet
+  //reader := TFDBatchMoveDataSetReader(FMover.Reader);
+  dst  := FReader.FDDataSet;
+
+  // read PK field
+  if dst.FindField('WERT_ID') <> nil then
+    pkv := dst.FieldByName('ID').Value
+  else
+    pkv := null;
+
+  // build the "full record" line
+  line := Format('ERROR: %s, pk=%s', [AException.Message, VarToStr(pkv)]);
+  for i := 0 to dst.FieldCount - 1 do
+    line := line + ', ' + dst.Fields[i].FieldName + '=' + dst.Fields[i].AsString;
+
+  // feedback
+  Feedback(line);
+  Feedback(AException.Message);
+  Feedback(AException.StackTrace);
+
+  // decide what to do with this row
+//AAction := eaSkip ; // -> skip this bad row and continue
+//AAction := eaAbort; // -> abort the batch
+  AAction := eaFail ; // -> treat as fatal error
+//AAction := eaRetry; // -> try again
+end;
+
+procedure TAgentEtlTableToTableThread.MoverOnProgress(ASender: TObject; APhase: TFDBatchMovePhase);
+var
+  dtp: TDateTime; // datetime prev
+  wrp: int64;     // write prev
+  rps: double;    // rows per second
+  line: string;   a: integer;
+begin
+  // exit
+  if APhase <> psProgress then
+    Exit;
+
+  {$REGION '*** DANGER ***'}
+  if FProgressRec.WriteCount >= 2147400000 then begin
+
+    Feedback('DANGER: FireDAC WriteCount is at %d and soon it will reach the limit of 2147483647 and then a fatal fail', [FProgressRec.WriteCount]);
+
+  end;
+  {$ENDREGION}
+
+  {$REGION 'prev progress'}
+  dtp := FProgressRec.Dt;
+  wrp := FProgressRec.WriteCount;
+  {$ENDREGION}
+
+  {$REGION 'this last progress'}
+  FProgressRec.Init(
+    FProgressRec.Id + 1
+  , Now()
+  , FMover.ReadCount
+  , FMover.WriteCount   // written rows
+  , FMover.InsertCount
+  , FMover.UpdateCount
+  , FMover.DeleteCount
+  , FMover.CommitCount
+  );
+
+  line := Format('progress:%4d, dt:%s, read:%d, write:%d, insert:%d, update:%d, delete:%d, commit:%d', [
+    FProgressRec.Id
+  , TDatRec.DatForLog(FProgressRec.Dt)
+  , FProgressRec.ReadCount
+  , FProgressRec.WriteCount
+  , FProgressRec.InsertCount
+  , FProgressRec.UpdateCount
+  , FProgressRec.DeleteCount
+  , FProgressRec.CommitCount
+  ]);
+
+  // log
+  Feedback(line);
+
+  // perf
+  rps := (FProgressRec.WriteCount - wrp) / SecondsBetween(dtp, FProgressRec.Dt);
+
+  // ui
+  UIUpdate('progress:%d, write:%d, rows/s:%f', [FProgressRec.Id, FProgressRec.WriteCount, rps]);
+  {$ENDREGION}
+
+  {$REGION 'commit surrogate for sleep or stop'}
+  // transactioncommitactive?
+
+  // somerowswritten
+  if FProgressRec.WriteCount > 0 then begin
+
+    // somecommittsaredone
+    if FProgressRec.CommitCount  > 0 then begin
+
+      // sleep, pause or stop at the end of each committed batch (between commits, when WriteCount = 1000, 2000, 3000; ...) keeps connection open
+      if FProgressRec.WriteCount mod FProgressRec.CommitCount = 0 then begin
+
+        // sleep
+        if (FBatchDelayMs > 0) and (FProgressRec.WriteCount > FLastSleepCount) then begin
+          Sleep(FBatchDelayMs);                                  // pause n ms between commits
+          FLastSleepCount := FProgressRec.WriteCount;         // remember we already slept for this batch
+        end;
+
+        // pause
+        while FPauseRequested do
+          TThread.Sleep(100);
+
+        // stop
+        if FAbortRequested then begin
+          Feedback('Agent %s stopped by user', [FAgentRec.Agent]);
+          raise EAbort.CreateFmt('Agent %s stopped by user', [FAgentRec.Agent]);  // exits Execute cleanly after a commit
+        end;
+      end;
+    end;
+  end;
+  {$ENDREGION}
+
+end;
+
+procedure TAgentEtlTableToTableThread.Preprocess(IvTargetDdl, IvTargetTable: string; var IvOptionCsv: string);
+var
+  sql: string;
+begin
+  // *** WARNING *** target table create-custom (FD field data-type geussing is unreliable)
+  if TCsvRec.CsvHas(IvOptionCsv, 'poCreateDest') then begin
+    // disable
+    TCsvRec.CsvRemove(IvOptionCsv, 'poCreateDest'); // IvOptionCsv :=
+
+    // noddl
+    if IvTargetDdl.Trim.IsEmpty then
+      raise Exception.Create('Unable to create the table on the target database, DDL script in the Note tab is empty')
+
+    else if FTargetConn.ExecSQL('if object_id(''' + IvTargetTable + ''', ''U'') is null select 0 else select 1') = 1 then
+      raise Exception.Create('Unable to create the table on the target database, table already exist')
+
+    else begin
+      sql         := 'if object_id(''' + IvTargetTable + ''', ''U'') is null begin'
+      + sLineBreak + IvTargetDdl
+      + sLineBreak + 'end;';
+      FTargetConn.ExecSQL(sql);
+    end;
+
+  // *** WARNING *** target table clear-custom
+  end else if TCsvRec.CsvHas(IvOptionCsv, 'poClearDest') or TCsvRec.CsvHas(IvOptionCsv, 'poClearDestNoUndo') then begin
+    // FD disable
+    TCsvRec.CsvRemove(IvOptionCsv, 'poClearDest');       // IvOptionCsv :=
+    TCsvRec.CsvRemove(IvOptionCsv, 'poClearDestNoUndo'); // IvOptionCsv :=
+
+    // custom
+    FTargetConn.ExecSQL(Format('if object_id(''%s'', ''U'') is not null truncate /* or drop*/ table %s;', [IvTargetTable, IvTargetTable])); // FD try to drop also if the table does not exists!
+  end;
+end;
+
+procedure TAgentEtlTableToTableThread.Execute;
+
+  {$REGION 'var'}
+var
+  jso: ISuperObject;
+
+  // source
+  sna, scs, scl, sqy: string; // name, connstr, connlib, query
+  srz, sct, sqt: integer;     // rowsetsize, conntimeout, querytimeout
+
+  // target
+  tna, tcs, tcl, tdl: string; // name, connstr, connlib, table, ddl
+ {trz,}tct, tqt: integer;     // rowsetsize(not needed), conntimeout, querytimeout
+
+  // etl
+  eib: boolean;               // isbatched
+  {ety,} ett: string;         // {type *** not yet used ***,} targettable
+  ecc, esc{, eiz}: integer;   // commitcountrows, statisticintervalcountrows, {bulkinsertsize (max 2147483647 !) *** not yet clear what it does ***}
+  eop, emo: string;           // options, mode
+
+  // run(s)
+  ros: boolean;               // oncesetupdo(1st run only)
+  rix: int64;                 // index
+  rk0, rk9, rzz, rrz: int64;  // pkminid, pkmaxid, rowstotalcount, rowsperrun(span)
+  rlo, rhi, rpk: int64;       // runidlow, runidhi, runpkcurrent
+  runs, progs: integer;       // runstoperform, progstoperform
   {$ENDREGION}
 
 begin
 
-  {$REGION 'init'}
+  {$REGION 'exit'}
   // nop
   if Terminated then begin
-    FInfoRec.Report.Add('terminated', true, 0);
+    {FInfoRec.Report.Add}Feedback('terminated'{, true, 0});
     UIUpdate('terminated');
     Exit;
   end;
+  if FAbortRequested then begin
+    {FInfoRec.Report.Add}Feedback('user requested to abort'{, true, 0});
+    UIUpdate('user requested to abort');
+    Exit;
+  end;
+  {$ENDREGION}
 
+  {$REGION 'init'}
   // naming
   NameThreadForDebugging(FAgentRec.Agent);
-  FInfoRec.Report.Add('running', true, 0);
-  UIUpdate('running');
-
-  // data
-  jso := FAgentRec.JsonCompiledSO;
+  {FInfoRec.Report.Add}Feedback('starting'{, true, 0});
+  UIUpdate('starting');
 
   // query (source), content compiled with Rv and json members, but not with $SliceBegin$ and $SliceEnd$
   sqy := FAgentRec.ContentCompiled;
-
-  // ddl (target), ddl code to create a table if doesn't exists
-  tdl := FAgentRec.Note;
-  {$ENDREGION}
-
-  {$REGION 'exit'}
-  // query
   if sqy.Trim.IsEmpty then begin
-    FInfoRec.Report.Add('Agent Content query is empty');
+    Feedback('Agent Content query is empty');
     Exit;
   end;
 
+  // data
+  jso := FAgentRec.JsonCompiledSO;
   // datasourcesection
   if not jso.AsObject.Exists('DataSource') then begin
-    FInfoRec.Report.Add('Json DataSource section is not present');
+    Feedback('Json DataSource section is not present');
     Exit;
   end;
-
   // datasourcesection
   if not jso.AsObject.Exists('DataTarget') then begin
-    FInfoRec.Report.Add('Json DataTarget section is not present');
+    Feedback('Json DataTarget section is not present');
+    Exit;
+  end;
+  // etlsection
+  if not jso.AsObject.Exists('Etl') then begin
+    Feedback('Json Etl section is not present');
+    Exit;
+  end;
+  // runssection
+  if not jso.AsObject.Exists('Runs') then begin
+    Feedback('Json Runs section is not present');
     Exit;
   end;
 
-  // etlsection
-  if not jso.AsObject.Exists('Etl') then begin
-    FInfoRec.Report.Add('Json Etl section is not present');
-    Exit;
-  end;
+  // note->ddl (target), ddl code to create a table if doesn't exists
+  tdl := FAgentRec.Note;
   {$ENDREGION}
 
   {$REGION 'source'}
   // name
   sna := jso.S['DataSource.Name'];
 
-  // connstr
-  if Assigned(jso.O['DataSource.ConnStr']) then begin
-    scs := jso.S['DataSource.ConnStr'];
-    FInfoRec.Report.Add('use source connection string: %s', [scs]);
-  end;
-  if scs.Trim.IsEmpty then begin
-    scs := DBA_CONNECTION_STR;
-    FInfoRec.Report.Add('Json DataSource.ConnStr not defined, use default: %s', [scs]);
-  end;
-  scs := grva.Rva(scs);
-
   // connlib
   if Assigned(jso.O['DataSource.ConnLib']) then begin
     scl := jso.S['DataSource.ConnLib'];
-    FInfoRec.Report.Add('use source connection library: %s', [scl]);
+    Feedback('use source connection library: %s', [scl]);
   end else begin
     scl := 'ADO';
-    FInfoRec.Report.Add('Json DataSource.ConnLib not defined, use defaulty: %s', [scl]);
+    Feedback('Json DataSource.ConnLib not defined, use defaulty: %s', [scl]);
   end;
 
-  // rowsetsize
-  srz := StrToIntDef(jso.S['DataSource.RowsetSize'], 10000); // controls how many rows FireDAC requests from the server per fetch (fmOnDemand) — i.e. how the client reads results from a SELECT
+  // connstr
+  if Assigned(jso.O['DataSource.ConnStr']) then begin
+    scs := jso.S['DataSource.ConnStr'];
+    Feedback('use source connection string: %s', [scs]);
+  end;
+  if scs.Trim.IsEmpty then begin
+    scs := DBA_CONNECTION_STR;
+    Feedback('Json DataSource.ConnStr not defined, use default: %s', [scs]);
+  end;
+  scs := grva.Rva(scs);
 
   // conntimeout
   sct := StrToIntDef(jso.S['DataSource.ConnTimeoutSec'], 10);
@@ -1181,28 +1422,25 @@ begin
   // name
   tna := jso.S['DataTarget.Name'];
 
-  // connstr
-  if Assigned(jso.O['DataTarget.ConnStr']) then begin
-    tcs := jso.S['DataTarget.ConnStr'];
-    FInfoRec.Report.Add('use target connection string: %s', [tcs]);
-  end;
-  if tcs.Trim.IsEmpty then begin
-    tcs := DBA_CONNECTION_STR;
-    FInfoRec.Report.Add('Json DataTarget.ConnStr not defined, use default: %s', [tcs]);
-  end;
-  tcs := grva.Rva(tcs);
-
   // connlib
   if Assigned(jso.O['DataTarget.ConnLib']) then begin
     tcl := jso.S['DataTarget.ConnLib'];
-    FInfoRec.Report.Add('use target connection library: %s', [tcl]);
+    Feedback('use target connection library: %s', [tcl]);
   end else begin
     tcl := 'ADO';
-    FInfoRec.Report.Add('Json DataTarget.ConnLib not defined, use default: %s', [tcl]);
+    Feedback('Json DataTarget.ConnLib not defined, use default: %s', [tcl]);
   end;
 
-  // rowsetsize
-//trz := StrToIntDef(jso.S['DataTarget.RowsetSize'], 10000); // not in scope ETL operations
+  // connstr
+  if Assigned(jso.O['DataTarget.ConnStr']) then begin
+    tcs := jso.S['DataTarget.ConnStr'];
+    Feedback('use target connection string: %s', [tcs]);
+  end;
+  if tcs.Trim.IsEmpty then begin
+    tcs := DBA_CONNECTION_STR;
+    Feedback('Json DataTarget.ConnStr not defined, use default: %s', [tcs]);
+  end;
+  tcs := grva.Rva(tcs);
 
   // conntimeout
   tct := StrToIntDef(jso.S['DataTarget.ConnTimeoutSec'], 10);
@@ -1212,230 +1450,355 @@ begin
   {$ENDREGION}
 
   {$REGION 'etl'}
-  // type
-  if Assigned(jso.O['Etl.Type']) then begin
-    ety := jso.S['Etl.Type'];
-    FInfoRec.Report.Add('use etl type: %s', [ety]);
-  end else begin
-    ety := 'TableToTable';
-    FInfoRec.Report.Add('Etl.Type not defined, use default: %s', [ety]);
-  end;
+//// type *** not yet used ***
+//if Assigned(jso.O['Etl.Type']) then begin
+//  ety := jso.S['Etl.Type'];
+//  Feedback('use etl type: %s', [ety]);
+//end else begin
+//  ety := 'TableToTable';
+//  Feedback('Etl.Type not defined, use default: %s', [ety]);
+//end;
 
   // targettable
   if Assigned(jso.O['Etl.TargetTable']) then begin
     ett := jso.S['Etl.TargetTable'];
-    FInfoRec.Report.Add('use target table: %s', [ett]);
+    Feedback('use target table: %s', [ett]);
   end;
   if ett.Trim.IsEmpty then begin
-    FInfoRec.Report.Add('Json Etl.TargetTable not defined');
+    Feedback('Json Etl.TargetTable not defined');
     Exit;
   end;
 
-  // datetimeformat
-  if Assigned(jso.O['Etl.DateTimeFormat']) then begin
-    edf := jso.S['Etl.DateTimeFormat'];
-    FInfoRec.Report.Add('use datetime format: %s', [edf]);
-  end;
-  if edf.Trim.IsEmpty then begin
-    edf := 'yyyy-mm-dd hh:nn:ss';
-    FInfoRec.Report.Add('Json Etl.DateTimeFormat not defined, use default: %s', [edf]);
-  end;
+  // batchdelayms (target)
+  FBatchDelayMs := StrToIntDef(jso.S['Etl.BatchDelayMs'], 0);  // ms to wait before each batch start (note: jso.S also read fron an integer value!)
+  Feedback('use batchdelayms: %d', [FBatchDelayMs]);
 
-  // PK begin integer/datetime
-  if Assigned(jso.O['Etl.KeyBegin']) then begin
-    ekb := jso.S['Etl.KeyBegin'];
-    FInfoRec.Report.Add('use KeyBegin: %s', [ekb]);
-  end;
-  if ekb.Trim.IsEmpty then begin
-    FInfoRec.Report.Add('Json Etl.KeyBegin not defined');
-  //Exit;
-  end;
-  //if TryStrToDateTime(ekb, edb) then
-    //edb := FormatDateTime(edf, ekb);
-    //FInfoRec.Report.Add('use KeyBegin is a datetime');
+  // rowsetsize (source)
+  srz := StrToIntDef(jso.S['Etl.RowsetSize'], 10000);          // controls how many rows FireDAC requests from the server per fetch (fmOnDemand) — i.e. how the client reads results from a SELECT
+  Feedback('use rowsetsize: %d', [srz]);
 
-  // PK end integer/datetime
-  if Assigned(jso.O['Etl.KeyEnd']) then begin
-    eke := jso.S['Etl.KeyEnd'];
-    FInfoRec.Report.Add('use KeyEnd: %s', [eke]);
-  end;
-  if eke.Trim.IsEmpty then begin
-    FInfoRec.Report.Add('Json Etl.KeyEnd not defined');
-  //Exit;
-  end;
-  //if not TryStrToDateTime(eke, ede) then begin
-    //ede := FormatDateTime(edf, eke);
-    //FInfoRec.Report.Add('use KeyEnd is a datetime');
+  // bulkinsertsize (target)
+//eiz := jso.I['Etl.BulkInsertSize'];                          // once the buffer reaches BulkInsertSize than calls the DB driver’s optimized array insert or bulk insert
+//if eiz < 10000 then eiz := 10000;                            // buffers that many source rows into memory using a Array DML
+//Feedback('use bulkinsertsize: %d', [eiz]);
 
-  // slicesize (rows/seconds of each slice/range from begin to end if positive else from end to begin if negative)
-  //
-  //  1strecord          Slice[i]Begin    slice    Slice[i]End             lastrecord    now
-  //   Begin                         |  subrange   |                              |       |     End
-  // ----|-------------*-------------*-------------*-------------*-------------*-------------*---|----> Key range
-  //           [0]           [1]     |-----[i]---->                    [n]
-  //
-  if Assigned(jso.O['Etl.SliceSize']) then begin
-    esz := jso.I['Etl.SliceSize'];
-    FInfoRec.Report.Add('use SliceSize (rows/seconds): %d', [esz]);
-  end;
-  if esz = 0 then begin
-    FInfoRec.Report.Add('Json Etl.SliceSize not defined or zero, please use a negative/positive number of rows/seconds (if negative the execution of batches start from the bigger PK going backwards)');
-  //Exit;
-  end;
+  // batchstatistics
+  esc := StrToIntDef(jso.S['Etl.StatisticsCountRows'], 10000); // triggers OnProgress every N inserts
+  Feedback('use batchstatistics: %d', [esc]);
 
-  // batchdelayms (ms to wait before each batch start)
-  ebd := StrToIntDef(jso.S['Etl.BatchDelayMs'], 0);
-
-  // bulkinsertsize
-  eiz := jso.I['Etl.BulkInsertSize']; // once the buffer reaches BulkInsertSize than calls the DB driver’s optimized array insert or bulk insert
-//if eiz < 10000 then eiz := 10000;   // buffers that many source rows into memory using a Array DML
-
-  // batchcommit every n inserts
-  ecc := StrToIntDef(jso.S['Etl.CommitCountRows'], 10000); // better if same as bulkinsertsize?  after each batch commit releases resources
-
-  // batchstatistics every n inserts
-  esc := StrToIntDef(jso.S['Etl.StatisticsCountRows'], 10000); // triggers OnProgress every 10000 rows
+  // commit (target)
+  ecc := StrToIntDef(jso.S['Etl.CommitCountRows'], 10000);     // commit every n inserts releasing resources (better if same as bulkinsertsize?)
+  Feedback('use commit: %d', [ecc]);
 
   // options
   eop := jso.S['Etl.OptionCsv'];
   if eop.Trim.IsEmpty then
-    eop := giif.Str(FAgentRec.Note.Trim.IsEmpty, '', 'poIdentityInsert');
+    eop := 'poIdentityInsert,poCreateDest,poSkipUnmatchedDestFields,poUseTransactions'; // FD default
+  Feedback('use options: %s', [eop]);
 
   // mode
   emo := jso.S['Etl.Mode'];
   if emo.Trim.IsEmpty then
-  //emo := 'dmAlwaysInsert'; // also fd default but no PK fields matching is performed
-    emo := 'dmAppendUpdate'; // this require a PK fields on the target table
+    emo := 'dmAlwaysInsert'; // also fd default (no PK fields is required on the target table)
+  //emo := 'dmAppendUpdate'; // this require a PK fields on the target table
+  Feedback('use mode: %s', [emo]);
+
+  // movermaxerror
+  FMoverMaxErrors        := StrToIntDef(jso.S['Etl.MoverMaxErrors'], 0);
+  Feedback('use movermaxerrors: %d'       , [FMoverMaxErrors]);
+
+  // moverlogfile
+  FMoverLogFileSpec := jso.S['Etl.MoverLogFileSpec'];
+  Feedback('use moverlogfilespec: %s', [FMoverLogFileSpec]);
+
+  // agentlogfile
+  FAgentLogFileSpec := jso.S['Etl.AgentLogFileSpec'];
+  Feedback('use agentlogfilespec: %s', [FAgentLogFileSpec]);
   {$ENDREGION}
 
-  {$REGION 'analysis'}
-  // sliced?
-  eib := Assigned(jso.O['Etl.KeyBegin'])
-     and Assigned(jso.O['Etl.KeyEnd'])
-     and Assigned(jso.O['Etl.SliceSize'])
-     and sqy.Contains('$SliceBegin$')
-     and sqy.Contains('$SliceEnd$');
+  {$REGION 'runs'}
+  // run size (number of rows per run)       (from begin to end if positive, from end to begin if negative)
+  //
+  //                              begin                 end
+  //       1strecord              run[1]             run[1]                lastrecord
+  //      |                       |                       |                |
+  //  ----O-----------------------X-----------------------X----------------O------X------------------> PK
+  //      |                       |                       |                       |
+  //      |--------run[0]-------->|                       |                       |
+  //      .                       |--------run[1]-------->|                       |
+  //      .                                               |--------run[2]-------->|
+  //      .                                                                       .
+  //      .                                                                       .
+  //      205                                                                     4876667849
+  //
+  //
+  //  table data
+  //  ---------------------------
+  //  pk min id      : 205
+  //  pk max id      : 4876667849
+  //  rows count     : 4876667849 - 205   approximate value if range is not dense
+  //
+  //  runs data
+  //  ---------------------------
+  //  rows per run   : 1000000000
+  //
+  //  calculated
+  //  ---------------------------
+  //  number of runs = (rows count) div (rows per run) + 1 = 4660358812 div 1000000000 + 1 = 5
+  //
 
-  // multinuns (sliced)
-  if not eib then
-    FInfoRec.Report.Add('Agent etl will be executed in a single run')
+  // PK min id
+  rk0 := StrToInt64Def(jso.S['Runs.PkMinId'], -1);
+  if not (rk0 >= 0) then begin
+    Feedback('PkMinId = %d must be greater or equal to 0', [rk0]);
+    Exit;
+  end;
+  Feedback('use pkminid: %d (included)', [rk0]);
 
-  // singlerun
-  else begin
-    FInfoRec.Report.Add('Agent etl will be executed in multiple batched runs');
-    // total
-    tot := eke.ToInteger - (ekb.ToInteger - 1);               // 1.000.000.000 - (1 - 1) = 1.000.000.000
+  // PK max id
+  rk9 := StrToInt64Def(jso.S['Runs.PkMaxId'], -1);
+  if not (rk0 <= rk9) then begin
+    Feedback('PkMaxId = %d must be greater or equal to PkMinId = %d', [rk9, rk0]);
+    Exit;
+  end;
+  Feedback('use pkmaxid: %d (NOT included)', [rk9]);
 
-    // slices(runs)
-    sli := tot div esz;                                       // 1.000.000.000 / 1.000.000 = 1.000
+  // rows count in [min,max) range  *** estimate, precise only if range is dense ***
+//rzz := RowsInMinMaxStrToInt64Def(jso.S['Runs.RowsInMinMax'], -1);
+  rzz := rk9 - rk0;
+//if not (rzz > 0) then begin
+//  Feedback('RowsInMinMax = %d must be greater than 0', [rzz]);
+//  Exit;
+//end;
+  Feedback('use rowsinminmax: %d (estimate value of rows in range if it is not dense)', [rzz]);
 
-    // migrationplan
-    FInfoRec.Report.Add('range       : %s - %s', [ekb, eke]); // 1 .. 1.000.000.000
-    FInfoRec.Report.Add('rows        : %d'     , [tot]);      // 1.000.000.000
-    FInfoRec.Report.Add('slicesize   : %d'     , [esz]);      // 1.000.000
-    FInfoRec.Report.Add('slices(runs): %d'     , [sli]);      // 1.000
+  // rowsperrun
+  rrz := StrToInt64Def(jso.S['Runs.RowsPerRun'], -1);
+  if not (rrz > 0) then begin
+    Feedback('RowsPerRun = %d must be greater than 0', [rrz]);
+    Exit;
+  end;
+  Feedback('use rowsperrun: %d', [rrz]);
 
-    // bigint
-    ebb := '1';
-    ebe := '1000';
-
-    // datetime
-    ebb := '1/1/2000';
-    ebe := '1/1/2001';
-
-    sqy := sqy.Replace('$SliceBegin$', ebb, [rfReplaceAll]);
-    sqy := sqy.Replace('$SliceEnd$'  , ebe, [rfReplaceAll]);
- end;
+  // runs
+  runs := rzz div rrz + 1;
+  Feedback('use %d runs in total', [runs]);
   {$ENDREGION}
 
-  {$REGION 'source obj'}
-  sco := TFDConnection.Create(nil);
-  sco.ConnectionString            := scs;
-  sco.FetchOptions.CursorKind     := ckForwardOnly;
-  sco.FetchOptions.Unidirectional := true;
-  sco.FetchOptions.Mode           := fmOnDemand; // will request RowsetSize rows per fetch (RowsetSize), when it is needed
-  sco.FetchOptions.RowsetSize     := srz;
-  sco.Connected                   := true;
-  FInfoRec.Report.Add('SOURCE: %s connected (request %d rows per fetch)', [sna, srz]);
+  {$REGION 'progresses'}
+  // progs
+  progs := rzz div ecc + 1;
+  Feedback('use %d progs in total', [progs]);
   {$ENDREGION}
 
-  {$REGION 'target obj'}
-  tco := TFDConnection.Create(nil);
-  tco.ConnectionString            := tcs;
-  tco.FetchOptions.CursorKind     := ckForwardOnly;
-  tco.FetchOptions.Unidirectional := true;
-//tco.FetchOptions.Mode           := fmOnDemand; // will request RowsetSize rows every fetch, when it is needed
-//tco.FetchOptions.RowsetSize     := trz;
-//tco.ResourceOptions..SilentMode  := true; // ?
-  tco.Connected                   := true;
-  FInfoRec.Report.Add('TARGET: %s connected (target table %s, bulkinsertsize: %d)', [tna, ett, eiz]);
-  {$ENDREGION}
-
-  {$REGION 'try'}
-  // initialize COM for this thread CoInitialize initializes the COM library on the current thread
-  CoInitializeEx(nil, COINIT_MULTITHREADED);
-
-  try
-    // sql is invalid
-    if not TSqlRec.IsValid(sqy) then begin
-      FInfoRec.Report.Add('query is invalid');
-
-    // sql is ok
-    end else begin
-
-      {$REGION 'EXECUTE'}
-      try
-
-        {$REGION 'JOB'}
-        aff := 0;
-             if ety = 'TableToTable' then FdEtlTableToTable(sqy, ebd, aff)
-        else if ety = 'TableToText'  then FdEtlTableToText (sqy, ebd, aff)
-        else if ety = 'TextToTable'  then FdEtlTextToTable (sqy, ebd, aff)
-        else                              FInfoRec.Report.Add('Unable to execute agent %s, unknown etl type, use: TableToTable, TextToTable ot TableToText', [FAgentRec.Agent]);
-        {$ENDREGION}
-
-        {$REGION 'Output'}
-        {$ENDREGION}
-
-        {$REGION 'Save'}
-      //if jso.B['Save.Active'] then
-        //SaveDo(jo, {ds}nil, NOT_AVAILABLE_STR); // se ogni job riportasse un ds allora si
-        {$ENDREGION}
-
-        {$REGION 'Email'}
-      //if jso.B['Email.Active'] then
-        //if not EmailDo(jo, fbk) then
-          //FInfoRec.Report.Add(fbk);
-        {$ENDREGION}
-
-      except
-
-        {$REGION 'Done'}
-        on e: Exception do
-          FInfoRec.Report.Add(e.Message);
-        {$ENDREGION}
-
+  {$REGION 'agentlog'}
+  // on/off
+  if FAgentLogFileSpec.Trim.IsEmpty then begin
+    Feedback('do not use agentlog');
+    FAgentLogFileOpened := false;
+  end else begin
+    try
+      AssignFile(FAgentLogFile, FAgentLogFileSpec);
+      Rewrite(FAgentLogFile);
+      FAgentLogFileOpened := true;
+    except
+      on e: Exception do begin
+        Feedback(e.Message);
+        FAgentLogFileOpened := false;
       end;
-      {$ENDREGION}
-
     end;
+  end;
+  {$ENDREGION}
 
-  finally
+  {$REGION 'start'}
+  Feedback('start: %s', [TDatRec.DatForLog(Now)]);
+  {$ENDREGION}
 
-    {$REGION 'Free'}
-    tco.Free;
-    sco.Free;
-    CoUninitialize;
+  {$REGION 'go'}
+  try
+    // init
+    FWatch                   := TStopWatch.StartNew;
+
+    // last progress
+    FProgressRec.Init(0, Now(), 0, 0, 0, 0, 0, 0);
+    FLastSleepCount := 0;
+    rix := 0;
+
+    // source
+    SourceConnectionsSetup(scs, srz);
+    Feedback('use source: %s (request %d rows per fetch)', [sna, srz]); // *** DUPS ***
+
+    // target
+    TargetConnectionsSetup(tcs);
+    Feedback('use target: %s', [tna]);                                  // *** DUPS ***
+
+    // preprocess
+    Preprocess(tdl, ett, eop);
+
+    // lo
+  //rlo := CheckpointLoad; // resume from last completed hi or
+  //if rlo <= 0 then
+      rlo := rk0;          // start from 1st record
+
+    // runs
+    ros := true;
+    while (rlo <{=} rk9) and (not FAbortRequested) do begin // get in the range [rlo, rhi)
+      // run
+      Inc(rix);
+      Feedback('run: %d, lo: %d, hi: %d', [rix, rlo, rhi]);
+
+      // hi
+      rhi := System.Math.Min(rlo + rrz, rk9 {+ 1}); // [Lo, Hi)
+
+      // sql
+      sqy := sqy.Replace('$RunLoId$', rlo.ToString, [rfReplaceAll]);
+      sqy := sqy.Replace('$RunHiId$', rhi.ToString, [rfReplaceAll]);
+
+      // etl components setup
+      ReaderSetup(sqy);
+      WriterSetup(ett);
+      MoverSetup(eop, emo, esc, ecc, ros);
+      ros := false;
+
+      // EXECUTE (runs this chunk only)
+      FMover.Execute;
+
+      // run chunk complete -> persist checkpoint and advance
+    //CheckpointSave(rhi); // *** BREAKPOINT HERE ***
+      rlo := rhi;
+    end;
+  except
+
+    {$REGION 'handling'}
+    // FD specific error handling
+    on e: EFDDBEngineException do begin
+      Feedback('exception in lo: %d, hi: %d, pk: %d', [rlo, rhi, rpk]);
+      Feedback(e.Message);
+      Feedback(e.SQL);
+    end;
+    // generic database error handling
+    on e: EDatabaseError do begin
+      Feedback('exception in lo: %d, hi: %d, pk: %d', [rlo, rhi, rpk]);
+      Feedback(e.Message);
+      Feedback(e.StackTrace);
+    end;
+    // user stop: previous batches are committed, current one not started
+    on e: EAbort do begin
+      Feedback('exception forced by user in lo: %d, hi: %d, pk: %d', [rlo, rhi, rpk]);
+      Feedback(e.Message);
+    end;
+    // other exceptions (non-FD related)
+    on e: Exception do begin
+      Feedback('exception in lo: %d, hi: %d, pk: %d', [rlo, rhi, rpk]);
+      Feedback(e.Message);
+
+      // queue to UI safely
+    //TThread.Queue(nil,
+    //  procedure begin
+    //  //ShowMessage('Error: ' + e.Message);
+    //  //Memo1.Lines.Add(E.Message);
+    //  end
+    //);
+
+    //raise;
+    end;
     {$ENDREGION}
 
   end;
   {$ENDREGION}
 
-  // ancestor
-  inherited;
+  {$REGION 'end'}
+  Feedback('end: %s', [TDatRec.DatForLog(Now)]);
 
-  // now the thread ends and we go to OnTerminate routine
+//swa: TStopwatch;
+//swa.Stop;
+//begin    := 'na';
+//end      := 'na';
+//duration := swa.ElapsedMilliseconds;
+//innserts := FMover.InsertCount;
+//ReportAddBatch(ThreadID, 1, 1, bbe, ben, bdu, bin);
+//IvAffected := bin;
+  {$ENDREGION}
+
+  {$REGION 'save'}
+//if jso.B['Save.Active'] then
+//SaveDo(jo, {ds}nil, NOT_AVAILABLE_STR); // se ogni job riportasse un ds allora si
+  //Feedback(fbk);
+  {$ENDREGION}
+
+  {$REGION 'email'}
+//if jso.B['Email.Active'] then
+//if not EmailDo(jo, fbk) then
+  //Feedback(fbk);
+  {$ENDREGION}
+
+  // ancestor then ends
+  inherited;
 end;
+
+  {$REGION 'Zzz'}
+//function  TAgentEtlTableToTableThread.CheckpointLoad: int64;
+//var
+//  ini: TIniFile;
+//begin
+//  Result := 0;
+//
+//  if (not FCheckpointIniSpec.IsEmpty) and FileExists(FCheckpointIniSpec) then begin
+//    ini := TIniFile.Create(FCheckpointIniSpec);
+//    try
+//      Result := ini.ReadInt64('Checkpoint', 'LastHi', 0);
+//    finally
+//      ini.Free;
+//    end;
+//  end;
+//end;
+
+//procedure TAgentEtlTableToTableThread.CheckpointSave(IvLastHi: int64);
+//var
+//  ini: TIniFile;
+//begin
+//  if (not FCheckpointIniSpec.IsEmpty) then begin
+//    ini := TIniFile.Create(FCheckpointIniSpec);
+//    try
+//      ini.WriteInt64('Checkpoint', 'LastHi', IvLastHi);
+//    finally
+//      ini.Free;
+//    end;
+//  end;
+//end;
+
+//function  TAgentEtlTableToTableThread.SourceQueryMake(const IvLo, IvHi: int64): TFDQuery;
+//var
+//  qry: TFDQuery;
+//begin
+//  qry := TFDQuery.Create(nil);
+//  qry.Connection := FSourceConn;
+//
+//  // use index on PK for fast range scans. ANSI join-free, simple WHERE.
+//  qry.SQL.Text := Format('select * from %s.%s where %s >= :PLo and %s < :PHi', ['FCfg.OraSchema', 'FCfg.OraTable', 'FCfg.PkName', 'FCfg.PkName']);
+//
+//  qry.ParamByName('PLo').DataType   := ftLargeint;
+//  qry.ParamByName('PHi').DataType   := ftLargeint;
+//  qry.ParamByName('PLo').AsLargeInt := IvLo;
+//  qry.ParamByName('PHi').AsLargeInt := IvHi;
+//
+//  // fetch blobs if needed:
+//  // qry.FetchOptions.Items := Q.FetchOptions.Items + [fiBlobs];
+//
+//  qry.Open;
+//  Result := qry;
+//end;
+  {$ENDREGION}
+
+{$ENDREGION}
+
+{$REGION 'TAgentEtlTableToTextThread'}
+{$ENDREGION}
+
+{$REGION 'TAgentEtlTextToTableThread'}
+{$ENDREGION}
+
+{$REGION 'TAgentEtlTableToMongodbThread'}
 
   {$REGION 'Zzz'}
 (*
@@ -1483,8 +1846,8 @@ begin
   {$ENDREGION}
 
   {$REGION 'Sql'}
-  bq := str.Replace(aq, '$SlicehBegin$', bbo);
-  bq := str.Replace(bq, '$SliceEnd$'  , beo);
+  bq := str.Replace(aq, '$RunBegin$', bbo);
+  bq := str.Replace(bq, '$RunEnd$'  , beo);
   if jo.B['Log.Verbose'] then
     ReportStr(bq);
   {$ENDREGION}
@@ -1720,464 +2083,5 @@ end;
 
 {$ENDREGION}
 
-{$REGION 'TAgentEtlThread2'}
-constructor TAgentEtlThread2.Create(IvAgentRec: TAgentRec{; IvCreateSuspended: boolean}; IvOnUIUpdate: TProc<integer, string>);
-begin
-  inherited Create(IvAgentRec{, IvCreateSuspended}, IvOnUIUpdate);
-end;
-
-destructor TAgentEtlThread2.Destroy;
-begin
-  FSourceConn.Free;
-  FTargetConn.Free;
-  FReader.Free;
-  FWriter.Free;
-  FMover.Free;
-
-  inherited;
-end;
-
-procedure TAgentEtlThread2.SourceConnectionsSetup(IvConnStr: string; IvRowsetSize: integer);
-begin
-  FSourceConn := TFDConnection.Create(nil);
-//FSourceConn.Params.Clear;
-  FSourceConn.LoginPrompt                 := false;
-  FSourceConn.ConnectionString            := IvConnStr;
-//FSourceConn.FetchOptions.CursorKind     := ckForwardOnly;
-//FSourceConn.FetchOptions.Unidirectional := true;
-//FSourceConn.FetchOptions.Mode           := fmOnDemand; // will request RowsetSize rows per fetch (RowsetSize), when it is needed
-
-  // options per-thread tuning
-  FSourceConn.FetchOptions.RowsetSize     := IvRowsetSize;
-
-//FDPhysOracleDriverLink1.VendorHome := 'C:\$\Oracle\instantclient64_23_9';
-//FDPhysOracleDriverLink1.VendorLib  := 'C:\$\Oracle\instantclient64_23_9\oci.dll';
-//FDPhysOracleDriverLink1.OCICompatibility := '19';  // or '21' – not mandatory
-
-  FSourceConn.Connected                   := true; // will load the OCI from VendorLib
-end;
-
-procedure TAgentEtlThread2.TargetConnectionsSetup(IvConnStr: string);
-begin
-  FTargetConn := TFDConnection.Create(nil);
-//FSourceConn.Params.Clear;
-  FTargetConn.LoginPrompt                 := false;
-  FTargetConn.ConnectionString            := IvConnStr;
-//FTargetConn.FetchOptions.CursorKind     := ckForwardOnly;
-//FTargetConn.FetchOptions.Unidirectional := true;
-//FTargetConn.FetchOptions.Mode           := fmOnDemand; // will request RowsetSize rows every fetch, when it is needed
-
-  // options per-thread tuning
-//FTargetConn.FetchOptions.RowsetSize     := trz;
-//FTargetConn.ResourceOptions.SilentMode  := true;    // useful for bulk etl
-//FTargetConn.Params.Values['PacketSize'] := '32767'; // to avoid truncation
-//FTargetConn.ResourceOptions.DirectExecute := True;
-//FTargetConn.UpdateOptions.CountUpdatedRecords := False;
-
-  FTargetConn.Connected                   := true;
-end;
-
-procedure TAgentEtlThread2.MoverSetup(IvReadSql, IvTargetTable, IvOptionCsv, IvMode: string; IvStatisticsInterval, IvCommitCount: integer);
-var
-  opv: TArray<string>;
-begin
-  // reader
-  FReader := TFDBatchMoveSQLReader.Create(nil);
-  FReader.Connection := FSourceConn;
-  FReader.ReadSQL := IvReadSql;
-
-  // writer (generates inserts)
-  FWriter := TFDBatchMoveSQLWriter.Create(nil);
-  FWriter.Connection := FTargetConn;
-  FWriter.TableName  := IvTargetTable;
-
-  // mover
-  FMover := TFDBatchMove.Create(nil);
-  FMover.Reader := FReader;
-  FMover.Writer := FWriter;
-  FMover.StatisticsInterval := IvStatisticsInterval; // if greater than zero will trigger the onprogress event
-  FMover.CommitCount        := IvCommitCount;        // if greater than zero commit every N rows wrap in a transaction
-  FMover.OnProgress         := MoverProgress;        // metrics and sleep
-
-  // options
-  opv := TVecRec.VecFromStr(IvOptionCsv);
-
-  FMover.Options := [];
-
-  if TVecRec.VecHas('poCreateDest', opv) then
-    FMover.Options := FMover.Options + [poCreateDest];              // creates the destination table before data movement, if it does not exist, FireDAC will use the data reader provided for field definitions
-
-  if TVecRec.VecHas('poClearDest', opv) then                        // *** DO NOT USE IF BATCHED/SLICED OR FOR BIG TABLES delete must be done in batches!!! *** (we will not implement batched/sliced!)
-    FMover.Options := FMover.Options + [poClearDest];               // deletes the content of the destination table before data movement, performing a transactional operation like SQL DELETE
-
-  if TVecRec.VecHas('poClearDestNoUndo', opv) then                  // *** DO NOT USE IF BATCHED/SLICED ***
-    FMover.Options := FMover.Options + [poClearDestNoUndo];         // deletes the content of the destination table before data movement, performing a non-transactional fast operation like SQL TRUNCATE
-
-  if TVecRec.VecHas('poIdentityInsert', opv) then
-    FMover.Options := FMover.Options + [poIdentityInsert];          // when destination table has an identity columns, enabled for inserts/updates
-
-  if TVecRec.VecHas('poSkipUnmatchedDestFields', opv) then
-    FMover.Options := FMover.Options + [poSkipUnmatchedDestFields]; // ?
-
-  if TVecRec.VecHas('poUseTransactions', opv) then
-    FMover.Options := FMover.Options + [poUseTransactions];         // ?
-
-  // mode
-       if IvMode.Equals('dmAppend') then
-    FMover.Mode := dmAppend
-  else if IvMode.Equals('dmUpdate') then
-    FMover.Mode := dmUpdate
-  else if IvMode.Equals('dmAppendUpdate') then
-    FMover.Mode := dmAppendUpdate
-  else if IvMode.Equals('dmDelete') then
-    FMover.Mode := dmDelete
-  else
-    FMover.Mode := dmAlwaysInsert;
-end;
-
-procedure TAgentEtlThread2.MoverProgress(ASender: TObject; APhase: TFDBatchMovePhase);
-var
-  rez, wrz, inz, upz, dez, coz: int64; // rowspertransaction
-begin
-  // exit
-  if APhase <> psProgress then
-    Exit;
-
-  // counters
-  rez := FMover.ReadCount;
-  wrz := FMover.WriteCount;
-  inz := FMover.InsertCount;
-  upz := FMover.UpdateCount;
-  dez := FMover.DeleteCount;
-  coz := FMover.CommitCount;
-
-  // metrics
-
-  // remember
-  FLastProgressDt   := Now();
-  FLastProgressWrittenRows := wrz;
-
-  {$REGION 'commit surrogate for sleep or stop'}
-  // transactioncommitactive?
-
-  // somerowswritten
-  if wrz > 0 then begin
-
-    // somecommittsaredone
-    if coz > 0 then begin
-
-      // sleep, pause or stop at the end of each committed batch (between commits, when WriteCount = 1000, 2000, 3000; ...) keeps connection open
-      if wrz mod coz = 0 then begin
-
-        // sleep
-        if (FBatchDelayMs > 0) and (wrz > FLastSleepCount) then begin
-          Sleep(FBatchDelayMs);           // pause n ms between commits
-          FLastSleepCount := wrz;         // remember we already slept for this batch
-        end;
-
-        // pause
-        while FPauseRequested do
-          TThread.Sleep(100);
-
-        // stop
-        if FStopRequested then
-          raise EAbort.CreateFmt('Thread %s stopped by user', [FAgentRec.Agent])  // exits Execute cleanly after a commit
-      end;
-    end;
-  end;
-  {$ENDREGION}
-
-end;
-
-procedure TAgentEtlThread2.Preprocess(IvTargetDdl, IvTargetTable: string);
-var
-  sql: string;
-begin
-  // create-custom (FD field data-type geussing is unreliable)
-  if poCreateDest in FMover.Options then begin
-    // disable
-    FMover.Options := FMover.Options - [poCreateDest];
-
-    // noddl
-    if IvTargetDdl.Trim.IsEmpty then
-      raise Exception.Create('Unable to create the table on the target database, DDL script in the Note tab is empty')
-
-    else if FTargetConn.ExecSQL('if object_id(''' + IvTargetTable + ''', ''U'') is null select 0 else select 1') = 1 then
-      raise Exception.Create('Unable to create the table on the target database, table already exist')
-
-    else begin
-      sql         := 'if object_id(''' + IvTargetTable + ''', ''U'') is null begin'
-      + sLineBreak + IvTargetDdl
-      + sLineBreak + 'end;';
-      FTargetConn.ExecSQL(sql);
-    end;
-  end;
-
-  // clear-custom
-  if (poClearDest in FMover.Options) or (poClearDestNoUndo in FMover.Options) then begin
-    // FD disable
-    FMover.Options := FMover.Options - [poClearDestNoUndo];
-    FMover.Options := FMover.Options - [poClearDest];
-
-    // custom
-    FTargetConn.ExecSQL(Format('if object_id(''%s'', ''U'') is not null truncate /*drop*/ table %s;', [IvTargetTable, IvTargetTable])); // FD try to drop also if the table does not exists!
-  end;
-end;
-
-procedure TAgentEtlThread2.Execute;
-
-  {$REGION 'var'}
-var
-  jso: ISuperObject;
-
-  // source
-  sna, scs, scl, sqy: string;         // name, connstr, connlib, query
-  srz, sct, sqt: integer;             // rowsetsize, conntimeout, querytimeout
-
-  // target
-  tna, tcs, tcl, tdl: string;         // name, connstr, connlib, table, ddl
- {trz,}tct, tqt: integer;             // rowsetsize(not needed), conntimeout, querytimeout
-
-  // etl
-  eib: boolean;                       // isbatched
-  ety, ett, edf, ekb, eke: string;    // type, targettable, datetimeformat, pkbegin int/datetime, pkend int/datetime
-  esz{, ebd}, ecc, esc, eiz: integer; // slicesize(rows/seconds), batchdelayms, commitcountrows, statisticintervalcountrows, bulkinsertsize
-  edb, ede: TDateTime;                // pkdatetime begin, end
-  eop, emo: string;                   // options, mode
-  ebb, ebe: string;                   // batch begin, end
-  {$ENDREGION}
-
-begin
-
-  {$REGION 'exit'}
-  // nop
-  if Terminated then begin
-    FInfoRec.Report.Add('terminated', true, 0);
-    UIUpdate('terminated');
-    Exit;
-  end;
-  if FStopRequested then begin
-    FInfoRec.Report.Add('user requested stop', true, 0);
-    UIUpdate('user requested stop');
-    Exit;
-  end;
-  {$ENDREGION}
-
-  {$REGION 'init'}
-  // naming
-  NameThreadForDebugging(FAgentRec.Agent);
-  FInfoRec.Report.Add('running', true, 0);
-  UIUpdate('running');
-
-  // data
-  jso := FAgentRec.JsonCompiledSO;
-
-  // query (source), content compiled with Rv and json members, but not with $SliceBegin$ and $SliceEnd$
-  sqy := FAgentRec.ContentCompiled;
-
-  // ddl (target), ddl code to create a table if doesn't exists
-  tdl := FAgentRec.Note;
-  {$ENDREGION}
-
-  {$REGION 'exit'}
-  // query
-  if sqy.Trim.IsEmpty then begin
-    FInfoRec.Report.Add('Agent Content query is empty');
-    Exit;
-  end;
-
-  // datasourcesection
-  if not jso.AsObject.Exists('DataSource') then begin
-    FInfoRec.Report.Add('Json DataSource section is not present');
-    Exit;
-  end;
-
-  // datasourcesection
-  if not jso.AsObject.Exists('DataTarget') then begin
-    FInfoRec.Report.Add('Json DataTarget section is not present');
-    Exit;
-  end;
-
-  // etlsection
-  if not jso.AsObject.Exists('Etl') then begin
-    FInfoRec.Report.Add('Json Etl section is not present');
-    Exit;
-  end;
-  {$ENDREGION}
-
-  {$REGION 'source'}
-  // name
-  sna := jso.S['DataSource.Name'];
-
-  // connlib
-  if Assigned(jso.O['DataSource.ConnLib']) then begin
-    scl := jso.S['DataSource.ConnLib'];
-    FInfoRec.Report.Add('use source connection library: %s', [scl]);
-  end else begin
-    scl := 'ADO';
-    FInfoRec.Report.Add('Json DataSource.ConnLib not defined, use defaulty: %s', [scl]);
-  end;
-
-  // connstr
-  if Assigned(jso.O['DataSource.ConnStr']) then begin
-    scs := jso.S['DataSource.ConnStr'];
-    FInfoRec.Report.Add('use source connection string: %s', [scs]);
-  end;
-  if scs.Trim.IsEmpty then begin
-    scs := DBA_CONNECTION_STR;
-    FInfoRec.Report.Add('Json DataSource.ConnStr not defined, use default: %s', [scs]);
-  end;
-  scs := grva.Rva(scs);
-
-  // conntimeout
-  sct := StrToIntDef(jso.S['DataSource.ConnTimeoutSec'], 10);
-
-  // querytimeout
-  sqt := StrToIntDef(jso.S['DataSource.QueryTimeoutSec'], 30);
-  {$ENDREGION}
-
-  {$REGION 'target'}
-  // name
-  tna := jso.S['DataTarget.Name'];
-
-  // connlib
-  if Assigned(jso.O['DataTarget.ConnLib']) then begin
-    tcl := jso.S['DataTarget.ConnLib'];
-    FInfoRec.Report.Add('use target connection library: %s', [tcl]);
-  end else begin
-    tcl := 'ADO';
-    FInfoRec.Report.Add('Json DataTarget.ConnLib not defined, use default: %s', [tcl]);
-  end;
-
-  // connstr
-  if Assigned(jso.O['DataTarget.ConnStr']) then begin
-    tcs := jso.S['DataTarget.ConnStr'];
-    FInfoRec.Report.Add('use target connection string: %s', [tcs]);
-  end;
-  if tcs.Trim.IsEmpty then begin
-    tcs := DBA_CONNECTION_STR;
-    FInfoRec.Report.Add('Json DataTarget.ConnStr not defined, use default: %s', [tcs]);
-  end;
-  tcs := grva.Rva(tcs);
-
-  // conntimeout
-  tct := StrToIntDef(jso.S['DataTarget.ConnTimeoutSec'], 10);
-
-  // querytimeout
-  tqt := StrToIntDef(jso.S['DataTarget.QueryTimeoutSec'], 30);
-  {$ENDREGION}
-
-  {$REGION 'etl'}
-  // type
-  if Assigned(jso.O['Etl.Type']) then begin
-    ety := jso.S['Etl.Type'];
-    FInfoRec.Report.Add('use etl type: %s', [ety]);
-  end else begin
-    ety := 'TableToTable';
-    FInfoRec.Report.Add('Etl.Type not defined, use default: %s', [ety]);
-  end;
-
-  // targettable
-  if Assigned(jso.O['Etl.TargetTable']) then begin
-    ett := jso.S['Etl.TargetTable'];
-    FInfoRec.Report.Add('use target table: %s', [ett]);
-  end;
-  if ett.Trim.IsEmpty then begin
-    FInfoRec.Report.Add('Json Etl.TargetTable not defined');
-    Exit;
-  end;
-
-  // batchdelayms (target, ms to wait before each batch start)
-  FBatchDelayMs := StrToIntDef(jso.S['Etl.BatchDelayMs'], 0);
-
-  // rowsetsize (source)
-  srz := StrToIntDef(jso.S['DataSource.RowsetSize'], 10000); // controls how many rows FireDAC requests from the server per fetch (fmOnDemand) — i.e. how the client reads results from a SELECT
-
-  // bulkinsertsize (target)
-  eiz := jso.I['Etl.BulkInsertSize']; // once the buffer reaches BulkInsertSize than calls the DB driver’s optimized array insert or bulk insert
-
-  // batchstatistics
-  esc := StrToIntDef(jso.S['Etl.StatisticsCountRows'], 10000); // every n inserts triggers OnProgress every 10000 rows
-
-  // commit (target)
-  ecc := StrToIntDef(jso.S['Etl.CommitCountRows'], 10000); // better if same as bulkinsertsize?  after every n inserts commit releasing resources
-
-  // options
-  eop := jso.S['Etl.OptionCsv'];
-  if eop.Trim.IsEmpty then
-    eop := giif.Str(FAgentRec.Note.Trim.IsEmpty, '', 'poIdentityInsert');
-
-  // mode
-  emo := jso.S['Etl.Mode'];
-  if emo.Trim.IsEmpty then
-    emo := 'dmAlwaysInsert'; // also fd default
-  {$ENDREGION}
-
-  {$REGION 'go'}
-  try
-    // source
-    SourceConnectionsSetup(scs, srz);
-    FInfoRec.Report.Add('SOURCE: %s connected (request %d rows per fetch)', [sna, srz]);
-
-    // target
-    TargetConnectionsSetup(tcs);
-    FInfoRec.Report.Add('TARGET: %s connected', [tna]);
-
-    // mover
-    MoverSetup(sqy, ett, eop, emo, esc, ecc);
-
-    // preprocess
-    Preprocess(tdl, ett);
-
-    // init
-    FWatch                   := TStopWatch.StartNew;
-    FLastProgressDt          := Now();
-    FLastProgressWrittenRows := 0;
-    FLastSleepCount          := 0;
-
-    // exec
-    FMover.Execute;
-  except
-    // FD specific error handling
-    on e: EFDDBEngineException do begin
-      FInfoRec.Report.Add(e.Message);
-      FInfoRec.Report.Add(e.SQL);
-    end;
-    // generic database error handling
-    on e: EDatabaseError do begin
-      FInfoRec.Report.Add(e.Message);
-      FInfoRec.Report.Add(e.StackTrace);
-    end;
-    on e: EAbort do begin
-      // user stop: previous batches are committed, current one not started
-      FInfoRec.Report.Add(e.Message);
-    end;
-    // other exceptions (non-FD related)
-    on e: Exception do begin
-      FInfoRec.Report.Add(e.Message);
-
-      // queue to UI safely
-      UIUpdate(e.Message);
-    //TThread.Queue(nil,
-    //  procedure begin
-    //  //ShowMessage('Error: ' + e.Message);
-    //  //Memo1.Lines.Add(E.Message);
-    //  end
-    //);
-
-    //raise;
-    end;
-  end;
-  {$ENDREGION}
-
-  // ancestor
-  inherited;
-
-  // now the thread ends and we go to OnTerminate routine
-end;
-{$ENDREGION}
-
-{$REGION 'Xxx'}
-{$ENDREGION}
-
 end.
+

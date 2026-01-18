@@ -12,7 +12,8 @@ uses
   Vcl.Mask, Vcl.ExtCtrls, JvExControls, JvScrollMax, JvExExtCtrls,
   JvExtComponent, WksLogFrameUnit, VirtualTrees, DTDBTreeView, DTClientTree,
   Vcl.ToolWin, JvNetscapeSplitter, JvComponentBase, JvThreadTimer, Vcl.AppEvnts,
-  JvClock, Vcl.Menus, Winapi.WebView2, Winapi.ActiveX, Vcl.Edge, Vcl.WinXCtrls;
+  JvClock, Vcl.Menus, Winapi.WebView2, Winapi.ActiveX, Vcl.Edge, Vcl.WinXCtrls,
+  JvDBDateTimePicker;
 {$ENDREGION}
 
 {$REGION 'Type'}
@@ -126,9 +127,14 @@ procedure TMemberMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // detail
-  if MemberClientDataSet.State = dsEdit then
+  {$REGION 'Object'}
+  {$ENDREGION}
+
+  {$REGION 'Detail'}
+  if not (MemberClientDataSet.State = dsBrowse) then
     MemberDBNavigator.BtnClick(nbPost);
+  {$ENDREGION}
+
 end;
 {$ENDREGION}
 
@@ -303,8 +309,7 @@ procedure TMemberMainForm.MemberClientDataSetAfterPost(DataSet: TDataSet);
 begin
   inherited;
 
-  {$REGION 'detail'}
-  // applyupdatetoremoteserver
+  {$REGION 'applyupdatetoremoteserver'}
   if MemberClientDataSet.ApplyUpdates(0) > 0 then
     TMesRec.I('Unable to save %s detail to remote server', [FObj])
   else begin
@@ -319,7 +324,7 @@ procedure TMemberMainForm.MemberClientDataSetReconcileError(DataSet: TCustomClie
 begin
   inherited;
 
-  {$REGION 'detail'}
+  {$REGION 'reconcileerror'}
   Action := HandleReconcileError(DataSet, UpdateKind, E);
   {$ENDREGION}
 

@@ -71,7 +71,7 @@ type
     { Private declarations }
   //FIni: TIniCls;
     FTic: TTicRec;
-    FWrq: TWrqRec;
+  //FWrq: TWrqRec;
     FWmoRec: TWmoRec;
   public
     { Public declarations }
@@ -156,7 +156,7 @@ begin
 
   // bo initialization via standard method
   if MODULE_USE_ON_METHODS then
-    FWmoRec.BeforeDispatch(Request, Response, FWrq, FTic)
+    FWmoRec.BeforeDispatch(Request, Response{, FWrq}, FTic)
 
   // bo initialization made locally (repeated in every module)
   else begin
@@ -191,7 +191,7 @@ end;
 procedure TMainWebModule.WebModuleAfterDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
   if MODULE_USE_ON_METHODS then
-    FWmoRec.AfterDispatch(Request, Response, FWrq, FTic)
+    FWmoRec.AfterDispatch(Request, Response{, FWrq}, FTic)
   else
     Response.Content := StringReplace(Response.Content, '$RvElapsedMs$', FTic.ElapsedMs.ToString, [rfReplaceAll]);
 end;

@@ -57,81 +57,6 @@ inherited SystemMainForm: TSystemMainForm
           TabOrder = 0
         end
       end
-      object TopServiceTabSheet: TTabSheet
-        Caption = 'Services'
-        ImageIndex = 5
-        object TopServiceLabel: TLabel
-          Left = 16
-          Top = 14
-          Width = 37
-          Height = 15
-          Caption = 'Service'
-        end
-        object TopServiceComboBox: TComboBox
-          Left = 64
-          Top = 11
-          Width = 145
-          Height = 23
-          TabOrder = 0
-          Text = 'TopServiceComboBox'
-          Items.Strings = (
-            ''
-            'Agent')
-        end
-        object TopServiceInstallButton: TButton
-          Left = 247
-          Top = 10
-          Width = 75
-          Height = 25
-          Caption = 'Install'
-          TabOrder = 1
-          OnClick = TopServiceInstallButtonClick
-        end
-        object TopServiceUninstallButton: TButton
-          Left = 328
-          Top = 10
-          Width = 75
-          Height = 25
-          Caption = 'Uninstall'
-          TabOrder = 2
-          OnClick = TopServiceUninstallButtonClick
-        end
-        object TopServicePauseButton: TButton
-          Left = 632
-          Top = 10
-          Width = 75
-          Height = 25
-          Caption = 'Pause'
-          TabOrder = 3
-        end
-        object TopServiceContinueButton: TButton
-          Left = 713
-          Top = 10
-          Width = 75
-          Height = 25
-          Caption = 'Continue'
-          TabOrder = 4
-          OnClick = TopServiceContinueButtonClick
-        end
-        object TopServiceStartButton: TButton
-          Left = 440
-          Top = 10
-          Width = 75
-          Height = 25
-          Caption = 'Start'
-          TabOrder = 5
-          OnClick = TopServiceStartButtonClick
-        end
-        object TopServiceStopButton: TButton
-          Left = 521
-          Top = 10
-          Width = 75
-          Height = 25
-          Caption = 'Stop'
-          TabOrder = 6
-          OnClick = TopServiceStopButtonClick
-        end
-      end
     end
     inherited TopPageControl3: TPageControl
       inherited TimeTabSheet: TTabSheet
@@ -338,6 +263,9 @@ inherited SystemMainForm: TSystemMainForm
             inherited ObjectId8Label: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectRouteIdCsvLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited ObjectOrderDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
@@ -353,56 +281,44 @@ inherited SystemMainForm: TSystemMainForm
             inherited ObjectId8DBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectRouteIdCsvDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
           end
           inherited ObjectDateJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectCreatedLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectCreatedDBText: TDBText
-              StyleElements = [seFont, seClient, seBorder]
-            end
             inherited ObjectUpdatedLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectUpdatedDBText: TDBText
+            inherited ObjectExpireLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectUpdatedByDBText: TDBText
+            inherited ObjectUpdatedDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectCreatedDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectPersonJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectAuthorLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectOwnerCsvLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectUpdatedByLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-          end
-          inherited ObjectFromJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectFromOrganizationLabel: TLabel
+            inherited ObjectOwnerCsvDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectFromMemberLabel: TLabel
+            inherited ObjectAuthorDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectFromTeamLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromAreaLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromDepartmentLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromOrganizationDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromMemberDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromTeamDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromAreaDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromDepartmentDBEdit: TDBEdit
+            inherited ObjectUpdatedByDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -422,7 +338,7 @@ inherited SystemMainForm: TSystemMainForm
             inherited ObjectToDepartmentLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectJobGradeMinLabel: TLabel
+            inherited ObjectToJobGradeMinLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectJobGradeCalculateLabel: TLabel
@@ -443,15 +359,7 @@ inherited SystemMainForm: TSystemMainForm
             inherited ObjectToDepartmentDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectJobGradeMinDBComboBox: TDBComboBox
-              StyleElements = [seFont, seClient, seBorder]
-            end
-          end
-          inherited ObjectApprovalJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectRouteLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectRouteDBEdit: TDBEdit
+            inherited ObjectToJobGradeMinDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -485,6 +393,9 @@ inherited SystemMainForm: TSystemMainForm
             inherited ObjectDataKindLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectGroupLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited ObjectContentKindDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
@@ -494,41 +405,58 @@ inherited SystemMainForm: TSystemMainForm
             inherited ObjectDataKindDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectGroupDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
           end
           inherited ObjectGeneralJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectStateLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectSpareLabel: TLabel
+            inherited ObjectBgColorLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectDescriptionLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectTitleLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectSubtitleLabel: TLabel
+            inherited ObjectFgColorLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectStateDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectSpareDBEdit: TDBEdit
+            inherited ObjectBgColorDBEdit: TDBEdit
+              StyleElements = [seFont, seClient]
+            end
+            inherited ObjectFgColorDBEdit: TDBEdit
+              StyleElements = [seFont, seClient]
+            end
+          end
+          inherited ObjectDataJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectData2Label: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectDescriptionDBEdit: TDBEdit
+            inherited ObjectData3Label: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectTitleDBEdit: TDBEdit
+            inherited ObjectData4Label: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectSubtitleDBEdit: TDBEdit
+            inherited ObjectData1Label: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData2DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData3DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData4DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData1DBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
           end
           object SystemJvScrollMaxBand: TJvScrollMaxBand
-            Width = 279
+            Width = 292
             Height = 21
             Expanded = False
             Caption = 'System'
@@ -544,7 +472,7 @@ inherited SystemMainForm: TSystemMainForm
               AlignWithMargins = True
               Left = 16
               Top = 53
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -556,7 +484,7 @@ inherited SystemMainForm: TSystemMainForm
               AlignWithMargins = True
               Left = 16
               Top = 103
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -568,7 +496,7 @@ inherited SystemMainForm: TSystemMainForm
               AlignWithMargins = True
               Left = 16
               Top = 153
-              Width = 247
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -580,7 +508,7 @@ inherited SystemMainForm: TSystemMainForm
               AlignWithMargins = True
               Left = 16
               Top = 74
-              Width = 247
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -597,7 +525,7 @@ inherited SystemMainForm: TSystemMainForm
               AlignWithMargins = True
               Left = 16
               Top = 124
-              Width = 247
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -610,7 +538,7 @@ inherited SystemMainForm: TSystemMainForm
               AlignWithMargins = True
               Left = 16
               Top = 174
-              Width = 247
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -623,7 +551,7 @@ inherited SystemMainForm: TSystemMainForm
               AlignWithMargins = True
               Left = 3
               Top = 22
-              Width = 273
+              Width = 286
               Height = 25
               DataSource = SystemDataSource
               VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
@@ -742,21 +670,21 @@ inherited SystemMainForm: TSystemMainForm
               StyleElements = [seFont, seClient, seBorder]
             end
           end
-          inherited OptionFilesJvScrollMaxBand: TJvScrollMaxBand
+          inherited OptionFileJvScrollMaxBand: TJvScrollMaxBand
             ExpandedHeight = 21
-            inherited OptionFilesWorkingFolderLabel: TLabel
+            inherited OptionFileWorkingFolderLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesOnDoubleClickLabel: TLabel
+            inherited OptionFileOnDoubleClickLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesWorkingFolderClearLabel: TLabel
+            inherited OptionFileWorkingFolderClearLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesOnDoubleClickComboBox: TComboBox
+            inherited OptionFileOnDoubleClickComboBox: TComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesWorkingFolderSelectButtonedEdit: TButtonedEdit
+            inherited OptionFileWorkingFolderSelectButtonedEdit: TButtonedEdit
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -766,18 +694,63 @@ inherited SystemMainForm: TSystemMainForm
   end
   inherited MainPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
-    OnClick = MainPanelClick
     inherited MainPageControl: TPageControl
-      ActivePage = SystemSourceTabSheet
+      ActivePage = DatabaseTabSheet
+      inherited ObjectContentPrevTabSheet: TTabSheet
+        inherited ObjectContentPrevTopPanel: TPanel
+          inherited ObjectContentPrevCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
       inherited ObjectContentTabSheet: TTabSheet
         inherited ObjectContentSplitter: TSplitter
           ExplicitHeight = 536
         end
+        inherited ObjectContentTopPanel: TPanel
+          inherited ObjectContentCharCountLabel: TLabel
+            Height = 22
+          end
+        end
         inherited ObjectContentSplitView: TSplitView
           DoubleBuffered = True
         end
+        inherited ObjectContentLeftPanel: TPanel
+          inherited ObjectContentTopPanel2: TPanel
+            inherited ObjectTitleLabel: TLabel
+              Width = 638
+            end
+            inherited ObjectSubtitleLabel: TLabel
+              Width = 638
+            end
+            inherited ObjectDescriptionLabel: TLabel
+              Width = 638
+            end
+          end
+        end
       end
-      object SystemSysLogTabSheet: TTabSheet
+      inherited ObjectDataTabSheet: TTabSheet
+        inherited ObjectDataTopPanel: TPanel
+          inherited ObjectDataCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited ObjectNoteTabSheet: TTabSheet
+        inherited ObjectNoteTopPanel: TPanel
+          inherited ObjectNoteCharCountLabel: TLabel
+            Height = 22
+          end
+        end
+      end
+      inherited FilesRioTabSheet: TTabSheet
+        inherited FilesRioTopPanel: TPanel
+          inherited FilesRioInfoLabel: TLabel
+            Height = 31
+          end
+        end
+      end
+      object SysLogTabSheet: TTabSheet
         Caption = 'SysLog'
         ImageIndex = 6
         object SysLogPanel: TPanel
@@ -801,11 +774,12 @@ inherited SystemMainForm: TSystemMainForm
             Left = 792
             Top = 3
             Width = 98
-            Height = 15
+            Height = 24
             Margins.Right = 8
             Align = alRight
             Caption = 'SysLogCountLabel'
             Layout = tlCenter
+            ExplicitHeight = 15
           end
           object SystemSyslogStartSpeedButton: TSpeedButton
             AlignWithMargins = True
@@ -889,7 +863,7 @@ inherited SystemMainForm: TSystemMainForm
             ExplicitHeight = 30
           end
         end
-        object SystemSyslogRichEdit: TRichEdit
+        object SyslogRichEdit: TRichEdit
           AlignWithMargins = True
           Left = 3
           Top = 33
@@ -908,13 +882,13 @@ inherited SystemMainForm: TSystemMainForm
           ReadOnly = True
           ScrollBars = ssBoth
           TabOrder = 1
-          OnChange = SystemSyslogRichEditChange
+          OnChange = SyslogRichEditChange
         end
       end
-      object SystemDbLogTabSheet: TTabSheet
+      object DbLogTabSheet: TTabSheet
         Caption = 'DbLog'
         ImageIndex = 4
-        object LogTopPanel: TPanel
+        object DbLogTopPanel: TPanel
           AlignWithMargins = True
           Left = 0
           Top = 0
@@ -926,22 +900,23 @@ inherited SystemMainForm: TSystemMainForm
           Margins.Bottom = 0
           Align = alTop
           BevelOuter = bvNone
-          Caption = 'LogTopPanel'
+          Caption = 'DbLogTopPanel'
           ParentBackground = False
           ShowCaption = False
           TabOrder = 0
-          object LogCountLabel: TLabel
+          object DbLogCountLabel: TLabel
             AlignWithMargins = True
-            Left = 809
+            Left = 794
             Top = 3
-            Width = 81
-            Height = 15
+            Width = 96
+            Height = 24
             Margins.Right = 8
             Align = alRight
-            Caption = 'LogCountLabel'
+            Caption = 'DbLogCountLabel'
             Layout = tlCenter
+            ExplicitHeight = 15
           end
-          object LogRefreshSpeedButton: TSpeedButton
+          object DbLogRefreshSpeedButton: TSpeedButton
             AlignWithMargins = True
             Left = 16
             Top = 3
@@ -978,11 +953,11 @@ inherited SystemMainForm: TSystemMainForm
               FF00FFFF00FF7AD67C7FD680C6EEC6D7F5D7D7F5D7C8EFC880D68078D579FF00
               FFFF00FFB3EFB4DDF7DDFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFC9EDC9DF
               F2DFE0F2E0CAEDCAFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF}
-            OnClick = LogRefreshSpeedButtonClick
+            OnClick = DbLogRefreshSpeedButtonClick
             ExplicitLeft = 15
           end
         end
-        object LogJvDBUltimGrid: TJvDBUltimGrid
+        object DbLogJvDBUltimGrid: TJvDBUltimGrid
           AlignWithMargins = True
           Left = 3
           Top = 33
@@ -990,7 +965,7 @@ inherited SystemMainForm: TSystemMainForm
           Height = 530
           Align = alClient
           BorderStyle = bsNone
-          DataSource = LogDataSource
+          DataSource = DbLogDataSource
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -12
@@ -1013,7 +988,7 @@ inherited SystemMainForm: TSystemMainForm
           SortWith = swClient
         end
       end
-      object SystemAuditTabSheet: TTabSheet
+      object AuditTabSheet: TTabSheet
         Caption = 'Audit'
         ImageIndex = 5
         object AuditTopPanel: TPanel
@@ -1037,11 +1012,12 @@ inherited SystemMainForm: TSystemMainForm
             Left = 800
             Top = 3
             Width = 90
-            Height = 15
+            Height = 24
             Margins.Right = 8
             Align = alRight
             Caption = 'AuditCountLabel'
             Layout = tlCenter
+            ExplicitHeight = 15
           end
           object AuditRefreshSpeedButton: TSpeedButton
             AlignWithMargins = True
@@ -1114,10 +1090,709 @@ inherited SystemMainForm: TSystemMainForm
           SortWith = swClient
         end
       end
-      object SystemBinariesTabSheet: TTabSheet
+      object ServerTabSheet: TTabSheet
+        Caption = 'Servers'
+        ImageIndex = 13
+        object ServerPanel: TPanel
+          AlignWithMargins = True
+          Left = 0
+          Top = 0
+          Width = 899
+          Height = 30
+          Margins.Left = 0
+          Margins.Top = 0
+          Margins.Right = 0
+          Margins.Bottom = 0
+          Align = alTop
+          BevelOuter = bvNone
+          Caption = 'ServerPanel'
+          ParentBackground = False
+          ShowCaption = False
+          TabOrder = 0
+          object ServerDBNavigator: TDBNavigator
+            Left = 0
+            Top = 0
+            Width = 240
+            Height = 30
+            DataSource = ServerDataSource
+            VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
+            Flat = True
+            TabOrder = 0
+          end
+        end
+        object ServerDBGrid: TDBGrid
+          AlignWithMargins = True
+          Left = 3
+          Top = 33
+          Width = 893
+          Height = 530
+          Align = alClient
+          BorderStyle = bsNone
+          DataSource = ServerDataSource
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -12
+          Font.Name = 'Segoe UI'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 1
+          TitleFont.Charset = DEFAULT_CHARSET
+          TitleFont.Color = clWindowText
+          TitleFont.Height = -12
+          TitleFont.Name = 'Segoe UI'
+          TitleFont.Style = [fsBold]
+        end
+      end
+      object DatabaseTabSheet: TTabSheet
+        Caption = 'Database'
+        ImageIndex = 9
+        object DatabaseLeftJvNetscapeSplitter: TJvNetscapeSplitter
+          Left = 250
+          Top = 46
+          Height = 520
+          Align = alLeft
+          Maximized = False
+          Minimized = False
+          ButtonCursor = crDefault
+          ExplicitLeft = 264
+          ExplicitTop = 248
+          ExplicitHeight = 100
+        end
+        object DatabasePanel: TPanel
+          AlignWithMargins = True
+          Left = 3
+          Top = 0
+          Width = 893
+          Height = 46
+          Margins.Top = 0
+          Margins.Bottom = 0
+          Align = alTop
+          BevelOuter = bvNone
+          Caption = 'AuditTopPanel'
+          ParentBackground = False
+          ShowCaption = False
+          TabOrder = 0
+          object DatabaseToolBar: TToolBar
+            Left = 0
+            Top = 0
+            Width = 485
+            Height = 46
+            Align = alLeft
+            AutoSize = True
+            ButtonHeight = 46
+            ButtonWidth = 97
+            Caption = 'BinariesToolBar'
+            Images = SystemImageList24
+            ShowCaptions = True
+            TabOrder = 0
+            object SystemDbaDefinitionRebuildToolButton: TToolButton
+              Left = 0
+              Top = 0
+              Action = SystemDbaDefinitionRebuildAction
+            end
+            object SystemDbaCreateDdlToolButton: TToolButton
+              Left = 97
+              Top = 0
+              Action = SystemDbaCreateDdlAction
+            end
+            object SystemDbaBackupDdlToolButton: TToolButton
+              Left = 194
+              Top = 0
+              Action = SystemDbaBackupDdlAction
+            end
+            object SystemDbaRestoreDdlToolButton: TToolButton
+              Left = 291
+              Top = 0
+              Action = SystemDbaRestoreDdlAction
+            end
+            object SystemDbaDeleteDdlToolButton: TToolButton
+              Left = 388
+              Top = 0
+              Action = SystemDbaDeleteDdlAction
+            end
+          end
+        end
+        object DatabaseRightPanel: TPanel
+          Left = 260
+          Top = 46
+          Width = 639
+          Height = 520
+          Align = alClient
+          BevelOuter = bvNone
+          Caption = 'DatabaseRightPanel'
+          ShowCaption = False
+          TabOrder = 1
+          object DatabaseRightSplitter: TSplitter
+            Left = 306
+            Top = 0
+            Height = 520
+            ExplicitLeft = 251
+          end
+          object DatabaseTblPanel: TPanel
+            AlignWithMargins = True
+            Left = 0
+            Top = 0
+            Width = 305
+            Height = 520
+            Margins.Left = 0
+            Margins.Top = 0
+            Margins.Right = 1
+            Margins.Bottom = 0
+            Align = alLeft
+            BevelOuter = bvNone
+            Caption = 'DatabaseTblPanel'
+            Constraints.MinWidth = 250
+            ParentBackground = False
+            ShowCaption = False
+            TabOrder = 0
+            object DatabaseTableCreateLabel: TLabel
+              Left = 140
+              Top = 3
+              Width = 65
+              Height = 15
+              Cursor = crHandPoint
+              Caption = 'Table Create'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlue
+              Font.Height = -12
+              Font.Name = 'Segoe UI'
+              Font.Style = [fsUnderline]
+              ParentFont = False
+              OnClick = DatabaseTableCreateLabelClick
+            end
+            object DatabaseTableCheckLabel: TLabel
+              Left = 220
+              Top = 3
+              Width = 33
+              Height = 15
+              Cursor = crHandPoint
+              Caption = 'Check'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlue
+              Font.Height = -12
+              Font.Name = 'Segoe UI'
+              Font.Style = [fsUnderline]
+              ParentFont = False
+              OnClick = DatabaseTableCheckLabelClick
+            end
+            object DatabaseTblLabel: TLabel
+              AlignWithMargins = True
+              Left = 3
+              Top = 3
+              Width = 33
+              Height = 15
+              Caption = 'Tables'
+            end
+            object DatabaseTblNoteSplitter: TSplitter
+              Left = 0
+              Top = 418
+              Width = 305
+              Height = 3
+              Cursor = crVSplit
+              Align = alBottom
+              ExplicitTop = 377
+              ExplicitWidth = 250
+            end
+            object DatabaseTblDBNavigator: TDBNavigator
+              Left = 0
+              Top = 16
+              Width = 240
+              Height = 30
+              DataSource = DatabaseTblDataSource
+              VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
+              Flat = True
+              TabOrder = 0
+            end
+            object DatabaseTableCreateCommitCheckBox: TCheckBox
+              Left = 60
+              Top = 2
+              Width = 71
+              Height = 17
+              Caption = 'Commit'
+              TabOrder = 1
+            end
+            object DatabaseTblDBGrid: TDBGrid
+              AlignWithMargins = True
+              Left = 3
+              Top = 44
+              Width = 299
+              Height = 371
+              Margins.Top = 44
+              Align = alClient
+              BorderStyle = bsNone
+              DataSource = DatabaseTblDataSource
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Segoe UI'
+              Font.Style = []
+              ParentFont = False
+              TabOrder = 2
+              TitleFont.Charset = DEFAULT_CHARSET
+              TitleFont.Color = clWindowText
+              TitleFont.Height = -12
+              TitleFont.Name = 'Segoe UI'
+              TitleFont.Style = [fsBold]
+            end
+            object DatabaseTblNoteDBMemo: TDBMemo
+              AlignWithMargins = True
+              Left = 3
+              Top = 424
+              Width = 299
+              Height = 93
+              Align = alBottom
+              BorderStyle = bsNone
+              DataField = 'FldNote'
+              DataSource = DatabaseTblDataSource
+              Font.Charset = ANSI_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -13
+              Font.Name = 'Consolas'
+              Font.Style = []
+              ParentFont = False
+              TabOrder = 3
+            end
+          end
+          object DatabaseFldPanel: TPanel
+            AlignWithMargins = True
+            Left = 309
+            Top = 0
+            Width = 329
+            Height = 520
+            Margins.Left = 0
+            Margins.Top = 0
+            Margins.Right = 1
+            Margins.Bottom = 0
+            Align = alClient
+            BevelOuter = bvNone
+            Caption = 'DatabaseFldPanel'
+            ParentBackground = False
+            ShowCaption = False
+            TabOrder = 1
+            object DatabaseFieldCreateLabel: TLabel
+              Left = 140
+              Top = 3
+              Width = 62
+              Height = 15
+              Cursor = crHandPoint
+              Caption = 'Field Create'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlue
+              Font.Height = -12
+              Font.Name = 'Segoe UI'
+              Font.Style = [fsUnderline]
+              ParentFont = False
+              OnClick = DatabaseFieldCreateLabelClick
+            end
+            object DatabaseFldNoteSplitter: TSplitter
+              Left = 0
+              Top = 418
+              Width = 329
+              Height = 3
+              Cursor = crVSplit
+              Align = alBottom
+              ExplicitTop = 377
+              ExplicitWidth = 290
+            end
+            object DatabaseFldLabel: TLabel
+              AlignWithMargins = True
+              Left = 3
+              Top = 3
+              Width = 30
+              Height = 15
+              Caption = 'Fields'
+            end
+            object DatabaseFldDBNavigator: TDBNavigator
+              Left = 0
+              Top = 16
+              Width = 240
+              Height = 30
+              DataSource = DatabaseFldDataSource
+              VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
+              Flat = True
+              TabOrder = 0
+            end
+            object DatabaseFieldCreateCommitCheckBox: TCheckBox
+              Left = 60
+              Top = 2
+              Width = 71
+              Height = 17
+              Caption = 'Commit'
+              TabOrder = 1
+            end
+            object DatabaseFldNoteDBMemo: TDBMemo
+              AlignWithMargins = True
+              Left = 3
+              Top = 424
+              Width = 323
+              Height = 93
+              Align = alBottom
+              BorderStyle = bsNone
+              DataField = 'FldNote'
+              DataSource = DatabaseFldDataSource
+              Font.Charset = ANSI_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -13
+              Font.Name = 'Consolas'
+              Font.Style = []
+              ParentFont = False
+              TabOrder = 2
+            end
+            object DatabaseFldDBGrid: TDBGrid
+              AlignWithMargins = True
+              Left = 3
+              Top = 44
+              Width = 323
+              Height = 371
+              Margins.Top = 44
+              Align = alClient
+              BorderStyle = bsNone
+              DataSource = DatabaseFldDataSource
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Segoe UI'
+              Font.Style = []
+              ParentFont = False
+              TabOrder = 3
+              TitleFont.Charset = DEFAULT_CHARSET
+              TitleFont.Color = clWindowText
+              TitleFont.Height = -12
+              TitleFont.Name = 'Segoe UI'
+              TitleFont.Style = [fsBold]
+            end
+          end
+        end
+        object DatabaseLeftPanel: TPanel
+          Left = 0
+          Top = 46
+          Width = 250
+          Height = 520
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = 'DatabaseLeftPanel'
+          Constraints.MinWidth = 250
+          ShowCaption = False
+          TabOrder = 2
+          object DatabaseDbaLabel: TLabel
+            AlignWithMargins = True
+            Left = 3
+            Top = 3
+            Width = 244
+            Height = 15
+            Align = alTop
+            Caption = 'Databases'
+            ExplicitWidth = 53
+          end
+          object DatabaseDbaDBGrid: TDBGrid
+            AlignWithMargins = True
+            Left = 3
+            Top = 45
+            Width = 244
+            Height = 472
+            Margins.Top = 24
+            Align = alClient
+            BorderStyle = bsNone
+            DataSource = DatabaseDbaDataSource
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -12
+            Font.Name = 'Segoe UI'
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 0
+            TitleFont.Charset = DEFAULT_CHARSET
+            TitleFont.Color = clWindowText
+            TitleFont.Height = -12
+            TitleFont.Name = 'Segoe UI'
+            TitleFont.Style = [fsBold]
+          end
+          object DatabaseDbaDBNavigator: TDBNavigator
+            Left = 0
+            Top = 16
+            Width = 240
+            Height = 30
+            DataSource = DatabaseDbaDataSource
+            VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
+            Flat = True
+            TabOrder = 1
+          end
+        end
+      end
+      object SourceTabSheet: TTabSheet
+        Caption = 'Sources'
+        ImageIndex = 10
+        object SourceLeftSplitter: TSplitter
+          Left = 250
+          Top = 0
+          Height = 566
+          ExplicitLeft = 360
+          ExplicitTop = 248
+          ExplicitHeight = 100
+        end
+        object SourceLeftPanel: TPanel
+          Left = 0
+          Top = 0
+          Width = 250
+          Height = 566
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = 'SourceLeftPanel'
+          Constraints.MinWidth = 250
+          ShowCaption = False
+          TabOrder = 0
+          object SourceDTClientTree: TDTClientTree
+            AlignWithMargins = True
+            Left = 0
+            Top = 31
+            Width = 247
+            Height = 532
+            Margins.Left = 0
+            Align = alClient
+            BorderStyle = bsNone
+            Colors.BorderColor = 15987699
+            Colors.DisabledColor = clGray
+            Colors.DropMarkColor = 15385233
+            Colors.DropTargetColor = 15385233
+            Colors.DropTargetBorderColor = 15385233
+            Colors.FocusedSelectionColor = 15385233
+            Colors.FocusedSelectionBorderColor = 15385233
+            Colors.GridLineColor = 15987699
+            Colors.HeaderHotColor = clBlack
+            Colors.HotColor = clBlack
+            Colors.SelectionRectangleBlendColor = 15385233
+            Colors.SelectionRectangleBorderColor = 15385233
+            Colors.SelectionTextColor = clBlack
+            Colors.TreeLineColor = 9471874
+            Colors.UnfocusedColor = clGray
+            Colors.UnfocusedSelectionColor = clWhite
+            Colors.UnfocusedSelectionBorderColor = clWhite
+            Header.AutoSizeIndex = 0
+            Header.MainColumn = -1
+            NodeDataSize = 4
+            TabOrder = 0
+            TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowRoot, toShowTreeLines, toThemeAware]
+            Touch.InteractiveGestures = [igPan, igPressAndTap]
+            Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+            DataSource = SourceDataSource
+            DBTreeFields.KeyFieldName = 'FldId'
+            DBTreeFields.ParentFieldName = 'FldPId'
+            DBTreeFields.ListFieldName = 'FldSource'
+            DBTreeFields.ParentOfRootValue = '0'
+            DBTreeImages.HasChildrenImageIndex = -1
+            DBTreeImages.HasChildrenSelectedIndex = -1
+            DBTreeImages.NoChildrenImageIndex = -1
+            DBTreeImages.NoChildrenSelectedIndex = -1
+            UseFilter = True
+            Columns = <>
+          end
+          object SourceDBNavigator: TDBNavigator
+            AlignWithMargins = True
+            Left = 0
+            Top = 3
+            Width = 247
+            Height = 25
+            Margins.Left = 0
+            Margins.Bottom = 0
+            DataSource = SourceDataSource
+            VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
+            Align = alTop
+            Flat = True
+            TabOrder = 1
+          end
+        end
+        object SourceMainPanel: TPanel
+          Left = 253
+          Top = 0
+          Width = 646
+          Height = 566
+          Align = alClient
+          BevelOuter = bvNone
+          Caption = 'SourceMainPanel'
+          ShowCaption = False
+          TabOrder = 1
+          object SourceSourceLabel: TLabel
+            AlignWithMargins = True
+            Left = 8
+            Top = 3
+            Width = 630
+            Height = 15
+            Margins.Left = 8
+            Margins.Right = 8
+            Align = alTop
+            Caption = 'Data Sources'
+            ExplicitWidth = 68
+          end
+          object SourceJvDBUltimGrid: TJvDBUltimGrid
+            AlignWithMargins = True
+            Left = 8
+            Top = 29
+            Width = 630
+            Height = 168
+            Margins.Left = 8
+            Margins.Top = 8
+            Margins.Right = 8
+            Align = alTop
+            BorderStyle = bsNone
+            DataSource = SourceDataSource
+            TabOrder = 0
+            TitleFont.Charset = DEFAULT_CHARSET
+            TitleFont.Color = clWindowText
+            TitleFont.Height = -12
+            TitleFont.Name = 'Segoe UI'
+            TitleFont.Style = []
+            SelectColumnsDialogStrings.Caption = 'Select columns'
+            SelectColumnsDialogStrings.OK = '&OK'
+            SelectColumnsDialogStrings.NoSelectionWarning = 'At least one column must be visible!'
+            EditControls = <>
+            RowsHeight = 19
+            TitleRowHeight = 19
+          end
+          object SourceConnStrAdoDBSynEdit: TDBSynEdit
+            AlignWithMargins = True
+            Left = 8
+            Top = 227
+            Width = 630
+            Height = 162
+            Cursor = crIBeam
+            Margins.Left = 8
+            Margins.Right = 8
+            DataField = 'FldConnStrADO'
+            DataSource = SourceDataSource
+            Align = alTop
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = 'Consolas'
+            Font.Style = []
+            Font.Quality = fqClearTypeNatural
+            ParentColor = False
+            ParentFont = False
+            TabOrder = 1
+            BorderStyle = bsNone
+            Gutter.Font.Charset = DEFAULT_CHARSET
+            Gutter.Font.Color = clWindowText
+            Gutter.Font.Height = -11
+            Gutter.Font.Name = 'Consolas'
+            Gutter.Font.Style = []
+            Gutter.Font.Quality = fqClearTypeNatural
+            Gutter.Bands = <>
+          end
+          object SourceConnStrFdDBSynEdit: TDBSynEdit
+            AlignWithMargins = True
+            Left = 8
+            Top = 419
+            Width = 630
+            Height = 139
+            Cursor = crIBeam
+            Margins.Left = 8
+            Margins.Right = 8
+            Margins.Bottom = 8
+            DataField = 'FldConnStrFD'
+            DataSource = SourceDataSource
+            Align = alClient
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = 'Consolas'
+            Font.Style = []
+            Font.Quality = fqClearTypeNatural
+            ParentColor = False
+            ParentFont = False
+            TabOrder = 2
+            BorderStyle = bsNone
+            Gutter.Font.Charset = DEFAULT_CHARSET
+            Gutter.Font.Color = clWindowText
+            Gutter.Font.Height = -11
+            Gutter.Font.Name = 'Consolas'
+            Gutter.Font.Style = []
+            Gutter.Font.Quality = fqClearTypeNatural
+            Gutter.Bands = <>
+          end
+          object SourceConnStrAdoPanel: TPanel
+            Left = 0
+            Top = 200
+            Width = 646
+            Height = 24
+            Align = alTop
+            BevelOuter = bvNone
+            Caption = 'SourceConnStrAdoPanel'
+            ShowCaption = False
+            TabOrder = 3
+            object SourceConnStrAdoLabel: TLabel
+              AlignWithMargins = True
+              Left = 8
+              Top = 3
+              Width = 124
+              Height = 18
+              Margins.Left = 8
+              Margins.Right = 8
+              Align = alLeft
+              Caption = 'Connection String ADO'
+              Layout = tlCenter
+              ExplicitHeight = 15
+            end
+            object SourceConnStrAdoTestLabel: TLabel
+              Left = 200
+              Top = 4
+              Width = 21
+              Height = 15
+              Cursor = crHandPoint
+              Caption = 'Test'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlue
+              Font.Height = -12
+              Font.Name = 'Segoe UI'
+              Font.Style = [fsUnderline]
+              ParentFont = False
+              OnClick = SourceConnStrAdoTestLabelClick
+            end
+          end
+          object SourceConnStrFdPanel: TPanel
+            Left = 0
+            Top = 392
+            Width = 646
+            Height = 24
+            Align = alTop
+            BevelOuter = bvNone
+            Caption = 'SystemSourceConnStrAdoPanel'
+            ShowCaption = False
+            TabOrder = 4
+            object SourceConnStrFdLabel: TLabel
+              AlignWithMargins = True
+              Left = 8
+              Top = 3
+              Width = 162
+              Height = 18
+              Margins.Left = 8
+              Margins.Right = 8
+              Align = alLeft
+              Caption = 'Connection String FD (Firedac)'
+              Layout = tlCenter
+              ExplicitHeight = 15
+            end
+            object SourceConnStrFdTestLabel: TLabel
+              Left = 200
+              Top = 4
+              Width = 21
+              Height = 15
+              Cursor = crHandPoint
+              Caption = 'Test'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlue
+              Font.Height = -12
+              Font.Name = 'Segoe UI'
+              Font.Style = [fsUnderline]
+              ParentFont = False
+              OnClick = SourceConnStrFdTestLabelClick
+            end
+          end
+        end
+      end
+      object BinariesTabSheet: TTabSheet
         Caption = 'Binaries'
         ImageIndex = 7
-        object Splitter1: TSplitter
+        object BinariesSplitter: TSplitter
           Left = 0
           Top = 370
           Width = 899
@@ -1148,11 +1823,12 @@ inherited SystemMainForm: TSystemMainForm
             Left = 788
             Top = 3
             Width = 102
-            Height = 15
+            Height = 40
             Margins.Right = 8
             Align = alRight
             Caption = 'BinariesCountLabel'
             Layout = tlCenter
+            ExplicitHeight = 15
           end
           object BinariesToolBar: TToolBar
             Left = 0
@@ -1224,7 +1900,7 @@ inherited SystemMainForm: TSystemMainForm
           TitleRowHeight = 19
           SortWith = swClient
         end
-        object PageControl1: TPageControl
+        object BinariesPageControl: TPageControl
           Left = 0
           Top = 373
           Width = 899
@@ -1277,326 +1953,204 @@ inherited SystemMainForm: TSystemMainForm
           end
         end
       end
-      object SystemDatabaseTabSheet: TTabSheet
-        Caption = 'Database'
-        ImageIndex = 9
-        object DatabasePanel: TPanel
-          AlignWithMargins = True
-          Left = 0
-          Top = 0
-          Width = 898
-          Height = 46
-          Margins.Left = 0
-          Margins.Top = 0
-          Margins.Right = 1
-          Margins.Bottom = 0
-          Align = alTop
-          BevelOuter = bvNone
-          Caption = 'AuditTopPanel'
-          ParentBackground = False
-          ShowCaption = False
+      object ServiceTabSheet: TTabSheet
+        Caption = 'Services'
+        ImageIndex = 5
+        object TopServiceLabel: TLabel
+          Left = 16
+          Top = 14
+          Width = 37
+          Height = 15
+          Caption = 'Service'
+        end
+        object TopServiceComboBox: TComboBox
+          Left = 64
+          Top = 11
+          Width = 145
+          Height = 23
           TabOrder = 0
-          object DatabaseToolBar: TToolBar
-            Left = 0
-            Top = 0
-            Width = 485
-            Height = 46
-            Align = alLeft
-            AutoSize = True
-            ButtonHeight = 46
-            ButtonWidth = 97
-            Caption = 'BinariesToolBar'
-            Images = SystemImageList24
-            ShowCaptions = True
-            TabOrder = 0
-            object SystemDbaDefinitionRebuildToolButton: TToolButton
-              Left = 0
-              Top = 0
-              Action = SystemDbaDefinitionRebuildAction
-            end
-            object SystemDbaCreateDdlToolButton: TToolButton
-              Left = 97
-              Top = 0
-              Action = SystemDbaCreateDdlAction
-            end
-            object SystemDbaBackupDdlToolButton: TToolButton
-              Left = 194
-              Top = 0
-              Action = SystemDbaBackupDdlAction
-            end
-            object SystemDbaRestoreDdlToolButton: TToolButton
-              Left = 291
-              Top = 0
-              Action = SystemDbaRestoreDdlAction
-            end
-            object SystemDbaDeleteDdlToolButton: TToolButton
-              Left = 388
-              Top = 0
-              Action = SystemDbaDeleteDdlAction
-            end
-          end
+          Text = 'TopServiceComboBox'
+          Items.Strings = (
+            ''
+            'Agent')
+        end
+        object TopServiceInstallButton: TButton
+          Left = 247
+          Top = 10
+          Width = 75
+          Height = 25
+          Caption = 'Install'
+          TabOrder = 1
+          OnClick = TopServiceInstallButtonClick
+        end
+        object TopServiceUninstallButton: TButton
+          Left = 328
+          Top = 10
+          Width = 75
+          Height = 25
+          Caption = 'Uninstall'
+          TabOrder = 2
+          OnClick = TopServiceUninstallButtonClick
+        end
+        object TopServicePauseButton: TButton
+          Left = 632
+          Top = 10
+          Width = 75
+          Height = 25
+          Caption = 'Pause'
+          TabOrder = 3
+        end
+        object TopServiceContinueButton: TButton
+          Left = 713
+          Top = 10
+          Width = 75
+          Height = 25
+          Caption = 'Continue'
+          TabOrder = 4
+          OnClick = TopServiceContinueButtonClick
+        end
+        object TopServiceStartButton: TButton
+          Left = 440
+          Top = 10
+          Width = 75
+          Height = 25
+          Caption = 'Start'
+          TabOrder = 5
+          OnClick = TopServiceStartButtonClick
+        end
+        object TopServiceStopButton: TButton
+          Left = 521
+          Top = 10
+          Width = 75
+          Height = 25
+          Caption = 'Stop'
+          TabOrder = 6
+          OnClick = TopServiceStopButtonClick
         end
       end
-      object SystemSourceTabSheet: TTabSheet
-        Caption = 'Sources'
-        ImageIndex = 10
-        object SystemSourceLeftSplitter: TSplitter
-          Left = 260
-          Top = 0
-          Height = 566
-          ExplicitLeft = 360
-          ExplicitTop = 248
-          ExplicitHeight = 100
-        end
-        object SystemSourceLeftPanel: TPanel
-          Left = 0
-          Top = 0
-          Width = 260
-          Height = 566
-          Align = alLeft
-          BevelOuter = bvNone
-          Caption = 'SystemSourceLeftPanel'
-          ShowCaption = False
+      object WebTabSheet: TTabSheet
+        Caption = '  Web '
+        ImageIndex = 11
+        object WebW3FilesGroupBox: TGroupBox
+          AlignWithMargins = True
+          Left = 16
+          Top = 137
+          Width = 867
+          Height = 105
+          Margins.Left = 16
+          Margins.Top = 16
+          Margins.Right = 16
+          Margins.Bottom = 0
+          Align = alTop
+          Caption = ' Web w3 framework files '
           TabOrder = 0
-          object SystemSourceDTClientTree: TDTClientTree
+          object WebW3FilesGenerateSpeedButton: TSpeedButton
             AlignWithMargins = True
-            Left = 0
-            Top = 31
-            Width = 257
-            Height = 532
-            Margins.Left = 0
-            Align = alClient
-            BorderStyle = bsNone
-            Colors.BorderColor = 15987699
-            Colors.DisabledColor = clGray
-            Colors.DropMarkColor = 15385233
-            Colors.DropTargetColor = 15385233
-            Colors.DropTargetBorderColor = 15385233
-            Colors.FocusedSelectionColor = 15385233
-            Colors.FocusedSelectionBorderColor = 15385233
-            Colors.GridLineColor = 15987699
-            Colors.HeaderHotColor = clBlack
-            Colors.HotColor = clBlack
-            Colors.SelectionRectangleBlendColor = 15385233
-            Colors.SelectionRectangleBorderColor = 15385233
-            Colors.SelectionTextColor = clBlack
-            Colors.TreeLineColor = 9471874
-            Colors.UnfocusedColor = clGray
-            Colors.UnfocusedSelectionColor = clWhite
-            Colors.UnfocusedSelectionBorderColor = clWhite
-            Header.AutoSizeIndex = 0
-            Header.MainColumn = -1
-            NodeDataSize = 4
-            TabOrder = 0
-            TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowRoot, toShowTreeLines, toThemeAware]
-            Touch.InteractiveGestures = [igPan, igPressAndTap]
-            Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-            DataSource = SourceDataSource
-            DBTreeFields.KeyFieldName = 'FldId'
-            DBTreeFields.ParentFieldName = 'FldPId'
-            DBTreeFields.ListFieldName = 'FldSource'
-            DBTreeFields.ParentOfRootValue = '0'
-            DBTreeImages.HasChildrenImageIndex = -1
-            DBTreeImages.HasChildrenSelectedIndex = -1
-            DBTreeImages.NoChildrenImageIndex = -1
-            DBTreeImages.NoChildrenSelectedIndex = -1
-            UseFilter = True
-            Columns = <>
+            Left = 18
+            Top = 33
+            Width = 79
+            Height = 54
+            Hint = 'Generate and save all the W3 framework web files (css, js)'
+            Margins.Left = 16
+            Margins.Top = 16
+            Margins.Right = 16
+            Margins.Bottom = 16
+            Align = alLeft
+            Caption = 'Generate'
+            OnClick = WebW3FilesGenerateSpeedButtonClick
           end
-          object SystemSourceDBNavigator: TDBNavigator
-            AlignWithMargins = True
-            Left = 0
-            Top = 3
-            Width = 257
-            Height = 25
-            Margins.Left = 0
-            Margins.Bottom = 0
-            DataSource = SourceDataSource
-            VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
-            Align = alTop
-            Flat = True
+          object WebW3ColorJsCheckBox: TCheckBox
+            Left = 239
+            Top = 53
+            Width = 97
+            Height = 17
+            Caption = 'w3color.js'
+            TabOrder = 0
+          end
+          object WebW3JsCheckBox: TCheckBox
+            Left = 136
+            Top = 53
+            Width = 97
+            Height = 17
+            Caption = 'w3.js'
             TabOrder = 1
+          end
+          object WebW3ThemeCssCheckBox: TCheckBox
+            Left = 445
+            Top = 53
+            Width = 156
+            Height = 17
+            Caption = 'w3-theme-<theme>.css'
+            TabOrder = 2
+          end
+          object WebW3CssCheckBox: TCheckBox
+            Left = 342
+            Top = 53
+            Width = 97
+            Height = 17
+            Caption = 'w3.css'
+            TabOrder = 3
           end
         end
-        object SystemSourceMainPanel: TPanel
-          Left = 263
-          Top = 0
-          Width = 636
-          Height = 566
-          Align = alClient
-          BevelOuter = bvNone
-          Caption = 'SystemSourceMainPanel'
-          ShowCaption = False
+        object WebWksGroupBox: TGroupBox
+          AlignWithMargins = True
+          Left = 16
+          Top = 16
+          Width = 867
+          Height = 105
+          Margins.Left = 16
+          Margins.Top = 16
+          Margins.Right = 16
+          Margins.Bottom = 0
+          Align = alTop
+          Caption = ' Web wks files '
           TabOrder = 1
-          object SystemSourceSourceLabel: TLabel
+          object WebWksFilesGenerateSpeedButton: TSpeedButton
             AlignWithMargins = True
-            Left = 8
-            Top = 3
-            Width = 620
-            Height = 15
-            Margins.Left = 8
-            Margins.Right = 8
-            Align = alTop
-            Caption = 'Sources'
-            ExplicitWidth = 41
+            Left = 18
+            Top = 33
+            Width = 79
+            Height = 54
+            Hint = 'Generate and save all the Wks web files (html, css, js)'
+            Margins.Left = 16
+            Margins.Top = 16
+            Margins.Right = 16
+            Margins.Bottom = 16
+            Align = alLeft
+            Caption = 'Generate'
+            OnClick = WebWksFilesGenerateSpeedButtonClick
           end
-          object SystemSourceDBGrid: TDBGrid
-            AlignWithMargins = True
-            Left = 8
-            Top = 29
-            Width = 620
-            Height = 168
-            Margins.Left = 8
-            Margins.Top = 8
-            Margins.Right = 8
-            Align = alTop
-            BorderStyle = bsNone
-            DataSource = SourceDataSource
+          object WebWksJsCheckBox: TCheckBox
+            Left = 136
+            Top = 53
+            Width = 97
+            Height = 17
+            Caption = 'wks.js'
             TabOrder = 0
-            TitleFont.Charset = DEFAULT_CHARSET
-            TitleFont.Color = clWindowText
-            TitleFont.Height = -12
-            TitleFont.Name = 'Segoe UI'
-            TitleFont.Style = []
           end
-          object SystemSourceConnStrAdoDBSynEdit: TDBSynEdit
-            AlignWithMargins = True
-            Left = 8
-            Top = 227
-            Width = 620
-            Height = 162
-            Cursor = crIBeam
-            Margins.Left = 8
-            Margins.Right = 8
-            DataField = 'FldConnStrADO'
-            DataSource = SourceDataSource
-            Align = alTop
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -13
-            Font.Name = 'Consolas'
-            Font.Style = []
-            Font.Quality = fqClearTypeNatural
-            ParentColor = False
-            ParentFont = False
+          object WebWksDefaultHtmlCheckBox: TCheckBox
+            Left = 342
+            Top = 53
+            Width = 97
+            Height = 17
+            Caption = 'default.html'
             TabOrder = 1
-            BorderStyle = bsNone
-            Gutter.Font.Charset = DEFAULT_CHARSET
-            Gutter.Font.Color = clWindowText
-            Gutter.Font.Height = -11
-            Gutter.Font.Name = 'Consolas'
-            Gutter.Font.Style = []
-            Gutter.Font.Quality = fqClearTypeNatural
-            Gutter.Bands = <>
           end
-          object SystemSourceConnStrFdDBSynEdit: TDBSynEdit
-            AlignWithMargins = True
-            Left = 8
-            Top = 419
-            Width = 620
-            Height = 139
-            Cursor = crIBeam
-            Margins.Left = 8
-            Margins.Right = 8
-            Margins.Bottom = 8
-            DataField = 'FldConnStrFD'
-            DataSource = SourceDataSource
-            Align = alClient
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -13
-            Font.Name = 'Consolas'
-            Font.Style = []
-            Font.Quality = fqClearTypeNatural
-            ParentColor = False
-            ParentFont = False
+          object WebWksCssCheckBox: TCheckBox
+            Left = 239
+            Top = 53
+            Width = 97
+            Height = 17
+            Caption = 'wks.css'
             TabOrder = 2
-            BorderStyle = bsNone
-            Gutter.Font.Charset = DEFAULT_CHARSET
-            Gutter.Font.Color = clWindowText
-            Gutter.Font.Height = -11
-            Gutter.Font.Name = 'Consolas'
-            Gutter.Font.Style = []
-            Gutter.Font.Quality = fqClearTypeNatural
-            Gutter.Bands = <>
           end
-          object SystemSourceConnStrAdoPanel: TPanel
-            Left = 0
-            Top = 200
-            Width = 636
-            Height = 24
-            Align = alTop
-            BevelOuter = bvNone
-            Caption = 'SystemSourceConnStrAdoPanel'
-            ShowCaption = False
+          object WebWksDefaultUseSpinCheckBox: TCheckBox
+            Left = 445
+            Top = 53
+            Width = 156
+            Height = 17
+            Caption = 'Use spin counter'
             TabOrder = 3
-            object SystemSourceConnStrAdoLabel: TLabel
-              AlignWithMargins = True
-              Left = 8
-              Top = 3
-              Width = 124
-              Height = 18
-              Margins.Left = 8
-              Margins.Right = 8
-              Align = alLeft
-              Caption = 'Connection String ADO'
-              Layout = tlCenter
-              ExplicitHeight = 15
-            end
-            object SystemSourceConnStrAdoTestLabel: TLabel
-              Left = 200
-              Top = 4
-              Width = 20
-              Height = 15
-              Cursor = crHandPoint
-              Caption = 'Test'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clBlue
-              Font.Height = -12
-              Font.Name = 'Segoe UI'
-              Font.Style = [fsUnderline]
-              ParentFont = False
-              OnClick = SystemSourceConnStrAdoTestLabelClick
-            end
-          end
-          object SystemSourceConnStrFdPanel: TPanel
-            Left = 0
-            Top = 392
-            Width = 636
-            Height = 24
-            Align = alTop
-            BevelOuter = bvNone
-            Caption = 'SystemSourceConnStrAdoPanel'
-            ShowCaption = False
-            TabOrder = 4
-            object SystemSourceConnStrFdLabel: TLabel
-              AlignWithMargins = True
-              Left = 8
-              Top = 3
-              Width = 162
-              Height = 18
-              Margins.Left = 8
-              Margins.Right = 8
-              Align = alLeft
-              Caption = 'Connection String FD (Firedac)'
-              Layout = tlCenter
-              ExplicitHeight = 15
-            end
-            object SystemSourceConnStrFdTestLabel: TLabel
-              Left = 200
-              Top = 4
-              Width = 20
-              Height = 15
-              Cursor = crHandPoint
-              Caption = 'Test'
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clBlue
-              Font.Height = -12
-              Font.Name = 'Segoe UI'
-              Font.Style = [fsUnderline]
-              ParentFont = False
-              OnClick = SystemSourceConnStrFdTestLabelClick
-            end
           end
         end
       end
@@ -2267,25 +2821,25 @@ inherited SystemMainForm: TSystemMainForm
       OnExecute = SystemDbaRestoreDdlActionExecute
     end
   end
-  object LogClientDataSet: TClientDataSet [29]
+  object DbLogClientDataSet: TClientDataSet [29]
     Aggregates = <>
     Params = <>
     ProviderName = 'LogDataSetProvider'
     ReadOnly = True
     RemoteServer = MainSoapConnection
-    AfterRefresh = LogClientDataSetAfterRefresh
+    AfterRefresh = DbLogClientDataSetAfterRefresh
     Left = 72
-    Top = 488
+    Top = 480
   end
-  object LogDataSource: TDataSource [30]
-    DataSet = LogClientDataSet
+  object DbLogDataSource: TDataSource [30]
+    DataSet = DbLogClientDataSet
     Left = 208
-    Top = 488
+    Top = 480
   end
   object AuditDataSource: TDataSource [31]
     DataSet = AuditClientDataSet
     Left = 208
-    Top = 544
+    Top = 528
   end
   object AuditClientDataSet: TClientDataSet [32]
     Aggregates = <>
@@ -2295,14 +2849,14 @@ inherited SystemMainForm: TSystemMainForm
     RemoteServer = MainSoapConnection
     AfterRefresh = AuditClientDataSetAfterRefresh
     Left = 72
-    Top = 544
+    Top = 528
   end
-  object SystemSyslogIdSyslogServer: TIdSyslogServer [33]
+  object SyslogIdSyslogServer: TIdSyslogServer [33]
     Bindings = <>
     ThreadedEvent = True
-    OnSyslog = SystemSyslogIdSyslogServerSyslog
-    Left = 792
-    Top = 600
+    OnSyslog = SyslogIdSyslogServerSyslog
+    Left = 720
+    Top = 488
   end
   object SystemSyslogImageList: TImageList
     ColorDepth = cd32Bit
@@ -2974,25 +3528,133 @@ inherited SystemMainForm: TSystemMainForm
     RemoteServer = MainSoapConnection
     AfterRefresh = BinariesClientDataSetAfterRefresh
     Left = 72
-    Top = 600
+    Top = 576
   end
   object BinariesDataSource: TDataSource
     DataSet = BinariesClientDataSet
     Left = 208
-    Top = 600
+    Top = 576
   end
   object SourceClientDataSet: TClientDataSet
     Aggregates = <>
     Params = <>
     ProviderName = 'SourceDataSetProvider'
     RemoteServer = MainSoapConnection
-    AfterRefresh = BinariesClientDataSetAfterRefresh
     Left = 72
-    Top = 656
+    Top = 624
   end
   object SourceDataSource: TDataSource
     DataSet = SourceClientDataSet
     Left = 208
+    Top = 624
+  end
+  object ServerClientDataSet: TClientDataSet
+    Aggregates = <>
+    IndexFieldNames = 'FldSystem'
+    MasterFields = 'FldObject'
+    MasterSource = ObjectDataSource
+    PacketRecords = 0
+    Params = <>
+    ProviderName = 'ServerDataSetProvider'
+    RemoteServer = MainSoapConnection
+    AfterOpen = ServerClientDataSetAfterOpen
+    AfterScroll = ServerClientDataSetAfterScroll
+    Left = 72
+    Top = 672
+  end
+  object DatabaseDbaClientDataSet: TClientDataSet
+    Aggregates = <>
+    IndexFieldNames = 'FldSystem'
+    MasterFields = 'FldObject'
+    MasterSource = ObjectDataSource
+    PacketRecords = 0
+    Params = <>
+    ProviderName = 'DatabaseDbaDataSetProvider'
+    RemoteServer = MainSoapConnection
+    AfterOpen = DatabaseDbaClientDataSetAfterOpen
+    AfterScroll = DatabaseDbaClientDataSetAfterScroll
+    Left = 862
+    Top = 432
+  end
+  object DatabaseTblClientDataSet: TClientDataSet
+    Aggregates = <>
+    IndexFieldNames = 'FldSystem;FldDatabase'
+    MasterFields = 'FldSystem;FldDatabase'
+    MasterSource = DatabaseDbaDataSource
+    PacketRecords = 0
+    Params = <>
+    ProviderName = 'DatabaseTblDataSetProvider'
+    RemoteServer = MainSoapConnection
+    AfterOpen = DatabaseTblClientDataSetAfterOpen
+    AfterScroll = DatabaseTblClientDataSetAfterScroll
+    Left = 862
+    Top = 488
+  end
+  object DatabaseFldClientDataSet: TClientDataSet
+    Aggregates = <>
+    IndexFieldNames = 'FldSystem;FldDatabase;FldTable;FldOrder'
+    MasterFields = 'FldSystem;FldDatabase;FldTable'
+    MasterSource = DatabaseTblDataSource
+    PacketRecords = 0
+    Params = <>
+    ProviderName = 'DatabaseFldDataSetProvider'
+    RemoteServer = MainSoapConnection
+    AfterOpen = DatabaseFldClientDataSetAfterOpen
+    Left = 862
+    Top = 544
+  end
+  object DatabaseIdxClientDataSet: TClientDataSet
+    Aggregates = <>
+    IndexFieldNames = 'FldSystem;FldDatabase;FldTable'
+    MasterFields = 'FldSystem;FldDatabase;FldTable'
+    MasterSource = DatabaseTblDataSource
+    PacketRecords = 0
+    Params = <>
+    ProviderName = 'DatabaseIdxDataSetProvider'
+    RemoteServer = MainSoapConnection
+    Left = 862
+    Top = 600
+  end
+  object ServerDataSource: TDataSource
+    DataSet = ServerClientDataSet
+    Left = 208
+    Top = 672
+  end
+  object DatabaseAccountClientDataSet: TClientDataSet
+    Aggregates = <>
+    IndexFieldNames = 'FldSystem'
+    MasterFields = 'FldSystem'
+    MasterSource = ServerDataSource
+    PacketRecords = 0
+    Params = <>
+    ProviderName = 'DatabaseAccountDataSetProvider'
+    RemoteServer = MainSoapConnection
+    Left = 862
+    Top = 656
+  end
+  object DatabaseDbaDataSource: TDataSource
+    DataSet = DatabaseDbaClientDataSet
+    Left = 1014
+    Top = 432
+  end
+  object DatabaseTblDataSource: TDataSource
+    DataSet = DatabaseTblClientDataSet
+    Left = 1014
+    Top = 488
+  end
+  object DatabaseFldDataSource: TDataSource
+    DataSet = DatabaseFldClientDataSet
+    Left = 1014
+    Top = 544
+  end
+  object DatabaseIdxDataSource: TDataSource
+    DataSet = DatabaseIdxClientDataSet
+    Left = 1014
+    Top = 600
+  end
+  object DatabaseAccountDataSource: TDataSource
+    DataSet = DatabaseAccountClientDataSet
+    Left = 1014
     Top = 656
   end
 end

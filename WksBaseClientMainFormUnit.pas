@@ -61,14 +61,16 @@ uses
     Winapi.Windows
   , Winapi.Messages
   , Winapi.ActiveX
+  , System.Win.ComObj        // edge webview
   , Winapi.WebView2          // edge webview
   , System.SysUtils
   , System.Variants
   , System.Classes
   , System.Actions
   , System.ImageList
-  , System.Win.ComObj        // edge webview
+  , Vcl.ActnColorMaps
   , Vcl.ActnList
+  , Vcl.ActnMan
   , Vcl.Buttons
   , Vcl.ComCtrls
   , Vcl.Controls
@@ -90,7 +92,7 @@ uses
   , Vcl.WinXCtrls            // win 10 ctrls
   , Vcl.PythonGUIInputOutput // python i/o
   , Data.DB
-  , Datasnap.DBClient
+  , Datasnap.DBClient        // clientdataset
 //, Midaslib                 // *** without it the client, on a different pc, give a blocching, hard to find error, moved in WksBaseClientProject.dpr ***
   , Soap.SOAPConn
   , SynEdit
@@ -98,6 +100,7 @@ uses
   , SynEditCodeFolding
   , JvCaptionPanel
   , JvDateTimePicker
+  , JvDBDateTimePicker
   , JvExComCtrls
   , JvExControls
   , JvExExtCtrls
@@ -118,6 +121,7 @@ uses
   , PythonVersions
   , Wks000Unit
   , WksLogFrameUnit
+  , WksColorDialogFormUnit
   , WksWordFrameUnit
   , WksPythonUnit
   ;
@@ -133,6 +137,10 @@ type
   TBaseMainForm = class(TForm)
     ActionBrowseAction: TAction;
     ActionBrowseToolButton: TToolButton;
+    ActionDeleteAction: TAction;
+    ActionDeleteToolButton: TToolButton;
+    ActionDestroyAction: TAction;
+    ActionDestroyToolButton: TToolButton;
     ActionEditAction: TAction;
     ActionEditToolButton: TToolButton;
     ActionFitAction: TAction;
@@ -244,7 +252,6 @@ type
     MemberRoleLevelLabel: TLabel;
     MemberTabSheet: TTabSheet;
     MonthLabel: TLabel;
-    ObjectApprovalJvScrollMaxBand: TJvScrollMaxBand;
     ObjectClientDataSet: TClientDataSet;
     ObjectContentCharCountLabel: TLabel;
     ObjectContentDBSynEdit: TDBSynEdit;
@@ -262,7 +269,6 @@ type
     ObjectContentSynEditTimer: TTimer;
     ObjectContentTabSheet: TTabSheet;
     ObjectContentTopPanel: TPanel;
-    ObjectCreatedDBText: TDBText;
     ObjectCreatedLabel: TLabel;
     ObjectDBEdit: TDBEdit;
     ObjectDBNavigator: TDBNavigator;
@@ -276,23 +282,10 @@ type
     ObjectDataTopPanel: TPanel;
     ObjectDataValidateSpeedButton: TSpeedButton;
     ObjectDateJvScrollMaxBand: TJvScrollMaxBand;
-    ObjectDescriptionDBEdit: TDBEdit;
     ObjectDescriptionDBSynEdit: TDBSynEdit;
-    ObjectDescriptionLabel: TLabel;
     ObjectDescriptionShowSpeedButton: TSpeedButton;
     ObjectDescriptionSplitter: TSplitter;
     ObjectEncryptedDBCheckBox: TDBCheckBox;
-    ObjectFromAreaDBEdit: TDBEdit;
-    ObjectFromAreaLabel: TLabel;
-    ObjectFromDepartmentDBEdit: TDBEdit;
-    ObjectFromDepartmentLabel: TLabel;
-    ObjectFromJvScrollMaxBand: TJvScrollMaxBand;
-    ObjectFromMemberDBEdit: TDBEdit;
-    ObjectFromMemberLabel: TLabel;
-    ObjectFromOrganizationDBEdit: TDBEdit;
-    ObjectFromOrganizationLabel: TLabel;
-    ObjectFromTeamDBEdit: TDBEdit;
-    ObjectFromTeamLabel: TLabel;
     ObjectGeneralJvScrollMaxBand: TJvScrollMaxBand;
     ObjectId8DBEdit: TDBEdit;
     ObjectId8Label: TLabel;
@@ -309,8 +302,8 @@ type
     ObjectImageLoadLabel: TLabel;
     ObjectImageSaveLabel: TLabel;
     ObjectJobGradeCalculateLabel: TLabel;
-    ObjectJobGradeMinDBComboBox: TDBComboBox;
-    ObjectJobGradeMinLabel: TLabel;
+    ObjectToJobGradeMinDBComboBox: TDBComboBox;
+    ObjectToJobGradeMinLabel: TLabel;
     ObjectJvScrollMax: TJvScrollMax;
     ObjectKindDBComboBox: TDBComboBox;
     ObjectKindDBText: TDBText;
@@ -328,19 +321,11 @@ type
     ObjectPersinstentDBCheckBox: TDBCheckBox;
     ObjectRevDBEdit: TDBEdit;
     ObjectRevLabel: TLabel;
-    ObjectRouteDBEdit: TDBEdit;
-    ObjectRouteLabel: TLabel;
-    ObjectSpareDBEdit: TDBEdit;
-    ObjectSpareLabel: TLabel;
     ObjectStateDBComboBox: TDBComboBox;
     ObjectStateDBText: TDBText;
     ObjectStateImageList24: TImageList;
     ObjectStateLabel: TLabel;
-    ObjectSubtitleDBEdit: TDBEdit;
-    ObjectSubtitleLabel: TLabel;
     ObjectTabSheet: TTabSheet;
-    ObjectTitleDBEdit: TDBEdit;
-    ObjectTitleLabel: TLabel;
     ObjectToAreaDBEdit: TDBEdit;
     ObjectToAreaLabel: TLabel;
     ObjectToDepartmentDBEdit: TDBEdit;
@@ -354,9 +339,6 @@ type
     ObjectToTeamLabel: TLabel;
     ObjectTreeTabSheet: TTabSheet;
     ObjectTypeJvScrollMaxBand: TJvScrollMaxBand;
-    ObjectUpdatedByDBText: TDBText;
-    ObjectUpdatedByLabel: TLabel;
-    ObjectUpdatedDBText: TDBText;
     ObjectUpdatedLabel: TLabel;
     OpenDialog: TOpenDialog;
     OptionAlwaysOnTopCheckBox: TCheckBox;
@@ -369,19 +351,19 @@ type
     OptionCryptoKeyEdit: TEdit;
     OptionCryptoKeyLabel: TLabel;
     OptionDateTimeJvScrollMaxBand: TJvScrollMaxBand;
-    OptionFilesBackupBeforeCheckInCheckBox: TCheckBox;
-    OptionFilesDeleteAfterUploadCheckBox: TCheckBox;
-    OptionFilesJvScrollMaxBand: TJvScrollMaxBand;
-    OptionFilesLocalFileOverrideAskCheckBox: TCheckBox;
-    OptionFilesOnDoubleClickComboBox: TComboBox;
-    OptionFilesOnDoubleClickLabel: TLabel;
-    OptionFilesOpenAfterChechOutCheckBox: TCheckBox;
-    OptionFilesReadOnlyDownloadedFileCheckBox: TCheckBox;
-    OptionFilesShowOnlyMyFilesCheckBox: TCheckBox;
-    OptionFilesWorkingFolderClearLabel: TLabel;
-    OptionFilesWorkingFolderLabel: TLabel;
-    OptionFilesWorkingFolderSelectButtonedEdit: TButtonedEdit;
-    OptionFilesWorkingFolderUseCheckBox: TCheckBox;
+    OptionFileBackupBeforeCheckInCheckBox: TCheckBox;
+    OptionFileDeleteAfterUploadCheckBox: TCheckBox;
+    OptionFileJvScrollMaxBand: TJvScrollMaxBand;
+    OptionFileLocalFileOverrideAskCheckBox: TCheckBox;
+    OptionFileOnDoubleClickComboBox: TComboBox;
+    OptionFileOnDoubleClickLabel: TLabel;
+    OptionFileOpenAfterChechOutCheckBox: TCheckBox;
+    OptionFileReadOnlyDownloadedFileCheckBox: TCheckBox;
+    OptionFileShowOnlyMyFilesCheckBox: TCheckBox;
+    OptionFileWorkingFolderClearLabel: TLabel;
+    OptionFileWorkingFolderLabel: TLabel;
+    OptionFileWorkingFolderSelectButtonedEdit: TButtonedEdit;
+    OptionFileWorkingFolderUseCheckBox: TCheckBox;
     OptionFoldersJvScrollMaxBand: TJvScrollMaxBand;
     OptionFoldingLineShowCheckBox: TCheckBox;
     OptionFontSizeJvSpinEdit: TJvSpinEdit;
@@ -470,11 +452,16 @@ type
     SearchToolButton: TToolButton;
     SearchWholeWordCheckBox: TCheckBox;
     StatusBar: TStatusBar;
-    SynEditInsertRegionPopup: TMenuItem;
+    SynEditContentHeaderInsertAction: TAction;
     SynEditContentPopup: TPopupMenu;
     SynEditContentRegionCollapseAction: TAction;
     SynEditContentRegionExpandAction: TAction;
     SynEditContentRegionInsertAction: TAction;
+    SynEditContentTemplateInsertAction: TAction;
+    SynEditContentTemplateInsertPopup: TMenuItem;
+    SynEditDataJsonTemplateInsertAction: TAction;
+    SynEditHeaderInsertPopup: TMenuItem;
+    SynEditInsertRegionPopup: TMenuItem;
     SynEditRegionInsertPopup: TMenuItem;
     SysEditContentAction: TActionList;
     SysEditContentImageList24: TImageList;
@@ -545,16 +532,50 @@ type
     WeekdayLabel: TLabel;
     WordTabSheet: TTabSheet;
     YearLabel: TLabel;
-    SynEditHeaderInsertPopup: TMenuItem;
-    SynEditContentHeaderInsertAction: TAction;
-    SynEditContentTemplateInsertPopup: TMenuItem;
-    SynEditContentTemplateInsertAction: TAction;
-    SynEditDataJsonTemplateInsertAction: TAction;
-    ActionDeleteToolButton: TToolButton;
-    ActionDeleteAction: TAction;
-    ActionDestroyAction: TAction;
-    ActionDestroyToolButton: TToolButton;
+    ActionImportToolButton: TToolButton;
+    ActionImportAction: TAction;
+    ObjectPersonJvScrollMaxBand: TJvScrollMaxBand;
+    ObjectAuthorLabel: TLabel;
+    ObjectOwnerCsvDBEdit: TDBEdit;
+    ObjectOwnerCsvLabel: TLabel;
+    ObjectUpdatedByLabel: TLabel;
+    ObjectExpireLabel: TLabel;
+    ObjectExpireJvDBDateTimePicker: TJvDBDateTimePicker;
+    ObjectGroupLabel: TLabel;
+    ObjectGroupDBEdit: TDBEdit;
+    ObjectHiddenDBCheckBox: TDBCheckBox;
+    ObjectContentTopPanel2: TPanel;
+    ObjectTitleLabel: TLabel;
+    ObjectTitleDBEdit: TDBEdit;
+    ObjectSubtitleLabel: TLabel;
+    ObjectSubtitleDBEdit: TDBEdit;
+    ObjectDescriptionLabel: TLabel;
+    ObjectBgColorLabel: TLabel;
+    ObjectBgColorDBEdit: TDBEdit;
+    ObjectFgColorLabel: TLabel;
+    ObjectFgColorDBEdit: TDBEdit;
+    ObjectRouteIdCsvLabel: TLabel;
+    ObjectRouteIdCsvDBEdit: TDBEdit;
+    ObjectUpdatedDBEdit: TDBEdit;
+    ObjectAuthorDBEdit: TDBEdit;
+    ObjectUpdatedByDBEdit: TDBEdit;
+    ObjectCreatedDBEdit: TDBEdit;
+    ObjectDataJvScrollMaxBand: TJvScrollMaxBand;
+    ObjectData2Label: TLabel;
+    ObjectData2DBEdit: TDBEdit;
+    ObjectData3Label: TLabel;
+    ObjectData3DBEdit: TDBEdit;
+    ObjectData4Label: TLabel;
+    ObjectData4DBEdit: TDBEdit;
+    ObjectData1Label: TLabel;
+    ObjectData1DBEdit: TDBEdit;
+    ActionExportToolButton: TToolButton;
+    ActionExportAction: TAction;
+    ActionGenerateToolButton: TToolButton;
+    ActionGenerateAction: TAction;
     procedure ActionBrowseActionExecute(Sender: TObject);
+    procedure ActionDeleteActionExecute(Sender: TObject);
+    procedure ActionDestroyActionExecute(Sender: TObject);
     procedure ActionEditActionExecute(Sender: TObject);
     procedure ActionFitActionExecute(Sender: TObject);
     procedure ActionGotoActionExecute(Sender: TObject);
@@ -647,6 +668,7 @@ type
     procedure ObjectDataDBSynEditChange(Sender: TObject);
     procedure ObjectDataDBSynEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ObjectDataDBSynEditMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure ObjectDataKindDBComboBoxChange(Sender: TObject);
     procedure ObjectDataValidateSpeedButtonClick(Sender: TObject);
     procedure ObjectDescriptionShowSpeedButtonClick(Sender: TObject);
     procedure ObjectIdDBTextDblClick(Sender: TObject);
@@ -660,8 +682,8 @@ type
     procedure ObjectNoteDBSynEditChange(Sender: TObject);
     procedure ObjectNoteDBSynEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ObjectNoteDBSynEditMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure OptionFilesWorkingFolderClearLabelClick(Sender: TObject);
-    procedure OptionFilesWorkingFolderSelectButtonedEditRightButtonClick(Sender: TObject);
+    procedure OptionFileWorkingFolderClearLabelClick(Sender: TObject);
+    procedure OptionFileWorkingFolderSelectButtonedEditRightButtonClick(Sender: TObject);
     procedure OptionFoldingLineShowCheckBoxClick(Sender: TObject);
     procedure OptionFontSizeJvSpinEditChange(Sender: TObject);
     procedure OptionPythonEnvInitSpeedButtonClick(Sender: TObject);
@@ -686,9 +708,11 @@ type
     procedure SearchReplaceSwapLabel2Click(Sender: TObject);
     procedure SearchReplaceSwapLabelClick(Sender: TObject);
     procedure SearchResultListBoxClick(Sender: TObject);
+    procedure SynEditContentHeaderInsertActionExecute(Sender: TObject);
     procedure SynEditContentRegionCollapseActionExecute(Sender: TObject);
     procedure SynEditContentRegionExpandActionExecute(Sender: TObject);
     procedure SynEditContentRegionInsertActionExecute(Sender: TObject);
+    procedure SynEditContentTemplateInsertPopupClick(Sender: TObject);
     procedure TextCommentActionExecute(Sender: TObject);
     procedure TextCompareActionExecute(Sender: TObject);
     procedure TextFoldActionExecute(Sender: TObject);
@@ -711,21 +735,26 @@ type
     procedure WeekLabelClick(Sender: TObject);
     procedure WordTabSheetHide(Sender: TObject);
     procedure WordTabSheetShow(Sender: TObject);
-    procedure SynEditContentHeaderInsertActionExecute(Sender: TObject);
-    procedure SynEditContentTemplateInsertPopupClick(Sender: TObject);
-    procedure ObjectDataKindDBComboBoxChange(Sender: TObject);
-    procedure ActionDeleteActionExecute(Sender: TObject);
-    procedure ActionDestroyActionExecute(Sender: TObject);
+    procedure ActionImportActionExecute(Sender: TObject);
+    procedure ObjectBgColorLabelClick(Sender: TObject);
+    procedure ObjectBgColorDBEditChange(Sender: TObject);
+    procedure ActionExportActionExecute(Sender: TObject);
+    procedure ActionGenerateActionExecute(Sender: TObject);
+  protected
+    // winmessages
+    procedure WmFormAfterShow(var Msg: TMessage); message WM_AFTER_SHOW;
+  //procedure WMMouseWheel(var Msg: TWMMouseWheel); message WM_MOUSEWHEEL; // overriding mouseweel
   private
     { Private declarations }
+    // flags
+    FMultiInsertOn       : boolean;                // set to true only if genetare mulpiple objects insert
     // chache
     FIdIni               : integer;                // idlastsaved
     FIdGui               : integer;                // idlastduringguitreeclick (after a refresh FId is resetted on cdsafterscroll... so we use FIdGui that is set on treenode click)
     FObject              : string;                 // objectname
     FObjectKind          : string;                 // Root, Zzz, Person, Code, ...
     FContentKind         : string;                 // Text, Sql, Py, Md, ...
-  //FFromOrganization    : string;                 //
-  //FFromMember          : string;                 //
+  //FAuthor              : string;                 // ex FromMember
     FInSearchAndReplace  : boolean;                // searchspeedup
   //FXxxFieldRecArr      : TXxxFieldRecArr;        // xxx variable/specific fields/values asked during new object creation (but in descendent forms!)
     // synedit
@@ -738,8 +767,6 @@ type
     // python
     FPythonEngine         : TPythonEngine;         // local
     FPythonGUIInputOutput : TPythonGUIInputOutput; // local
-    // winmessages
-    procedure WmFormAfterShow(var Msg: TMessage); message WM_AFTER_SHOW;
     // cds
     function  CdsCloseAll(var IvFbk: string): boolean;
     function  CdsOpenAll(var IvFbk: string): boolean;
@@ -782,7 +809,7 @@ type
   public
     { Public declarations }
     // object
-    FObj               : string;          // Xxx, Account, Code, Person...
+    FObj               : string;          // Xxx, Account, Code, Person... --> TObjEnum
     FId                : integer;         // id        (current)
     FPId               : integer;         // parentid  (hierarchical relationship)
   //FObjectId          : integer;         // objectid  (id in details table)
@@ -822,6 +849,7 @@ uses
   , System.UITypes
   , System.Diagnostics
   , System.Math
+  , System.Generics.Collections
 //, System.UITypes // vkcodes
   , Vcl.RecError // reconcileerrors
   , Vcl.DBGrids
@@ -835,6 +863,8 @@ uses
   , WksTextDiffFormUnit
   , WksTextStatsFormUnit
   , WksMemberRoleLevelGradeFormUnit
+  , WksGenerateDialogFormUnit
+//, WksExportDialogFormUnit *** incomplete ***
   , WksFileSoapMainServiceIntf
   ;
 {$ENDREGION}
@@ -1124,29 +1154,29 @@ begin
   tab := Trunc(OptionTabWidthJvSpinEdit.Value);
 
   // selectively
-           if MainPageControl.ActivePage = ObjectContentPrevTabSheet then begin
+//         if MainPageControl.ActivePage = ObjectContentPrevTabSheet then begin
     ObjectContentPrevDBSynEdit.BeginUpdate;
     gsyn.Setup(ObjectContentPrevDBSynEdit, tab, cke                , OptionFoldingLineShowCheckBox.Checked);
     ObjectContentPrevDBSynEdit.EndUpdate;
 
-  end else if MainPageControl.ActivePage = ObjectContentTabSheet then begin
+//end else if MainPageControl.ActivePage = ObjectContentTabSheet then begin
     ObjectDescriptionDBSynEdit.BeginUpdate;
-    gsyn.Setup(ObjectDescriptionDBSynEdit, tab);
+    gsyn.Setup(ObjectDescriptionDBSynEdit, tab{, cke});
     ObjectDescriptionDBSynEdit.EndUpdate;
     ObjectContentDBSynEdit.BeginUpdate;
     gsyn.Setup(ObjectContentDBSynEdit    , tab, cke                , OptionFoldingLineShowCheckBox.Checked);
     ObjectContentDBSynEdit.EndUpdate;
 
-  end else if MainPageControl.ActivePage =ObjectDataTabSheet then begin
+//end else if MainPageControl.ActivePage = ObjectDataTabSheet then begin
     ObjectDataDBSynEdit.BeginUpdate;
     gsyn.Setup(ObjectDataDBSynEdit       , tab, TCodKindEnum.ckJson, OptionFoldingLineShowCheckBox.Checked); // *** NOP, depends on DataType --> dke? ***
     ObjectDataDBSynEdit.EndUpdate;
 
-  end else if MainPageControl.ActivePage =ObjectDataTabSheet then begin
+//end else if MainPageControl.ActivePage = ObjectDataTabSheet then begin
     ObjectNoteDBSynEdit.BeginUpdate;
     gsyn.Setup(ObjectNoteDBSynEdit       , tab, TCodKindEnum.ckTxt , OptionFoldingLineShowCheckBox.Checked);
     ObjectNoteDBSynEdit.EndUpdate;
-  end;
+//end;
 
   // adjust
   ObjectDBEdit.Margins.Left := 35;
@@ -1231,11 +1261,11 @@ end;
 
 procedure TBaseMainForm.ObjectSynEditsUnfreeze;
 begin
-//ObjectContentDBSynEdit.EndUpdate;
   ObjectContentPrevDBSynEdit.DataSource := ObjectDataSource;
   ObjectContentDBSynEdit.DataSource     := ObjectDataSource;
   ObjectDataDBSynEdit.DataSource        := ObjectDataSource;
   ObjectNoteDBSynEdit.DataSource        := ObjectDataSource;
+//ObjectContentDBSynEdit.EndUpdate;
 end;
 
 procedure TBaseMainForm.ObjectTabsUpdate;
@@ -1265,8 +1295,8 @@ begin
     , ''                                                                   // class
     , ''                                                                   // style
     , true                                                                 // titleshow
-    , true                                                                 // imageshow
     , true                                                                 // subtitleshow
+    , true                                                                 // imageshow
     , true                                                                 // topnavoff
     , true                                                                 // systeminfooff
     , false                                                                // urlabsolute
@@ -1372,6 +1402,9 @@ begin
 
   {$REGION 'form'}
   TFrmRec.FormInit(Sender as TForm);
+
+  // enable wheel events for the form
+  //Self.OnMouseWheel := FormMouseWheel;
   {$ENDREGION}
 
   {$REGION 'gui'}
@@ -1391,7 +1424,7 @@ begin
   ObjectContentPrevDBSynEdit.ReadOnly          := true;
   ObjectContentSplitter.Visible                := false;
   ObjectContentSplitView.Opened                := false;
-  ObjectDescriptionDBSynEdit.Visible           := false;
+  ObjectContentTopPanel2.Visible               := false;
   ObjectDescriptionSplitter.Visible            := false;
 //ActionMarkdownAction.Checked                 := true;
   SearchReplaceOutEdit.Clear;
@@ -1417,47 +1450,47 @@ begin
   FIdGui := FId;
 
   // option (common)
-  OptionCryptoKeyEdit.Text                          := gini.CryGet('Common/OptionCryptoKey'                   , '12345'                    );
-  OptionPersistRootFolderEdit.Text                  := gini.StrGet('Common/OptionPersistRootFolder'           , 'C:\$\Persist'             );
-  OptionTempFolderEdit.Text                         := gini.StrGet('Common/OptionTempFolder'                  , 'C:\$\Temp'                );
-  OptionWeekWorkOneStartJvDateTimePicker.DateTime   := gini.FloGet('Common/OptionWeekWorkOneStart'            , IncHour(Date(), 19)        ); OptionWeekWorkOneStartJvDateTimePickerChange(nil);
+  OptionCryptoKeyEdit.Text                         := gini.CryGet('Common/OptionCryptoKey'                  , '12345'                    );
+  OptionPersistRootFolderEdit.Text                 := gini.StrGet('Common/OptionPersistRootFolder'          , 'C:\$\Persist'             );
+  OptionTempFolderEdit.Text                        := gini.StrGet('Common/OptionTempFolder'                 , 'C:\$\Temp'                );
+  OptionWeekWorkOneStartJvDateTimePicker.DateTime  := gini.FloGet('Common/OptionWeekWorkOneStart'           , IncHour(Date(), 19)        ); OptionWeekWorkOneStartJvDateTimePickerChange(nil);
 
-  // optionfiles (common)
-  OptionFilesShowOnlyMyFilesCheckBox.Checked        := gini.BooGet('File/OptionFilesShowOnlyMyFiles'          , true                       );
-  OptionFilesLocalFileOverrideAskCheckBox.Checked   := gini.BooGet('File/OptionFilesLocalFileOverrideAsk'     , true                       );
-  OptionFilesReadOnlyDownloadedFileCheckBox.Checked := gini.BooGet('File/OptionFilesReadOnlyDownloadedFile'   , true                       );
-  OptionFilesOpenAfterChechOutCheckBox.Checked      := gini.BooGet('File/OptionFilesOpenAfterChechOut'        , true                       );
-  OptionFilesDeleteAfterUploadCheckBox.Checked      := gini.BooGet('File/OptionFilesDeleteAfterUpload'        , true                       );
-  OptionFilesBackupBeforeCheckInCheckBox.Checked    := gini.BooGet('File/OptionFilesBackupBeforeCheckIn'      , true                       );
-  OptionFilesWorkingFolderUseCheckBox.Checked       := gini.BooGet('File/OptionFilesWorkingFolderUse'         , true                       );
-  OptionFilesWorkingFolderSelectButtonedEdit.Text   := gini.StrGet('File/OptionFilesWorkingFolderSelect'      , FILE_WORKING_FOLDER_DEFAULT);
-  OptionFilesOnDoubleClickComboBox.ItemIndex        := gini.IntGet('File/OptionFilesOnDoubleClick'            , 0                          );
+  // optionfile (common)
+  OptionFileShowOnlyMyFilesCheckBox.Checked        := gini.BooGet('File/OptionFileShowOnlyMyFiles'          , true                       );
+  OptionFileLocalFileOverrideAskCheckBox.Checked   := gini.BooGet('File/OptionFileLocalFileOverrideAsk'     , true                       );
+  OptionFileReadOnlyDownloadedFileCheckBox.Checked := gini.BooGet('File/OptionFileReadOnlyDownloadedFile'   , true                       );
+  OptionFileOpenAfterChechOutCheckBox.Checked      := gini.BooGet('File/OptionFileOpenAfterChechOut'        , true                       );
+  OptionFileDeleteAfterUploadCheckBox.Checked      := gini.BooGet('File/OptionFileDeleteAfterUpload'        , true                       );
+  OptionFileBackupBeforeCheckInCheckBox.Checked    := gini.BooGet('File/OptionFileBackupBeforeCheckIn'      , true                       );
+  OptionFileWorkingFolderUseCheckBox.Checked       := gini.BooGet('File/OptionFileWorkingFolderUse'         , true                       );
+  OptionFileWorkingFolderSelectButtonedEdit.Text   := gini.StrGet('File/OptionFileWorkingFolderSelect'      , FILE_WORKING_FOLDER_DEFAULT);
+  OptionFileOnDoubleClickComboBox.ItemIndex        := gini.IntGet('File/OptionFileOnDoubleClick'            , 0                          );
 
   // optiongeneral (by obj)
-  OptionStateDefaultComboBox.ItemIndex           := gini.IntGet(FObj + '/OptionStateDefaul'                   , 0                          );
-  OptionFontSizeJvSpinEdit.Value                 := gini.FloGet(FObj + '/OptionFontSize'                      , 10                         ); OptionFontSizeJvSpinEditChange(nil);
-  OptionTabWidthJvSpinEdit.Value                 := gini.FloGet(FObj + '/OptionTabWidth'                      , 2                          ); OptionTabWidthJvSpinEditChange(nil);
-  OptionTextRightEdgeComboBox.ItemIndex          := gini.IntGet(FObj + '/OptionTextRightEdge'                 , 5 {128}                    ); OptionTextRightEdgeComboBoxChange(nil);
-  OptionAutoRunCheckBox.Checked                  := gini.BooGet(FObj + '/OptionAutoRun'                       , false                      );
-  OptionAutoLoginCheckBox.Checked                := gini.BooGet(FObj + '/OptionAutoLogin'                     , false                      );
-  OptionAutoHideCheckBox.Checked                 := gini.BooGet(FObj + '/OptionAutoHide'                      , false                      );
-  OptionAutoRefreshCheckBox.Checked              := gini.BooGet(FObj + '/OptionAutoRefresh'                   , false                      );
-  OptionShowInTrayCheckBox.Checked               := gini.BooGet(FObj + '/OptionShowInTray'                    , true                       );
-  OptionMessageBeforeHideCheckBox.Checked        := gini.BooGet(FObj + '/OptionMessageBeforeHide'             , true                       );
-  OptionPasswordOnMaximizeCheckBox.Checked       := gini.BooGet(FObj + '/OptionPasswordOnMaximize'            , false                      );
-  OptionBackupOnExitCheckBox.Checked             := gini.BooGet(FObj + '/OptionBackupOnExit'                  , false                      );
-  OptionAlwaysOnTopCheckBox.Checked              := gini.BooGet(FObj + '/OptionAlwaysOnTop'                   , false                      );
-  OptionCommentRemoveCheckBox.Checked            := gini.BooGet(FObj + '/OptionCommentRemove'                 , true                       );
-  OptionVerboseCheckBox.Checked                  := gini.BooGet(FObj + '/OptionVerbose'                       , false                      );
+  OptionStateDefaultComboBox.ItemIndex             := gini.IntGet(FObj + '/OptionStateDefaul'               , 0                          );
+  OptionFontSizeJvSpinEdit.Value                   := gini.FloGet(FObj + '/OptionFontSize'                  , 10                         ); OptionFontSizeJvSpinEditChange(nil);
+  OptionTabWidthJvSpinEdit.Value                   := gini.FloGet(FObj + '/OptionTabWidth'                  , 2                          ); OptionTabWidthJvSpinEditChange(nil);
+  OptionTextRightEdgeComboBox.ItemIndex            := gini.IntGet(FObj + '/OptionTextRightEdge'             , 5 {128}                    ); OptionTextRightEdgeComboBoxChange(nil);
+  OptionAutoRunCheckBox.Checked                    := gini.BooGet(FObj + '/OptionAutoRun'                   , false                      );
+  OptionAutoLoginCheckBox.Checked                  := gini.BooGet(FObj + '/OptionAutoLogin'                 , false                      );
+  OptionAutoHideCheckBox.Checked                   := gini.BooGet(FObj + '/OptionAutoHide'                  , false                      );
+  OptionAutoRefreshCheckBox.Checked                := gini.BooGet(FObj + '/OptionAutoRefresh'               , false                      );
+  OptionShowInTrayCheckBox.Checked                 := gini.BooGet(FObj + '/OptionShowInTray'                , true                       );
+  OptionMessageBeforeHideCheckBox.Checked          := gini.BooGet(FObj + '/OptionMessageBeforeHide'         , true                       );
+  OptionPasswordOnMaximizeCheckBox.Checked         := gini.BooGet(FObj + '/OptionPasswordOnMaximize'        , false                      );
+  OptionBackupOnExitCheckBox.Checked               := gini.BooGet(FObj + '/OptionBackupOnExit'              , false                      );
+  OptionAlwaysOnTopCheckBox.Checked                := gini.BooGet(FObj + '/OptionAlwaysOnTop'               , false                      );
+  OptionCommentRemoveCheckBox.Checked              := gini.BooGet(FObj + '/OptionCommentRemove'             , true                       );
+  OptionVerboseCheckBox.Checked                    := gini.BooGet(FObj + '/OptionVerbose'                   , false                      );
 
   // optionshow (by obj)
-  OptionTextBoxInfoShowCheckBox.Checked          := gini.BooGet(FObj + '/OptionTextBoxInfoShow'               , true                       );
-  OptionFoldingLineShowCheckBox.Checked          := gini.BooGet(FObj + '/OptionFoldingLineShow'               , false                      );
+  OptionTextBoxInfoShowCheckBox.Checked            := gini.BooGet(FObj + '/OptionTextBoxInfoShow'           , true                       );
+  OptionFoldingLineShowCheckBox.Checked            := gini.BooGet(FObj + '/OptionFoldingLineShow'           , false                      );
 
   // searchreplace (by obj)
-  SearchInContentCheckBox.Checked                := gini.BooGet(FObj + '/SearchInContent'                     , true                       );
-  SearchInDataCheckBox.Checked                   := gini.BooGet(FObj + '/SearchInData'                        , false                      );
-  SearchInNoteCheckBox.Checked                   := gini.BooGet(FObj + '/SearchInNote'                        , false                      );
+  SearchInContentCheckBox.Checked                  := gini.BooGet(FObj + '/SearchInContent'                 , true                       );
+  SearchInDataCheckBox.Checked                     := gini.BooGet(FObj + '/SearchInData'                    , false                      );
+  SearchInNoteCheckBox.Checked                     := gini.BooGet(FObj + '/SearchInNote'                    , false                      );
   {$ENDREGION}
 
   {$REGION 'proxy'}
@@ -1672,6 +1705,24 @@ begin
   ObjectContentEdgeBrowser.CreateWebView;
 end;
 
+{procedure TBaseMainForm.WMMouseWheel(var Msg: TWMMouseWheel);
+const
+  ScrollStep = 20; // adjust to how many pixels you want per wheel notch
+begin
+  // weelscroll
+  if Msg.WheelDelta < 0 then
+//  ObjectJvScrollMax.Perform(WM_VSCROLL, SB_LINEDOWN, 0)
+    ObjectJvScrollMax.ScrollBy(0, ScrollStep)
+  else
+//  ObjectJvScrollMax.Perform(WM_VSCROLL, SB_LINEUP, 0)
+    ObjectJvScrollMax.ScrollBy(0, -ScrollStep)
+  ;
+  // force ScrollMax to actually update the scrollbox
+//  ObjectJvScrollMax.Perform(CM_SCROLLBARCHANGE, 0, 0);
+
+  Msg.Result := 1; // mark as handled
+end;}
+
 procedure TBaseMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
 var
   i: integer;
@@ -1698,47 +1749,47 @@ begin
   gini.IntSet(FObj + '/Id', FId);
 
   // option (common)
-  gini.CrySet( 'Common/OptionCryptoKey'                 , OptionCryptoKeyEdit.Text                         );
-  gini.StrSet( 'Common/OptionPersistRootFolder'         , OptionPersistRootFolderEdit.Text                 );
-  gini.StrSet( 'Common/OptionTempFolder'                , OptionTempFolderEdit.Text                        );
-  gini.FloSet( 'Common/OptionWeekWorkOneStart'          , OptionWeekWorkOneStartJvDateTimePicker.DateTime  );
+  gini.CrySet( 'Common/OptionCryptoKey'                , OptionCryptoKeyEdit.Text                        );
+  gini.StrSet( 'Common/OptionPersistRootFolder'        , OptionPersistRootFolderEdit.Text                );
+  gini.StrSet( 'Common/OptionTempFolder'               , OptionTempFolderEdit.Text                       );
+  gini.FloSet( 'Common/OptionWeekWorkOneStart'         , OptionWeekWorkOneStartJvDateTimePicker.DateTime );
 
-  // optionfiles (common)
-  gini.BooSet(  'File/OptionFilesShowOnlyMyFiles'       , OptionFilesShowOnlyMyFilesCheckBox.Checked       );
-  gini.BooSet(  'Files/OptionFileLocalFileOverrideAsk'  , OptionFilesLocalFileOverrideAskCheckBox.Checked  );
-  gini.BooSet(  'Files/OptionFileReadOnlyDownloadedFile', OptionFilesReadOnlyDownloadedFileCheckBox.Checked);
-  gini.BooSet(  'Files/OptionFileOpenAfterChechOut'     , OptionFilesOpenAfterChechOutCheckBox.Checked     );
-  gini.BooSet(  'Files/OptionFileDeleteAfterUpload'     , OptionFilesDeleteAfterUploadCheckBox.Checked     );
-  gini.BooSet(  'Files/OptionFileBackupBeforeCheckIn'   , OptionFilesBackupBeforeCheckInCheckBox.Checked   );
-  gini.BooSet(  'Files/OptionFileWorkingFolderUse'      , OptionFilesWorkingFolderUseCheckBox.Checked      );
-  gini.StrSet(  'Files/OptionFileWorkingFolderSelect'   , OptionFilesWorkingFolderSelectButtonedEdit.Text  );
-  gini.IntSet(  'Files/OptionFileOnDoubleClick'         , OptionFilesOnDoubleClickComboBox.ItemIndex       );
+  // optionfile (common)
+  gini.BooSet(  'File/OptionFileShowOnlyMyFiles'       , OptionFileShowOnlyMyFilesCheckBox.Checked       );
+  gini.BooSet(  'File/OptionFileLocalFileOverrideAsk'  , OptionFileLocalFileOverrideAskCheckBox.Checked  );
+  gini.BooSet(  'File/OptionFileReadOnlyDownloadedFile', OptionFileReadOnlyDownloadedFileCheckBox.Checked);
+  gini.BooSet(  'File/OptionFileOpenAfterChechOut'     , OptionFileOpenAfterChechOutCheckBox.Checked     );
+  gini.BooSet(  'File/OptionFileDeleteAfterUpload'     , OptionFileDeleteAfterUploadCheckBox.Checked     );
+  gini.BooSet(  'File/OptionFileBackupBeforeCheckIn'   , OptionFileBackupBeforeCheckInCheckBox.Checked   );
+  gini.BooSet(  'File/OptionFileWorkingFolderUse'      , OptionFileWorkingFolderUseCheckBox.Checked      );
+  gini.StrSet(  'File/OptionFileWorkingFolderSelect'   , OptionFileWorkingFolderSelectButtonedEdit.Text  );
+  gini.IntSet(  'File/OptionFileOnDoubleClick'         , OptionFileOnDoubleClickComboBox.ItemIndex       );
 
   // optiongeneral (by obj)
-  gini.IntSet(FObj + '/OptionStateDefaul'               , OptionStateDefaultComboBox.ItemIndex             );
-  gini.FloSet(FObj + '/OptionFontSize'                  , OptionFontSizeJvSpinEdit.Value                   );
-  gini.FloSet(FObj + '/OptionTabWidth'                  , OptionTabWidthJvSpinEdit.Value                   );
-  gini.IntSet(FObj + '/OptionTextRightEdge'             , OptionTextRightEdgeComboBox.ItemIndex            );
-  gini.BooSet(FObj + '/OptionAutoRun'                   , OptionAutoRunCheckBox.Checked                    );
-  gini.BooSet(FObj + '/OptionAutoLogin'                 , OptionAutoLoginCheckBox.Checked                  );
-  gini.BooSet(FObj + '/OptionAutoHide'                  , OptionAutoHideCheckBox.Checked                   );
-  gini.BooSet(FObj + '/OptionAutoRefresh'               , OptionAutoRefreshCheckBox.Checked                );
-  gini.BooSet(FObj + '/OptionShowInTray'                , OptionShowInTrayCheckBox.Checked                 );
-  gini.BooSet(FObj + '/OptionMessageBeforeHide'         , OptionMessageBeforeHideCheckBox.Checked          );
-  gini.BooSet(FObj + '/OptionPasswordOnMaximize'        , OptionPasswordOnMaximizeCheckBox.Checked         );
-  gini.BooSet(FObj + '/OptionBackupOnExit'              , OptionBackupOnExitCheckBox.Checked               );
-  gini.BooSet(FObj + '/OptionAlwaysOnTop'               , OptionAlwaysOnTopCheckBox.Checked                );
-  gini.BooSet(FObj + '/OptionCommentRemove'             , OptionCommentRemoveCheckBox.Checked              );
-  gini.BooSet(FObj + '/OptionVerbose'                   , OptionVerboseCheckBox.Checked                    );
+  gini.IntSet(FObj + '/OptionStateDefaul'              , OptionStateDefaultComboBox.ItemIndex            );
+  gini.FloSet(FObj + '/OptionFontSize'                 , OptionFontSizeJvSpinEdit.Value                  );
+  gini.FloSet(FObj + '/OptionTabWidth'                 , OptionTabWidthJvSpinEdit.Value                  );
+  gini.IntSet(FObj + '/OptionTextRightEdge'            , OptionTextRightEdgeComboBox.ItemIndex           );
+  gini.BooSet(FObj + '/OptionAutoRun'                  , OptionAutoRunCheckBox.Checked                   );
+  gini.BooSet(FObj + '/OptionAutoLogin'                , OptionAutoLoginCheckBox.Checked                 );
+  gini.BooSet(FObj + '/OptionAutoHide'                 , OptionAutoHideCheckBox.Checked                  );
+  gini.BooSet(FObj + '/OptionAutoRefresh'              , OptionAutoRefreshCheckBox.Checked               );
+  gini.BooSet(FObj + '/OptionShowInTray'               , OptionShowInTrayCheckBox.Checked                );
+  gini.BooSet(FObj + '/OptionMessageBeforeHide'        , OptionMessageBeforeHideCheckBox.Checked         );
+  gini.BooSet(FObj + '/OptionPasswordOnMaximize'       , OptionPasswordOnMaximizeCheckBox.Checked        );
+  gini.BooSet(FObj + '/OptionBackupOnExit'             , OptionBackupOnExitCheckBox.Checked              );
+  gini.BooSet(FObj + '/OptionAlwaysOnTop'              , OptionAlwaysOnTopCheckBox.Checked               );
+  gini.BooSet(FObj + '/OptionCommentRemove'            , OptionCommentRemoveCheckBox.Checked             );
+  gini.BooSet(FObj + '/OptionVerbose'                  , OptionVerboseCheckBox.Checked                   );
 
   // optionshow (by obj)
-  gini.BooSet(FObj + '/OptionTextBoxInfoShow'           , OptionTextBoxInfoShowCheckBox.Checked            );
-  gini.BooSet(FObj + '/OptionFoldingLineShow'           , OptionFoldingLineShowCheckBox.Checked            );
+  gini.BooSet(FObj + '/OptionTextBoxInfoShow'          , OptionTextBoxInfoShowCheckBox.Checked           );
+  gini.BooSet(FObj + '/OptionFoldingLineShow'          , OptionFoldingLineShowCheckBox.Checked           );
 
   // searchreplace (by obj)
-  gini.BooSet(FObj + '/SearchInContent'                 , SearchInContentCheckBox.Checked                  );
-  gini.BooSet(FObj + '/SearchInData'                    , SearchInDataCheckBox.Checked                     );
-  gini.BooSet(FObj + '/SearchInNote'                    , SearchInNoteCheckBox.Checked                     );
+  gini.BooSet(FObj + '/SearchInContent'                , SearchInContentCheckBox.Checked                 );
+  gini.BooSet(FObj + '/SearchInData'                   , SearchInDataCheckBox.Checked                    );
+  gini.BooSet(FObj + '/SearchInNote'                   , SearchInNoteCheckBox.Checked                    );
   {$ENDREGION}
 
   {$REGION 'sessionclose'}
@@ -1865,17 +1916,17 @@ begin
     end;
   finally
     MainPageControl.ActivePage := ObjectContentTabSheet;
-    ObjectContentDBSynEdit.SetFocus;
+  //ObjectContentDBSynEdit.SetFocus;
     Screen.Cursor := crDefault;
   end;
 end;
 
 procedure TBaseMainForm.ActionPostActionExecute(Sender: TObject);
 begin
-  // object
-  if ObjectClientDataSet.State = dsEdit then begin
+  if not (ObjectClientDataSet.State = dsBrowse) then begin
     // rev
     ObjectClientDataSet.FieldByName('FldRev').Value := ObjectClientDataSet.FieldByName('FldRev').AsInteger + 1;
+    
     // post
     ObjectDBNavigator.BtnClick(nbPost);
   end;
@@ -1974,7 +2025,7 @@ var
   oid, pid: integer;
 begin
   // ownercheck
-  mbr := ObjectClientDataSet.FieldByName('FldFromMember').AsString;
+  mbr := ObjectClientDataSet.FieldByName('FldAuthor').AsString;
   if mbr <> gusr.Username then begin
     TMesRec.I('Not allowed!  only %s can recycle this item !', [mbr]);
     Exit;
@@ -2018,7 +2069,7 @@ var
   oid, pid: integer;
 begin
   // ownercheck
-  mbr := ObjectClientDataSet.FieldByName('FldFromMember').AsString;
+  mbr := ObjectClientDataSet.FieldByName('FldAuthor').AsString;
   if mbr <> gusr.Username then begin
     TMesRec.I('Not allowed!  only %s can recycle this item !', [mbr]);
     Exit;
@@ -2113,6 +2164,269 @@ begin
     Exit;
 
   ObjectContentDBSynEdit.Lines.SaveToFile(OpenDialog.FileName);
+end;
+
+procedure TBaseMainForm.ActionGenerateActionExecute(Sender: TObject);
+var
+  fbk: string;
+  okk: boolean;
+begin
+  FMultiInsertOn := true;
+  try
+    okk := TGenerateDialogForm.Execute(FObj, FId, ObjectClientDataSet, fbk, Format('Generate Multiple %s Objects', [FObj]));
+    if okk then
+      ActionRefreshAction.Execute;
+    LogFrame.Log(fbk);
+  finally
+    FMultiInsertOn := false;
+  end;
+end;
+
+procedure TBaseMainForm.ActionExportActionExecute(Sender: TObject);
+//var
+//  f, e, k: string;
+//  fbk: string;
+//  okk: boolean;
+begin
+(*
+  SaveDialog.FileName := TSysRec.Name + '_' + FObj + '_' + TDatRec.DtToCode(Now);
+  if not SaveDialog.Execute then
+    Exit;
+
+  f := SaveDialog.FileName;
+  e := ExtractFileExt(f);
+
+  if TFsyRec.FileExists(f, k) then
+    if not TAskRec.Yes(TFsyRec.FSY_FILE_ALREADY_EXISTS_REPLACE_IT) then
+      Exit;
+
+  if SameText(e, '.xml') then
+    ObjectClientDataset.SaveToFile(f, dfXMLUTF8)
+  else
+    ObjectClientDataset.SaveToFile(f, dfBinary); // .cds
+  TMesRec.I('All objects exported to %s', [f]);
+
+procedure TXxxMainForm.XxxTreeBranchExportPopupClick(Sender: TObject);
+var
+  j: superobject.ISuperobject;
+  i, n, f: string; // id, name, filespec
+begin
+  // zip
+  i := XxxClientDataSet.FieldByName('FldId').AsString;
+  n := XxxClientDataSet.FieldByName(FFldObj).AsString;
+  f := Format('%s\Wks%s_%s_%s.json', [wks.Dir('tmp'), FObj, i, n]);
+
+  // tojson
+  Dst.RecordToJson(XxxClientDataSet, j);
+  if not Assigned(j) then //begin
+    raise Exception.CreateFmt('Unable to parse %s %s %s as json, probably invalid escape', [FObj, i, a]);
+  //Exit;
+//end;
+
+  // disk
+  j.SaveTo(f, true, true);
+  LogFmt('%-10s|%s ...', ['EXPORT', f]);
+  mes.IFmt('%s %s %s exported to %s', [FObj, i, n, f]);
+end;
+*)
+end;
+
+procedure TBaseMainForm.ActionImportActionExecute(Sender: TObject);
+var
+  i, z, idn, pid, ck: integer; // cryptokey
+  s1, s2: TStream;
+  f, e, o, d, x, h, u, p, n, y, l, k: string; // filename, ext, owner, kind, xxx, hook, username, password, note, encrypted
+  cds: TClientDataset;
+begin
+
+  {$REGION 'File'}
+  if not OpenDialog.Execute then
+    Exit;
+
+  pid := FId;
+  o   := gmbr.Member;
+  f   := OpenDialog.FileName;
+  e   := ExtractFileExt(f);
+  {$ENDREGION}
+
+  {$REGION 'Exit'}
+  if not ({(e = '.xls') or (e = '.xlsx') or} (e = '.xml') or (e = '.cds')) then begin
+    TMesRec.W('Unable to import file of type %s, valid types are: *.xml, *.cds', [f, e]); // *.xls, *.xlsx,
+    Exit;
+  end;
+  {$ENDREGION}
+
+  try
+
+    {$REGION 'Load'}
+    if          (e = '.xls') or (e = '.xlsx') then begin
+
+      {$REGION 'XlsXlsx'}
+    // connect to excel file
+    //ImportXlsADOConnection.Close;
+    //ImportXlsADOConnection.ConnectionString := CsMsExcel('ADO', f);
+    //ImportXlsADOConnection.Open;
+    ////ImportXlsADOConnection.GetTableNames(IvExcelSheet, true);
+    //ImportXlsADOQuery.Active := true;
+      {$ENDREGION}
+
+    end else if (e = '.xml') or (e = '.cds') then begin
+
+      {$REGION 'XmlCds'}
+      cds := TClientDataset.Create(nil);
+      cds.LoadFromFile(f);
+      cds.Open;
+      {$ENDREGION}
+
+    end;
+    if TAskRec.No('Loaded file %s.  Continue to import %d total records ?', [f, cds.RecordCount]) then
+      Exit;
+    {$ENDREGION}
+
+    {$REGION 'Scan'}
+    for i := 0 to cds.RecordCount-1 do begin
+      // record
+      d := cds.FieldByName('FldKind').AsString     ;
+      y := cds.FieldByName('FldEncrypted').AsString;
+      x := cds.FieldByName('FldObject').AsString   ;
+
+      // loghead
+      l := Format('%.3d) [RvState] %s, %s, %s, %s', [i, x, h, u, p]);
+
+      // alreadyexists and validusernamepassword
+      if (u <> '') and (p <> '') {and (XxxExists('FldObject;FldUsername;FldPassword', VarArrayOf([h, u, p]), k))} then begin
+        l := TStrRec.StrReplace(l, '[RvState]', 'ALREADYEXIST');
+
+      // doesntexists
+      end else begin
+        l := TStrRec.StrReplace(l, '[RvState]', 'IMPORTED    ');
+
+        // idnext
+        idn := TDbaRec.TblIdNextRio('');
+
+        // appendnewbatimage
+        ObjectClientDataSet.AppendRecord([idn, pid, o, d, x, h, u, p, n, y, nil]);
+
+        // edit
+        ObjectClientDataSet.Edit;
+
+        // create a read stream channel to the image field
+        s1 := cds.CreateBlobStream(cds.FieldByName('FldImage'), bmRead);
+        try
+          s1.Seek(0, soFromBeginning);
+          // create a write stream to the image field of current record of accountcsd
+          s2 := ObjectClientDataSet.CreateBlobStream(ObjectClientDataSet.FieldByName('FldImage'), bmWrite);
+          // copy from 1st stream to the 2nd one
+          try
+            s2.Seek(0, soFromBeginning);
+            s2.CopyFrom(s1, s1.Size);
+          finally
+            FreeAndNil(s2);
+          end;
+        finally
+          FreeAndNil(s1);
+        end;
+
+        // post
+      //ObjectClientDataSet.Post;
+        ObjectDBNavigator.BtnClick(nbPost);
+        Application.ProcessMessages;
+        Inc(z);
+
+        // end
+      //if ObjectClientDataSet.ApplyUpdates(0) > 0 then
+        //l := str.Replace(l, 'IMPORTED    ', 'UPDATEFAILED');
+      end;
+
+      // log
+      LogFrame.Log(l);
+
+      // next
+      cds.Next;
+    end;
+
+    // end
+    cds.Close;
+    TMesRec.I('Imported %d records', [z]);
+    {$ENDREGION}
+
+  except
+    on e: Exception do begin
+      LogFrame.Log(e);
+      TMesRec.W(e.Message);
+    end;
+  end;
+
+(*
+procedure TXxxMainForm.XxxTreeBranchImportPopupClick(Sender: TObject);
+var
+  i, p, n: integer; // id, pid, idnext
+  j: superobject.ISuperobject;
+  f, q, k: string; // filespec
+  d: TFileOpenDialog;
+begin
+  mes.NA;
+  d := TFileOpenDialog.Create(nil);
+  try
+    // dialog
+    d.Title := FObj + ' Import';
+    d.DefaultExtension := '.json';
+    d.DefaultFolder := ExtractfileDir(wks.TempDir);
+
+    if d.Execute then begin
+      // json
+      f := d.FileName;
+      j := TSuperObject.ParseFile(f, false);
+      LogFmt('%-10s|%s ...', ['IMPORTING', f]);
+      Log(j.AsJSon(true, false));
+
+      // idincoming
+      i := j.I['FldId'];
+
+      // idincoming-exist --> override-existing and locate-to-it
+      if XxxClientDataSet.Locate('FldId', i, []) then begin
+
+      // override-current
+    //end else begin
+
+      // insert-new under current as a new-child
+      end else begin
+        // parentcurrent
+        p := XxxClientDataSet.FieldByName('FldId').AsInteger;
+
+        // idnext *** NOOOOOOO ***
+        n := x.TblIdNext('DbaXxx.dbo.TblXxx');
+
+        // append
+        XxxClientDataSet.AppendRecord( [
+         {j.I['FldId']}          n            // Id
+        ,{j.I['FldPId']}         p            // PId
+        , j.S['FldOrganization'].QuotedString // Organization
+        , j.S['FldOwner'       ].QuotedString // Owner
+        , j.S['FldXxx'         ].QuotedString // Xxx
+        , j.S['FldKind'        ].QuotedString // Kind
+        , j.S['FldState'       ].QuotedString // State
+        , j.S['FldCreated'     ].QuotedString // Created
+        , j.S['FldUpdated'     ].QuotedString // Updated
+        , j.S['FldDescription' ].QuotedString // Description
+        , j.S['FldContent'     ].QuotedString // Script
+        , j.S['FldJson'        ].QuotedString // Json
+        , j.S['FldContinuousOn'].QuotedString // ContinuousOn
+        , j.S['FldDelayMs'     ].QuotedString // DelayMs
+        , j.S['FldOnSuccess'   ].QuotedString // OnSuccess
+        , j.S['FldOnFail'      ].QuotedString // OnFail
+        , j.S['FldOnEmpty'     ].QuotedString // OnEmpty
+        , j.S['FldHistorySave' ].QuotedString // HistorySave
+        ] );
+        Log(q);
+      end;
+      LogFmt('%-10s|%s under %d', ['IMPORTED', f, p]);
+    end;
+  finally
+    FreeAndNil(d);
+  end
+end;
+*)
 end;
 
 procedure TBaseMainForm.ActionPersistedOpenActionExecute(Sender: TObject);
@@ -2678,8 +2992,8 @@ begin
     Exit;
 
   // edit
-  if not (ObjectClientDataSet.State in [dsEdit]) then
-    ObjectClientDataSet.Edit;
+//  if not (ObjectClientDataSet.State in [dsEdit]) then
+//    ObjectClientDataSet.Edit;
 
   // modified
   if not TStrRec.StrEndsWith(ObjectContentTabSheet.Caption, ' ' + CHAR_CONTENT_CHANGED) then
@@ -2755,12 +3069,11 @@ end;
 
 procedure TBaseMainForm.ObjectDescriptionShowSpeedButtonClick(Sender: TObject);
 begin
-  //ObjectDescriptionShowSpeedButton.Down := not ObjectDescriptionShowSpeedButton.Down;
-  ObjectDescriptionDBSynEdit.Visible := ObjectDescriptionShowSpeedButton.Down;
+  ObjectContentTopPanel2.Visible     := ObjectDescriptionShowSpeedButton.Down;
   ObjectDescriptionSplitter.Visible  := ObjectDescriptionShowSpeedButton.Down;
   if ObjectDescriptionShowSpeedButton.Down then begin
     ObjectDescriptionShowSpeedButton.Caption := '-';
-    ObjectDescriptionSplitter.Top := ObjectDescriptionDBSynEdit.Height;
+    ObjectDescriptionSplitter.Top := ObjectContentTopPanel2.Height;
   end else
     ObjectDescriptionShowSpeedButton.Caption := '+';
 end;
@@ -2816,8 +3129,8 @@ end;
 procedure TBaseMainForm.ObjectDataDBSynEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   // edit
-  if not (ObjectClientDataSet.State in [dsEdit]) then
-    ObjectClientDataSet.Edit;
+//  if not (ObjectClientDataSet.State in [dsEdit]) then
+//    ObjectClientDataSet.Edit;
 
   // modified
   if not TStrRec.StrEndsWith(ObjectDataTabSheet.Caption, ' ' + CHAR_CONTENT_CHANGED) then
@@ -2860,8 +3173,8 @@ begin
   ObjectNoteInfoUpdate;
 
   // edit
-  if not (ObjectClientDataSet.State in [dsEdit]) then
-    ObjectClientDataSet.Edit;
+//  if not (ObjectClientDataSet.State in [dsEdit]) then
+//    ObjectClientDataSet.Edit;
 
   // modified
   if not TStrRec.StrEndsWith(ObjectNoteTabSheet.Caption, ' ' + CHAR_CONTENT_CHANGED) then
@@ -2885,16 +3198,17 @@ begin
     Sender.AddWebResourceRequestedFilter('*', COREWEBVIEW2_WEB_RESOURCE_CONTEXT_IMAGE)
 
   else if AResult = HResultFromWin32(ERROR_FILE_NOT_FOUND) then
-    TMesRec.W('Could not find Edge installation')
+    LogFrame.LogOne('No Edge installation been detected', fmWarning)
 
   else if AResult = E_FAIL then
-    TMesRec.W('Failed to initialise Edge loader')
+    LogFrame.LogOne('Failed to initialise Edge loader', fmWarning)
 
   else try
     OleCheck(AResult)
+
   except
     on e: Exception do
-      TMesRec.W('Failed to initialise Edge: %s', [e.Message]);
+      LogFrame.LogOne('Failed to initialise Edge: %s', [e.Message], fmWarning);
   end;
 end;
   {$ENDREGION}
@@ -2909,14 +3223,14 @@ end;
 procedure TBaseMainForm.ObjectJobGradeCalculateLabelClick(Sender: TObject);
 var
   rol, lev, fbk: string;
-  jgm: integer; // jobgrademin
+  jgm: integer; // ToJobGradeMin
   okk: boolean;
 begin
-  jgm := ObjectClientDataSet.FieldByName('FldJobGradeMin').AsInteger;
+  jgm := ObjectClientDataSet.FieldByName('FldToJobGradeMin').AsInteger;
   okk := TMemberRoleLevelGradeForm.Execute(rol, lev, jgm, fbk);
   if okk then begin
     ObjectClientDataSet.Edit;
-    ObjectClientDataSet.FieldByName('FldJobGradeMin').Value := jgm;
+    ObjectClientDataSet.FieldByName('FldToJobGradeMin').Value := jgm;
   //ObjectClientDataSet.Post;
     ObjectDBNavigator.BtnClick(nbPost);
     LogFrame.Log('Object %d %s will be availble only to "%s %s %d" or upper grade members', [ObjectClientDataSet.FieldByName('FldId').AsInteger, ObjectClientDataSet.FieldByName('FldObject').AsString, rol, lev, jgm]);
@@ -2991,7 +3305,7 @@ begin
 
   // synsetupandstate
   ObjectSynEditsSetup;
-//  ObjectSynEditStateRestoreFromDb;
+//ObjectSynEditStateRestoreFromDb;
 
   // edge
   if ActionMarkdownAction.Checked then begin
@@ -3010,13 +3324,55 @@ begin
 end;
     {$ENDREGION}
 
+    {$REGION 'Colors'}
+procedure TBaseMainForm.ObjectBgColorLabelClick(Sender: TObject);
+var
+  col, fbk: string;
+  lab: TLabel;
+  edi: TDBEdit;
+begin
+  inherited;
+
+  // init
+  lab := Sender as TLabel;
+  if      lab.Tag = 0 then edi := ObjectBgColorDBEdit
+  else if lab.Tag = 1 then edi := ObjectFgColorDBEdit;
+
+  // color
+  col := edi.Text;
+  if col.Trim.IsEmpty then
+    col := 'FFFFFF';
+
+  // formandset
+  if not TColorDialogForm.Execute(col, fbk) then
+    LogFrame.Log(fbk, clWebOrange)
+  else begin
+    ObjectClientDataSet.Edit;
+    edi.Text := col;
+    ObjectClientDataSet.Post;
+    LogFrame.Log(fbk)
+  end;
+end;
+
+procedure TBaseMainForm.ObjectBgColorDBEditChange(Sender: TObject);
+var
+  col: TColor;
+begin
+  inherited;
+
+  col := TColRec.FromHexStr((Sender as TDBEdit).Text);
+  (Sender as TDBEdit).Color      := col;
+  (Sender as TDBEdit).Font.Color := TColRec.TColAntiBw(col);
+end;
+    {$ENDREGION}
+
   {$ENDREGION}
 
   {$REGION 'Search'}
 procedure TBaseMainForm.SearchButtonedEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if Key = VK_RETURN then
-    SearchButtonedEditRightButtonClick(Sender);
+    SearchButtonedEditLeftButtonClick(Sender);
 end;
 
 procedure TBaseMainForm.SearchButtonedEditLeftButtonClick(Sender: TObject);
@@ -3449,8 +3805,8 @@ procedure TBaseMainForm.ObjectClientDataSetAfterScroll(DataSet: TDataSet);
 var
   eon: boolean; // edgeopened
 begin
-  // searchandreplacespeedups
-  if FInSearchAndReplace then
+  // speedups
+  if FInSearchAndReplace or FMultiInsertOn then
     Exit;
 
   {$REGION 'object'}
@@ -3459,8 +3815,7 @@ begin
   FPId              := DataSet.FieldByName('FldPId'             ).AsInteger;
   FObjectKind       := DataSet.FieldByName('FldObjectKind'      ).AsString;
   FContentKind      := DataSet.FieldByName('FldContentKind'     ).AsString;
-//FFromOrganization := DataSet.FieldByName('FldFromOrganization').AsString;  // ex FldOrganization
-//FFromMember       := DataSet.FieldByName('FldFromMember'      ).AsString;  // ex FldOwner
+//FAuthor           := DataSet.FieldByName('FldAuthor'          ).AsString;  // ex FldOwner, FldFromMember
   FObject           := DataSet.FieldByName('FldObject'          ).AsString;
 
   // info
@@ -3484,18 +3839,18 @@ begin
 //ObjectSynEditFoldRestoreFromDb;  *** unnecessary, already done in prev line ***
 
   // contentjsonnote focus and charcount
-       if MainPageControl.ActivePage = ObjectContentPrevTabSheet then begin
-    ObjectContentPrevDBSynEdit.SetFocus;
+           if MainPageControl.ActivePage = ObjectContentPrevTabSheet then begin
     ObjectContentPrevInfoUpdate;
+  //ObjectContentPrevDBSynEdit.SetFocus;
   end else if MainPageControl.ActivePage = ObjectContentTabSheet then begin
     ObjectContentInfoUpdate;
-    ObjectContentDBSynEdit.SetFocus;
+  //ObjectContentDBSynEdit.SetFocus;
   end else if MainPageControl.ActivePage = ObjectDataTabSheet then begin
     ObjectDataInfoUpdate;
-    ObjectDataDBSynEdit.SetFocus;
+  //ObjectDataDBSynEdit.SetFocus;
   end else if MainPageControl.ActivePage = ObjectNoteTabSheet then begin
     ObjectNoteInfoUpdate;
-    ObjectNoteDBSynEdit.SetFocus;
+  //ObjectNoteDBSynEdit.SetFocus;
   end;
 
   // edge
@@ -3534,6 +3889,9 @@ end;
 
 procedure TBaseMainForm.ObjectClientDataSetBeforePost(DataSet: TDataSet);
 begin
+  // speedups
+  if FInSearchAndReplace or FMultiInsertOn then
+    Exit;
 
   {$REGION 'object'}
   // syneditstate
@@ -3574,6 +3932,9 @@ procedure TBaseMainForm.ObjectClientDataSetAfterPost(DataSet: TDataSet);
 var
   vnp: PVirtualNode;
 begin
+  // speedups
+  if FInSearchAndReplace or FMultiInsertOn then
+    Exit;
 
   {$REGION 'object'}
   // applyupdatetoremoteserver
@@ -3609,12 +3970,15 @@ begin
   end;
   {$ENDREGION}
 
-  // logeffimery
+  // log
   LogFrame.LogOne('posted', fmInfo, 2000);
 end;
 
 procedure TBaseMainForm.ObjectClientDataSetBeforeInsert(DataSet: TDataSet);
 begin
+  // speedups
+  if FInSearchAndReplace or FMultiInsertOn then
+    Exit;
 
   {$REGION 'object'}
   // freeze
@@ -3630,6 +3994,9 @@ var
   pmv: array of string; // prompts
   vav: array of string; // values
 begin
+  // speedups
+  if FInSearchAndReplace or FMultiInsertOn then
+    Exit;
 
   {$REGION 'object'}
   // askvectors
@@ -3653,7 +4020,7 @@ begin
 
   try
     // ask
-    if not InputQuery('New object data for ' + FObj, pmv, vav) then begin
+    if not InputQuery('New data for ' + FObj, pmv, vav) then begin
       DataSet.Delete; // Abort ?
     //mes.I('User cancelled the action');
     //ObjectDTClientTree.DataSource := ObjectDataSource; // 2-IMPORTANT treereconnect
@@ -3672,50 +4039,28 @@ begin
     // set
     try
       DataSet.Edit;
-      DataSet.FieldByName('FldId'              ).Value := idn;
-      DataSet.FieldByName('FldPId'             ).Value := FId;
-      DataSet.FieldByName('FldId8'             ).Value := TId8Rec.Generate;
-    //DataSet.FieldByName('FldOrder'           ).Value := null;
-      DataSet.FieldByName('FldRev'             ).Value := 0;
-      DataSet.FieldByName('FldCreated'         ).Value := now;
-      DataSet.FieldByName('FldUpdated'         ).Value := null;
-      DataSet.FieldByName('FldUpdatedBy'       ).Value := null;
-      DataSet.FieldByName('FldFromOrganization').Value := gmbr.Organization;
-      DataSet.FieldByName('FldFromDepartment'  ).Value := gmbr.Department;
-      DataSet.FieldByName('FldFromArea'        ).Value := gmbr.Area;
-      DataSet.FieldByName('FldFromTeam'        ).Value := gmbr.Team;
-      DataSet.FieldByName('FldFromMember'      ).Value := gmbr.Member;
-      DataSet.FieldByName('FldToOrganization'  ).Value := gmbr.Organization;
-      DataSet.FieldByName('FldToDepartment'    ).Value := gmbr.Department;
-      DataSet.FieldByName('FldToArea'          ).Value := gmbr.Area;
-      DataSet.FieldByName('FldToTeam'          ).Value := gmbr.Team;
-      DataSet.FieldByName('FldToMember'        ).Value := '%'; // *** when solved the onjects sharing address problem, set back to '*' ***
-    //DataSet.FieldByName('FldJobGradeMin'     ).Value := null;
-    //DataSet.FieldByName('FldRoute'           ).Value := null;
-      DataSet.FieldByName('FldObjectKind'      ).Value := vav[0];
-      DataSet.FieldByName('FldContentKind'     ).Value := vav[1];
-    //DataSet.FieldByName('FldDataKind'        ).Value := null;
-      DataSet.FieldByName('FldState'           ).Value := TStaRec.Active.Name;
-      DataSet.FieldByName('FldTitle'           ).Value := giif.NxN(vav[3]);
-      DataSet.FieldByName('FldSubtitle'        ).Value := giif.NxN(vav[4]);
-    //DataSet.FieldByName('FldDescription'     ).Value := null;
-    //DataSet.FieldByName('FldSpare'           ).Value := null;
-      DataSet.FieldByName('FldEncrypted'       ).Value := false;
-      DataSet.FieldByName('FldPersist'         ).Value := true;
-    //DataSet.FieldByName('FldImage'           ).Value := null;
-    //DataSet.FieldByName('FldContentPrev'     ).Value := null;
-    //DataSet.FieldByName('FldContent'         ).Value := null;
-    //DataSet.FieldByName('FldData'            ).Value := null;
-    //DataSet.FieldByName('FldNote'            ).Value := null;
-    //DataSet.FieldByName('FldBinary'          ).Value := null;
-      DataSet.FieldByName('FldObject'          ).Value := vav[2]; // this goes into TblObject, in TblXxx we do NOT replicate into FldXxx and leave just the FldId that is auto generated due to master-detail relationship
+
+      // setup standard
+      TObjRec.ObjDstRecordSetup(
+        DataSet
+      , idn              // id
+      , FId              // pid
+      , vav[0]           // objectkind
+      , vav[1]           // contentkind
+      , vav[2]           // object
+      , giif.NxN(vav[3]) // title
+      , giif.NxN(vav[4]) // subtitle
+      , null             // description
+      , null             // order
+      );
+
     //DataSet.Post;
       ObjectDBNavigator.BtnClick(nbPost);
       //IdNextReleaseRio;
       LogFrame.Log('Object data for %s initialized', [FObj]);
 
       // locate
-      DataSet.Locate('FldId', idn, []); // ObjectNodeLocateAndExpand(i);
+      //DataSet.Locate('FldId', idn, []); // ObjectNodeLocateAndExpand(i); // error! but not needed
     except
       on e: Exception do begin
         // cancel
@@ -3777,7 +4122,7 @@ end;
 procedure TBaseMainForm.ObjectClientDataSetReconcileError(DataSet: TCustomClientDataSet; E: EReconcileError; UpdateKind: TUpdateKind; var Action: TReconcileAction);
 begin
 
-  {$REGION 'object'}
+  {$REGION 'reconcileerror'}
   Action := HandleReconcileError(DataSet, UpdateKind, E);
   {$ENDREGION}
 
@@ -3787,19 +4132,19 @@ end;
 {$REGION 'Files'}
 
   {$REGION 'options'}
-procedure TBaseMainForm.OptionFilesWorkingFolderSelectButtonedEditRightButtonClick(Sender: TObject);
+procedure TBaseMainForm.OptionFileWorkingFolderSelectButtonedEditRightButtonClick(Sender: TObject);
 var
   dir, fbk: string;
 begin
   if TFsyRec.DirChose('C:\', FILE_WORKING_FOLDER_DEFAULT, dir, fbk) then
-    OptionFilesWorkingFolderSelectButtonedEdit.Text := dir;
+    OptionFileWorkingFolderSelectButtonedEdit.Text := dir;
 end;
 
-procedure TBaseMainForm.OptionFilesWorkingFolderClearLabelClick(Sender: TObject);
+procedure TBaseMainForm.OptionFileWorkingFolderClearLabelClick(Sender: TObject);
 var
   dir, fbk: string;
 begin
-  dir := OptionFilesWorkingFolderSelectButtonedEdit.Text;
+  dir := OptionFileWorkingFolderSelectButtonedEdit.Text;
 
   if not TFsyRec.DirExists(dir, fbk) then begin
     TMesRec.I('Unable to delete the working folder %s, it does not exists', [dir]);
@@ -3828,13 +4173,13 @@ begin
 //end;
 
   // workingfoldercheck
-//if not TFsyRec.DirExists(OptionFilesWorkingFolderSelectButtonedEdit.Text, fbk) then begin
+//if not TFsyRec.DirExists(OptionFileWorkingFolderSelectButtonedEdit.Text, fbk) then begin
 //  TMesRec.W('Path is empty, use default C:\$\Filer, please check the local "Working Folder" or the remote file "Path" property');
-//  TFsyRec.DirForce(OptionFilesWorkingFolderSelectButtonedEdit.Text, fbk);
+//  TFsyRec.DirForce(OptionFileWorkingFolderSelectButtonedEdit.Text, fbk);
 //end;
 
   // path
-  pha := ifthen(OptionFilesWorkingFolderUseCheckBox.Checked, OptionFilesWorkingFolderSelectButtonedEdit.Text, IvFilePathOriginal);
+  pha := ifthen(OptionFileWorkingFolderUseCheckBox.Checked, OptionFileWorkingFolderSelectButtonedEdit.Text, IvFilePathOriginal);
   if not giis.Ex(pha) then begin
     TMesRec.W('Local path is empty, please check the local "Working Folder" or the remote file "Path" property');
     pha := 'C:\$\Filer';
@@ -3875,7 +4220,7 @@ procedure TBaseMainForm.FilesRioFileLocalDelete(IvLocalFileSpec: string; var IvF
   end;
 
 begin
-  if OptionFilesDeleteAfterUploadCheckBox.Checked then
+  if OptionFileDeleteAfterUploadCheckBox.Checked then
     FileDeleteMacro
   else if TAskRec.Yes('Delete local file %s ?', [IvLocalFileSpec]) then
     FileDeleteMacro;
@@ -3949,7 +4294,7 @@ begin
         Exit;
 
       // delete
-      if OptionFilesLocalFileOverrideAskCheckBox.Checked then begin
+      if OptionFileLocalFileOverrideAskCheckBox.Checked then begin
         if TAskRec.Yes('Override existing local file %s ?', [lfs]) then
           Result := TFsyRec.FileDelete(lfs, IvFbk)
         else
@@ -3966,7 +4311,7 @@ begin
       Exit;
 
     // readonlyset
-    if {OptionFilesReadOnlyDownloadedFileCheckBox.Checked and} IvFilenameReadOnly then begin
+    if {OptionFileReadOnlyDownloadedFileCheckBox.Checked and} IvFilenameReadOnly then begin
       Result := TFsyRec.FileAttrReadOnlySet(lfs, IvFbk);
       if not Result then
         Exit;
@@ -4167,7 +4512,7 @@ end;
 
 procedure TBaseMainForm.FilesRioTreeDblClick(Sender: TObject);
 begin
-  if OptionFilesOnDoubleClickComboBox.Text = 'CheckOut' then
+  if OptionFileOnDoubleClickComboBox.Text = 'CheckOut' then
     FilesRioCheckOutAction.Execute
   else
     FilesRioDownloadAction.Execute;
@@ -4462,7 +4807,7 @@ begin
     end;
 
     // open
-    if OptionFilesOpenAfterChechOutCheckBox.Checked then
+    if OptionFileOpenAfterChechOutCheckBox.Checked then
       boo := TWinRec.WinShellExec(Application.Handle, lfs, fbk);
       if not boo then
         TMesRec.I(fbk);
@@ -4485,7 +4830,7 @@ begin
 
     // upload
     LogFrame.Log('Uploading %s ...', [lfs]);
-    if not FilesRioFileUpload(lfs, OptionFilesDeleteAfterUploadCheckBox.Checked, fbk) then
+    if not FilesRioFileUpload(lfs, OptionFileDeleteAfterUploadCheckBox.Checked, fbk) then
       TMesRec.W(fbk);
 
     // refresh
@@ -4562,7 +4907,7 @@ begin
   FilesRioRefreshAction.Execute;
 
   // open
-  if OptionFilesOpenAfterChechOutCheckBox.Checked then
+  if OptionFileOpenAfterChechOutCheckBox.Checked then
     boo := TWinRec.WinShellExec(Application.Handle, lfs, fbk);
     if not boo then
       TMesRec.I(fbk);
@@ -4646,7 +4991,7 @@ begin
   lfs := FilesRioFileLocalSpec(pfr.PathOriginal, pfr.Filename, false);
 
   // checkin = fileremoteupdatewithfilelocal
-  boo := FilesRioFileUpdate(pfr, OptionFilesDeleteAfterUploadCheckBox.Checked, lfs, fbk);
+  boo := FilesRioFileUpdate(pfr, OptionFileDeleteAfterUploadCheckBox.Checked, lfs, fbk);
   if not boo then begin
     TMesRec.I(fbk);
     Exit;
@@ -4876,7 +5221,7 @@ var
 begin
   // node
   if not Assigned(FilesRioTree.FocusedNode) then begin
-    TMesRec.I('Please select one file to open from the local working folder ' + OptionFilesWorkingFolderSelectButtonedEdit.Text);
+    TMesRec.I('Please select one file to open from the local working folder ' + OptionFileWorkingFolderSelectButtonedEdit.Text);
     Exit;
   end;
 
@@ -4897,10 +5242,10 @@ procedure TBaseMainForm.FilesLocalFolderOpenActionExecute(Sender: TObject);
 var
   wof, fbk: string;
 begin
-  wof := OptionFilesWorkingFolderSelectButtonedEdit.Text;
+  wof := OptionFileWorkingFolderSelectButtonedEdit.Text;
   if not TFsyRec.DirExists(wof, fbk) then
     TMesRec.I('Unable to open the working folder %s, it does not exists (it will be auto created after the 1st download/checkout)', [wof])
-  else if not TFsyRec.DirOpen(OptionFilesWorkingFolderSelectButtonedEdit.Text, fbk) then
+  else if not TFsyRec.DirOpen(OptionFileWorkingFolderSelectButtonedEdit.Text, fbk) then
     TMesRec.I(fbk);
 end;
   {$ENDREGION}

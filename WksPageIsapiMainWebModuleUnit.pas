@@ -77,7 +77,7 @@ type
     { Private declarations }
   //FIni: TIniCls;
     FTic: TTicRec;
-    FWrq: TWrqRec;
+  //FWrq: TWrqRec;
     FWmoRec: TWmoRec;
   public
     { Public declarations }
@@ -152,9 +152,9 @@ end;
 
 procedure TMainWebModule.WebModuleBeforeDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
-  Inc(FWmoRec.Run);                                      // comment if useless
-  FWmoRec.BeforeDispatch(Request, Response, FWrq, FTic); // comment to skip session/request flow
-//gwrq.WebRequestOrig := Request; // cagnolina           // uncomment if revious is commented
+  Inc(FWmoRec.Run);                                        // comment if useless
+  FWmoRec.BeforeDispatch(Request, Response{, FWrq}, FTic); // comment to skip session/request flow
+//gwrq.WebRequestOrig := Request; // cagnolina             // uncomment if revious is commented
 
   {$REGION 'CustomHeader'}
   // handle here specific CustomHeader for all webactions or at beginning of each specific webaction
@@ -174,7 +174,7 @@ end;
 
 procedure TMainWebModule.WebModuleAfterDispatch(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
 begin
-  FWmoRec.AfterDispatch(Request, Response, FWrq, FTic); // comment to skip session/request flow
+  FWmoRec.AfterDispatch(Request, Response{, FWrq}, FTic); // comment to skip session/request flow
 end;
   {$ENDREGION}
 
@@ -185,15 +185,26 @@ procedure TMainWebModule.MainWebModuleDefaultHandlerAction(Sender: TObject; Requ
 var
   pid: integer;
   str: string;
+  tis, sts, ims, tnh, sih: boolean;
 begin
 //TWrsRec.ResponseSet(Response, THtmRec.PageDefault);
 
-  if not FWrq.Error.IsEmpty then begin
-    str := THtmRec.PageWarning('Wrong url address', FWrq.Error);
+  if not {FWrq}gwrq.Error.IsEmpty then begin
+    str := THtmRec.PageWarning('Wrong url address', {FWrq}gwrq.Error);
     TWrsRec.ResponseSet(Response, str);
   end else begin
-    pid := FWrq.PageId;
-    str := THtmRec.Page(pid);
+    // coords
+    pid := {FWrq}gwrq.PageId;
+    tis := gwrq.FieldQueryGet('CoTitleShow'    , true );
+    ims := gwrq.FieldQueryGet('CoSubTitleShow' , true );
+    sts := gwrq.FieldQueryGet('CoImageShow'    , false);
+    tnh := gwrq.FieldQueryGet('CoTopNavOff'    , false);
+    sih := gwrq.FieldQueryGet('CoSystemInfoOff', false);
+
+    // html
+    str := THtmRec.Page(pid, tis, ims, sts, tnh, sih);
+
+    // response
     TWrsRec.ResponseSet(Response, str);
   end;
 end;
@@ -209,11 +220,6 @@ begin
 
   TWrsRec.ResponseSet(Response, TJteRec.ServerInfo('Serves dynamic web Page''s', 'Web Broker Isapi', vec), TCtyRec.CTY_APP_JSON);
 end;
-
-procedure TMainWebModule.MainWebModuleViewWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean);
-begin
-  TWrsRec.ResponseSet(Response, THtmRec.Page(FWrq.PageId));
-end;
     {$ENDREGION}
 
     {$REGION 'Utils'}
@@ -223,13 +229,13 @@ var
   uin: string; // userinput
 begin
   // input
-  uin := FWrq.FieldContentGet('CoConfirm', 'No');
+  uin := {FWrq}gwrq.FieldContentGet('CoConfirm', 'No');
 
   // execute
   if uin.Equals('Ok') then begin
     // filesgenerate
-    TW3fRec.W3WebFilesGenerate;   // w3.js, w3.css, w3-theme-name.css with name=[amber,silver,...]
-    TSysRec.WksWebFilesGenerate;  // wks.js, wks.css, default.htm
+    TW3fRec.W3WebFilesGenerate(true, true, true, true);   // w3.js, w3.css, w3-theme-name.css with name=[amber,silver,...]
+    TSysRec.WksWebFilesGenerate(true, true, true, true);  // wks.js, wks.css, default.htm
   sbu.Add('<script>wks.fbkOk("Files generated at %s");</script>'                      , [TDatRec.DatNowStr]);
   end;
 
@@ -241,13 +247,14 @@ begin
   sbu.Add(    THtmRec.List(TW3fRec.FILE_VEC)                                                                );
   sbu.Add(    '<h2>Create the following WKS files:</h2>'                                                    );
   sbu.Add(    THtmRec.List(TSysRec.FILE_VEC)                                                                );
-  sbu.Add(    '<h2>Please confirm</h2>'                                                                     );
+  sbu.Add(    '<h2>Confirm</h2>'                                                                     );
   sbu.Add(    THtmRec.Choice('radio', 'CoConfirm', 'Confirm', ['No', 'Ok'], ['No', 'Ok'], '', '', '', [uin]));
   sbu.Add(    '<br>'                                                                                        );
   sbu.Add(    '<input class="w3-btn w3-round-xxlarge w3-blue" type="button" value="Cancel" onclick="window.location=''/WksPageIsapiProject.dll'';return false;">');
   sbu.Add(    '<input class="w3-btn w3-round-xxlarge w3-red" type="submit" value="Submit">'                 );
   sbu.Add(  '</form>'                                                                                       );
   sbu.Add(  '<br>'                                                                                          );
+  sbu.Add(  'Wks and w3 web files can be generated also from the <b>System Client<b><br>'                   );
   sbu.Add('</div>'                                                                                          );
   sbu.Add('<br><br>'                                                                                        );
 
@@ -261,12 +268,12 @@ var
   aff: integer;
 begin
   // input
-  uin := FWrq.FieldContentGet('CoConfirm', 'No');
+  uin := {FWrq}gwrq.FieldContentGet('CoConfirm', 'No');
 
   // execute
   if uin.Equals('Ok') then begin
     // themeset
-    ths := FWrq.FieldContentGet('CoTheme', 'White');
+    ths := {FWrq}gwrq.FieldContentGet('CoTheme', 'White');
     sql := Format('update DbaOrganization.dbo.TblTheme set FldTheme = ''%s'' where FldObjectId = %d', [ths, gorg.ObjectId]);
     TDbaRec.CmdExec(sql, aff, fbk);
     gthe.Theme := ths;
@@ -299,22 +306,22 @@ procedure TMainWebModule.MainWebModuleTestWebActionAction(Sender: TObject; Reque
 var
   jes, con: string;
 begin
-  jes := TTblRec.TblEditJsonStr('DbaAaa.dbo.TblTest', ['FldId'], ['FldA', 'FldB', 'FldC', 'FldD']);
+  jes := TTblRec.TblEditJsonStr('DbaTest.dbo.TblTest', ['FldId'], ['FldA', 'FldB', 'FldC', 'FldD']);
 
   con := THtmRec.TableFromSql(
-    0                                                  // context dst#
-  , 'select * From DbaAaa.dbo.TblTest order by 1 desc' // sql
-  , ''                                                 // connstr
-  , ''                                                 // connlib
-  , NO_DATA_STR                                        // default
-  , ''                                                 // coname
-  , 'w3-table-all w3-hoverable'                        // class
-  , ''                                                 // style
-  , true                                               // editable
-  , jes                                                // jsoneditstr
-  , hvHorizontal                                       // mode
-//, false                                              // recordcountoff
-//, false                                              // headeroff
+    0                                                   // context dst#
+  , 'select * From DbaTest.dbo.TblTest order by 1 desc' // sql
+  , ''                                                  // connstr
+  , ''                                                  // connlib
+  , NO_DATA_STR                                         // default
+  , ''                                                  // coname
+  , 'w3-table-all w3-hoverable'                         // class
+  , ''                                                  // style
+  , true                                                // editable
+  , jes                                                 // jsoneditstr
+  , hvHorizontal                                        // mode
+//, false                                               // recordcountoff
+//, false                                               // headeroff
   );
   con := THtmRec.Page('Test', '', con);
 
@@ -329,10 +336,10 @@ var
   usr, pas, rmb, rid: string; // username, password, rememberme, redirecttopageid
 begin
   // input
-  usr := FWrq.FieldCookieGet('CoUsername', '');
-  pas := FWrq.FieldCookieGet('CoPassword', '');
-  rmb := giif.Str(FWrq.FieldCookieGet('CoRememberMe', false), ' checked="checked"', '');
-  rid := giif.ExP(FWrq.FieldGet('CoRedirectToPageId', ''), '?CoRedirectToPageId=');
+  usr := {FWrq}gwrq.FieldCookieGet('CoUsername', '');
+  pas := {FWrq}gwrq.FieldCookieGet('CoPassword', '');
+  rmb := giif.Str({FWrq}gwrq.FieldCookieGet('CoRememberMe', false), ' checked="checked"', '');
+  rid := giif.ExP({FWrq}gwrq.FieldGet('CoRedirectToPageId', ''), '?CoRedirectToPageId=');
 
 //gdbg.Dbg('usr = %s', [usr]);
 //gdbg.Dbg('pas = %s', [pas]);
@@ -428,13 +435,13 @@ begin
     // writeonclient-browser
     rem := gwrq.FieldContentGet('CoRememberMe', 'false');
     if rem = 'true' then begin
-      TWrsRec.FieldCookieSet(Response, 'CoUsername', usr);
-      TWrsRec.FieldCookieSet(Response, 'CoPassword', pas);
-      TWrsRec.FieldCookieSet(Response, 'CoRememberMe', 'true');
+      TWrsRec.FieldCookieSet(Response, 'CoUsername'  , usr   , 30, gwrq.Host);
+      TWrsRec.FieldCookieSet(Response, 'CoPassword'  , pas   , 30, gwrq.Host);
+      TWrsRec.FieldCookieSet(Response, 'CoRememberMe', 'true', 30, gwrq.Host);
   //end else begin
-    //TWrsRec.FieldCookieDelete(Response, 'CoUsername');
-    //TWrsRec.FieldCookieDelete(Response, 'CoPassword');
-    //TWrsRec.FieldCookieDelete(Response, 'CoRememberMe');
+    //TWrsRec.FieldCookieDelete(Response, 'CoUsername'  , gwrq.Host);
+    //TWrsRec.FieldCookieDelete(Response, 'CoPassword'  , gwrq.Host);
+    //TWrsRec.FieldCookieDelete(Response, 'CoRememberMe', gwrq.Host);
     end;
   end;
   {$ENDREGION}
@@ -455,19 +462,18 @@ procedure TMainWebModule.MainWebModuleLogoutWebActionAction(Sender: TObject; Req
 var
   fbk: string;
 begin
-
   // session
   gses.Close(fbk);
-//gses.Reset; //  done in gses.Close
+//gses.Reset; // done in gses.Close
 
   // busobjreset
   gmbr.Reset(true);
   gusr.Reset;
 
   // removefromclientbrowser (if user just Quit then leave the cookies) note: these cookies are deleted if the server-session expire
-  TWrsRec.FieldCookieDelete(Response, 'CoDateTime');
-  TWrsRec.FieldCookieDelete(Response, 'CoSessionId');
-  TWrsRec.FieldCookieDelete(Response, 'CoFingerprintId');
+  TWrsRec.FieldCookieDelete(Response, 'CoDateTimeBegin', gwrq.Host);
+  TWrsRec.FieldCookieDelete(Response, 'CoSessionId'    , gwrq.Host);
+  TWrsRec.FieldCookieDelete(Response, 'CoFingerprintId', gwrq.Host);
 
   // redirect
   Response.Content := TWrsRec.SendRedirectJsStr('/Default.htm');
@@ -508,11 +514,11 @@ var
   dst: TDataset;
 begin
   // input
-  rid := FWrq.FieldQueryGet('CoReportId', -1);
+  rid := {FWrq}gwrq.FieldQueryGet('CoReportId', -1);
 
   // error
   if rid < 0 then
-    TWrsRec.ResponseSet(Response, THtmRec.PageWarning('CoReportId not found', 'The link need to hace a parametr like ?CoReportId=123'))
+    TWrsRec.ResponseSet(Response, THtmRec.PageWarning('CoReportId not found', 'The link need a parametr like ?CoReportId=123'))
 
   // reportinfo
   else begin
@@ -537,8 +543,8 @@ begin
       , dst.FieldByName('FldClass').AsString                                                               // class        , transferred from report to page
       , dst.FieldByName('FldStyle').AsString                                                               // style        , idem
       , {dst.FieldByName('FldReportTitleOn').AsBoolean} false {report engine will take care}               // titleshow    , mute page title
-      , false                                                                                              // imageshow    , mute page
       , {dst.FieldByName('FldReportTitleOn').AsBoolean} false {report engine will take care}               // subtitleshow , mute page subtitle
+      , false                                                                                              // imageshow    , mute page title image
       , false                                                                                              // topnavoff
       , false                                                                                              // systeminfooff
       , false                                                                                              // urlabsolute
@@ -549,6 +555,29 @@ begin
     end;
 
   end;
+end;
+    {$ENDREGION}
+
+    {$REGION 'View'}
+procedure TMainWebModule.MainWebModuleViewWebActionAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: boolean); // *** same as MainWebModuleDefaultHandlerAction, please check! ***
+var
+  pid: integer;
+  str: string;
+  tis, sts, ims, tnh, sih: boolean;
+begin
+  // coords
+  pid := {FWrq}gwrq.PageId;
+  tis := gwrq.FieldQueryGet('CoTitleShow'    , true );
+  ims := gwrq.FieldQueryGet('CoSubTitleShow' , true );
+  sts := gwrq.FieldQueryGet('CoImageShow'    , false);
+  tnh := gwrq.FieldQueryGet('CoTopNavOff'    , false);
+  sih := gwrq.FieldQueryGet('CoSystemInfoOff', false);
+
+  // html
+  str := THtmRec.Page(pid, tis, ims, sts, tnh, sih);
+
+  // response
+  TWrsRec.ResponseSet(Response, str);
 end;
     {$ENDREGION}
 

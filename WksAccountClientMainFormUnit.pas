@@ -35,6 +35,7 @@ uses
   , JvClock
   , JvComponentBase
   , JvDateTimePicker
+  , JvDBDateTimePicker
   , JvExComCtrls
   , JvExControls
   , JvExExtCtrls
@@ -146,9 +147,14 @@ procedure TAccountMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // detail
-  if AccountClientDataSet.State = dsEdit then
+  {$REGION 'Object'}
+  {$ENDREGION}
+
+  {$REGION 'Detail'}
+  if not (AccountClientDataSet.State = dsBrowse) then
     AccountDBNavigator.BtnClick(nbPost);
+  {$ENDREGION}
+
 end;
 {$ENDREGION}
 
@@ -269,8 +275,7 @@ procedure TAccountMainForm.AccountClientDataSetAfterPost(DataSet: TDataSet);
 begin
   inherited;
 
-  {$REGION 'detail'}
-  // applyupdatetoremoteserver
+  {$REGION 'applyupdatetoremoteserver'}
   if AccountClientDataSet.ApplyUpdates(0) > 0 then
     TMesRec.I('Unable to save %s detail to remote server', [FObj])
   else begin
@@ -285,7 +290,7 @@ procedure TAccountMainForm.AccountClientDataSetReconcileError(DataSet: TCustomCl
 begin
   inherited;
 
-  {$REGION 'detail'}
+  {$REGION 'reconcileerror'}
   Action := HandleReconcileError(DataSet, UpdateKind, E);
   {$ENDREGION}
 

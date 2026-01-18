@@ -6,14 +6,14 @@ uses
   Vcl.Forms,
   Wks000Unit in 'Wks000Unit.pas',
   WksLogFrameUnit in 'WksLogFrameUnit.pas' {LogFrame: TFrame},
-  WksSpellcheckFormUnit in 'WksSpellcheckFormUnit.pas' {SpellcheckForm},
+  WksSpellcheckDialogFormUnit in 'WksSpellcheckDialogFormUnit.pas' {SpellcheckDialogForm},
   WksTextEditorFormUnit in 'WksTextEditorFormUnit.pas' {TextEditorForm};
 
 {$R *.res}
 {$I Wks000Inc.inc}
 
 begin
-  ReportMemoryLeaksOnShutdown := DebugHook <> 0;
+  ReportMemoryLeaksOnShutdown := IsDebuggerPresent();
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TTextEditorForm, TextEditorForm);

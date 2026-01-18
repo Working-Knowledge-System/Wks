@@ -16,7 +16,8 @@ uses
   Vcl.Mask, Vcl.ExtCtrls, JvExControls, JvScrollMax, JvExExtCtrls,
   JvExtComponent, WksLogFrameUnit, VirtualTrees, DTDBTreeView, DTClientTree,
   Vcl.ToolWin, JvNetscapeSplitter, JvComponentBase, JvThreadTimer, Vcl.AppEvnts,
-  JvClock, Vcl.Menus, Winapi.WebView2, Winapi.ActiveX, Vcl.Edge, Vcl.WinXCtrls;
+  JvClock, Vcl.Menus, Winapi.WebView2, Winapi.ActiveX, Vcl.Edge, Vcl.WinXCtrls,
+  Vcl.ActnMan, Vcl.ActnColorMaps, JvDBDateTimePicker;
 {$ENDREGION}
 
 {$REGION 'Type'}
@@ -132,7 +133,7 @@ uses
   , System.Types
   , Vcl.RecError // reconcileerrors
   , Wks000Unit
-  , WksColorFormUnit
+  , WksColorDialogFormUnit
   ;
 {$ENDREGION}
 
@@ -177,11 +178,17 @@ procedure TOrganizationMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // detail
-  if OrganizationClientDataSet.State = dsEdit then
+  {$REGION 'Object'}
+  {$ENDREGION}
+
+  {$REGION 'Detail'}
+  if not (OrganizationClientDataSet.State = dsBrowse) then
     OrganizationDBNavigator.BtnClick(nbPost);
-  if ThemeClientDataSet.State = dsEdit then
-    ThemeDBNavigator.BtnClick(nbPost);
+    
+  if not (ThemeClientDataSet.State = dsBrowse) then
+    ThemeDBNavigator.BtnClick(nbPost)
+  {$ENDREGION}
+;
 end;
 {$ENDREGION}
 
@@ -285,8 +292,7 @@ procedure TOrganizationMainForm.ThemeClientDataSetAfterPost(DataSet: TDataSet);
 begin
   inherited;
 
-  {$REGION 'detail'}
-  // applyupdatetoremoteserver
+  {$REGION 'applyupdatetoremoteserver'} 
   if ThemeClientDataSet.ApplyUpdates(0) > 0 then
     TMesRec.I('Unable to save Theme deta to remote server')
   else begin
@@ -302,14 +308,14 @@ begin
   inherited;
 
   ThemeClientDataSet.Edit;
-  ThemePrimary60BgColorDBEdit.Text   := TTheRec.PRIMARY60BG_COLOR_DEF  ;
-  ThemeSecondary30FgColorDBEdit.Text := TTheRec.SECONDARY30FG_COLOR_DEF;
-  ThemeAccent10ColorDBEdit.Text      := TTheRec.ACCENT10_COLOR_DEF     ;
-  ThemeErrorColorDBEdit.Text         := TTheRec.ERROR_COLOR_DEF        ;
-  ThemeDangerColorDBEdit.Text        := TTheRec.DANGER_COLOR_DEF       ;
-  ThemeWarningColorDBEdit.Text       := TTheRec.WARNING_COLOR_DEF      ;
-  ThemeInfoColorDBEdit.Text          := TTheRec.INFO_COLOR_DEF         ;
-  ThemeSuccessColorDBEdit.Text       := TTheRec.SUCCESS_COLOR_DEF      ;
+  ThemePrimary60BgColorDBEdit.Text   := TTheRec.PRIMARY60BG_COLOR_DEFAULT  ;
+  ThemeSecondary30FgColorDBEdit.Text := TTheRec.SECONDARY30FG_COLOR_DEFAULT;
+  ThemeAccent10ColorDBEdit.Text      := TTheRec.ACCENT10_COLOR_DEFAULT     ;
+  ThemeErrorColorDBEdit.Text         := TTheRec.ERROR_COLOR_DEFAULT        ;
+  ThemeDangerColorDBEdit.Text        := TTheRec.DANGER_COLOR_DEFAULT       ;
+  ThemeWarningColorDBEdit.Text       := TTheRec.WARNING_COLOR_DEFAULT      ;
+  ThemeInfoColorDBEdit.Text          := TTheRec.INFO_COLOR_DEFAULT         ;
+  ThemeSuccessColorDBEdit.Text       := TTheRec.SUCCESS_COLOR_DEFAULT      ;
   ThemeClientDataSet.Post;
   LogFrame.Log('Organization theme colors resetted');
 end;
@@ -346,9 +352,11 @@ begin
 
   // color
   col := edi.Text;
+  if col.Trim.IsEmpty then
+    col := 'FFFFFF';
 
   // formandset
-  if not TColorForm.Execute(col, fbk) then
+  if not TColorDialogForm.Execute(col, fbk) then
     LogFrame.Log(fbk, clWebOrange)
   else begin
     ThemeClientDataSet.Edit;
@@ -427,8 +435,7 @@ procedure TOrganizationMainForm.OrganizationClientDataSetAfterPost(DataSet: TDat
 begin
   inherited;
 
-  {$REGION 'detail'}
-  // applyupdatetoremoteserver
+  {$REGION 'applyupdatetoremoteserver'} 
   if OrganizationClientDataSet.ApplyUpdates(0) > 0 then begin
     TMesRec.I('Unable to save %s detail to remote server', [FObj]);
     Exit;
@@ -461,7 +468,7 @@ procedure TOrganizationMainForm.OrganizationClientDataSetReconcileError(DataSet:
 begin
   inherited;
 
-  {$REGION 'detail'}
+  {$REGION 'reconcileerror'}
   Action := HandleReconcileError(DataSet, UpdateKind, E);
   {$ENDREGION}
 

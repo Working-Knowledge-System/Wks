@@ -43,6 +43,18 @@ type
     RequirementsDataSetProvider: TDataSetProvider;
     SourceDataSetProvider: TDataSetProvider;
     SourceADOTable: TADOTable;
+    ServerADOTable: TADOTable;
+    ServerDataSetProvider: TDataSetProvider;
+    DatabaseDbaADOTable: TADOTable;
+    DatabaseDbaDataSetProvider: TDataSetProvider;
+    DatabaseTblADOTable: TADOTable;
+    DatabaseTblDataSetProvider: TDataSetProvider;
+    DatabaseFldADOTable: TADOTable;
+    DatabaseFldDataSetProvider: TDataSetProvider;
+    DatabaseIdxADOTable: TADOTable;
+    DatabaseIdxDataSetProvider: TDataSetProvider;
+    DatabaseAccountADOTable: TADOTable;
+    DatabaseAccountDataSetProvider: TDataSetProvider;
     procedure SoapDataModuleCreate(Sender: TObject);
   private
     { Private declarations }

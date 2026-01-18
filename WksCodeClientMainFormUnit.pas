@@ -13,7 +13,7 @@ uses
   JvExtComponent, WksLogFrameUnit, VirtualTrees, DTDBTreeView, DTClientTree,
   Vcl.ToolWin, JvNetscapeSplitter, JvComponentBase, JvThreadTimer, Vcl.AppEvnts,
   JvClock, Vcl.Menus, Winapi.WebView2, Winapi.ActiveX, Vcl.Edge, Vcl.WinXCtrls
-  , Wks000Unit;
+  , Wks000Unit, JvDBDateTimePicker;
 {$ENDREGION}
 
 {$REGION 'Type'}
@@ -63,7 +63,7 @@ type
     CodeEnvComboBox: TComboBox;
     CodeSaveToComboBox: TComboBox;
     CodeSaveLabel: TLabel;
-    CodeHeaderAndFooterOffDBCheckBox: TDBCheckBox;
+    CodeHeaderAndFooterAddDBCheckBox: TDBCheckBox;
     CodeCommentRemoveDBCheckBox: TDBCheckBox;
     CodeLinesEmptyRemoveDBCheckBox: TDBCheckBox;
     CodeDescriptionBlockAddDBCheckBox: TDBCheckBox;
@@ -88,12 +88,14 @@ type
     procedure CodeOutputTestDirectoryLabelClick(Sender: TObject);
   private
     { Private declarations }
-    FOutputToChache: string;
-    FOutputDirectoryChache: string;
-    function  CodeOutputEnv: string; // Dev, Test, Prod
-    function  CodeSaveItem  ({IvId: integer;} IvEnv: string; var IvFbk: TFbk2Rec): boolean;
-    function  CodeSaveChilds({IvId: integer;} IvEnv: string; var IvFbk: TFbk2Rec): boolean;
-    function  CodeSaveBranch({IvId: integer;} IvEnv: string; var IvFbk: TFbk2Rec): boolean;
+    FOutputDevDirectoryChache : string;
+  //FOutputTestDirectoryChache: string;
+  //FOutputProdDirectoryChache: string;
+    function  OutputDirPath(IvEnv: string): string;
+    function  OutputFileName: string;
+    function  CodeSaveItem  (IvEnv: string): boolean;
+    function  CodeSaveChilds(IvEnv: string): boolean;
+    function  CodeSaveBranch(IvEnv: string): boolean;
   public
     { Public declarations }
   end;
@@ -115,6 +117,7 @@ uses
   , System.Types
   , System.Math
   , System.RegularExpressions
+  , System.IOUtils
   , Vcl.RecError // reconcileerrors
   , superobject
   ;
@@ -128,13 +131,14 @@ begin
   inherited;
 
   {$REGION 'gui'}
+//CodeSaveToComboBox.Enabled := false;
   {$ENDREGION}
 
   {$REGION 'ini'}
   OptionCodeDirCreateIfNotExixtsCheckBox.Checked  := gini.BooGet(FObj + '/DirCreateIfNotExixts'      , true );
   OptionCodeSaveAfterPostCheckBox.Checked         := gini.BooGet(FObj + '/SaveAfterPost'             , true );
   CodeEnvComboBox.ItemIndex                       := gini.IntGet(FObj + '/CodeEnv'                   , 0    );
-  CodeSaveToComboBox.ItemIndex                    := gini.IntGet(FObj + '/CodeSaveTo'                , 0    ); CodeSaveToComboBox.Enabled := false;
+  CodeSaveToComboBox.ItemIndex                    := gini.IntGet(FObj + '/CodeSaveTo'                , 0    );
   {$ENDREGION}
 
   {$REGION 'property'}
@@ -164,9 +168,14 @@ procedure TCodeMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // detail
-  if CodeClientDataSet.State = dsEdit then
+  {$REGION 'Object'}
+  {$ENDREGION}
+
+  {$REGION 'Detail'}
+  if not (CodeClientDataSet.State = dsBrowse) then
     CodeDBNavigator.BtnClick(nbPost);
+  {$ENDREGION}
+
 end;
 {$ENDREGION}
 
@@ -210,18 +219,53 @@ end;
 {$ENDREGION}
 
 {$REGION 'CodeActions'}
-function  TCodeMainForm.CodeOutputEnv: string;
+function  TCodeMainForm.OutputDirPath(IvEnv: string): string;
 begin
-  Result := CodeEnvComboBox.Items.KeyNames[CodeEnvComboBox.ItemIndex];
+       if SameText('Prod', IvEnv) then
+    Result := CodeClientDataSet.FieldByName('FldOutputProdDirectory').AsString
+  else if SameText('Test', IvEnv) then
+    Result := CodeClientDataSet.FieldByName('FldOutputTestDirectory').AsString
+  else {if SameText('Dev', IvEnv) then}
+    Result := CodeClientDataSet.FieldByName('FldOutputDevDirectory').AsString;
 end;
 
-function  TCodeMainForm.CodeSaveItem({IvId: integer;} IvEnv: string; var IvFbk: TFbk2Rec): boolean;
+function  TCodeMainForm.OutputFileName: string;
+var
+  oid: integer;     // objid
+  ona, ofn: string; // objname, outputfilename
+begin
+  // zip
+  oid := ObjectClientDataSet.FieldByName('FldId').AsInteger;
+  ona := ObjectClientDataSet.FieldByName('FldObject').AsString;
+  ofn := CodeClientDataSet.FieldByName('FldOutputFileName').AsString;
+
+  // filemname
+  if giis.Nx(ofn) then begin
+    LogFrame.Log('%d - Output filename not defined, use object name "%s"', [oid, ona]);
+    Result := ona;
+  end else
+    Result := ofn;
+
+  // .ext
+//ext := TPatRec.Ext(ofn);
+//if giis.Nx(fix) then begin
+//  fix := ObjectClientDataSet.FieldByName('FldContentKind').AsString;
+//  fix := TPatRec.ExtEnsure(fix);
+//end;
+//if giis.Nx(fix) then begin
+//  LogFrame.Log('Extension or kind for %s not defined, nothing done', [ona], clRed);
+//  Exit;
+//end;
+//if not TPatRec.ExtHas(ofn) then
+//  ofn := ofn + fix;
+end;
+
+function  TCodeMainForm.CodeSaveItem(IvEnv: string): boolean;
 var
   i, oid: integer;
-  ist: boolean;                                 // istemplate? (item "content" is a template/stencil so must be compiled with json in "data", the json can be multi-colors so might generate many content-compiled outputs)
-  ona, ofn, fin{, fix}, fsp, odi, fbk: string;  // objname, outputfilename, filename, fileext, filespec, outputdir
-  jso, jsi: ISuperObject; jva: string;          // jsonobj, jsonitem, jsonvalue
-  dba{, hfo}, cor, ler: boolean;                  // descriptionblockadd, headerandfooteroff, commentremove, linesemptyremove
+  odi, fin, fsp: string;               // outputdir, filename
+  jso, jsi: ISuperObject; jva: string; // jsonobj, jsonitem, jsonvalue
+  ist: boolean;                        // istemplate? (item "content" is a template/stencil so must be compiled with json in "data", the json can be multi-colors so might generate many content-compiled outputs)
 
 procedure filesave(IvFsp: string; IvRvDsDo, IvRvJsonDo: boolean);
 var
@@ -229,6 +273,7 @@ var
   sbu: TSbuRec;
   oid, pid, ord: integer;
   ona, cki, des, con, com, co1, co2, csr, a, b: string; // objectname, contentkind, description, content, comment, comment1, comment2, commentseparatorrow
+  dba, hfo, cor, ler: boolean;                          // descriptionblockadd, headerandfooteradd, commentremove, linesemptyremove
 begin
   // *** DUPLICATED LOGIC IN TDbaRec.ObjTreeContentDba ***
 
@@ -241,9 +286,15 @@ begin
   ord := ObjectClientDataSet.FieldByName('FldOrder').AsInteger;
 //sta := ObjectClientDataSet.FieldByName('FldState').AsString;
   cki := ObjectClientDataSet.FieldByName('FldContentKind').AsString;
-  des := ObjectClientDataSet.FieldByName('FldDescription').AsString.Trim;
+  des := ObjectClientDataSet.FieldByName('FldDescription').AsString{.Trim};
   ona := ObjectClientDataSet.FieldByName('FldObject').AsString;
   con := ObjectClientDataSet.FieldByName('FldContent').AsString;
+
+  // zip
+  dba := CodeClientDataSet.FieldByName('FldDescriptionBlockAdd').AsBoolean;
+  hfo := CodeClientDataSet.FieldByName('FldHeaderAndFooterAdd').AsBoolean;
+  cor := CodeClientDataSet.FieldByName('FldCommentRemove').AsBoolean;
+  ler := CodeClientDataSet.FieldByName('FldLinesEmptyRemove').AsBoolean;
 
   // commentstrings
   com := TCodRec.CommentStr(cki);
@@ -251,7 +302,7 @@ begin
   co2 := TCodRec.Comment2Str(cki);
 
   // commentseparatorrow
-  if not CodeClientDataSet.FieldByName('FldHeaderAndFooterOff').AsBoolean then begin
+  if hfo then begin
     if      Sametext('Html', cki) then
       csr := co1 + StringOfChar(com.Chars[0], 73) + co2   // <!------------>
     else if Sametext('Css', cki) then
@@ -261,7 +312,7 @@ begin
   end;
 
   // header
-  if not CodeClientDataSet.FieldByName('FldHeaderAndFooterOff').AsBoolean then begin
+  if hfo then begin
     a := Format('%s', [ona]);
     b := Format('(oid:%d, pid:%d, ord:%d)', [oid, pid, ord]);
     sbu.Add(csr, true, System.Math.IfThen(i = 0, 0, 2));
@@ -284,7 +335,7 @@ begin
   end;
 
   // content
-  con := grva.Rva(con, CodeClientDataSet.FieldByName('FldCommentRemove').AsBoolean, CodeClientDataSet.FieldByName('FldLinesEmptyRemove').AsBoolean, true);
+  con := grva.Rva(con, cor, ler, true);
   // rva with datasets
 if IvRvDsDo then
   con := grva.RvaDsRecord(con, [ObjectClientDataSet, CodeClientDataSet]);
@@ -295,7 +346,7 @@ if IvRvJsonDo then
   sbu.Add(con, true, 0);
 
   // footer
-  if not CodeClientDataSet.FieldByName('FldHeaderAndFooterOff').AsBoolean then begin
+  if hfo then begin
     a := Format('END', []);
     b := Format('(generated by wks @ %s in %d ms)', [DateTimeToStr(Now), tik.ElapsedMs]);
     sbu.Add(csr, true, 2);
@@ -313,57 +364,26 @@ if IvRvJsonDo then
 end;
 
 begin
-  // init
-  IvFbk.Clear;
+  // zip
   oid := ObjectClientDataSet.FieldByName('FldId').AsInteger;
-  ona := ObjectClientDataSet.FieldByName('FldObject').AsString;
-  ofn := CodeClientDataSet.FieldByName('FldOutputFileName').AsString;
-
-  // filemname
-  if giis.Nx(ofn) then begin
-    IvFbk.AddW('%4d - Outputfilename not defined, use objectname "%s"', [oid, ona]);
-    fin := ona;
-  end else
-    fin := ofn;
-
-  // .ext
-//ext := TPatRec.Ext(ofn);
-//if giis.Nx(fix) then begin
-//  fix := ObjectClientDataSet.FieldByName('FldContentKind').AsString;
-//  fix := TPatRec.ExtEnsure(fix);
-//end;
-//if giis.Nx(fix) then begin
-//  LogFrame.Log('Extension or kind for %s not defined, nothing done', [ona], clRed);
-//  Exit;
-//end;
-//if not TPatRec.ExtHas(ofn) then
-//  ofn := ofn + fix;
 
   // outputdir
-  if SameText('Dev', IvEnv) then
-    odi := CodeClientDataSet.FieldByName('FldOutputDevDirectory').AsString
-  else if SameText('Test', IvEnv) then
-    odi := CodeClientDataSet.FieldByName('FldOutputTestDirectory').AsString
-  else if SameText('Prod', IvEnv) then
-    odi := CodeClientDataSet.FieldByName('FldOutputProdDirectory').AsString;
+  odi := OutputDirPath(IvEnv);
   if giis.Nx(odi) then begin
-    IvFbk.AddE('%4d - Output %s directory for %s not defined, nothing done', [oid, IvEnv.ToUpper, ona]);
+    LogFrame.Log('%d - output directory %s not defined, nothing done', [oid, odi]);
     Exit;
   end;
 
-  // forceoutputdir
+  // ensure
   if not DirectoryExists(odi) then
     if not System.SysUtils.ForceDirectories(odi) then begin
-      IvFbk.AddE(fbk);
+      LogFrame.Log('%d - output directory %s error: %s, nothing done', [oid, odi, SysErrorMessage(GetLastError)]);
       Exit;
     end else
-      IvFbk.AddI('%4d - OutputDirectory %s does not exists, created on the fly', [oid, odi]);
+      LogFrame.Log('%d - output directory %s created on the fly', [oid, odi]);
 
-  // options
-  dba := CodeClientDataSet.FieldByName('FldDescriptionBlockAdd').AsBoolean;
-//hfo := CodeClientDataSet.FieldByName('FldHeaderAndFooterOff').AsBoolean;
-  cor := CodeClientDataSet.FieldByName('FldCommentRemove').AsBoolean;
-  ler := CodeClientDataSet.FieldByName('FldLinesEmptyRemove').AsBoolean;
+  // filename
+  fin := OutputFileName;
 
   // istemplate
   ist := (not ObjectClientDataSet.FieldByName('FldData').AsString.Trim.IsEmpty) and TRegEx.IsMatch(ObjectClientDataSet.FieldByName('FldData').AsString, '\$.*\$', []);
@@ -378,7 +398,7 @@ begin
     filesave(fsp, true, false);
 
     // log
-    IvFbk.AddS('%4d - Code saved to: %s', [oid, fsp]);
+    LogFrame.Log('%d - Code saved to: %s', [oid, fsp], clGreen);
 
   // compile and save com
   end else begin
@@ -399,18 +419,17 @@ begin
       filesave(fsp, true, true);
 
       // log
-      IvFbk.AddS('%4d - template%d "%s" saved to: %s', [oid, i, jsi.AsString, fsp]);
+      LogFrame.Log('%d - Code template compiled-%d and saved to: %s', [oid, i, fsp], clGreen);
     end;
   end;
 end;
 
-function  TCodeMainForm.CodeSaveChilds({IvId: integer;} IvEnv: string; var IvFbk: TFbk2Rec): boolean;
+function  TCodeMainForm.CodeSaveChilds(IvEnv: string): boolean;
 var
   dat: PNodeItem;
   nod: PVirtualNode;
   oid: integer;
   bkm: TBookmark;
-  fbk: TFbk2Rec;
 begin
   // exit
   if not TVstRec.NodeHasChildren(ObjectDTClientTree.FocusedNode) then begin
@@ -431,12 +450,11 @@ begin
       // exist
       if Assigned(dat) then begin
         // caption col0
-      //IvFbk.Add('%4d', [ObjectDTClientTree.Text[nod, 0]]);
+      //LogFrame.Log('%d', [ObjectDTClientTree.Text[nod, 0]]);
 
         // nodeparams
-      //if not VarIsClear(dat.Param) then begin
+      //if not VarIsClear(dat.Param) then
       //  TVstRec.NodeParamGet(ObjectDTClientTree, sib, idi, pid, azo, nam, obj, obk, cok, sta, org, dax);
-      //end;
 
         // id
         oid := dat.Key.ToInteger;
@@ -445,86 +463,107 @@ begin
         ObjectClientDataSet.Locate('FldId', oid, []);
 
         // save
-        if ObjectClientDataSet.FieldByName('FldState').AsString = 'Active' then
-          CodeSaveItem({FId,} CodeOutputEnv, fbk);
+        if SameText(ObjectClientDataSet.FieldByName('FldState').AsString, 'Active') then
+          CodeSaveItem(IvEnv);
       end;
 
       // next
     //nod := ObjectDTClientTree.GetNextSibling(nod);
       nod := nod.NextSibling;
     end;
-
-    // log
-    LogFrame.Log(fbk.Text);
   finally
     ObjectClientDataSet.GotoBookmark(bkm);
     ObjectClientDataSet.EnableControls;
   end;
 end;
 
-function  TCodeMainForm.CodeSaveBranch({IvId: integer;} IvEnv: string; var IvFbk: TFbk2Rec): boolean;
+function  TCodeMainForm.CodeSaveBranch(IvEnv: string): boolean;
 var
-  aff: integer;
-  fsp, ona, cod, fbk: string;
-  dba, hfo, cor, ler: boolean;
+  oid, aff: integer;
+  odi, fin, fsp, ona, cod, fbk: string;
+  dba, hfo, cor, ler, okk: boolean;
 begin
-  LogFrame.Log(NOT_IMPLEMENTED_STR, clRed);
-  Exit;
-
-  // options
+  // zip
+  oid := ObjectClientDataSet.FieldByName('FldId').AsInteger;
   dba := CodeClientDataSet.FieldByName('FldDescriptionBlockAdd').AsBoolean;
-  hfo := CodeClientDataSet.FieldByName('FldHeaderAndFooterOff').AsBoolean;
+  hfo := CodeClientDataSet.FieldByName('FldHeaderAndFooterAdd').AsBoolean;
   cor := CodeClientDataSet.FieldByName('FldCommentRemove').AsBoolean;
   ler := CodeClientDataSet.FieldByName('FldLinesEmptyRemove').AsBoolean;
 
   // savelocally
   if CodeSaveToComboBox.ItemIndex = 0 then begin
     // codefromdbario
-    if not TDbaRec.ObjTreeContentRio    ('Code', FId.ToString, true, dba, hfo, cor, ler{, fsp}, aff, ona, cod, fbk) then begin
+    okk := TDbaRec.ObjTreeContentRio    ('Code', FId.ToString, true, dba, hfo, cor, ler{, fsp}, aff, ona, cod, fbk);
+    if not okk then begin
       TMesRec.W(fbk);
       LogFrame.Log(fbk, clRed);
     end else begin
-      LogFrame.Log(NOT_IMPLEMENTED_STR, clRed);
+      // outputdir
+      odi := OutputDirPath(IvEnv);
+      if giis.Nx(odi) then begin
+        LogFrame.Log('%d - output directory %s not defined, nothing done', [oid, odi]);
+        Exit;
+      end;
+
+      // ensure
+      if not DirectoryExists(odi) then
+        if not System.SysUtils.ForceDirectories(odi) then begin
+          LogFrame.Log('%d - output directory %s error: %s, nothing done', [oid, odi, SysErrorMessage(GetLastError)]);
+          Exit;
+        end else
+          LogFrame.Log('%d - output directory %s created on the fly', [oid, odi]);
+
+      // filename
+      fin := OutputFileName;
+
+      // filespec
+      fsp := TPatRec.DelimiterEnsure(odi) + fin;
+
+      // save
+      TFile.WriteAllText(fsp, cod, TEncoding.UTF8);
+      LogFrame.Log('%d - Code branch saved to %s', [oid, fsp], clGreen);
     end;
 
   // saveremoterio
   end else begin
-    if not TDbaRec.ObjTreeContentRioSave('Code', FId.ToString, true, dba, hfo, cor, ler , fsp , aff, ona, cod, fbk) then begin
+    // everything happens remotely on the server
+    okk := TDbaRec.ObjTreeContentRioSave('Code', FId.ToString, true, dba, hfo, cor, ler , fsp , aff, ona, cod, fbk);
+    if not okk then begin
       TMesRec.W(fbk);
       LogFrame.Log(fbk, clRed);
     end else
-      LogFrame.Log(fbk, clGreen); // *** message should be adjusted ***
+      LogFrame.Log(fbk, clGreen);
   end;
 end;
 
 procedure TCodeMainForm.CodeSaveItemActionExecute(Sender: TObject);
 var
-  fbk: TFbk2Rec;
+  env: string;
 begin
   inherited;
 
-  CodeSaveItem({FId,} CodeOutputEnv, fbk);
-  LogFrame.Log(fbk.Text);
+  env := CodeEnvComboBox.Items.KeyNames[CodeEnvComboBox.ItemIndex];
+  CodeSaveItem(env);
 end;
 
 procedure TCodeMainForm.CodeSaveChildsActionExecute(Sender: TObject);
 var
-  fbk: TFbk2Rec;
+  env: string;
 begin
   inherited;
 
-  CodeSaveChilds({FId,} CodeOutputEnv, fbk);
-  LogFrame.Log(fbk.Text);
+  env := CodeEnvComboBox.Items.KeyNames[CodeEnvComboBox.ItemIndex];
+  CodeSaveChilds(env);
 end;
 
 procedure TCodeMainForm.CodeSaveBranchActionExecute(Sender: TObject);
 var
-  fbk: TFbk2Rec;
+  env: string;
 begin
   inherited;
 
-  CodeSaveBranch({FId,} CodeOutputEnv, fbk);
-  LogFrame.Log(fbk.Text);
+  env := CodeEnvComboBox.Items.KeyNames[CodeEnvComboBox.ItemIndex];
+  CodeSaveBranch(env);
 end;
 
 procedure TCodeMainForm.CodeRunActionExecute(Sender: TObject);
@@ -534,38 +573,40 @@ var
 begin
   inherited;
 
-  // idname
+  // zip
   oid := ObjectClientDataSet.FieldByName('FldId').AsInteger;
   cna := ObjectClientDataSet.FieldByName('FldObject').AsString;
 
   // runcommand
   ruc := CodeClientDataSet.FieldByName('FldRunCommand').AsString;
-  if giis.Nx(ruc) then begin
-    LogFrame.Log('Unable to execute "%s" code, "Run Command" not yet defined, exit', [cna], clRed);
-    Exit;
-  end;
-
-  // confirm
-  if TAskRec.No('You are about to execute "%s" code.  Continue?', [cna]) then
-    Exit;
-  LogFrame.Log('Running code %d %s', [oid, cna]);
 
   // rv
   ruc := grva.RvaDsRecord(ruc, [ObjectClientDataSet, CodeClientDataSet]);
 
+  // undefined
+  if giis.Nx(ruc) then begin
+    LogFrame.Log('%d - Unable to execute code "%s", "Run Command" not defined, nothing done', [oid, cna], clWebOrange);
+    Exit;
+  end;
+
   // commented
-  if ruc.StartsWith('--')  then
-    LogFrame.Log('Unable to executed commented: %s', [ruc])
+  if ruc.StartsWith('--')  then begin
+    LogFrame.Log('%d - Unable to executed code "%s", run command is commented, nothing done', [oid, cna], clWebOrange);
+    Exit;
+  end;
+
+  // confirm
+  if TAskRec.No('Execute the code "%s" with command: %s ?', [cna, ruc]) then
+    Exit;
 
   // run
-  else begin
-    try
-      TWinRec.WinProcessRun(ruc);
-      LogFrame.Log('Executed: %s', [ruc]);
-    except
-      on e: Exception do
-        LogFrame.Log(e);
-    end;
+  try
+    LogFrame.Log('%d - Code "%s" running... (%s)', [oid, cna, ruc]);
+    TWinRec.WinProcessRun(ruc);
+    LogFrame.Log('%d - Code "%s" executed', [oid, cna]);
+  except
+    on e: Exception do
+      LogFrame.Log(e);
   end;
 end;
 {$ENDREGION}
@@ -595,26 +636,39 @@ begin
 
   {$REGION 'detail'}
     // askvectors
-  SetLength(pmv, 2);
+  SetLength(pmv, {3}1);
   SetLength(vav, Length(pmv));
 
   // objectdefault
-  pmv[0] := 'Output To'       ; vav[0] := giif.NxD(FOutputToChache       , 'LocalComputer');
-  pmv[1] := 'Output Directory'; vav[1] := giif.NxD(FOutputDirectoryChache, ''             );
+  pmv[0] := 'Output to DEV Directory' ; vav[0] := giif.NxD(FOutputDevDirectoryChache , 'C:\$\Include\W\wks');
+//pmv[1] := 'Output to TEST Directory'; vav[1] := giif.NxD(FOutputTestDirectoryChache, ''                  );
+//pmv[2] := 'Output to PROD Directory'; vav[2] := giif.NxD(FOutputProdDirectoryChache, ''                  );
+
+  // ask
+  if not InputQuery('New data for ' + FObj, pmv, vav) then begin
+    DataSet.Delete; // Abort ?
+    Exit;
+  end;
 
   // chache
-  FOutputToChache        := vav[0];
-  FOutputDirectoryChache := vav[1];
+  FOutputDevDirectoryChache  := vav[0];
+//FOutputTestDirectoryChache := vav[1];
+//FOutputProdDirectoryChache := vav[2];
 
   // set
   DataSet.Edit;
-//DataSet.FieldByName('FldObjectId'       ).Value := FId; // automatic
-  DataSet.FieldByName('FldReturnAs'       ).Value := null;
-  DataSet.FieldByName('FldReturnMimeType' ).Value := null;
-  DataSet.FieldByName('FldOutputTo'       ).Value := FOutputToChache;
-  DataSet.FieldByName('FldOutputDirectory').Value := FOutputDirectoryChache;
-  DataSet.FieldByName('FldOutputFileName' ).Value := null;
-  DataSet.FieldByName('FldRunCommand'     ).Value := null;
+//DataSet.FieldByName('FldObjectId'           ).Value := FId;  // automatic
+  DataSet.FieldByName('FldReturnAs'           ).Value := null;
+  DataSet.FieldByName('FldReturnMimeType'     ).Value := null;
+  DataSet.FieldByName('FldOutputDevDirectory' ).Value := FOutputDevDirectoryChache;
+  DataSet.FieldByName('FldOutputTestDirectory').Value := null; //FOutputTestDirectoryChache;
+  DataSet.FieldByName('FldOutputProdDirectory').Value := null; //FOutputProdDirectoryChache;
+  DataSet.FieldByName('FldOutputFileName'     ).Value := null;
+  DataSet.FieldByName('FldRunCommand'         ).Value := null;
+  DataSet.FieldByName('FldDescriptionBlockAdd').Value := false;
+  DataSet.FieldByName('FldHeaderAndFooterAdd' ).Value := false;
+  DataSet.FieldByName('FldCommentRemove'      ).Value := false;
+  DataSet.FieldByName('FldLinesEmptyRemove'   ).Value := false;
   DataSet.Post;
   LogFrame.Log('%s data initialized', [FObj]);
   {$ENDREGION}
@@ -625,8 +679,7 @@ procedure TCodeMainForm.CodeClientDataSetAfterPost(DataSet: TDataSet);
 begin
   inherited;
 
-  {$REGION 'detail'}
-  // applyupdatetoremoteserver
+  {$REGION 'applyupdatetoremoteserver'}
   if CodeClientDataSet.ApplyUpdates(0) > 0 then
     TMesRec.I('Unable to save %s detail to remote server', [FObj])
   else begin
@@ -641,7 +694,7 @@ procedure TCodeMainForm.CodeClientDataSetReconcileError(DataSet: TCustomClientDa
 begin
   inherited;
 
-  {$REGION 'detail'}
+  {$REGION 'reconcileerror'}
   Action := HandleReconcileError(DataSet, UpdateKind, E);
   {$ENDREGION}
 
@@ -660,13 +713,10 @@ begin
 end;
 
 procedure TCodeMainForm.CodeOutputDevSaveLabelClick(Sender: TObject);
-var
-  fbk: TFbk2Rec;
 begin
   inherited;
 
-  CodeSaveItem({FId,} 'Dev', fbk);
-  LogFrame.Log(fbk.Text);
+  CodeSaveItem('Dev');
 end;
 
 procedure TCodeMainForm.CodeOutputTestDirectoryLabelClick(Sender: TObject);
@@ -680,13 +730,10 @@ begin
 end;
 
 procedure TCodeMainForm.CodeOutputTestSaveLabelClick(Sender: TObject);
-var
-  fbk: TFbk2Rec;
 begin
   inherited;
 
-  CodeSaveItem({FId,} 'Test', fbk);
-  LogFrame.Log(fbk.Text);
+  CodeSaveItem('Test');
 end;
 
 procedure TCodeMainForm.CodeOutputProdDirectoryLabelClick(Sender: TObject);
@@ -700,13 +747,10 @@ begin
 end;
 
 procedure TCodeMainForm.CodeOutputProdSaveLabelClick( Sender: TObject);
-var
-  fbk: TFbk2Rec;
 begin
   inherited;
 
-  CodeSaveItem({FId,} 'Prod', fbk);
-  LogFrame.Log(fbk.Text);
+  CodeSaveItem('Prod');
 end;
 {$ENDREGION}
 

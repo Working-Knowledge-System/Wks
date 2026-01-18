@@ -17,14 +17,19 @@ type
   private
     FRefName    : string;   // i.e. the agent name
     FOutStrings : TStrings; // output
-    FLogStrings : TStrings; // report
+    FLogStrings : TStrings; // log
   public
     constructor Create(IvRefName: string; IvOutStrings, IvLogStrings: TStrings);
     destructor  Destroy; override;
     function  CodeIsValid(IvScript: string; var IvFbk: string): boolean;
-    function  CodeRun(const IvCode, IvConnectionStr, IvConnectionLib: string; out IvMsg: string; out IvAffected: integer; IvQueryTimeoutSec: integer = DBA_COMMAND_TIMEOUT_SEC): boolean;
-    function  FileRun(const IvFile, IvConnectionStr, IvConnectionLib: string; out IvMsg: string; out IvAffected: integer; IvQueryTimeoutSec: integer = DBA_COMMAND_TIMEOUT_SEC): boolean;
+    function  CodeRun(const IvCode, IvConnectionStr, IvConnectionLib: string; out IvMsg: string; out IvAffected: integer; IvConnectionTimeoutSec: integer = DBA_CONNECTION_TIMEOUT_SEC; IvQueryTimeoutSec: integer = DBA_COMMAND_TIMEOUT_SEC{; IvCodeSaveToAFile: boolean; IvEmailDo: boolean}): boolean;
+    function  FileRun(const IvFile, IvConnectionStr, IvConnectionLib: string; out IvMsg: string; out IvAffected: integer; IvConnectionTimeoutSec: integer = DBA_CONNECTION_TIMEOUT_SEC; IvQueryTimeoutSec: integer = DBA_COMMAND_TIMEOUT_SEC{; IvCodeSaveToAFile: boolean; IvEmailDo: boolean}): boolean;
   end;
+
+  // note:
+  // CodeRun() and FileRun() assume to run a DDL command that do not returns records
+  // in case the code returns records need to implement the management of FetchOptions.Mode := fmOnDemand/fmAll
+  // in that case only the first 1000 rows are fetched!
 {$ENDREGION}
 
 implementation
@@ -95,9 +100,12 @@ begin
     IvFbk := 'SQL code is not valid (it is empty!)';
 end;
 
-function  TSqlEngineCls.CodeRun(const IvCode, IvConnectionStr, IvConnectionLib: string; out IvMsg: string; out IvAffected: integer; IvQueryTimeoutSec: integer): boolean;
+function  TSqlEngineCls.CodeRun(const IvCode, IvConnectionStr, IvConnectionLib: string; out IvMsg: string; out IvAffected: integer; IvConnectionTimeoutSec, IvQueryTimeoutSec: integer): boolean;
 const
-  IvCodeSaveToAFile = false;
+//IvCodeSaveToAFile = false;
+  IvEmailDo = false;
+
+  {$REGION 'var'}
 var
   fcn: TFDConnection;
   fqu: TFDQuery;
@@ -105,6 +113,35 @@ var
   que: TADOQuery;
   stl: TStringList;
   fis: string; // filespec
+  {$ENDREGION}
+
+  {$REGION 'macro'}
+  //procedure save(ivfile, ivbody);
+  //begin
+  //  stl := TStringList.Create;
+  //  try
+  //    stl.Text := IvCode;
+  //    fis := TFsyRec.FileTempRnd('.sql');
+  //    stl.SaveToFile(fis);
+  //  finally
+  //    DeleteFile(fis);
+  //    stl.Free;
+  //  end;
+  //end;
+
+  //procedure email(ivto, ivcc, ivbody);
+  //  // replace
+  //  if Assigned(jso.O['Email.Content']) then
+  //    if jso.S['Email.Content'].Contains('$Dataset(0)$') then begin
+  //      dst.ToHtml(que, s0);
+  //      jso.S['Email.Content'] := StringReplace(jso.S['Email.Content'], '$Dataset(0)$', s0, [rfReplaceAll]);
+  //    end;
+  //  // send
+  //  if not EmailDo(jo, fbk) then
+  //    MessageAdd(fbk);
+  //end;
+  {$ENDREGION}
+
 begin
   // def
   IvAffected := 0;
@@ -116,29 +153,20 @@ begin
     Exit;
   end;
 
+  Result := CodeIsValid(IvCode, IvMsg);
+  if not Result then begin
+    IvMsg := 'Code is not valid';
+    Exit;
+  end;
+
   Result := not IvConnectionStr.IsEmpty;
   if not Result then begin
     IvMsg := 'Connection string is empty';
     Exit;
   end;
 
-  Result := CodeIsValid(IvCode, IvMsg);
-  if not Result then
-    Exit;
-  {$ENDREGION}
-
-  {$REGION 'CodeSaveToAFile'}
-  if IvCodeSaveToAFile then begin
-    stl := TStringList.Create;
-    try
-      stl.Text := IvCode;
-      fis := TFsyRec.FileTempRnd('.sql');
-      stl.SaveToFile(fis);
-    finally
-      DeleteFile(fis);
-      stl.Free;
-    end;
-  end;
+  if IvConnectionLib.IsEmpty then
+    FLogStrings.Add('IvConnectionLib is empty, FD will be used');
   {$ENDREGION}
 
   {$REGION 'FD'}
@@ -148,17 +176,19 @@ begin
 
     // connection
     fcn := TFDConnection.Create(nil);
-    fcn.ConnectionString               := IvConnectionStr;
-  //fcn.ResourceOptions.ConnTimeout    := {IvConnectionTimeout} 10;
-    fcn.ResourceOptions.CmdExecTimeout := IvQueryTimeoutSec;
-    fcn.LoginPrompt := false;
+    fcn.ConnectionString                   := IvConnectionStr;
+  //fcn.ResourceOptions.ConnTimeout        := {IvConnectionTimeout} 10;
+    fcn.Params.Add(Format('LoginTimeout=%d', [IvConnectionTimeoutSec])); // *** sec or millisec ? ***
+    fcn.ResourceOptions.CmdExecTimeout     := IvQueryTimeoutSec;
+    fcn.LoginPrompt                        := false;
 
     // query
     fqu := TFDQuery.Create(nil);
     fqu.Connection                     := fcn;
     fqu.ResourceOptions.CmdExecTimeout := IvQueryTimeoutSec * 1000; // *** milliseconds ***
-    fqu.ResourceOptions.CmdExecMode    := amAsync;
-    fqu.FetchOptions.Mode              := fmAll;
+  //fqu.ResourceOptions.CmdExecMode    := amAsync;                  // *** nop ***
+  //fqu.FetchOptions.Mode              := fmOnDemand;               // do not fetch all records at once!
+    fqu.FetchOptions.RowsetSize        := 1000;                     // but fetch in streaming this amount of records per network roundtrip
     fqu.SQL.Text                       := IvCode;
 
     // do
@@ -174,6 +204,25 @@ begin
         IvMsg := 'FD query executed';
         FLogStrings.Add(IvMsg);
         Result := true;
+
+  {$REGION 'SaveToAFile'}
+//  if IvCodeSaveToAFile then begin
+//    stl := TStringList.Create;
+//    try
+//      stl.Text := IvCode;
+//      fis := TFsyRec.FileTempRnd('.sql');
+//      stl.SaveToFile(fis);
+//    finally
+//      DeleteFile(fis);
+//      stl.Free;
+//    end;
+//  end;
+  {$ENDREGION}
+
+  {$REGION 'SenvViaEmail}
+      //if jso.B['Email.Active'] then
+      //  email();
+  {$ENDREGION}
 
       //TDstRec.DstToCsv(que, IvOutput);
       except
@@ -270,7 +319,7 @@ begin
 
 end;
 
-function  TSqlEngineCls.FileRun(const IvFile, IvConnectionStr, IvConnectionLib: string; out IvMsg: string; out IvAffected: integer; IvQueryTimeoutSec: integer = DBA_COMMAND_TIMEOUT_SEC): boolean;
+function  TSqlEngineCls.FileRun(const IvFile, IvConnectionStr, IvConnectionLib: string; out IvMsg: string; out IvAffected: integer; IvConnectionTimeoutSec, IvQueryTimeoutSec: integer): boolean;
 var
   cod: string;
 begin

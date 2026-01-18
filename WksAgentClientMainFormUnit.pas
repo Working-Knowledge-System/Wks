@@ -72,6 +72,7 @@ uses
   , Vcl.Edge
   , Data.DB
   , Data.Win.ADODB
+  , Soap.SOAPConn
   , Datasnap.DBClient
   , FireDAC.Stan.Intf
   , FireDAC.Stan.Option
@@ -97,12 +98,10 @@ uses
 //, FireDAC.Phys.OracleDef, FireDAC.Phys.Oracle
 //, FireDAC.Phys.ODBCDef  , FireDAC.Phys.ODBC  , FireDAC.Phys.ODBCBase
   , FireDAC.Phys.SQLiteDef, FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteWrapper.Stat
-  , Soap.SOAPConn
-  , SynDBEdit
-  , SynEdit
   , JvClock
   , JvComponentBase
   , JvDateTimePicker
+  , JvDBDateTimePicker
   , JvExComCtrls
   , JvExControls
   , JvExExtCtrls
@@ -112,7 +111,10 @@ uses
   , JvScrollMax
   , JvSpin
   , JvThreadTimer
+  , SynDBEdit
+  , SynEdit
   , VirtualTrees
+//, VirtualTrees.BaseAncestorVCL, VirtualTrees.BaseTree, VirtualTrees.AncestorVCL
   , DTClientTree
   , DTDBTreeView
   , WksBaseClientMainFormUnit
@@ -240,11 +242,14 @@ type
     AgentCsFdTestAction: TAction;
     AgentCsAdoTestAction: TAction;
     RunningTabSheet: TTabSheet;
-    RunningPanel: TPanel;
+    RunningListPanel: TPanel;
     RunningPauseLabel: TLabel;
     RunningListBox: TListBox;
-    RunningStopLabel: TLabel;
+    RunningAbortLabel: TLabel;
     RunningContinueLabel: TLabel;
+    AgentActiveListEmptyInfoLabel: TLabel;
+    AgentRunningListEmptyInfoLabel: TLabel;
+    AgentRunListEmptyInfoLabel: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
     procedure AgentActiveActionExecute(Sender: TObject);
@@ -290,9 +295,11 @@ type
     procedure SynEditDataJsonFdMongodbCsPopupClick(Sender: TObject);
     procedure AgentCsAdoTestActionExecute(Sender: TObject);
     procedure AgentCsFdTestActionExecute(Sender: TObject);
-    procedure RunningStopLabelClick(Sender: TObject);
+    procedure RunningAbortLabelClick(Sender: TObject);
     procedure RunningPauseLabelClick(Sender: TObject);
     procedure RunningContinueLabelClick(Sender: TObject);
+    procedure RunListTabSheetShow(Sender: TObject);
+    procedure RunningTabSheetShow(Sender: TObject);
   private
     { Private declarations }
     // winmessages
@@ -309,13 +316,13 @@ type
   //procedure AgentActiveUnload;
     // run
     procedure AgentRunInfoClear;
-    procedure AgentRunStart(IvAgentRec: TAgentRec; IvCtxTag: string = ''; IvCtxIdx: integer = -1); // ctxtag = MANU|AUTO
+    procedure AgentRunStart(IvAgentRec: TAgentRec; IvCtxTag: string = ''{; IvCtxIdx: integer = -1}); // ctxtag = MANU|AUTO
     // running
     procedure AgentRunningInc;
     procedure AgentRunningDec;
     function  AgentRunningSelected: TAgentThread;
     function  AgentRunningIdFindByThread(const IvAgentThread: TAgentThread): integer;
-    procedure AgentRunningUiUpdate(const IvRunningId: Integer; const IvString: string);
+    procedure AgentRunningUiUpdate(const IvRunningId: integer; const IvString: string);
     // thread
     procedure AgentThreadStart(IvAgentRec: TAgentRec; IvCtxTag: string = '');
     procedure AgentThreadOnTerminate(Sender: TObject);
@@ -437,7 +444,7 @@ begin
   RunInfoReportRichEdit.Clear;
 end;
 
-procedure TAgentMainForm.AgentRunStart(IvAgentRec: TAgentRec; IvCtxTag: string; IvCtxIdx: integer);
+procedure TAgentMainForm.AgentRunStart(IvAgentRec: TAgentRec; IvCtxTag: string{; IvCtxIdx: integer});
 begin
   inherited;
 
@@ -445,11 +452,13 @@ begin
   Screen.Cursor := crHourGlass;
   try
     AgentThreadStart(IvAgentRec, IvCtxTag); // *** it will be handy an option to avoid sending emails inside the thread ***
+    // ok this
     LogFrame.LogOne('Agent %d "%s" has been started', [IvAgentRec.Id, IvAgentRec.Agent], fmDanger);
-    if IvCtxIdx < 0 then
-      LogFrame.Log('Agent %d "%s" started at min:%s, sec:%s', [IvAgentRec.Id, IvAgentRec.Agent, IvAgentRec.RunAtMinute, IvAgentRec.RunAtSecond])
-    else
-      LogFrame.Log('%3d) agent %4d %-32s started at min:%s, sec:%s', [IvCtxIdx, IvAgentRec.Id, IvAgentRec.Agent.QuotedString('"'), IvAgentRec.RunAtMinute, IvAgentRec.RunAtSecond]);
+    // this is a kind of duplicated info
+  //if IvCtxIdx < 0 then
+  //  LogFrame.Log('Agent %d "%s" started at min:%s, sec:%s', [IvAgentRec.Id, IvAgentRec.Agent, IvAgentRec.RunAtMinute, IvAgentRec.RunAtSecond])
+  //else
+  //  LogFrame.Log('%3d) agent %4d %-32s started at min:%s, sec:%s', [IvCtxIdx, IvAgentRec.Id, IvAgentRec.Agent.QuotedString('"'), IvAgentRec.RunAtMinute, IvAgentRec.RunAtSecond]);
   finally
     Screen.Cursor := crDefault
   end;
@@ -541,11 +550,11 @@ begin
   AgentRunningInc;
 
   // log
-  LogFrame.Log('%-16s | %4d "%s"', ['AGENTSTART (%s)', IvAgentRec.Id, IvAgentRec.Agent, IvCtxTag], clBlue);
+  LogFrame.Log('%-12s | %3d "%s"'                                      , ['AGENTSTART', IvAgentRec.Id  , IvAgentRec.Agent  , IvCtxTag], clBlue);
 
-  // BAT
+    {$REGION 'BAT'}
   if          IvAgentRec.ContentKind = TCodRec.BAT.Kind then begin
-    //with TAgentDosThread.Create(IvAgentRec{, true}, ) do begin
+    //with TAgentDosThread.Create(IvAgentRec{, true}, AgentRunningUiUpdate) do begin
     //  OnTerminate := AgentThreadOnTerminate;
     //  Start; // now the execute method is called, Resume is deprecated
     //end;
@@ -561,8 +570,9 @@ begin
     Application.ProcessMessages;
     sleep(SLEEP_MS);
     ath.Start;
+    {$ENDREGION}
 
-  // JSL
+    {$REGION 'JSL'}
   end else if IvAgentRec.ContentKind = TCodRec.JSL.Kind then begin
     //with TAgentJslThread.Create(IvAgentRec{, true}, AgentRunningUiUpdate) do begin
     //  OnTerminate := AgentThreadOnTerminate;
@@ -580,8 +590,9 @@ begin
     Application.ProcessMessages;
     sleep(SLEEP_MS);
     ath.Start;
+    {$ENDREGION}
 
-  // PY
+    {$REGION 'PY'}
   end else if IvAgentRec.ContentKind = TCodRec.PY.Kind then begin
     //with TAgentPythonThread.Create(IvAgentRec{, true}, AgentRunningUiUpdate) do begin
     //  OnTerminate := AgentThreadOnTerminate;
@@ -599,10 +610,11 @@ begin
     Application.ProcessMessages;
     sleep(SLEEP_MS);
     ath.Start;
+    {$ENDREGION}
 
-  // SQL
+    {$REGION 'SQL'}
   end else if IvAgentRec.ContentKind = TCodRec.SQL.Kind then begin
-    //with TAgentSqlThread.Create(IvAgentRec{, true}, ) do begin
+    //with TAgentSqlThread.Create(IvAgentRec{, true}, AgentRunningUiUpdate) do begin
     //  OnTerminate := AgentThreadOnTerminate;
     //  Start;
     //end;
@@ -618,14 +630,15 @@ begin
     Application.ProcessMessages;
     sleep(SLEEP_MS);
     ath.Start;
+    {$ENDREGION}
 
-  // ETL
+    {$REGION 'ETL (TableToTable)'}
   end else if IvAgentRec.ContentKind = TCodRec.ETL.Kind then begin
-    //with TAgentEtlThread2.Create(IvAgentRec{, true}, ) do begin
+    //with TAgentEtlThread2.Create(IvAgentRec{, true}, AgentRunningUiUpdate) do begin
     //  OnTerminate := AgentThreadOnTerminate;
     //  Start;
     //end;
-    ath := TAgentEtlThread2.Create(IvAgentRec{, true}
+    ath := TAgentEtlTableToTableThread.Create(IvAgentRec{, true}
     , procedure(AId: Integer; AString: string)
       begin
         AgentRunningUiUpdate(AId, AString);
@@ -637,14 +650,17 @@ begin
     Application.ProcessMessages;
     sleep(SLEEP_MS);
     ath.Start;
+    {$ENDREGION}
 
-  // UNKNOWN
+    {$REGION 'UNKNOWN'}
   end else begin
     TMesRec.W('Unable to start agent , content kind "%s" is not implemented', [IvAgentRec.Id, IvAgentRec.Agent, IvAgentRec.ContentKind]);
 
     // -1
     AgentRunningDec;
   end;
+    {$ENDREGION}
+
   {$ENDREGION}
 
 end;
@@ -687,7 +703,7 @@ begin
   RunListBox.AddItem(Format('%s - #%d "%s"', [DateTimeToStr(ptr.Started), ath.AgentRec.Id, ath.AgentRec.Agent]), TObject(ptr));
 
   // log
-  LogFrame.Log('%-16s | %4d "%s" elapsed: %d ms, affected: %d, msg: %s', ['AGENTSTOP', ath.AgentRec.Id, ath.AgentRec.Agent, ptr.ElapsedMs, ptr.Affected, ptr.Message], clBlue);
+  LogFrame.Log('%-12s | %3d "%s" elapsed: %d ms, affected: %d, msg: %s', ['AGENTSTOP' , ath.AgentRec.Id, ath.AgentRec.Agent, ptr.ElapsedMs, ptr.Affected, ptr.Message], clBlue);
 
   // output
   LogFrame.Output(ptr.Output.Text);
@@ -791,14 +807,45 @@ begin
   AgentActiveDBCtrlGridRefresh;
 end;
 
+  {$REGION 'ActiveList'}
 procedure TAgentMainForm.AgentActiveTabSheetShow(Sender: TObject);
 begin
   inherited;
 
-  AgentActiveDBCtrlGridRefresh;
+//  if AgentActiveClientDataSet.IsEmpty then begin
+//    AgentActiveDBNavigator.Visible := false;
+//    AgentActiveDBCtrlGrid.Visible := false;
+//    AgentActiveListEmptyInfoLabel.Visible := true;
+//    AgentActiveListEmptyInfoLabel.align := alClient;
+//  end else begin
+//    AgentActiveDBNavigator.Visible := true;
+//    AgentActiveDBCtrlGrid.Visible := true;
+      AgentActiveListEmptyInfoLabel.Visible := false;
+//    AgentActiveListEmptyInfoLabel.align := alNone;
+//
+      AgentActiveDBCtrlGridRefresh;
+//  end;
 end;
+  {$ENDREGION}
 
   {$REGION 'RunningList'}
+procedure TAgentMainForm.RunningTabSheetShow(Sender: TObject);
+begin
+  inherited;
+
+//  if RunListBox.Items.IsEmpty then begin
+//    RunningListPanel.Visible := false;
+//    RunningListBox.Visible := false;
+//    AgentRunningListEmptyInfoLabel.Visible := true;
+//    AgentRunningListEmptyInfoLabel.align := alClient;
+//  end else begin
+//    RunningListPanel.Visible := true;
+//    RunningListBox.Visible := true;
+      AgentRunningListEmptyInfoLabel.Visible := false;
+//    AgentRunningListEmptyInfoLabel.align := alNone;
+//  end;
+end;
+
 procedure TAgentMainForm.RunningPauseLabelClick(Sender: TObject);
 begin
   inherited;
@@ -817,17 +864,34 @@ begin
     sth.ContinueRequest;
 end;
 
-procedure TAgentMainForm.RunningStopLabelClick(Sender: TObject);
+procedure TAgentMainForm.RunningAbortLabelClick(Sender: TObject);
 begin
   inherited;
 
   var sth := AgentRunningSelected;
   if Assigned(sth) then
-    sth.StopRequest;
+    sth.AbortRequest;
 end;
   {$ENDREGION}
 
-  {$REGION 'RunList'}
+  {$REGION 'RunsList'}
+procedure TAgentMainForm.RunListTabSheetShow(Sender: TObject);
+begin
+  inherited;
+
+//  if AgentActiveClientDataSet.IsEmpty then begin
+//    RunListPanel.Visible := false;
+//    RunListBox.Visible := false;
+//    AgentRunListEmptyInfoLabel.Visible := true;
+//    AgentRunListEmptyInfoLabel.align := alClient;
+//  end else begin
+//    RunListPanel.Visible := true;
+//    RunListBox.Visible := true;
+      AgentRunListEmptyInfoLabel.Visible := false;
+//    AgentRunListEmptyInfoLabel.align := alNone;
+//  end;
+end;
+
 procedure TAgentMainForm.RunListBoxClick(Sender: TObject);
  var
   ptr: PAgentThreadInfoRec;
@@ -1019,9 +1083,14 @@ procedure TAgentMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // detail
-  if AgentClientDataSet.State = dsEdit then
+  {$REGION 'Object'}
+  {$ENDREGION}
+
+  {$REGION 'Detail'}
+  if not (AgentClientDataSet.State = dsBrowse) then
     AgentDBNavigator.BtnClick(nbPost);
+  {$ENDREGION}
+
 end;
 {$ENDREGION}
 
@@ -1117,8 +1186,7 @@ procedure TAgentMainForm.AgentClientDataSetAfterPost(DataSet: TDataSet);
 begin
   inherited;
 
-  {$REGION 'detail'}
-  // applyupdatetoremoteserver
+  {$REGION 'applyupdatetoremoteserver'}
   if AgentClientDataSet.ApplyUpdates(0) > 0 then
     TMesRec.I('Unable to save %s detail to remote server', [FObj])
   else begin
@@ -1136,7 +1204,7 @@ procedure TAgentMainForm.AgentClientDataSetReconcileError(DataSet: TCustomClient
 begin
   inherited;
 
-  {$REGION 'detail'}
+  {$REGION 'reconcileerror'}
   Action := HandleReconcileError(DataSet, UpdateKind, E);
   {$ENDREGION}
 
@@ -1466,7 +1534,7 @@ procedure TAgentMainForm.TimerJvThreadTimerTimer(Sender: TObject); // this timer
 
   {$REGION 'var'}
 var
-  i: integer;
+//i: integer;
 //jso: ISuperobject;
   okk: boolean;
   age: TAgentRec;
@@ -1532,11 +1600,11 @@ begin
 
   {$REGION 'loop'}
   LogFrame.Log('starting active agent(s) scheduled in the next 60 minutes ...');
-  i := 0;
+//i := 0;
   AgentActiveClientDataSet.First;
   while not AgentActiveClientDataSet.Eof do begin
     // idx
-    Inc(i);
+  //Inc(i);
 
     // agent
     age.FromAgentActiveDs(AgentActiveClientDataSet); // from a restricted agentactive dataset
@@ -1547,11 +1615,12 @@ begin
 
     // start <- ontime
     else if AgentIsOnTime(age) then
-      AgentRunStart(age, 'AUTO', i)
+      AgentRunStart(age, 'AUTO'{, i})
 
     // info <- isnext
     else if AgentIsNext(age) then
-      LogFrame.Log('%3d) agent %4d %-32s will run at hour:%s min:%s sec:%s', [i, age.Id, age.Agent.QuotedString('"'), age.RunAtHour, age.RunAtMinute, age.RunAtSecond])
+    //LogFrame.Log('%3d) agent %4d %-32s will run at hour:%s min:%s sec:%s', [i, age.Id, age.Agent.QuotedString('"'), age.RunAtHour, age.RunAtMinute, age.RunAtSecond])
+      LogFrame.Log(     'agent %4d %-32s will run at hour:%s min:%s sec:%s', [   age.Id, age.Agent.QuotedString('"'), age.RunAtHour, age.RunAtMinute, age.RunAtSecond])
 
     // skip <- isfuture
     else if AgentIsFuture(age) then

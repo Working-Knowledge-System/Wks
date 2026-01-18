@@ -20,7 +20,7 @@ type
   public
     // system methods
     function  SystemInfoSoap                (var IvFbk: string): boolean; stdcall;
-    function  SystemOutlineSoap             (var IvOutline: string; var IvFbk: string): boolean; stdcall;
+    function  SystemDescriptionSoap         (var IvDescription: string; var IvFbk: string): boolean; stdcall;
     function  SystemPrivacySoap             (var IvPrivacy: string; var IvFbk: string): boolean; stdcall;
     function  SystemLicenseSoap             (var IvLicense: string; var IvFbk: string): boolean; stdcall;
     function  SystemCopyrightSoap           (var IvCopyright: string; var IvFbk: string): boolean; stdcall;
@@ -45,16 +45,18 @@ type
     function  SystemSessionInsertSoap       (const IvDateTimeBegin: TDateTime               ; const IvKind: string; const IvSessionId, IvFingerprintId: cardinal; const IvIpLan, IvDomain, IvComputer, IvOsLogin, IvClient, IvVersion, IvServer, IvOrganization, IvUsername: string; var IvFbk: string): boolean; stdcall;
     function  SystemSessionCloseSoap        (const IvDateTimeBegin, IvDateTimeEnd: TDateTime; const IvKind: string; const IvSessionId, IvFingerprintId: cardinal; const IvIpLan, IvDomain, IvComputer, IvOsLogin, IvClient, IvVersion, IvServer, IvOrganization, IvUsername: string; var IvFbk: string): boolean; stdcall;
     // object methods
-    function  SystemObjectIdNextSoap        (const IvObj: string; var IvIdNext: integer; var IvFbk: string): boolean; stdcall;
-    function  SystemObjectNewRio            (const IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvFromOrganization, IvFromMember: string; var IvIdNew: integer): boolean; stdcall;
-    function  SystemObjectTreeContent       (const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean                          ; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; stdcall;
-    function  SystemObjectTreeContentSave   (const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean; IvRemoteFileSpec: string; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; stdcall;
-    function  SystemObjSoapFieldGet         (const IvObj, IvIdOrPath, IvField: string;   var IvValue: variant; const IvDefault: variant): boolean; stdcall;
-    function  SystemObjSoapFieldSet         (const IvObj, IvIdOrPath, IvField: string; const IvValue: variant): boolean; stdcall;
+    function  SystemObjIdNextSoap           (const IvObj: string; var IvIdNext: integer; var IvFbk: string): boolean; stdcall;
+    function  SystemObjNewSoap              (const IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvOrganization, IvAuthor: string; var IvIdNew: integer): boolean; stdcall;
+    function  SystemObjTreeContentSoap      (const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterAdd, IvCommentRemove, IvLinesEmptyRemove: boolean                          ; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; stdcall;
+    function  SystemObjTreeContentSaveSoap  (const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterAdd, IvCommentRemove, IvLinesEmptyRemove: boolean; IvRemoteFileSpec: string; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean; stdcall;
+    function  SystemObjFieldGetSoap         (const IvObj, IvIdOrPath, IvField: string;   var IvValue: variant; const IvDefault: variant): boolean; stdcall;
+    function  SystemObjFieldSetSoap         (const IvObj, IvIdOrPath, IvField: string; const IvValue: variant): boolean; stdcall;
+    // dbacmd methods
+    function  SystemDbaCmdExecSoap          (const IvSql: string; var IvAffected: integer; var IvFbk: string; IvTimeoutSec: integer): boolean; stdcall;
     // dba methods
     function  SystemDbaInfosSoap            (var IvBuild, IvMajorVersion, IvMinorVersion, IvBuildType, IvUpdateLevel, IvUpdateReference, IvFbk: string): boolean; stdcall;
     function  SystemDbaFilesPathsSoap       (var IvDataPath, IvLogPath, IvBackupPath, IvFbk: string): boolean; stdcall;
-    function  SystemDbaDatabaseRebuildSoap  (var IvFbk: string): boolean; stdcall;
+    function  SystemDbaRebuildSoap          (var IvFbk: string; IvReset: boolean = false): boolean; stdcall;
     function  SystemDbaCreateDdlSoap        (var IvHost, IvDateTimeCode, IvDdl, IvFbk: string): boolean; stdcall;
     function  SystemDbaDeleteDdlSoap        (var IvHost, IvDateTimeCode, IvDdl, IvFbk: string): boolean; stdcall;
     function  SystemDbaBackupDdlSoap        (var IvHost, IvDateTimeCode, IvDdl, IvFbk: string): boolean; stdcall;
@@ -65,6 +67,7 @@ type
     function  SystemTblIdMaxSoap            (const IvTbl, IvWhere: string): integer; stdcall;
     function  SystemTblIdAvailableSoap      (const IvTbl, IvWhere: string): integer; stdcall;
     function  SystemTblIdNextSoap           (const IvTbl: string; IvUseIdAvailable: boolean): integer; stdcall;
+    function  SystemTblCheckSoap            (const IvSys, IvDba, IvTbl: string; var IvFbk: string): boolean; stdcall;
     // rec methods
     function  SystemRecInsertSoap           (const IvTbl: string; const IvValueVec: {TVariantVector}TArray<variant>; var IvFbk: string): boolean; stdcall;
     // fld methods
@@ -98,7 +101,7 @@ begin
   Result := true;
 end;
 
-function TSystemSoapMainService.SystemOutlineSoap(var IvOutline, IvFbk: string): boolean;
+function TSystemSoapMainService.SystemDescriptionSoap(var IvDescription, IvFbk: string): boolean;
 var
   def, vnt: variant; // default
 begin
@@ -111,8 +114,8 @@ begin
   + sLineBreak + 'All the documentation and software included in this package is copyrighted by Wks';
 
   // get
-  Result := TObjRec.FieldGet('System', '103', 'FldContent', vnt, def);
-  IvOutline := vnt;
+  Result := TObjRec.FieldGet('System', '103', 'FldDescription', vnt, def);
+  IvDescription := vnt;
   IvFbk := 'Ok';
 end;
 
@@ -496,33 +499,36 @@ begin
   ses.Server        := IvServer        ; // FldServer
   ses.Organization  := IvOrganization  ; // FldOrganization
   ses.Username      := IvUsername      ; // FldUsername
-  Result := ses.Close(IvFbk); // ses.Reset   done in gses.Close
+
+//ses.Reset // *** done in gses.Close ***
+
+  Result := ses.Close(IvFbk); 
 end;
   {$ENDREGION}
 
   {$REGION 'Object'}
-function  TSystemSoapMainService.SystemObjectIdNextSoap(const IvObj: string; var IvIdNext: integer; var IvFbk: string): boolean;
+function  TSystemSoapMainService.SystemObjIdNextSoap(const IvObj: string; var IvIdNext: integer; var IvFbk: string): boolean;
 begin
   Result := TObjRec.IdNext(IvObj, IvIdNext, IvFbk);
 end;
 
-function  TSystemSoapMainService.SystemObjectNewRio(const IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvFromOrganization, IvFromMember: string; var IvIdNew: integer): boolean;
+function  TSystemSoapMainService.SystemObjNewSoap(const IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvOrganization, IvAuthor: string; var IvIdNew: integer): boolean;
 begin
-  Result := TObjRec.New(IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvFromOrganization, IvFromMember, IvIdNew);
+  Result := TObjRec.DbaNew(IvObj, IvIdOrPath, IvObject, IvObjectKind, IvContentKind, IvOrganization, IvAuthor, IvIdNew);
 end;
 
-function  TSystemSoapMainService.SystemObjectTreeContent(const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean;
+function  TSystemSoapMainService.SystemObjTreeContentSoap(const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterAdd, IvCommentRemove, IvLinesEmptyRemove: boolean; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean;
 begin
   // tree contents flattened
-  Result := TDbaRec.ObjTreeContentDba(IvObj, IvIdOrPath, IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove, IvAffected, IvObjName, IvHTreeContent, IvFbk);
+  Result := TDbaRec.ObjTreeContentDba(IvObj, IvIdOrPath, IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterAdd, IvCommentRemove, IvLinesEmptyRemove, IvAffected, IvObjName, IvHTreeContent, IvFbk);
 end;
 
-function  TSystemSoapMainService.SystemObjectTreeContentSave(const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove: boolean; IvRemoteFileSpec: string; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean;
+function  TSystemSoapMainService.SystemObjTreeContentSaveSoap(const IvObj, IvIdOrPath: string; IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterAdd, IvCommentRemove, IvLinesEmptyRemove: boolean; IvRemoteFileSpec: string; var IvAffected: integer; var IvObjName, IvHTreeContent, IvFbk: string): boolean;
 var
   stl: TStringList;
 begin
   // tree contents flattened
-  Result := TDbaRec.ObjTreeContentDba(IvObj, IvIdOrPath, IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterOff, IvCommentRemove, IvLinesEmptyRemove, IvAffected, IvObjName, IvHTreeContent, IvFbk);
+  Result := TDbaRec.ObjTreeContentDba(IvObj, IvIdOrPath, IvWithChild, IvDescriptionBlockAdd, IvHeaderAndFooterAdd, IvCommentRemove, IvLinesEmptyRemove, IvAffected, IvObjName, IvHTreeContent, IvFbk);
 
   // save locally (but remotely-executed from a client)
   stl := TStringList.Create;
@@ -539,18 +545,23 @@ begin
   end;
 end;
 
-function  TSystemSoapMainService.SystemObjSoapFieldGet(const IvObj, IvIdOrPath, IvField: string; var IvValue: variant; const IvDefault: variant): boolean;
+function  TSystemSoapMainService.SystemObjFieldGetSoap(const IvObj, IvIdOrPath, IvField: string; var IvValue: variant; const IvDefault: variant): boolean;
 begin
   Result := TObjRec.FieldGet(IvObj, IvIdOrPath, IvField, IvValue, IvDefault);
 end;
 
-function  TSystemSoapMainService.SystemObjSoapFieldSet(const IvObj, IvIdOrPath, IvField: string; const IvValue: variant): boolean;
+function  TSystemSoapMainService.SystemObjFieldSetSoap(const IvObj, IvIdOrPath, IvField: string; const IvValue: variant): boolean;
 begin
   Result := TObjRec.FieldSet(IvObj, IvIdOrPath, IvField, IvValue);
 end;
   {$ENDREGION}
 
   {$REGION 'Dba'}
+function TSystemSoapMainService.SystemDbaCmdExecSoap(const IvSql: string; var IvAffected: integer; var IvFbk: string; IvTimeoutSec: integer): boolean;
+begin
+  Result := TDbaRec.CmdExec(IvSql, IvAffected, IvFbk, IvTimeoutSec);
+end;
+
 function  TSystemSoapMainService.SystemDbaInfosSoap(var IvBuild, IvMajorVersion, IvMinorVersion, IvBuildType, IvUpdateLevel, IvUpdateReference, IvFbk: string): boolean;
 var
   sql: string;
@@ -640,156 +651,231 @@ begin
   end;
 end;
 
-function  TSystemSoapMainService.SystemDbaDatabaseRebuildSoap(var IvFbk: string): boolean;
+function  TSystemSoapMainService.SystemDbaRebuildSoap(var IvFbk: string; IvReset: boolean = false): boolean;
 var
-  sql: string;
+  sql: TSbuRec;
   aff: integer; // affected
 begin
+  Result := false;
+
   // sql
-  sql         := '-- reset'
-  + sLineBreak + 'delete from DbaDatabase.dbo.TblServer   where FldSystem = ''Wks'''
-  + sLineBreak + 'delete from DbaDatabase.dbo.TblDatabase where FldSystem = ''Wks'''
-  + sLineBreak + 'delete from DbaDatabase.dbo.TblTable    where FldSystem = ''Wks'''
-  + sLineBreak + 'delete from DbaDatabase.dbo.TblField    where FldSystem = ''Wks'''
-//+ sLineBreak + 'delete from DbaDatabase.dbo.TblIndex    where FldSystem = ''Wks'''
-  + sLineBreak + ''
-  + sLineBreak + '-- server insert'
-  + sLineBreak + 'insert into DbaDatabase.dbo.TblServer'
-  + sLineBreak + 'select'
-  + sLineBreak + '    ''Wks''     as FldSystem'
-  + sLineBreak + '  , ''WKS''     as FldServer'
-  + sLineBreak + '  , ''Active''  as FldState'
-  + sLineBreak + '  , ''MsSqlDb'' as FldKind'
-  + sLineBreak + '  , null        as FldPort'
-  + sLineBreak + '  , null        as FldLocation'
-  + sLineBreak + '  , null        as FldSaUsername'
-  + sLineBreak + '  , null        as FldSaPassword'
-  + sLineBreak + '  , null        as FldDescription'
-  + sLineBreak + '  , null        as FldNote'
-  + sLineBreak + ''
-  + sLineBreak + '-- databases insert'
-  + sLineBreak + 'insert into DbaDatabase.dbo.TblDatabase'
-  + sLineBreak + 'select'
-  + sLineBreak + '    ''Wks''    as FldSystem'
-  + sLineBreak + '  , name       as FldDatabase'
-  + sLineBreak + '  , ''Active'' as FldState'
-  + sLineBreak + '  , null       as FldKind'
-  + sLineBreak + '  , null       as FldProvider       -- remove all and set only a connection string!'
-  + sLineBreak + '  , null       as FldDataSource'
-  + sLineBreak + '  , null       as FldInitialCatalog'
-  + sLineBreak + '  , null       as FldUsername'
-  + sLineBreak + '  , null       as FldPassword'
-  + sLineBreak + '  , null       as FldOraServer'
-  + sLineBreak + '  , null       as FldOraSchema'
-  + sLineBreak + '  , null       as FldOraPort'
-  + sLineBreak + '  , null       as FldOraSID'
-  + sLineBreak + '  , null       as FldOraServiceName'
-  + sLineBreak + '  , null       as FldDescription'
-  + sLineBreak + '  , null       as FldNote'
-  + sLineBreak + 'from'
-  + sLineBreak + '    master.dbo.sysdatabases'
-  + sLineBreak + 'where'
-  + sLineBreak + '    name like ''Dba%'''
-//+ sLineBreak + 'and name not in(''master'', ''model'', ''msdb'', ''sa'', ''tempdb'')'
-  + sLineBreak + 'order by'
-  + sLineBreak + '    name'
-  + sLineBreak + ''
-  + sLineBreak + '-- cursor1'
-  + sLineBreak + 'declare c1 cursor for'
-  + sLineBreak + 'select'
-  + sLineBreak + '    FldDatabase'
-  + sLineBreak + 'from'
-  + sLineBreak + '    DbaDatabase.dbo.TblDatabase'
-  + sLineBreak + 'where'
-  + sLineBreak + '    FldSystem = ''Wks'''
-  + sLineBreak + 'order by'
-  + sLineBreak + '    FldDatabase'
-  + sLineBreak + ''
-  + sLineBreak + '-- walk'
-  + sLineBreak + 'declare @d sysname       -- database'
-  + sLineBreak + 'declare @s nvarchar(max) -- sql'
-  + sLineBreak + 'open c1'
-  + sLineBreak + 'fetch next from c1 into @d'
-  + sLineBreak + 'while @@fetch_status = 0 begin'
-  + sLineBreak + ''
-  + sLineBreak + '    -- insert tables'
-  + sLineBreak + '    set @s = '''''
-  + sLineBreak + '  + ''use '' + @d + '';'''
-  + sLineBreak + '  + '' insert into DbaDatabase.dbo.TblTable'''
-  + sLineBreak + '  + '' select'''
-  + sLineBreak + '  + ''     ''''Wks''''          as FldSystem'''
-  + sLineBreak + '  + ''   , '''''' + @d + '''''' as FldDatabase'''
-  + sLineBreak + '  + ''   , table_name           as FldTable'''
-  + sLineBreak + '  + ''   , null                 as FldTable2'''
-  + sLineBreak + '  + ''   , ''''Active''''       as FldState'''
-  + sLineBreak + '  + ''   , null                 as FldKind'''
-  + sLineBreak + '  + ''   , null                 as FldDescription'''
-  + sLineBreak + '  + ''   , null                 as FldDescription2'''
-  + sLineBreak + '  + ''   , null                 as FldPrimaryKey'''
-  + sLineBreak + '  + ''   , null                 as FldForeignKey'''
-  + sLineBreak + '  + ''   , null                 as FldRows'''
-  + sLineBreak + '  + ''   , null                 as FldSizeMb'''
-  + sLineBreak + '  + ''   , null                 as FldRecordOldest'''
-  + sLineBreak + '  + ''   , null                 as FldRecordYoungest'''
-  + sLineBreak + '  + ''   , null                 as FldFieldCount'''
-  + sLineBreak + '  + ''   , null                 as FldNote'''
-  + sLineBreak + '  + ''   , null                 as FldWho'''
-  + sLineBreak + '  + ''   , null                 as FldWhen'''
-  + sLineBreak + '  + '' from'''
-  + sLineBreak + '  + ''     information_schema.tables'''
-  + sLineBreak + '  + '' order by'''
-  + sLineBreak + '  + ''    table_name''' // insert should honor this but it doesnt
-//+ sLineBreak + '  --print(@s)'
-  + sLineBreak + '  exec(@s)'
-  + sLineBreak + ''
-  + sLineBreak + '  -- insert fields'
-  + sLineBreak + '    set @s = '''''
-  + sLineBreak + '  + ''use '' + @d + '';'''
-  + sLineBreak + '  + ''insert into DbaDatabase.dbo.TblField'''
-  + sLineBreak + '  + '' select'''
-  + sLineBreak + '  + ''     ''''Wks''''                                           as FldSystem'''
-  + sLineBreak + '  + ''   , table_catalog                                         as FldDatabase'''
-  + sLineBreak + '  + ''   , table_name                                            as FldTable'''
-  + sLineBreak + '  + ''   , column_name                                           as FldField'''
-  + sLineBreak + '  + ''   , null                                                  as FldField2'''
-  + sLineBreak + '  + ''   , ''''Active''''                                        as FldState'''
-  + sLineBreak + '  + ''   , null                                                  as FldKind'''
-  + sLineBreak + '  + ''   , data_type                                             as FldType'''
-  + sLineBreak + '  + ''   , character_maximum_length                              as FldLength'''
-  + sLineBreak + '  + ''   , case when is_nullable = ''''YES'''' then 1 else 0 end as FldIsNullable'''
-  + sLineBreak + '  + ''   , null                                                  as FldIsPrimaryKey'''
-  + sLineBreak + '  + ''   , null                                                  as FldIsForeignKey'''
-  + sLineBreak + '  + ''   , ordinal_position                                      as FldOrder'''
-  + sLineBreak + '  + ''   , null                                                  as FldDescription'''
-  + sLineBreak + '  + ''   , null                                                  as FldDescription2'''
-  + sLineBreak + '  + ''   , null                                                  as FldNote'''
-  + sLineBreak + '  + ''   , null                                                  as FldWho'''
-  + sLineBreak + '  + ''   , null                                                  as FldWhen'''
-  + sLineBreak + '  + '' from'''
-  + sLineBreak + '  + ''     information_schema.columns'''
-  + sLineBreak + '  + '' where'''
-  + sLineBreak + '  + ''     objectproperty(object_id(table_name), ''''IsTable'''') = 1'''
-  + sLineBreak + '  + '' order by'''
-  + sLineBreak + '  + ''     table_name'''
-  + sLineBreak + '  + ''   , ordinal_position'''
-//+ sLineBreak + '  + ''   , table_schema             as FldSchema'''
-//+ sLineBreak + '  + ''   , case when character_maximum_length = -1 then ''''max'''' else character_maximum_length end as FldLength'''
-//+ sLineBreak + '  --print(@s)'
-  + sLineBreak + '    exec(@s)'
-  + sLineBreak + ''
-  + sLineBreak + '  -- next'
-  + sLineBreak + '  fetch next from c1 into @d'
-  + sLineBreak + 'end'
-  + sLineBreak + '-- dispose'
-  + sLineBreak + 'close c1'
-  + sLineBreak + 'deallocate c1'
-  ;
+if IvReset then begin
+  sql.Add('-- reset');
+  sql.Add('delete from DbaSystem.dbo.TblServer   where FldSystem = ''Wks''');
+  sql.Add('delete from DbaSystem.dbo.TblDatabase where FldSystem = ''Wks''');
+  sql.Add('delete from DbaSystem.dbo.TblTable    where FldSystem = ''Wks''');
+  sql.Add('delete from DbaSystem.dbo.TblField    where FldSystem = ''Wks''');
+  sql.Add('delete from DbaSystem.dbo.TblIndex    where FldSystem = ''Wks''');
+//sql.Add('delete from DbaSystem.dbo.TblAccount  where FldSystem = ''Wks''');
+end;
+  sql.Add('-- vars');
+  sql.Add('declare @dba sysname       -- database name');
+  sql.Add('declare @tbl sysname       -- table');
+  sql.Add('declare @sql nvarchar(max) -- query');
+  sql.Add('');
+  sql.Add('/* SERVER */');
+  sql.Add('-- server insert if not exist');
+  sql.Add('if exists (select 1 from DbaSystem.dbo.TblServer where FldSystem = ''Wks'')');
+  sql.Add('    print(''Wks server entry already present'')');
+  sql.Add('else begin');
+  sql.Add('    insert into DbaSystem.dbo.TblServer');
+  sql.Add('    select');
+  sql.Add('        ''Wks''                                      as FldSystem');
+  sql.Add('      , ''WKS''                                      as FldServer');
+  sql.Add('      , ''Cloud''                                    as FldLocation');
+  sql.Add('      , ''Working Knowledge System database server'' as FldPurpose');
+  sql.Add('      , ''VPS1''                                     as FldKind');
+  sql.Add('      , ''Active''                                   as FldState');
+  sql.Add('      , null                                         as FldNote');
+  sql.Add('    print(''Wks server NEW entry created'')');
+  sql.Add('end;');
+  sql.Add('');
+  sql.Add('');
+  sql.Add('/* DATABASES */');
+  sql.Add('-- databases phisical');
+  sql.Add('declare cur cursor fast_forward for');
+  sql.Add('select');
+  sql.Add('    name as FldDatabase');
+  sql.Add('from');
+  sql.Add('    master.dbo.sysdatabases');
+  sql.Add('where');
+  sql.Add('    name like ''Dba%''');
+  sql.Add('order by');
+  sql.Add('    name');
+  sql.Add('');
+  sql.Add('-- databases phisical walk');
+  sql.Add('open cur');
+  sql.Add('fetch next from cur into @dba');
+  sql.Add('while @@fetch_status = 0 begin');
+  sql.Add('');
+  sql.Add('    -- dba definition insert if not exists');
+  sql.Add('    if exists (select 1 from DbaSystem.dbo.TblDatabase where FldSystem = ''Wks'' and FldDatabase = @dba)');
+  sql.Add('        print(''Wks '' + @dba + '' database entry already present'')');
+  sql.Add('    else begin');
+  sql.Add('        insert into DbaSystem.dbo.TblDatabase');
+  sql.Add('        select');
+  sql.Add('            ''Wks''    as FldSystem');
+  sql.Add('          , @dba       as FldDatabase');
+  sql.Add('          , null       as FldPurpose');
+  sql.Add('          , null       as FldKind');
+  sql.Add('          , ''Active'' as FldState');
+  sql.Add('          , null       as FldNote');
+  sql.Add('        print(''Wks '' + @dba + '' database NEW entry created'')');
+  sql.Add('    end;');
+  sql.Add('');
+  sql.Add('    -- database phisical next');
+  sql.Add('    fetch next from cur into @dba');
+  sql.Add('end');
+  sql.Add('close cur');
+  sql.Add('deallocate cur');
+  sql.Add('');
+  sql.Add('');
+  sql.Add('/* TABLES */');
+  sql.Add('-- databases phisical');
+  sql.Add('declare cur cursor fast_forward for');
+  sql.Add('select');
+  sql.Add('    name as FldDatabase             -- FldDatabase');
+  sql.Add('from');
+  sql.Add('    master.dbo.sysdatabases         -- DbaSystem.dbo.TblDatabase');
+  sql.Add('where');
+  sql.Add('    name like ''Dba%''              -- FldSystem = ''Wks''');
+  sql.Add('order by');
+  sql.Add('    FldDatabase');
+  sql.Add('');
+  sql.Add('-- databases phisical walk');
+  sql.Add('open cur');
+  sql.Add('fetch next from cur into @dba');
+  sql.Add('while @@fetch_status = 0 begin');
+  sql.Add('    print (''--================== database: '' + @dba)');
+  sql.Add('');
+  sql.Add('    -- tables phisical');
+  sql.Add('    set @sql = ''');
+  sql.Add('    declare cu2 cursor fast_forward for');
+  sql.Add('    select t.name');
+  sql.Add('    from   '' + @dba + ''.sys.tables t');
+  sql.Add('    join   '' + @dba + ''.sys.schemas s on t.schema_id = s.schema_id');
+  sql.Add('    where  s.name = ''''dbo'''';');
+  sql.Add('');
+  sql.Add('    -- tables phisical walk');
+  sql.Add('    declare @tbl sysname');
+  sql.Add('    open cu2');
+  sql.Add('    fetch next from cu2 into  @tbl');
+  sql.Add('    while @@fetch_status = 0 begin');
+  sql.Add('        print(''''---------- table: '''' + @tbl)');
+  sql.Add('');
+  sql.Add('        -- table definition insert if not exists');
+  sql.Add('        if exists (select 1 from DbaSystem.dbo.Tbltable where FldSystem = ''''Wks'''' and FldDatabase = '''''' + @dba + '''''' and FldTable = @tbl)');
+  sql.Add('            print(''''Wks '' + @dba + ''.dbo.'''' + @tbl + '''' table entry already present'''')');
+  sql.Add('        else begin');
+  sql.Add('            insert into DbaSystem.dbo.TblTable');
+  sql.Add('            select');
+  sql.Add('                ''''Wks''''          as FldSystem');
+  sql.Add('              , '''''' + @dba + '''''' as FldDatabase');
+  sql.Add('              , @tbl             as FldTable');
+  sql.Add('              , null             as FldPurpose');
+  sql.Add('              , ''''Table''''    as FldKind');
+  sql.Add('              , ''''Active''''   as FldState');
+  sql.Add('              , null             as FldNote');
+  sql.Add('              , null             as FldOrder');
+  sql.Add('              , null             as FldFieldCount');
+  sql.Add('              , null             as FldRowCount');
+  sql.Add('              , null             as FldRecordOldest');
+  sql.Add('              , null             as FldRecordYoungest');
+  sql.Add('              , null             as FldSizeMb');
+  sql.Add('              , null             as FldPrimaryKey');
+  sql.Add('              , null             as FldForeignKey');
+  sql.Add('              , null             as FldTable2');
+  sql.Add('              , null             as FldPurpose2');
+  sql.Add('            print(''''Wks '' + @dba + ''.dbo.'''' + @tbl + '''' table NEW entry created'''')');
+  sql.Add('        end;');
+  sql.Add('');
+  sql.Add('        -- table phisical next');
+  sql.Add('        fetch next from cu2 into @tbl');
+  sql.Add('    end');
+  sql.Add('    close cu2');
+  sql.Add('    deallocate cu2');
+  sql.Add('    ''');
+  sql.Add('  --print(@sql)');
+  sql.Add('    exec(@sql)');
+  sql.Add('');
+  sql.Add('  -- database definitions next');
+  sql.Add('  fetch next from cur into @dba');
+  sql.Add('end');
+  sql.Add('close cur');
+  sql.Add('deallocate cur');
+  sql.Add('');
+  sql.Add('');
+  sql.Add('/* FIELDS */');
+  sql.Add('-- tables definition');
+  sql.Add('declare cur cursor fast_forward for');
+  sql.Add('select --top(3)');
+  sql.Add('    FldDatabase');
+  sql.Add('  , FldTable');
+  sql.Add('from');
+  sql.Add('    DbaSystem.dbo.TblTable');
+  sql.Add('where');
+  sql.Add('    FldSystem = ''Wks''');
+  sql.Add('order by');
+  sql.Add('    FldDatabase');
+  sql.Add('  , FldTable');
+  sql.Add('');
+  sql.Add('-- tables definition walk');
+  sql.Add('open cur');
+  sql.Add('fetch next from cur into @dba, @tbl');
+  sql.Add('while @@fetch_status = 0 begin');
+  sql.Add('    print(''---------- table: '' + @dba + ''.dbo.'' + @tbl)');
+  sql.Add('');
+  sql.Add('    -- field definition insert if not exists');
+  sql.Add('    set @sql = ''');
+  sql.Add('    use '' + @dba + ''');
+  sql.Add('    insert into DbaSystem.dbo.TblField');
+  sql.Add('    select');
+  sql.Add('        ''''Wks''''                         as FldSystem');
+  sql.Add('      , '''''' + @dba + ''''''              as FldDatabase');
+  sql.Add('      , t.name                              as FldTable');
+  sql.Add('      , c.name                              as FldField');
+  sql.Add('      , ty.name                             as FldType');
+  sql.Add('      , case');
+  sql.Add('            when ty.name in (''''varchar'''', ''''char'''', ''''nvarchar'''', ''''nchar'''') then c.max_length');
+  sql.Add('            when ty.name in (''''decimal'''', ''''numeric'''')                               then concat(c.precision, '''','''', c.scale)');
+  sql.Add('            else null');
+  sql.Add('        end                                 as FldLength');
+  sql.Add('      , c.is_nullable                       as FldNullable');
+  sql.Add('      , c.column_id                         as FldOrder');
+  sql.Add('      , null                                as FldPurpose');
+  sql.Add('      , null                                as FldKind');
+  sql.Add('      , ''''Active''''                      as FldState');
+  sql.Add('      , null                                as FldNote');
+  sql.Add('      , null                                as FldField2');
+  sql.Add('      , null                                as FldFldPurpose2');
+  sql.Add('    from sys.tables t');
+  sql.Add('    join sys.columns c on t.object_id = c.object_id');
+  sql.Add('    join sys.types ty on c.user_type_id = ty.user_type_id');
+  sql.Add('    where');
+  sql.Add('        t.name = '''''' + @tbl + ''''''');
+  sql.Add('    and c.name collate database_default not in (');
+  sql.Add('        select FldField from DbaSystem.dbo.TblField');
+  sql.Add('        where FldSystem = ''''Wks'''' and FldDatabase = '''''' + @dba + '''''' and FldTable = t.name collate database_default');
+  sql.Add('        )');
+  sql.Add('    order by');
+  sql.Add('        t.name,');
+  sql.Add('        c.column_id');
+  sql.Add('   ''');
+  sql.Add('  --print(@sql)');
+  sql.Add('    exec(@sql)');
+  sql.Add('');
+  sql.Add('    -- database definitions next');
+  sql.Add('    fetch next from cur into @dba, @tbl');
+  sql.Add('end');
+  sql.Add('close cur');
+  sql.Add('deallocate cur');
+
   // exec
-  Result := TDbaRec.CmdExec(sql, aff, IvFbk);
+  Result := TDbaRec.CmdExec(sql.Text, aff, IvFbk);
   if not Result then
-    IvFbk := 'Unable to rebuild databases definitions, ' + IvFbk
+    IvFbk := 'Unable to update databases definitions, ' + IvFbk
   else
-    IvFbk := 'Databases definitions rebuilded, ' + IvFbk;
+    IvFbk := 'Databases definitions update, ' + IvFbk;
 end;
 
 function  TSystemSoapMainService.SystemDbaCreateDdlSoap(var IvHost, IvDateTimeCode, IvDdl, IvFbk: string): boolean;
@@ -797,7 +883,7 @@ function  TSystemSoapMainService.SystemDbaCreateDdlSoap(var IvHost, IvDateTimeCo
 // , [FldUId]       [uniqueidentifier] ROWGUIDCOL   NOT NULL
 var
   dbp, lgp, bkp: string; // data, log, backup path
-  tit, dba, des, tbl, com, fld, typ, len, nul, pke, fke: string; // title, dba, descr, tbl, comma, fld, type, lenght, null, primarykey, foreignkey
+  tit, dba, des, tbl, com, fld, typ, len, nul{, pke, fke}: string; // title, dba, descr, tbl, comma, fld, type, lenght, null, primarykey, foreignkey
   u, v, w: TDataset; // dba, tbl, fld
   idx: boolean; // fldid index
   sbu: TSbuRec;
@@ -815,17 +901,17 @@ begin
   sbu.Add(' *  '                                                                                          );
   sbu.Add(' *  ' + tit                                                                                    );
   sbu.Add(' *  '                                                                                          );
-  sbu.Add(' *  create all databases and tables in a server instance'                                      );
+  sbu.Add(' *  create all databases and tables in a SQL Server instance'                                  );
   sbu.Add(' *  '                                                                                          );
   sbu.Add('\**********************************************************************************/'          );
 
   // dbaloop
-  TDbaRec.DsFromSql('select * from DbaDatabase.dbo.TblDatabase where FldSystem = ''Wks'' order by FldDatabase', u);
+  TDbaRec.DsFromSql('select * from DbaSystem.dbo.TblDatabase where FldSystem = ''Wks'' order by FldDatabase', u);
   try
     while not u.Eof do begin
       // zip
       dba := u.FieldByName('FldDatabase').AsString;
-      des := u.FieldByName('FldDescription').AsString;
+      des := u.FieldByName('FldPurpose').AsString;
       if des <> '' then des := ' -- ' + des;
 
       // build
@@ -845,12 +931,12 @@ begin
       sbu.Add('GO');
 
       // tablesloop
-      TDbaRec.DsFromSql(Format('select * from DbaDatabase.dbo.TblTable where FldSystem = ''Wks'' and FldDatabase = ''%s'' order by FldTable', [dba]), v);
+      TDbaRec.DsFromSql(Format('select * from DbaSystem.dbo.TblTable where FldSystem = ''Wks'' and FldDatabase = ''%s'' order by FldTable', [dba]), v);
       try
         while not v.Eof do begin
           // zip
           tbl := v.FieldByName('FldTable').AsString;
-          des := v.FieldByName('FldDescription').AsString;
+          des := v.FieldByName('FldPurpose').AsString;
           if des <> '' then des := ' -- ' + des;
           idx := false;
 
@@ -860,7 +946,7 @@ begin
 
           // fieldsloop
           com := ' ';
-          TDbaRec.DsFromSql(Format('select * from DbaDatabase.dbo.TblField where FldSystem = ''Wks'' and FldDatabase = ''%s'' and FldTable = ''%s'' order by FldOrder', [dba, tbl]), w);
+          TDbaRec.DsFromSql(Format('select * from DbaSystem.dbo.TblField where FldSystem = ''Wks'' and FldDatabase = ''%s'' and FldTable = ''%s'' order by FldOrder', [dba, tbl]), w);
           try
             while not w.Eof do begin
               // zip
@@ -869,11 +955,12 @@ begin
               len :=       w.FieldByName('FldLength').AsString;
               if len = '-1' then len := 'max';
               if (len <> '') and (Length(len) <= 4) then typ := typ + '(' + len + ')'; // skip [image](2147483647), max is (8000)
-              nul := giif.Str(w.FieldByName('FldIsNullable'  ).AsBoolean, 'NULL', 'NOT NULL');
-              pke := giif.Str(w.FieldByName('FldIsPrimaryKey').AsBoolean, 'PrimaryKey', '');
-              fke := giif.Str(w.FieldByName('FldIsForeignKey').AsBoolean, 'ForeignKey', '');
-              des :=          w.FieldByName('FldDescription').AsString;
-              if des <> '' then des := Format(' -- %s %s %s', [pke, fke, des]);
+              nul := giif.Str(w.FieldByName('FldNullable'    ).AsBoolean, 'NULL', 'NOT NULL');
+            //pke := giif.Str(w.FieldByName('FldIsPrimaryKey').AsBoolean, 'PrimaryKey', '');
+            //fke := giif.Str(w.FieldByName('FldIsForeignKey').AsBoolean, 'ForeignKey', '');
+              des :=          w.FieldByName('FldPurpose').AsString;
+            //if des <> '' then des := Format(' -- %s %s %s', [pke, fke, des]);
+              if des <> '' then des := Format(' -- %s', [des]);
 
               // build
               sbu.Add('  %s %-44s%-20s%16s%s', [com, fld, typ, nul, des]); // multipli di 4
@@ -1192,6 +1279,11 @@ end;
 function TSystemSoapMainService.SystemTblIdNextSoap(const IvTbl: string; IvUseIdAvailable: boolean): integer;
 begin
   Result := TDbaRec.TblIdNext(IvTbl, IvUseIdAvailable);
+end;
+
+function TSystemSoapMainService.SystemTblCheckSoap(const IvSys, IvDba, IvTbl: string; var IvFbk: string): boolean;
+begin
+  Result := TDbaRec.TblCheck(IvSys, IvDba, IvTbl, IvFbk);
 end;
   {$ENDREGION}
 

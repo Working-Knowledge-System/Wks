@@ -4,18 +4,67 @@ interface
 
 {$REGION 'Uses'}
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, WksBaseClientMainFormUnit, Data.DB,
-  Datasnap.DBClient, Soap.SOAPConn, System.Actions, Vcl.ActnList,
-  System.ImageList, Vcl.ImgList, Vcl.Buttons, SynEdit, SynDBEdit, Vcl.ComCtrls,
-  Vcl.StdCtrls, JvExMask, JvSpin, JvExComCtrls, JvDateTimePicker, Vcl.DBCtrls,
-  Vcl.Mask, Vcl.ExtCtrls, JvExControls, JvScrollMax, JvExExtCtrls,
-  JvExtComponent, WksLogFrameUnit, VirtualTrees, DTDBTreeView, DTClientTree,
-  Vcl.ToolWin, JvNetscapeSplitter, Vcl.Grids, Vcl.DBGrids, JvExDBGrids,
-  JvDBGrid, JvDBUltimGrid, JvComponentBase, JvThreadTimer, Vcl.AppEvnts, JvClock,
-  IdSysLogMessage, IdSocketHandle, IdBaseComponent, IdComponent, IdUDPBase,
-  IdUDPServer, IdSysLogServer, Vcl.Menus, Winapi.WebView2, Winapi.ActiveX,
-  Vcl.Edge, Vcl.WinXCtrls;
+    Winapi.Windows
+  , Winapi.ActiveX
+  , Winapi.Messages
+  , Winapi.WebView2
+  , System.Actions
+  , System.Classes
+  , System.ImageList
+  , System.SysUtils
+  , System.Variants
+  , Vcl.ActnList
+  , Vcl.AppEvnts
+  , Vcl.Buttons
+  , Vcl.ComCtrls
+  , Vcl.Controls
+  , Vcl.DBCtrls
+  , Vcl.DBGrids
+  , Vcl.Dialogs
+  , Vcl.Edge
+  , Vcl.ExtCtrls
+  , Vcl.Forms
+  , Vcl.Graphics
+  , Vcl.Grids
+  , Vcl.ImgList
+  , Vcl.Mask
+  , Vcl.Menus
+  , Vcl.StdCtrls
+  , Vcl.ToolWin
+  , Vcl.WinXCtrls
+  , Data.DB
+  , Datasnap.DBClient
+  , Soap.SOAPConn
+  , IdBaseComponent
+  , IdComponent
+  , IdSocketHandle
+  , IdSysLogMessage
+  , IdSysLogServer
+  , IdUDPBase
+  , IdUDPServer
+  , JvClock
+  , JvComponentBase
+  , JvDBDateTimePicker
+  , JvDBGrid
+  , JvDBUltimGrid
+  , JvDateTimePicker
+  , JvExComCtrls
+  , JvExControls
+  , JvExDBGrids
+  , JvExExtCtrls
+  , JvExMask
+  , JvExtComponent
+  , JvNetscapeSplitter
+  , JvScrollMax
+  , JvSpin
+  , JvThreadTimer
+  , SynDBEdit
+  , SynEdit
+  , VirtualTrees
+  , DTClientTree
+  , DTDBTreeView
+  , WksLogFrameUnit, WksBaseClientMainFormUnit
+  ;
 {$ENDREGION}
 
 {$REGION 'Type'}
@@ -26,40 +75,86 @@ type
     AuditDataSource: TDataSource;
     AuditJvDBUltimGrid: TJvDBUltimGrid;
     AuditRefreshSpeedButton: TSpeedButton;
+    AuditTabSheet: TTabSheet;
     AuditTopPanel: TPanel;
+    BinariesAction: TActionList;
     BinariesClientDataSet: TClientDataSet;
+    BinariesClientDeployAction: TAction;
+    BinariesClientDeployToolButton: TToolButton;
     BinariesCountLabel: TLabel;
+    BinariesDBNavigator: TDBNavigator;
     BinariesDataSource: TDataSource;
     BinariesDescriptionDBMemo: TDBMemo;
     BinariesDescriptionTabSheet: TTabSheet;
+    BinariesImageList: TImageList;
     BinariesJvDBUltimGrid: TJvDBUltimGrid;
     BinariesNoteDBMemo: TDBMemo;
     BinariesNoteTabSheet: TTabSheet;
+    BinariesPageControl: TPageControl;
     BinariesPanel: TPanel;
-    BinariesAction: TActionList;
-    BinariesClientDeployAction: TAction;
-    BinariesClientDeployToolButton: TToolButton;
-    BinariesImageList: TImageList;
     BinariesServerDeployAction: TAction;
     BinariesServerDeployToolButton: TToolButton;
     BinariesServiceDeployAction: TAction;
+    BinariesServiceToolButton: TToolButton;
+    BinariesSplitter: TSplitter;
+    BinariesTabSheet: TTabSheet;
     BinariesToolBar: TToolBar;
-    LogClientDataSet: TClientDataSet;
-    LogCountLabel: TLabel;
-    LogDataSource: TDataSource;
-    LogJvDBUltimGrid: TJvDBUltimGrid;
-    LogRefreshSpeedButton: TSpeedButton;
-    LogTopPanel: TPanel;
-    PageControl1: TPageControl;
+    DatabaseAccountClientDataSet: TClientDataSet;
+    DatabaseAccountDataSource: TDataSource;
+    DatabaseDbaClientDataSet: TClientDataSet;
+    DatabaseDbaDataSource: TDataSource;
+    DatabaseFldClientDataSet: TClientDataSet;
+    DatabaseFldDBNavigator: TDBNavigator;
+    DatabaseFldDataSource: TDataSource;
+    DatabaseFldPanel: TPanel;
+    DatabaseIdxClientDataSet: TClientDataSet;
+    DatabaseIdxDataSource: TDataSource;
+    DatabasePanel: TPanel;
+    ServerClientDataSet: TClientDataSet;
+    ServerDBNavigator: TDBNavigator;
+    ServerDataSource: TDataSource;
+    ServerPanel: TPanel;
+    DatabaseTabSheet: TTabSheet;
+    DatabaseTblClientDataSet: TClientDataSet;
+    DatabaseTblDBNavigator: TDBNavigator;
+    DatabaseTblDataSource: TDataSource;
+    DatabaseTblPanel: TPanel;
+    DatabaseToolBar: TToolBar;
+    DbLogClientDataSet: TClientDataSet;
+    DbLogCountLabel: TLabel;
+    DbLogDataSource: TDataSource;
+    DbLogJvDBUltimGrid: TJvDBUltimGrid;
+    DbLogRefreshSpeedButton: TSpeedButton;
+    DbLogTabSheet: TTabSheet;
+    DbLogTopPanel: TPanel;
+    ServiceTabSheet: TTabSheet;
+    SourceClientDataSet: TClientDataSet;
+    SourceConnStrAdoDBSynEdit: TDBSynEdit;
+    SourceConnStrAdoLabel: TLabel;
+    SourceConnStrAdoPanel: TPanel;
+    SourceConnStrAdoTestLabel: TLabel;
+    SourceConnStrFdDBSynEdit: TDBSynEdit;
+    SourceConnStrFdLabel: TLabel;
+    SourceConnStrFdPanel: TPanel;
+    SourceConnStrFdTestLabel: TLabel;
+    SourceJvDBUltimGrid: TJvDBUltimGrid;
+    SourceDBNavigator: TDBNavigator;
+    SourceDTClientTree: TDTClientTree;
+    SourceDataSource: TDataSource;
+    SourceLeftPanel: TPanel;
+    SourceLeftSplitter: TSplitter;
+    SourceMainPanel: TPanel;
+    SourceSourceLabel: TLabel;
+    SourceTabSheet: TTabSheet;
     SysLogLabel: TLabel;
     SysLogPanel: TPanel;
+    SysLogTabSheet: TTabSheet;
+    SyslogIdSyslogServer: TIdSyslogServer;
+    SyslogRichEdit: TRichEdit;
     SystemAction: TActionList;
-    SystemAuditTabSheet: TTabSheet;
-    SystemBinariesTabSheet: TTabSheet;
     SystemClientDataSet: TClientDataSet;
     SystemDBNavigator: TDBNavigator;
     SystemDataSource: TDataSource;
-    SystemDbLogTabSheet: TTabSheet;
     SystemDbaBackupDdlAction: TAction;
     SystemDbaBackupDdlToolButton: TToolButton;
     SystemDbaCreateDdlAction: TAction;
@@ -74,13 +169,10 @@ type
     SystemJvScrollMaxBand: TJvScrollMaxBand;
     SystemObjectIdDBEdit: TDBEdit;
     SystemObjectIdLabel: TLabel;
-    SystemSysLogTabSheet: TTabSheet;
     SystemSyslogAction: TActionList;
     SystemSyslogCleanAction: TAction;
     SystemSyslogCleanSpeedButton: TSpeedButton;
-    SystemSyslogIdSyslogServer: TIdSyslogServer;
     SystemSyslogImageList: TImageList;
-    SystemSyslogRichEdit: TRichEdit;
     SystemSyslogStartAction: TAction;
     SystemSyslogStartSpeedButton: TSpeedButton;
     SystemTabSheet: TTabSheet;
@@ -96,42 +188,58 @@ type
     TopServicePauseButton: TButton;
     TopServiceStartButton: TButton;
     TopServiceStopButton: TButton;
-    TopServiceTabSheet: TTabSheet;
     TopServiceUninstallButton: TButton;
-    Splitter1: TSplitter;
-    BinariesServiceToolButton: TToolButton;
-    BinariesDBNavigator: TDBNavigator;
-    SystemDatabaseTabSheet: TTabSheet;
-    DatabasePanel: TPanel;
-    DatabaseToolBar: TToolBar;
-    SystemSourceTabSheet: TTabSheet;
-    SystemSourceLeftPanel: TPanel;
-    SystemSourceDTClientTree: TDTClientTree;
-    SystemSourceDBNavigator: TDBNavigator;
-    SystemSourceLeftSplitter: TSplitter;
-    SystemSourceMainPanel: TPanel;
-    SystemSourceConnStrAdoLabel: TLabel;
-    SystemSourceConnStrFdLabel: TLabel;
-    SystemSourceDBGrid: TDBGrid;
-    SystemSourceConnStrAdoDBSynEdit: TDBSynEdit;
-    SystemSourceConnStrFdDBSynEdit: TDBSynEdit;
-    SourceClientDataSet: TClientDataSet;
-    SourceDataSource: TDataSource;
-    SystemSourceSourceLabel: TLabel;
-    SystemSourceConnStrAdoPanel: TPanel;
-    SystemSourceConnStrFdPanel: TPanel;
-    SystemSourceConnStrFdTestLabel: TLabel;
-    SystemSourceConnStrAdoTestLabel: TLabel;
-    procedure FormCreate(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    WebTabSheet: TTabSheet;
+    WebW3ColorJsCheckBox: TCheckBox;
+    WebW3CssCheckBox: TCheckBox;
+    WebW3FilesGenerateSpeedButton: TSpeedButton;
+    WebW3FilesGroupBox: TGroupBox;
+    WebW3JsCheckBox: TCheckBox;
+    WebW3ThemeCssCheckBox: TCheckBox;
+    WebWksCssCheckBox: TCheckBox;
+    WebWksDefaultHtmlCheckBox: TCheckBox;
+    WebWksDefaultUseSpinCheckBox: TCheckBox;
+    WebWksFilesGenerateSpeedButton: TSpeedButton;
+    WebWksGroupBox: TGroupBox;
+    WebWksJsCheckBox: TCheckBox;
+    ServerDBGrid: TDBGrid;
+    DatabaseTblDBGrid: TDBGrid;
+    DatabaseFldDBGrid: TDBGrid;
+    DatabaseTblNoteSplitter: TSplitter;
+    DatabaseTblNoteDBMemo: TDBMemo;
+    DatabaseFldNoteSplitter: TSplitter;
+    DatabaseFldNoteDBMemo: TDBMemo;
+    DatabaseTableCreateLabel: TLabel;
+    DatabaseTableCreateCommitCheckBox: TCheckBox;
+    DatabaseTableCheckLabel: TLabel;
+    DatabaseFieldCreateCommitCheckBox: TCheckBox;
+    DatabaseFieldCreateLabel: TLabel;
+    DatabaseLeftJvNetscapeSplitter: TJvNetscapeSplitter;
+    DatabaseRightPanel: TPanel;
+    DatabaseTblLabel: TLabel;
+    DatabaseRightSplitter: TSplitter;
+    DatabaseFldLabel: TLabel;
+    ServerTabSheet: TTabSheet;
+    DatabaseLeftPanel: TPanel;
+    DatabaseDbaLabel: TLabel;
+    DatabaseDbaDBNavigator: TDBNavigator;
+    DatabaseDbaDBGrid: TDBGrid;
     procedure ActionPostActionExecute(Sender: TObject);
-    procedure SystemSyslogIdSyslogServerSyslog(Sender: TObject; ASysLogMessage: TIdSysLogMessage; ABinding: TIdSocketHandle);
-    procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
     procedure AuditClientDataSetAfterRefresh(DataSet: TDataSet);
     procedure AuditRefreshSpeedButtonClick(Sender: TObject);
-    procedure LogClientDataSetAfterRefresh(DataSet: TDataSet);
-    procedure LogRefreshSpeedButtonClick(Sender: TObject);
-    procedure SystemSyslogRichEditChange(Sender: TObject);
+    procedure BinariesClientDataSetAfterRefresh(DataSet: TDataSet);
+    procedure BinariesClientDeployActionExecute(Sender: TObject);
+    procedure BinariesServerDeployActionExecute(Sender: TObject);
+    procedure BinariesServiceDeployActionExecute(Sender: TObject);
+    procedure DbLogClientDataSetAfterRefresh(DataSet: TDataSet);
+    procedure DbLogRefreshSpeedButtonClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormCreate(Sender: TObject);
+    procedure ObjectClientDataSetBeforeDelete(DataSet: TDataSet);
+    procedure SourceConnStrAdoTestLabelClick(Sender: TObject);
+    procedure SourceConnStrFdTestLabelClick(Sender: TObject);
+    procedure SyslogIdSyslogServerSyslog(Sender: TObject; ASysLogMessage: TIdSysLogMessage; ABinding: TIdSocketHandle);
+    procedure SyslogRichEditChange(Sender: TObject);
     procedure SystemClientDataSetAfterDelete(DataSet: TDataSet);
     procedure SystemClientDataSetAfterInsert(DataSet: TDataSet);
     procedure SystemClientDataSetAfterPost(DataSet: TDataSet);
@@ -141,20 +249,25 @@ type
     procedure SystemDbaDefinitionRebuildActionExecute(Sender: TObject);
     procedure SystemDbaDeleteDdlActionExecute(Sender: TObject);
     procedure SystemDbaRestoreDdlActionExecute(Sender: TObject);
-    procedure TopServiceInstallButtonClick(Sender: TObject);
+    procedure SystemSyslogCleanActionExecute(Sender: TObject);
+    procedure SystemSyslogStartActionExecute(Sender: TObject);
     procedure TopServiceContinueButtonClick(Sender: TObject);
-    procedure TopServiceUninstallButtonClick(Sender: TObject);
+    procedure TopServiceInstallButtonClick(Sender: TObject);
     procedure TopServiceStartButtonClick(Sender: TObject);
     procedure TopServiceStopButtonClick(Sender: TObject);
-    procedure SystemSyslogStartActionExecute(Sender: TObject);
-    procedure SystemSyslogCleanActionExecute(Sender: TObject);
-    procedure BinariesClientDeployActionExecute(Sender: TObject);
-    procedure BinariesServerDeployActionExecute(Sender: TObject);
-    procedure BinariesServiceDeployActionExecute(Sender: TObject);
-    procedure BinariesClientDataSetAfterRefresh(DataSet: TDataSet);
-    procedure MainPanelClick(Sender: TObject);
-    procedure SystemSourceConnStrAdoTestLabelClick(Sender: TObject);
-    procedure SystemSourceConnStrFdTestLabelClick(Sender: TObject);
+    procedure TopServiceUninstallButtonClick(Sender: TObject);
+    procedure WebW3FilesGenerateSpeedButtonClick(Sender: TObject);
+    procedure WebWksFilesGenerateSpeedButtonClick(Sender: TObject);
+    procedure DatabaseTableCreateLabelClick(Sender: TObject);
+    procedure ServerClientDataSetAfterScroll(DataSet: TDataSet);
+    procedure DatabaseDbaClientDataSetAfterScroll(DataSet: TDataSet);
+    procedure DatabaseTblClientDataSetAfterScroll(DataSet: TDataSet);
+    procedure ServerClientDataSetAfterOpen(DataSet: TDataSet);
+    procedure DatabaseDbaClientDataSetAfterOpen(DataSet: TDataSet);
+    procedure DatabaseTblClientDataSetAfterOpen(DataSet: TDataSet);
+    procedure DatabaseTableCheckLabelClick(Sender: TObject);
+    procedure DatabaseFldClientDataSetAfterOpen(DataSet: TDataSet);
+    procedure DatabaseFieldCreateLabelClick(Sender: TObject);
   private
     { Private declarations }
     FSyslogCount: integer;
@@ -244,14 +357,14 @@ begin
 
   {$REGION 'syslog'}
   SysLogLabel.Caption := '';
-  SystemSyslogRichEdit.Clear;
+  SyslogRichEdit.Clear;
   {$ENDREGION}
 
 end;
 
 procedure TSystemMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  SystemSyslogIdSyslogServer.Active := false;
+  SyslogIdSyslogServer.Active := false;
 
   inherited;
 end;
@@ -262,9 +375,14 @@ procedure TSystemMainForm.ActionPostActionExecute(Sender: TObject);
 begin
   inherited;
 
-  // detail
-  if SystemClientDataSet.State = dsEdit then
+  {$REGION 'Object'}
+  {$ENDREGION}
+
+  {$REGION 'Detail'}
+  if not (SystemClientDataSet.State = dsBrowse) then
     SystemDBNavigator.BtnClick(nbPost);
+  {$ENDREGION}
+
 end;
 {$ENDREGION}
 
@@ -332,8 +450,7 @@ procedure TSystemMainForm.SystemClientDataSetAfterPost(DataSet: TDataSet);
 begin
   inherited;
 
-  {$REGION 'detail'}
-  // applyupdatetoremoteserver
+  {$REGION 'applyupdatetoremoteserver'}
   if SystemClientDataSet.ApplyUpdates(0) > 0 then
     TMesRec.I('Unable to save %s detail to remote server', [FObj])
   else begin
@@ -348,10 +465,143 @@ procedure TSystemMainForm.SystemClientDataSetReconcileError(DataSet: TCustomClie
 begin
   inherited;
 
-  {$REGION 'detail'}
+  {$REGION 'reconcileerror'}
   Action := HandleReconcileError(DataSet, UpdateKind, E);
   {$ENDREGION}
 
+end;
+{$ENDREGION}
+
+{$REGION 'Syslog'}
+procedure TSystemMainForm.SyslogRichEditChange(Sender: TObject);
+begin
+  inherited;
+
+  SendMessage(SyslogRichEdit.handle, WM_VSCROLL, SB_BOTTOM, 0);
+end;
+
+procedure TSystemMainForm.SystemSyslogStartActionExecute(Sender: TObject);
+begin
+  inherited;
+
+  SyslogIdSyslogServer.Active := SystemSyslogStartAction.Checked;
+  if SyslogIdSyslogServer.Active then begin
+  //SyslogRichEdit.SetFocus;
+  //SyslogRichEdit.Lines.Add('Wks SysLog Server Started');
+    StatusBar.SimpleText := 'Wks SysLog Server Started';
+  end else
+  //SyslogRichEdit.Lines.Add('Wks SysLog Server Stopped');
+    StatusBar.SimpleText := 'Wks SysLog Server Stopped';
+end;
+
+procedure TSystemMainForm.SystemSyslogCleanActionExecute(Sender: TObject);
+begin
+  inherited;
+
+  SyslogRichEdit.Clear;
+end;
+
+procedure TSystemMainForm.SyslogIdSyslogServerSyslog(Sender: TObject; ASysLogMessage: TIdSysLogMessage; ABinding: TIdSocketHandle);
+var
+  r: string;            // rawmsg
+  h, p: string;         // host, peer=hostip
+  t: TDateTime;         // timestamp
+//f: TidSyslogFacility; // facility
+//s: TIdSyslogSeverity; // severity
+//m: TIdSysLogMsgPart;  // msg
+  e: string;            // text
+  c: string;            // content
+  x: string;            // process
+//a: boolean;           // pidisavailable
+//i: integer;           // pid
+  l: string;            // logrow
+//b: TTabSheet;         // tab
+//j: integer;           // tabidx
+begin
+  inherited;
+
+  // zip
+  r := ASysLogMessage.RawMessage;
+  h := ASysLogMessage.Hostname;
+  p := ASysLogMessage.Peer;
+  t := ASysLogMessage.TimeStamp;
+//f := ASysLogMessage.Facility;
+//s := ASysLogMessage.Severity;
+//a := ASysLogMessage.Msg.PIDAvailable;
+  e := ASysLogMessage.Msg.Text;
+  x := ASysLogMessage.Msg.Process;
+//i := ASysLogMessage.Msg.PID;
+  c := ASysLogMessage.Msg.Content;
+
+  // row
+  l := Format('%s - %s - %s : %s', [FormatDateTime('yyyy/mm/dd hh:nn:ss', t), h, x, c]);
+
+  // log
+  SyslogRichEdit.SetFocus;
+  SyslogRichEdit.SelStart := SyslogRichEdit.GetTextLen;
+  SyslogRichEdit.Perform(EM_SCROLLCARET, 0, 0);
+  SyslogRichEdit.Lines.Add(l);
+  Inc(FSyslogCount);
+  SysLogLabel.Caption := Format('Entries %d', [FSyslogCount]);
+
+  // tablog
+//for j := 0 to MainPageControl.PageCount-1 do begin
+//  b := MainPageControl.Pages[j];
+//  if SameText(b.Caption, h) then
+//    with b.Controls[0] as TRichEdit do begin
+//      Lines.Add(l);
+//      Exit;
+//    end;
+//end;
+
+  // logdetails
+  {
+  SyslogRichEdit.Lines.Add(r);                              // <14>Nov  8 15:42:35 www.wks.cloud WksWaferMarkDualProject[3312]: tick...
+  SyslogRichEdit.Lines.Add(h);                              // www.wks.cloud
+  SyslogRichEdit.Lines.Add(p);                              // 10.176.66.8
+  SyslogRichEdit.Lines.Add(DateTimeToStr(t));               // 11/8/2022 3:42:35 PM
+  SyslogRichEdit.Lines.Add(TEnumConverter.EnumToString(f)); // sfUserLevel
+  SyslogRichEdit.Lines.Add(TEnumConverter.EnumToString(s)); // slInformational
+  SyslogRichEdit.Lines.Add(a.ToString);                     // -1
+  SyslogRichEdit.Lines.Add(e);                              // WksWafermarkDualProject[3312]: Z:\
+  SyslogRichEdit.Lines.Add(x);                              // WksWafermarkDualProject
+  SyslogRichEdit.Lines.Add(i.ToString);                     // 3312
+  SyslogRichEdit.Lines.Add(c);                              // tick...
+  }
+end;
+{$ENDREGION}
+
+{$REGION 'DbaLog'}
+procedure TSystemMainForm.DbLogClientDataSetAfterRefresh(DataSet: TDataSet);
+begin
+  inherited;
+
+  TGriRec.GriFit(DbLogJvDBUltimGrid);
+  DbLogCountLabel.Caption := Format('%d logs', [DataSet.RecordCount]);
+end;
+
+procedure TSystemMainForm.DbLogRefreshSpeedButtonClick(Sender: TObject);
+begin
+  inherited;
+
+  DbLogClientDataSet.Refresh;
+end;
+{$ENDREGION}
+
+{$REGION 'Audit'}
+procedure TSystemMainForm.AuditClientDataSetAfterRefresh(DataSet: TDataSet);
+begin
+  inherited;
+
+  TGriRec.GriFit(AuditJvDBUltimGrid);
+  AuditCountLabel.Caption := Format('%d audits', [DataSet.RecordCount]);
+end;
+
+procedure TSystemMainForm.AuditRefreshSpeedButtonClick(Sender: TObject);
+begin
+  inherited;
+
+  AuditClientDataSet.Refresh;
 end;
 {$ENDREGION}
 
@@ -367,13 +617,18 @@ begin
   www := UpperCase(gaps.Www);
 
   // ask
-  if TAskRec.No('Rebuild definitions for all databases hosted at ' + www + '?' + sLineBreak + 'All DbaDatabase tables will be replaced!') then
+  if TAskRec.No(   'Rebuild definitions for all system databases hosted at ' + www + '?'
+    + sLineBreak + 'Definitio tables: TblDatabase, TblTable, TblField, TblIndex will be aligned with the phisical database'
+    + sLineBreak + 'Data already present will be preserved'
+    + sLineBreak + 'Fields not present in the definition tables will be added'
+  //+ sLineBreak + 'Fields not present in the database will be set to Inactive'
+    ) then
     Exit;
 
   // rio
   Screen.Cursor := crHourGlass;
   try
-    {bol :=} (TRioRec.HttpRio as ISystemSoapMainService).SystemDbaDatabaseRebuildSoap(k);
+    {bol :=} (TRioRec.HttpRio as ISystemSoapMainService).SystemDbaRebuildSoap(k);
     TMesRec.I(k);
   finally
     Screen.Cursor := crDefault;
@@ -411,144 +666,133 @@ begin
   // macro
   SystemDbaDdlExport('Restore');
 end;
-{$ENDREGION}
 
-{$REGION 'Syslog'}
-procedure TSystemMainForm.SystemSyslogRichEditChange(Sender: TObject);
+
+procedure TSystemMainForm.ServerClientDataSetAfterOpen(DataSet: TDataSet);
 begin
   inherited;
 
-  SendMessage(SystemSyslogRichEdit.handle, WM_VSCROLL, SB_BOTTOM, 0);
+  ServerClientDataSet.Locate('FldServer', gini.StrGet(FObj + '/Server', ''), []);
 end;
 
-procedure TSystemMainForm.SystemSyslogStartActionExecute(Sender: TObject);
+procedure TSystemMainForm.DatabaseDbaClientDataSetAfterOpen(DataSet: TDataSet);
 begin
   inherited;
 
-  SystemSyslogIdSyslogServer.Active := SystemSyslogStartAction.Checked;
-  if SystemSyslogIdSyslogServer.Active then begin
-  //SystemSyslogRichEdit.SetFocus;
-  //SystemSyslogRichEdit.Lines.Add('Wks SysLog Server Started');
-    StatusBar.SimpleText := 'Wks SysLog Server Started';
-  end else
-  //SystemSyslogRichEdit.Lines.Add('Wks SysLog Server Stopped');
-    StatusBar.SimpleText := 'Wks SysLog Server Stopped';
+  DatabaseDbaClientDataSet.Locate('FldDatabase', gini.StrGet(FObj + '/DatabaseDba', ''), []);
+  TGriRec.GriColumnsWidthFit(DatabaseDbaDBGrid);
 end;
 
-procedure TSystemMainForm.SystemSyslogCleanActionExecute(Sender: TObject);
+procedure TSystemMainForm.DatabaseTblClientDataSetAfterOpen(DataSet: TDataSet);
 begin
   inherited;
 
-  SystemSyslogRichEdit.Clear;
+  DatabaseTblClientDataSet.Locate('FldTable', gini.StrGet(FObj + '/DatabaseTbl', ''), []);
+  TGriRec.GriColumnsWidthFit(DatabaseTblDBGrid);
 end;
 
-procedure TSystemMainForm.SystemSyslogIdSyslogServerSyslog(Sender: TObject; ASysLogMessage: TIdSysLogMessage; ABinding: TIdSocketHandle);
+procedure TSystemMainForm.DatabaseFldClientDataSetAfterOpen(DataSet: TDataSet);
+begin
+  inherited;
+
+  TGriRec.GriColumnsWidthFit(DatabaseFldDBGrid);
+end;
+
+
+procedure TSystemMainForm.ServerClientDataSetAfterScroll(DataSet: TDataSet);
+begin
+  inherited;
+
+  gini.StrSet(FObj + '/Server', ServerClientDataSet.FieldByName('FldServer').AsString);
+end;
+
+procedure TSystemMainForm.DatabaseDbaClientDataSetAfterScroll(DataSet: TDataSet);
+begin
+  inherited;
+
+  gini.StrSet(FObj + '/DatabaseDba', DatabaseDbaClientDataSet.FieldByName('FldDatabase').AsString);
+end;
+
+procedure TSystemMainForm.DatabaseTblClientDataSetAfterScroll(DataSet: TDataSet);
+begin
+  inherited;
+
+  gini.StrSet(FObj + '/DatabaseTbl', DatabaseTblClientDataSet.FieldByName('FldTable').AsString);
+end;
+
+
+procedure TSystemMainForm.DatabaseTableCreateLabelClick(Sender: TObject);
 var
-  r: string;            // rawmsg
-  h, p: string;         // host, peer=hostip
-  t: TDateTime;         // timestamp
-//f: TidSyslogFacility; // facility
-//s: TIdSyslogSeverity; // severity
-//m: TIdSysLogMsgPart;  // msg
-  e: string;            // text
-  c: string;            // content
-  x: string;            // process
-//a: boolean;           // pidisavailable
-//i: integer;           // pid
-  l: string;            // logrow
-//b: TTabSheet;         // tab
-//j: integer;           // tabidx
+  com, dba, tbl, fld, typ, len, nul, fbk: string;
+  sbu: TSbuRec;
+  aff: integer;
+  ook: boolean;
 begin
   inherited;
 
-  // zip
-  r := ASysLogMessage.RawMessage;
-  h := ASysLogMessage.Hostname;
-  p := ASysLogMessage.Peer;
-  t := ASysLogMessage.TimeStamp;
-//f := ASysLogMessage.Facility;
-//s := ASysLogMessage.Severity;
-//a := ASysLogMessage.Msg.PIDAvailable;
-  e := ASysLogMessage.Msg.Text;
-  x := ASysLogMessage.Msg.Process;
-//i := ASysLogMessage.Msg.PID;
-  c := ASysLogMessage.Msg.Content;
+  dba := DatabaseDbaClientDataSet.FieldByName('FldDatabase').AsString;
+  tbl := DatabaseTblClientDataSet.FieldByName('FldTable').AsString;
 
-  // row
-  l := Format('%s - %s - %s : %s', [FormatDateTime('yyyy/mm/dd hh:nn:ss', t), h, x, c]);
+  sbu.Add('use [%s]', [dba]);
+//  sbu.Add('if not exists (');
+//  sbu.Add('    select 1');
+//  sbu.Add('    from sys.tables t');
+//  sbu.Add('    join sys.schemas s on t.schema_id = s.schema_id');
+//  sbu.Add('    where t.name = ''%s''', [tbl]);
+//  sbu.Add('      and s.name = ''dbo''');
+//  sbu.Add(') begin');
+  sbu.Add('if object_id(''%s'', ''U'') is not null', [tbl]);
+  sbu.Add('begin');
+  sbu.Add('    raiserror (''table %s already exists.'', 16, 1);', [tbl]);
+  sbu.Add('    return');
+  sbu.Add('end');
 
-  // log
-  SystemSyslogRichEdit.SetFocus;
-  SystemSyslogRichEdit.SelStart := SystemSyslogRichEdit.GetTextLen;
-  SystemSyslogRichEdit.Perform(EM_SCROLLCARET, 0, 0);
-  SystemSyslogRichEdit.Lines.Add(l);
-  Inc(FSyslogCount);
-  SysLogLabel.Caption := Format('Entries %d', [FSyslogCount]);
+  sbu.Add('create table [%s].[dbo].[%s] (', [dba, tbl]);
+  com := '';
+  DatabaseFldClientDataSet.First;
+  while not DatabaseFldClientDataSet.Eof do begin
+    com := IfThen(com.IsEmpty, '    ', '  , ');
+    fld := DatabaseFldClientDataSet.FieldByName('FldField').AsString;
+    typ := DatabaseFldClientDataSet.FieldByName('FldType').AsString;
+    len := IfThen(typ.Contains('char'), Format('(%s)', [DatabaseFldClientDataSet.FieldByName('FldLength').AsString]), '');
+    nul := IfThen(DatabaseFldClientDataSet.FieldByName('FldNullable').AsBoolean, 'null', 'not null');
+    sbu.Add('%s[%s] %s%s %s', [com, fld, typ, len, nul]);
+    DatabaseFldClientDataSet.Next;
+  end;
+  sbu.Add(') on [primary]');
+  sbu.Add('print ''table %s created''', [tbl]);
 
-  // tablog
-//for j := 0 to MainPageControl.PageCount-1 do begin
-//  b := MainPageControl.Pages[j];
-//  if SameText(b.Caption, h) then
-//    with b.Controls[0] as TRichEdit do begin
-//      Lines.Add(l);
-//      Exit;
-//    end;
-//end;
+  LogFrame.Output(sbu.Text);
 
-  // logdetails
-  {
-  SyslogRichEdit.Lines.Add(r);                              // <14>Nov  8 15:42:35 www.wks.cloud WksWaferMarkDualProject[3312]: tick...
-  SyslogRichEdit.Lines.Add(h);                              // www.wks.cloud
-  SyslogRichEdit.Lines.Add(p);                              // 10.176.66.8
-  SyslogRichEdit.Lines.Add(DateTimeToStr(t));               // 11/8/2022 3:42:35 PM
-  SyslogRichEdit.Lines.Add(TEnumConverter.EnumToString(f)); // sfUserLevel
-  SyslogRichEdit.Lines.Add(TEnumConverter.EnumToString(s)); // slInformational
-  SyslogRichEdit.Lines.Add(a.ToString);                     // -1
-  SyslogRichEdit.Lines.Add(e);                              // WksWafermarkDualProject[3312]: Z:\
-  SyslogRichEdit.Lines.Add(x);                              // WksWafermarkDualProject
-  SyslogRichEdit.Lines.Add(i.ToString);                     // 3312
-  SyslogRichEdit.Lines.Add(c);                              // tick...
-  }
-end;
-{$ENDREGION}
-
-{$REGION 'DbaLog'}
-procedure TSystemMainForm.LogClientDataSetAfterRefresh(DataSet: TDataSet);
-begin
-  inherited;
-
-  TGriRec.GriFit(LogJvDBUltimGrid);
-  LogCountLabel.Caption := Format('%d logs', [DataSet.RecordCount]);
+  // rio
+  if DatabaseTableCreateCommitCheckBox.Checked then begin
+    ook := TDbaRec.CmdExecRio(sbu.Text, aff, fbk);
+    LogFrame.Output(fbk, ook);
+  end;
 end;
 
-procedure TSystemMainForm.LogRefreshSpeedButtonClick(Sender: TObject);
+procedure TSystemMainForm.DatabaseTableCheckLabelClick(Sender: TObject);
+var
+  fbk: string;
+  ook: boolean;
 begin
   inherited;
 
-  LogClientDataSet.Refresh;
-end;
-procedure TSystemMainForm.MainPanelClick(Sender: TObject);
-begin
-  inherited;
-
-end;
-
-{$ENDREGION}
-
-{$REGION 'Audit'}
-procedure TSystemMainForm.AuditClientDataSetAfterRefresh(DataSet: TDataSet);
-begin
-  inherited;
-
-  TGriRec.GriFit(AuditJvDBUltimGrid);
-  AuditCountLabel.Caption := Format('%d audits', [DataSet.RecordCount]);
+  // rio
+  ook := TDbaRec.TblCheckRio(
+    DatabaseTblClientDataSet.FieldByName('FldSystem').AsString
+  , DatabaseTblClientDataSet.FieldByName('FldDatabase').AsString
+  , DatabaseTblClientDataSet.FieldByName('FldTable').AsString
+  , fbk);
+  LogFrame.Output(fbk, ook);
 end;
 
-procedure TSystemMainForm.AuditRefreshSpeedButtonClick(Sender: TObject);
+
+procedure TSystemMainForm.DatabaseFieldCreateLabelClick(Sender: TObject);
 begin
   inherited;
 
-  AuditClientDataSet.Refresh;
+  TMesRec.NI;
 end;
 {$ENDREGION}
 
@@ -671,7 +915,9 @@ begin
 end;
   {$ENDREGION}
 
-  {$REGION 'Services'}
+{$ENDREGION}
+
+{$REGION 'Services'}
 procedure TSystemMainForm.TopServiceInstallButtonClick(Sender: TObject);
 var
   sch, svh: SC_HANDLE; // servicecontrolmanagerhandle, servicehandle
@@ -860,28 +1106,48 @@ begin
   inherited;
 
 end;
-  {$ENDREGION}
+{$ENDREGION}
 
+{$REGION 'Web'}
+procedure TSystemMainForm.WebWksFilesGenerateSpeedButtonClick(Sender: TObject);
+begin
+  inherited;
+
+  if TAskRec.Yes('Generate the Wks web files?') then begin
+    TSysRec.WksWebFilesGenerate(WebWksJsCheckBox.Checked, WebWksCssCheckBox.Checked, WebWksDefaultHtmlCheckBox.Checked, WebWksDefaultUseSpinCheckBox.Checked);
+    LogFrame.LogOne('Wks web files generated', fmInfo);
+  end;
+end;
+
+procedure TSystemMainForm.WebW3FilesGenerateSpeedButtonClick(Sender: TObject);
+begin
+  inherited;
+
+  if TAskRec.Yes('Generate and save the Wks web files?') then begin
+    TW3fRec.W3WebFilesGenerate(WebW3JsCheckBox.Checked, WebW3ColorJsCheckBox.Checked, WebW3CssCheckBox.Checked, WebW3ThemeCssCheckBox.Checked);
+    LogFrame.LogOne('W3 web files generated', fmInfo);
+  end;
+end;
 {$ENDREGION}
 
 {$REGION 'Sources'}
-procedure TSystemMainForm.SystemSourceConnStrAdoTestLabelClick(Sender: TObject);
+procedure TSystemMainForm.SourceConnStrAdoTestLabelClick(Sender: TObject);
 var
   fbk: string;
 begin
   inherited;
 
-  gcns.CsAdoTest(SystemSourceConnStrAdoDBSynEdit.Text, fbk);
+  gcns.CsAdoTest(SourceConnStrAdoDBSynEdit.Text, fbk);
   TMesRec.I(fbk);
 end;
 
-procedure TSystemMainForm.SystemSourceConnStrFdTestLabelClick(Sender: TObject);
+procedure TSystemMainForm.SourceConnStrFdTestLabelClick(Sender: TObject);
 var
   fbk: string;
 begin
   inherited;
 
-  gcns.CsFdTest(SystemSourceConnStrAdoDBSynEdit.Text, fbk);
+  gcns.CsFdTest(SourceConnStrAdoDBSynEdit.Text, fbk);
   TMesRec.I(fbk);
 end;
 {$ENDREGION}

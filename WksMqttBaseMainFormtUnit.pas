@@ -86,9 +86,6 @@ implementation
 {$REGION 'Form'}
 procedure TBaseForm.FormCreate(Sender: TObject);
 begin
-  // init
-  ReportMemoryLeaksOnShutdown := true;
-
   // gui
   Caption := 'WKS MQTT Base';
   TopPageControl.ActivePageIndex := 0;

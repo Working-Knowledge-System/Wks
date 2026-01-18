@@ -50,9 +50,7 @@ object Form1: TForm1
         Kind = gbkMargin
         Width = 3
       end>
-    SelectedColor.Alpha = 0.400000005960464500
-    ExplicitWidth = 688
-    ExplicitHeight = 480
+    ScrollbarAnnotations = <>
     RemovedKeystrokes = <
       item
         Command = ecCut

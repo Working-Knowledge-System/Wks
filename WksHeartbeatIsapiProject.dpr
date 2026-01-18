@@ -3,6 +3,7 @@ library WksHeartbeatIsapiProject;
 {$R 'Wks000Res.res' 'Wks000Res.rc'}
 
 uses
+  Winapi.Windows,
   Winapi.ActiveX,
   System.Win.ComObj,
   Web.WebBroker,
@@ -21,5 +22,6 @@ begin
   CoInitFlags := COINIT_MULTITHREADED;
   Application.Initialize;
   Application.WebModuleClass := WebModuleClass;
+  Application.CacheConnections := not IsDebuggerPresent();
   Application.Run;
 end.

@@ -21,7 +21,6 @@ inherited CodeMainForm: TCodeMainForm
   inherited TopPanel: TPanel
     StyleElements = [seFont, seClient, seBorder]
     inherited TopPageControl: TPageControl
-      ActivePage = CodeTabSheet
       inherited TopSearchTabSheet: TTabSheet
         inherited SearchReplaceOutLabel: TLabel
           StyleElements = [seFont, seClient, seBorder]
@@ -246,20 +245,21 @@ inherited CodeMainForm: TCodeMainForm
           Hints.Strings = ()
         end
       end
-      inherited WordTabSheet: TTabSheet
-        ExplicitHeight = 571
-      end
     end
   end
   inherited BottomPanel: TPanel
     Top = 685
     StyleElements = [seFont, seClient, seBorder]
     ExplicitTop = 685
+    ExplicitWidth = 1580
     inherited LogFrame: TLogFrame
+      ExplicitWidth = 1580
       inherited LogPageControl: TPageControl
+        ExplicitWidth = 1580
         inherited OutputTabSheet: TTabSheet
           inherited OutputRichEdit: TRichEdit
             StyleElements = [seFont, seClient, seBorder]
+            ExplicitWidth = 1570
           end
         end
         inherited LogTabSheet: TTabSheet
@@ -351,6 +351,9 @@ inherited CodeMainForm: TCodeMainForm
             inherited ObjectId8Label: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectRouteIdCsvLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited ObjectOrderDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
@@ -366,56 +369,44 @@ inherited CodeMainForm: TCodeMainForm
             inherited ObjectId8DBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectRouteIdCsvDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
           end
           inherited ObjectDateJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectCreatedLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectCreatedDBText: TDBText
-              StyleElements = [seFont, seClient, seBorder]
-            end
             inherited ObjectUpdatedLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectUpdatedDBText: TDBText
+            inherited ObjectExpireLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectUpdatedByDBText: TDBText
+            inherited ObjectUpdatedDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectCreatedDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+          end
+          inherited ObjectPersonJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectAuthorLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectOwnerCsvLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectUpdatedByLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-          end
-          inherited ObjectFromJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectFromOrganizationLabel: TLabel
+            inherited ObjectOwnerCsvDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectFromMemberLabel: TLabel
+            inherited ObjectAuthorDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectFromTeamLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromAreaLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromDepartmentLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromOrganizationDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromMemberDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromTeamDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromAreaDBEdit: TDBEdit
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectFromDepartmentDBEdit: TDBEdit
+            inherited ObjectUpdatedByDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -435,7 +426,7 @@ inherited CodeMainForm: TCodeMainForm
             inherited ObjectToDepartmentLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectJobGradeMinLabel: TLabel
+            inherited ObjectToJobGradeMinLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectJobGradeCalculateLabel: TLabel
@@ -456,15 +447,7 @@ inherited CodeMainForm: TCodeMainForm
             inherited ObjectToDepartmentDBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectJobGradeMinDBComboBox: TDBComboBox
-              StyleElements = [seFont, seClient, seBorder]
-            end
-          end
-          inherited ObjectApprovalJvScrollMaxBand: TJvScrollMaxBand
-            inherited ObjectRouteLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectRouteDBEdit: TDBEdit
+            inherited ObjectToJobGradeMinDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -498,6 +481,9 @@ inherited CodeMainForm: TCodeMainForm
             inherited ObjectDataKindLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectGroupLabel: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
             inherited ObjectContentKindDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
@@ -507,45 +493,62 @@ inherited CodeMainForm: TCodeMainForm
             inherited ObjectDataKindDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
+            inherited ObjectGroupDBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
           end
           inherited ObjectGeneralJvScrollMaxBand: TJvScrollMaxBand
             inherited ObjectStateLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectSpareLabel: TLabel
+            inherited ObjectBgColorLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectDescriptionLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectTitleLabel: TLabel
-              StyleElements = [seFont, seClient, seBorder]
-            end
-            inherited ObjectSubtitleLabel: TLabel
+            inherited ObjectFgColorLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
             inherited ObjectStateDBComboBox: TDBComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectSpareDBEdit: TDBEdit
+            inherited ObjectBgColorDBEdit: TDBEdit
+              StyleElements = [seFont, seClient]
+            end
+            inherited ObjectFgColorDBEdit: TDBEdit
+              StyleElements = [seFont, seClient]
+            end
+          end
+          inherited ObjectDataJvScrollMaxBand: TJvScrollMaxBand
+            inherited ObjectData2Label: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectDescriptionDBEdit: TDBEdit
+            inherited ObjectData3Label: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectTitleDBEdit: TDBEdit
+            inherited ObjectData4Label: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited ObjectSubtitleDBEdit: TDBEdit
+            inherited ObjectData1Label: TLabel
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData2DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData3DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData4DBEdit: TDBEdit
+              StyleElements = [seFont, seClient, seBorder]
+            end
+            inherited ObjectData1DBEdit: TDBEdit
               StyleElements = [seFont, seClient, seBorder]
             end
           end
           object CodeJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
+            Width = 292
             Height = 21
             Expanded = False
             Caption = 'Code'
-            ExpandedHeight = 359
+            ExpandedHeight = 266
             ButtonFont.Charset = ANSI_CHARSET
             ButtonFont.Color = clWindowText
             ButtonFont.Height = -11
@@ -557,7 +560,7 @@ inherited CodeMainForm: TCodeMainForm
               AlignWithMargins = True
               Left = 16
               Top = 53
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -569,7 +572,7 @@ inherited CodeMainForm: TCodeMainForm
               AlignWithMargins = True
               Left = 16
               Top = 103
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -581,19 +584,19 @@ inherited CodeMainForm: TCodeMainForm
               AlignWithMargins = True
               Left = 16
               Top = 153
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
               Caption = 'Return Mime Type'
-              ExplicitWidth = 96
+              ExplicitWidth = 97
             end
             object CodeRunCommandLabel: TLabel
               AlignWithMargins = True
               Left = 16
               Top = 203
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -605,7 +608,7 @@ inherited CodeMainForm: TCodeMainForm
               AlignWithMargins = True
               Left = 16
               Top = 74
-              Width = 249
+              Width = 260
               Height = 23
               Margins.Left = 16
               Margins.Right = 16
@@ -622,7 +625,7 @@ inherited CodeMainForm: TCodeMainForm
               AlignWithMargins = True
               Left = 3
               Top = 22
-              Width = 275
+              Width = 286
               Height = 25
               DataSource = CodeDataSource
               VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel, nbRefresh, nbApplyUpdates, nbCancelUpdates]
@@ -634,7 +637,7 @@ inherited CodeMainForm: TCodeMainForm
               AlignWithMargins = True
               Left = 16
               Top = 124
-              Width = 249
+              Width = 260
               Height = 23
               Hint = 'State'
               Margins.Left = 16
@@ -644,11 +647,12 @@ inherited CodeMainForm: TCodeMainForm
               DataSource = CodeDataSource
               Items.Strings = (
                 ''
-                'AsScript'
-                'AsCsv'
-                'AsHtml'
-                'AsJson'
-                'AsXml')
+                'Code'
+                'Result'
+                'Csv'
+                'Html'
+                'Json'
+                'Xml')
               ParentShowHint = False
               ShowHint = True
               TabOrder = 2
@@ -657,7 +661,7 @@ inherited CodeMainForm: TCodeMainForm
               AlignWithMargins = True
               Left = 16
               Top = 174
-              Width = 249
+              Width = 260
               Height = 23
               Hint = 'State'
               Margins.Left = 16
@@ -682,7 +686,7 @@ inherited CodeMainForm: TCodeMainForm
               AlignWithMargins = True
               Left = 16
               Top = 224
-              Width = 249
+              Width = 260
               Height = 23
               Hint = 'Page'
               Margins.Left = 16
@@ -696,8 +700,9 @@ inherited CodeMainForm: TCodeMainForm
             end
           end
           object CodeOutputJvScrollMaxBand: TJvScrollMaxBand
-            Width = 281
-            Height = 326
+            Width = 292
+            Height = 21
+            Expanded = False
             Caption = 'Output'
             ExpandedHeight = 326
             ButtonFont.Charset = ANSI_CHARSET
@@ -717,7 +722,7 @@ inherited CodeMainForm: TCodeMainForm
               AlignWithMargins = True
               Left = 16
               Top = 72
-              Width = 249
+              Width = 260
               Height = 15
               Cursor = crHandPoint
               Hint = 'Open the output directory'
@@ -738,7 +743,7 @@ inherited CodeMainForm: TCodeMainForm
               AlignWithMargins = True
               Left = 16
               Top = 22
-              Width = 249
+              Width = 260
               Height = 15
               Margins.Left = 16
               Margins.Right = 16
@@ -750,7 +755,7 @@ inherited CodeMainForm: TCodeMainForm
               AlignWithMargins = True
               Left = 16
               Top = 172
-              Width = 249
+              Width = 260
               Height = 15
               Cursor = crHandPoint
               Hint = 'Open the output PROD directory'
@@ -771,7 +776,7 @@ inherited CodeMainForm: TCodeMainForm
               AlignWithMargins = True
               Left = 16
               Top = 122
-              Width = 249
+              Width = 260
               Height = 15
               Cursor = crHandPoint
               Hint = 'Open the output TEST directory'
@@ -786,13 +791,14 @@ inherited CodeMainForm: TCodeMainForm
               Font.Style = [fsUnderline]
               ParentFont = False
               OnClick = CodeOutputTestDirectoryLabelClick
-              ExplicitWidth = 115
+              ExplicitWidth = 117
             end
             object CodeOutputProdSaveLabel: TLabel
               Left = 240
               Top = 174
               Width = 24
               Height = 15
+              Cursor = crHandPoint
               Caption = 'Save'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
@@ -807,6 +813,7 @@ inherited CodeMainForm: TCodeMainForm
               Top = 124
               Width = 24
               Height = 15
+              Cursor = crHandPoint
               Caption = 'Save'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
@@ -821,6 +828,7 @@ inherited CodeMainForm: TCodeMainForm
               Top = 74
               Width = 24
               Height = 15
+              Cursor = crHandPoint
               Caption = 'Save'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlue
@@ -834,7 +842,7 @@ inherited CodeMainForm: TCodeMainForm
               AlignWithMargins = True
               Left = 16
               Top = 93
-              Width = 249
+              Width = 260
               Height = 23
               Hint = 'Page'
               Margins.Left = 16
@@ -851,7 +859,7 @@ inherited CodeMainForm: TCodeMainForm
               AlignWithMargins = True
               Left = 16
               Top = 43
-              Width = 249
+              Width = 260
               Height = 23
               Hint = 'Page'
               Margins.Left = 16
@@ -868,7 +876,7 @@ inherited CodeMainForm: TCodeMainForm
               AlignWithMargins = True
               Left = 16
               Top = 193
-              Width = 249
+              Width = 260
               Height = 23
               Hint = 'Page'
               Margins.Left = 16
@@ -885,7 +893,7 @@ inherited CodeMainForm: TCodeMainForm
               AlignWithMargins = True
               Left = 16
               Top = 143
-              Width = 249
+              Width = 260
               Height = 23
               Hint = 'Page'
               Margins.Left = 16
@@ -898,26 +906,25 @@ inherited CodeMainForm: TCodeMainForm
               ShowHint = True
               TabOrder = 3
             end
-            object CodeHeaderAndFooterOffDBCheckBox: TDBCheckBox
+            object CodeHeaderAndFooterAddDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
               Top = 250
-              Width = 249
+              Width = 260
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
               Align = alTop
-              Caption = 'Header and Footer off'
-              DataField = 'FldHeaderAndFooterOff'
+              Caption = 'Header and Footer add'
+              DataField = 'FldHeaderAndFooterAdd'
               DataSource = CodeDataSource
               TabOrder = 4
-              ExplicitTop = 281
             end
             object CodeCommentRemoveDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
               Top = 273
-              Width = 249
+              Width = 260
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -926,13 +933,12 @@ inherited CodeMainForm: TCodeMainForm
               DataField = 'FldCommentRemove'
               DataSource = CodeDataSource
               TabOrder = 5
-              ExplicitTop = 304
             end
             object CodeLinesEmptyRemoveDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
               Top = 296
-              Width = 249
+              Width = 260
               Height = 17
               Margins.Left = 16
               Margins.Right = 16
@@ -941,24 +947,21 @@ inherited CodeMainForm: TCodeMainForm
               DataField = 'FldLinesEmptyRemove'
               DataSource = CodeDataSource
               TabOrder = 6
-              ExplicitTop = 327
             end
             object CodeDescriptionBlockAddDBCheckBox: TDBCheckBox
               AlignWithMargins = True
               Left = 16
               Top = 227
-              Width = 249
+              Width = 260
               Height = 17
               Margins.Left = 16
               Margins.Top = 8
               Margins.Right = 16
               Align = alTop
-              Caption = 'Add Description block'
+              Caption = 'Description block add'
               DataField = 'FldDescriptionBlockAdd'
               DataSource = CodeDataSource
               TabOrder = 7
-              ExplicitLeft = 15
-              ExplicitTop = 222
             end
           end
         end
@@ -1077,20 +1080,20 @@ inherited CodeMainForm: TCodeMainForm
               StyleElements = [seFont, seClient, seBorder]
             end
           end
-          inherited OptionFilesJvScrollMaxBand: TJvScrollMaxBand
-            inherited OptionFilesWorkingFolderLabel: TLabel
+          inherited OptionFileJvScrollMaxBand: TJvScrollMaxBand
+            inherited OptionFileWorkingFolderLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesOnDoubleClickLabel: TLabel
+            inherited OptionFileOnDoubleClickLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesWorkingFolderClearLabel: TLabel
+            inherited OptionFileWorkingFolderClearLabel: TLabel
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesOnDoubleClickComboBox: TComboBox
+            inherited OptionFileOnDoubleClickComboBox: TComboBox
               StyleElements = [seFont, seClient, seBorder]
             end
-            inherited OptionFilesWorkingFolderSelectButtonedEdit: TButtonedEdit
+            inherited OptionFileWorkingFolderSelectButtonedEdit: TButtonedEdit
               StyleElements = [seFont, seClient, seBorder]
             end
           end
@@ -1133,6 +1136,9 @@ inherited CodeMainForm: TCodeMainForm
             end
           end
         end
+      end
+      inherited WordTabSheet: TTabSheet
+        ExplicitHeight = 571
       end
     end
   end
@@ -1183,7 +1189,19 @@ inherited CodeMainForm: TCodeMainForm
           Height = 543
           ExplicitHeight = 543
           inherited ObjectContentDBSynEdit: TDBSynEdit
-            Height = 425
+            Height = 290
+            ExplicitHeight = 290
+          end
+          inherited ObjectContentTopPanel2: TPanel
+            inherited ObjectTitleLabel: TLabel
+              Width = 638
+            end
+            inherited ObjectSubtitleLabel: TLabel
+              Width = 638
+            end
+            inherited ObjectDescriptionLabel: TLabel
+              Width = 638
+            end
           end
         end
       end
@@ -1245,6 +1263,9 @@ inherited CodeMainForm: TCodeMainForm
     DataSet = CodeClientDataSet
     Left = 208
     Top = 432
+  end
+  inherited MainSoapConnection: TSoapConnection
+    URL = 'http://localhost/WksCodeSoapProject.dll/soap'
   end
   object CodeImageList24: TImageList [26]
     ColorDepth = cd32Bit
