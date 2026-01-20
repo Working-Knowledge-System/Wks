@@ -176,9 +176,123 @@ begin
 end;
 
 procedure TGenerateDialogForm.SaveTemplateActionExecute(Sender: TObject);
+var
+  csv: TJvCsvDataSet;
 begin
-  ;
-  TMesRec.I('Template CSV file saved to %s');
+  if OpenDialog.Filename <> '' then
+    SaveDialog.Filename := 'AccountTemplate.csv';
+
+  if not SaveDialog.Execute then
+    Exit;
+
+  csv := TJvCsvDataSet.Create(nil);
+
+// $ = string
+// % = integer
+// & = floating
+// @ = datetime as YYYY/MM/DD HH:MM:SS
+// # = Hex-Ascii Timestamp (A93F38C9) seconds since Jan 1, 1970 GMT
+// ^ = Hex-Ascii Timestamp (A93F38CP) corrected to local timezone
+// ! = Boolean Field (0 in csv file=false, not 0 = true, blank = NULL)
+// ~ = UTF8
+  csv.CsvFieldDef := '''
+   FldId:%
+  ,FldPId:%
+  ,FldId8:$
+  ,FldOrder:%
+  ,FldRev:%
+  ,FldRouteIdCsv:$
+  ,FldCreated:@
+  ,FldUpdated :@
+  ,FldExpire:@
+  ,FldAuthor:$
+  ,FldOwnerCsv:$
+  ,FldUpdatedBy:$
+  ,FldToOrganization:$
+  ,FldToDepartment:$
+  ,FldToArea:$
+  ,FldToTeam:$
+  ,FldToMember:$
+  ,FldToJobGradeMin:%
+  ,FldObjectKind:$
+  ,FldContentKind:$
+  ,FldDataKind:$
+  ,FldGroup:$
+  ,FldState:$
+  ,FldTitle:$
+  ,FldSubtitle:$
+  ,FldDescription:$
+  ,FldBgColor:$
+  ,FldFgColor:$
+  ,FldHidden:!
+  ,FldEncrypted:!
+  ,FldPersist:!
+  ,FldImage:$
+  ,FldContentPrev:$
+  ,FldContent:$
+  ,FldNote:$
+  ,FldData:$
+  ,FldData1:$
+  ,FldData2:$
+  ,FldData3:$
+  ,FldData4:$
+  ,FldObject:$
+  ,FldEditorCaret:$
+  ,FldEditorFolding:$
+  ''';
+
+//  csv.FieldDefs.Add('FldId'             , ftInteger ,   0, false);
+//  csv.FieldDefs.Add('FldPId'            , ftInteger ,   0, false);
+//  csv.FieldDefs.Add('FldId8'            , ftString  ,   8, false);
+//  csv.FieldDefs.Add('FldOrder'          , ftInteger ,   0, false);
+//  csv.FieldDefs.Add('FldRev'            , ftInteger ,   0, false);
+//  csv.FieldDefs.Add('FldRouteIdCsv'     , ftString  ,  64, false);
+//  csv.FieldDefs.Add('FldCreated'        , ftDateTime,   0, false);
+//  csv.FieldDefs.Add('FldUpdated '       , ftDateTime,   0, false);
+//  csv.FieldDefs.Add('FldExpire'         , ftDateTime,   0, false);
+//  csv.FieldDefs.Add('FldAuthor'         , ftString  ,  32, false);
+//  csv.FieldDefs.Add('FldOwnerCsv'       , ftString  , 256, false);
+//  csv.FieldDefs.Add('FldUpdatedBy'      , ftString  ,  32, false);
+//  csv.FieldDefs.Add('FldToOrganization' , ftString  ,  32, false);
+//  csv.FieldDefs.Add('FldToDepartment'   , ftString  ,  32, false);
+//  csv.FieldDefs.Add('FldToArea'         , ftString  ,  32, false);
+//  csv.FieldDefs.Add('FldToTeam'         , ftString  ,  32, false);
+//  csv.FieldDefs.Add('FldToMember'       , ftString  ,  32, false);
+//  csv.FieldDefs.Add('FldToJobGradeMin'  , ftInteger ,   0, false);
+//  csv.FieldDefs.Add('FldObjectKind'     , ftString  ,  16, false);
+//  csv.FieldDefs.Add('FldContentKind'    , ftString  ,  16, false);
+//  csv.FieldDefs.Add('FldDataKind'       , ftString  ,  16, false);
+//  csv.FieldDefs.Add('FldGroup'          , ftString  ,  32, false);
+//  csv.FieldDefs.Add('FldState'          , ftString  ,  32, false);
+//  csv.FieldDefs.Add('FldTitle'          , ftString  , 256, false);
+//  csv.FieldDefs.Add('FldSubtitle'       , ftString  , 256, false);
+//  csv.FieldDefs.Add('FldDescription'    , ftString  ,1024, false);
+//  csv.FieldDefs.Add('FldBgColor'        , ftString  ,   8, false);
+//  csv.FieldDefs.Add('FldFgColor'        , ftString  ,   8, false);
+//  csv.FieldDefs.Add('FldHidden'         , ftBoolean ,   0, false);
+//  csv.FieldDefs.Add('FldEncrypted'      , ftBoolean ,   0, false);
+//  csv.FieldDefs.Add('FldPersist'        , ftBoolean ,   0, false);
+//  csv.FieldDefs.Add('FldImage'          , ftStream  ,   0, false);
+//  csv.FieldDefs.Add('FldContentPrev'    , ftString  ,8000, false);
+//  csv.FieldDefs.Add('FldContent'        , ftString  ,8000, false);
+//  csv.FieldDefs.Add('FldNote'           , ftString  ,8000, false);
+//  csv.FieldDefs.Add('FldData'           , ftString  ,8000, false);
+//  csv.FieldDefs.Add('FldData1'          , ftString  , 256, false);
+//  csv.FieldDefs.Add('FldData2'          , ftString  , 256, false);
+//  csv.FieldDefs.Add('FldData3'          , ftString  , 256, false);
+//  csv.FieldDefs.Add('FldData4'          , ftString  , 256, false);
+//  csv.FieldDefs.Add('FldObject'         , ftString  , 256, false);
+//  csv.FieldDefs.Add('FldEditorCaret'    , ftString  ,  32, false);
+//  csv.FieldDefs.Add('FldEditorFolding'  , ftString  ,8000, false);
+
+  csv.FileName := SaveDialog.Filename;
+  csv.LoadsFromFile := false;
+  csv.Open;
+  csv.First;
+  csv.SaveToFile(SaveDialog.Filename);
+  csv.Free;
+
+  TMesRec.I('Template CSV file saved to %s', [SaveDialog.Filename]);
 end;
 
 procedure TGenerateDialogForm.GenerateActionExecute(Sender: TObject);

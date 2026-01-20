@@ -137,10 +137,13 @@ object GenerateDialogForm: TGenerateDialogForm
   end
   object ObjectDBGrid: TDBGrid
     AlignWithMargins = True
-    Left = 3
+    Left = 8
     Top = 49
-    Width = 1178
-    Height = 549
+    Width = 1168
+    Height = 544
+    Margins.Left = 8
+    Margins.Right = 8
+    Margins.Bottom = 8
     Align = alClient
     DataSource = ObjectDataSource
     TabOrder = 1

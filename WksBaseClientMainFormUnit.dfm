@@ -3652,11 +3652,16 @@ object BaseMainForm: TBaseMainForm
             ExplicitTop = 225
           end
           object ObjectContentDBSynEdit: TDBSynEdit
+            AlignWithMargins = True
             Left = 0
             Top = 253
             Width = 689
             Height = 285
             Cursor = crIBeam
+            Margins.Left = 0
+            Margins.Top = 0
+            Margins.Right = 0
+            Margins.Bottom = 0
             DataField = 'FldContent'
             DataSource = ObjectDataSource
             Align = alClient
@@ -3702,6 +3707,9 @@ object BaseMainForm: TBaseMainForm
               end>
             OnChange = ObjectContentDBSynEditChange
             OnStatusChange = ObjectContentDBSynEditStatusChange
+            ExplicitLeft = 2
+            ExplicitTop = 254
+            ExplicitWidth = 683
           end
           object ObjectContentTopPanel2: TPanel
             Left = 0
@@ -3711,53 +3719,60 @@ object BaseMainForm: TBaseMainForm
             Align = alTop
             BevelOuter = bvNone
             Caption = 'ObjectContentTopPanel2'
+            ParentBackground = False
             ShowCaption = False
             TabOrder = 1
+            ExplicitLeft = 2
+            ExplicitTop = 3
             object ObjectTitleLabel: TLabel
               AlignWithMargins = True
-              Left = 35
+              Left = 32
               Top = 3
-              Width = 638
+              Width = 641
               Height = 15
               Hint = 'The title of the object'
-              Margins.Left = 35
+              Margins.Left = 32
               Margins.Right = 16
               Align = alTop
               Caption = 'Title'
-              ExplicitWidth = 23
+              ExplicitWidth = 638
             end
             object ObjectSubtitleLabel: TLabel
               AlignWithMargins = True
-              Left = 35
+              Left = 32
               Top = 53
-              Width = 638
+              Width = 641
               Height = 15
               Hint = 'The subtitle of the object'
-              Margins.Left = 35
+              Margins.Left = 32
               Margins.Right = 16
               Align = alTop
               Caption = 'Subtitle'
-              ExplicitWidth = 40
+              ExplicitWidth = 638
             end
             object ObjectDescriptionLabel: TLabel
               AlignWithMargins = True
-              Left = 35
+              Left = 32
               Top = 103
-              Width = 638
+              Width = 641
               Height = 15
               Hint = 'A description for the object'
-              Margins.Left = 35
+              Margins.Left = 32
               Margins.Right = 16
               Align = alTop
               Caption = 'Description'
-              ExplicitWidth = 60
+              ExplicitWidth = 638
             end
             object ObjectDescriptionDBSynEdit: TDBSynEdit
+              AlignWithMargins = True
               Left = 0
-              Top = 121
+              Top = 124
               Width = 689
-              Height = 122
+              Height = 119
               Cursor = crIBeam
+              Margins.Left = 0
+              Margins.Right = 0
+              Margins.Bottom = 0
               DataField = 'FldDescription'
               DataSource = ObjectDataSource
               Align = alClient
@@ -3795,14 +3810,16 @@ object BaseMainForm: TBaseMainForm
                   Kind = gbkMargin
                   Width = 3
                 end>
+              ExplicitLeft = 2
+              ExplicitWidth = 683
             end
             object ObjectTitleDBEdit: TDBEdit
               AlignWithMargins = True
-              Left = 35
+              Left = 32
               Top = 24
-              Width = 638
+              Width = 641
               Height = 23
-              Margins.Left = 35
+              Margins.Left = 32
               Margins.Right = 16
               Align = alTop
               DataField = 'FldTitle'
@@ -3810,14 +3827,15 @@ object BaseMainForm: TBaseMainForm
               ParentShowHint = False
               ShowHint = True
               TabOrder = 1
+              ExplicitWidth = 638
             end
             object ObjectSubtitleDBEdit: TDBEdit
               AlignWithMargins = True
-              Left = 35
+              Left = 32
               Top = 74
-              Width = 638
+              Width = 641
               Height = 23
-              Margins.Left = 35
+              Margins.Left = 32
               Margins.Right = 16
               Align = alTop
               DataField = 'FldSubtitle'
@@ -3825,6 +3843,7 @@ object BaseMainForm: TBaseMainForm
               ParentShowHint = False
               ShowHint = True
               TabOrder = 2
+              ExplicitWidth = 638
             end
           end
         end
@@ -3878,6 +3897,8 @@ object BaseMainForm: TBaseMainForm
               Width = 3
             end>
           OnChange = ObjectDataDBSynEditChange
+          ExplicitLeft = 2
+          ExplicitTop = 26
         end
         object ObjectDataTopPanel: TPanel
           AlignWithMargins = True
