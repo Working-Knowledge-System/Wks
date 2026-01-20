@@ -998,11 +998,11 @@ type
     AGG_Y_UP           = false;
     AGG_TEXT_UP        = not AGG_Y_UP;
     AGG_TEXT_HEIGHT    = 10.0;
-    AGG_TEXT_COLOR     = '000000ff';        // RGBA
+    AGG_TEXT_COLOR     = '000000ff';            // RGBA
     AGG_TEXT_FONT      = FONT_FAMILY_MONOSPACE; // filename containing the font face to be used
-    AGG_TEXT_ALIGNMENT = 'cc';              // center-center
-    AGG_TEXT_HINTS     = true;              // sembra influenzi leggermente lo spessore del testo
-    AGG_TEXT_ROUND_OFF = true;              // rounds to integers the text x y origin
+    AGG_TEXT_ALIGNMENT = 'cc';                  // center-center
+    AGG_TEXT_HINTS     = true;                  // sembra influenzi leggermente lo spessore del testo
+    AGG_TEXT_ROUND_OFF = true;                  // rounds to integers the text x y origin
     {$ENDREGION}
 
   public
@@ -1946,40 +1946,6 @@ type
     class procedure FileCrypt(const IvFileSource, IvFileDestination, IvPassword: string; IvCrypt: boolean); static;
   end;
 
-  TCveRec = record // conversion
-    class function  PxToPt(IvPixel: integer): double; static;
-    class function  MmToPt(IvMm: double): double; static;
-    class function  PtToMm(IvPt: double): double; static;
-  end;
-
-  {$REGION 'TDatKindEnum'}
-  TDatKindEnum = (
-    dkCsv      // 0
-  , dkJson     // 1
-  , dkXml      // 2
-  , dkYaml     // 3
-  );
-  {$ENDREGION}
-
-  TDosRec = record // dos
-  public
-    class function  IsValid(IvCommandLine: string; var IvFbk: string): boolean; static;
-    class function  Exec(IvCommandLine: string; var IvOutput: string; IvWorkDir: string = TEMP_PATH): boolean; static; // capture dos process output as a string
-  end;
-
-  THlsRec = record // color in the HLS model
-  const
-    MaxFactor = 100; // percentage 0..100
-  public
-    class function  Brighten(Color: TColor; Factor: integer): TColor; static;                            // Factor: 0..MaxFactor
-    class function  Darken(Color: TColor; Factor: integer): TColor; static;                              // Factor: 0..MaxFactor
-    class function  BrightnessChange(Color: TColor; Factor: integer): TColor; static;                    // Factor: -MaxFactor..MaxFactor
-    class function  SetLuminanceToRGBValue(Value, CurrentLum, NewLum: Integer): byte; static;            // for luminance in the HLS model: Value: 0..255 RGB value, CurrentLum: 0..510, NewLum: 0..510
-    class function  SetLuminanceToRGBValues(Color: TColor; CurrentLum, NewLum: integer): TColor; static; // for fast calculation, you must precalculate CurrentLum and convert Color to RGB
-    class function  SetLuminanceToRGB(Color: TColor; NewLum: integer): TColor; static;                   // NewLum: 0..510
-    class function  TColLuminance(Color: TColor): integer; static;                                       // Result: 0..510
-  end;
-
   TCsvRec = record // csv/list *** 1 row only! --> merge with TLstRec, real csv have to manage multi-lines ***
     class function  CsvHas(IvCsvRow: string; IvValue: string): boolean; static;
     class function  CsvRemove(IvCsvRow: string; IvValue: string): string; static;
@@ -2032,6 +1998,34 @@ type
     CTY_TXT_SSE         = 'text/event-stream';
 
     // video
+  end;
+
+  TCveRec = record // conversion
+    class function  PxToPt(IvPixel: integer): double; static;
+    class function  MmToPt(IvMm: double): double; static;
+    class function  PtToMm(IvPt: double): double; static;
+  end;
+
+  {$REGION 'TDatKindEnum'}
+  TDatKindEnum = (
+    dkCsv      // 0
+  , dkJson     // 1
+  , dkXml      // 2
+  , dkYaml     // 3
+  );
+  {$ENDREGION}
+
+  THlsRec = record // color in the HLS model
+  const
+    MaxFactor = 100; // percentage 0..100
+  public
+    class function  Brighten(Color: TColor; Factor: integer): TColor; static;                            // Factor: 0..MaxFactor
+    class function  Darken(Color: TColor; Factor: integer): TColor; static;                              // Factor: 0..MaxFactor
+    class function  BrightnessChange(Color: TColor; Factor: integer): TColor; static;                    // Factor: -MaxFactor..MaxFactor
+    class function  SetLuminanceToRGBValue(Value, CurrentLum, NewLum: Integer): byte; static;            // for luminance in the HLS model: Value: 0..255 RGB value, CurrentLum: 0..510, NewLum: 0..510
+    class function  SetLuminanceToRGBValues(Color: TColor; CurrentLum, NewLum: integer): TColor; static; // for fast calculation, you must precalculate CurrentLum and convert Color to RGB
+    class function  SetLuminanceToRGB(Color: TColor; NewLum: integer): TColor; static;                   // NewLum: 0..510
+    class function  TColLuminance(Color: TColor): integer; static;                                       // Result: 0..510
   end;
 
   TDatRec = record // datetime
@@ -2228,6 +2222,12 @@ type
   TDocRec = record // document
   public
     class function  DocKindVector(): TArray<string>; static;
+  end;
+
+  TDosRec = record // dos
+  public
+    class function  IsValid(IvCommandLine: string; var IvFbk: string): boolean; static;
+    class function  Exec(IvCommandLine: string; var IvOutput: string; IvWorkDir: string = TEMP_PATH): boolean; static; // capture dos process output as a string
   end;
 
   TDstRec = record // dataset
@@ -5198,7 +5198,7 @@ type
 //  ExePath: string;
 //end;
 
-  TSvcRec = record // wks services
+  TSvcRec = record // services
   public
     class function ServiceName(IvName: string): string; static;
     class function DisplayName(IvName: string): string; static;
@@ -15550,7 +15550,7 @@ var
     //cva := StringReplace(cva, 'Dollar', '$', []);
     //cva := StringReplace(cva, 'Euro'  , '€', []);
     //cva := Strip(cva, false); // htmltagsstrip
-    //cva := Encode(cva);   // charsescape
+    //cva := Encode(cva);       // charsescape
     //if cva.Contains(sLineBreak) then cva := StringReplace(cva, sLineBreak, HBR);
       ivsbu.Add('<td>%s</td>', [fld.AsString]);
     end;
@@ -17071,32 +17071,32 @@ var
   begin
     Ctx := TRttiContext.Create;
     try
-  // reflect
+      // reflect
       RttiType := Ctx.GetType(TypeInfo(TReportDataSetRec));
 
-  // recordloop
+      // recordloop
       for Field in RttiType.GetFields do begin
-    // skip
+        // skip
         if not (Field.FieldType.TypeKind in [tkUString, tkLString, tkWString, tkString]) then
           continue;
 
-    // valuecurrent
+        // valuecurrent
         val := Field.GetValue(@ivtreportdatasetrec);
 
-    // skip
+        // skip
         if not val.ToString.Contains('$') then
           continue;
 
-    // replace
+        // replace
         str := params_replace(val.ToString, ivpav);
 
-    // selectively
+        // selectively
         case Field.FieldType.TypeKind of
           tkUString, tkLString, tkWString, tkString: begin
             Field.SetValue(@ivtreportdatasetrec, str);
           end;
 
-      // you can extend with more kinds (sets, dyn arrays, nested records, etc. tkUnknow, tkSetn, tkClass, tkMethod, tkVariant, tkArray, tkRecord, tkInterface, tkDynArray, tkClassRef, tkPointer, tkProcedure, tkMRecord)
+          // you can extend with more kinds (sets, dyn arrays, nested records, etc. tkUnknow, tkSetn, tkClass, tkMethod, tkVariant, tkArray, tkRecord, tkInterface, tkDynArray, tkClassRef, tkPointer, tkProcedure, tkMRecord)
          {tkInteger, tkInt64, tkEnumeration: begin
             if str.trim.IsEmpty then
               Field.SetValue(@ivtreportdatasetrec, StrToInt(str));
@@ -22540,7 +22540,7 @@ begin
   Result := true;
 end;
 
-class function TObjRec.FieldGetRio(const IvObj, IvIdOrPath, IvField: string; var IvValue: variant; const IvDefault: variant): boolean;
+class function  TObjRec.FieldGetRio(const IvObj, IvIdOrPath, IvField: string; var IvValue: variant; const IvDefault: variant): boolean;
 begin
   Screen.Cursor := crHourGlass;
   try
@@ -22563,7 +22563,7 @@ begin
   Result := TDbaRec.CmdExec(sql, aff, fbk);
 end;
 
-class function TObjRec.FieldSetRio(const IvObj, IvIdOrPath, IvField: string; const IvValue: variant): boolean;
+class function  TObjRec.FieldSetRio(const IvObj, IvIdOrPath, IvField: string; const IvValue: variant): boolean;
 begin
   Screen.Cursor := crHourGlass;
   try
@@ -24456,8 +24456,8 @@ begin
 
     // scrolldown
     IvRichEdit.SelStart := IvRichEdit.GetTextLen; // again
-    IvRichEdit.Perform(EM_SCROLLCARET, 0, 0); // scrolls until the caret
-  //IvRichEdit.Perform(EM_LINESCROLL, 0, 1);  // scroll just one line, no garantee to scroll to the bottom is the user has moved up the cursor
+    IvRichEdit.Perform(EM_SCROLLCARET, 0, 0);     // scrolls until the caret
+  //IvRichEdit.Perform(EM_LINESCROLL, 0, 1);      // scroll just one line, no garantee to scroll to the bottom is the user has moved up the cursor
   finally
     IvRichEdit.Lines.EndUpdate;
   end;

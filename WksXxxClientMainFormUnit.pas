@@ -38,6 +38,7 @@ uses
   , JvClock
   , JvComponentBase
   , JvDateTimePicker
+  , JvDBDateTimePicker
   , JvExComCtrls
   , JvExControls
   , JvExExtCtrls
@@ -47,7 +48,6 @@ uses
   , JvScrollMax
   , JvSpin
   , JvThreadTimer
-  , JvDBDateTimePicker
   , SynDBEdit
   , SynEdit
   , VirtualTrees

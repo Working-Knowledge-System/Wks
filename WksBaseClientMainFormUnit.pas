@@ -2517,7 +2517,7 @@ end;
 
 procedure TBaseMainForm.TextGutterActionExecute(Sender: TObject);
 begin
-  if gsyn.Focused = nil then begin
+ {if gsyn.Focused = nil then begin
     TMesRec.W('Edit control not focused! Please click inside the edit control to make it focused');
     Exit;
   end;
@@ -2527,7 +2527,35 @@ begin
   if gsyn.Focused.Gutter.Visible then
     ObjectDBEdit.Margins.Left := 35
   else
-    ObjectDBEdit.Margins.Left := 3;
+    ObjectDBEdit.Margins.Left := 3;}
+
+  ObjectContentPrevDBSynEdit.Gutter.Visible := TextGutterAction.Checked;
+  ObjectContentDBSynEdit.Gutter.Visible     := TextGutterAction.Checked;
+  ObjectDataDBSynEdit.Gutter.Visible        := TextGutterAction.Checked;
+  ObjectNoteDBSynEdit.Gutter.Visible        := TextGutterAction.Checked;
+  ObjectDescriptionDBSynEdit.Gutter.Visible := TextGutterAction.Checked;
+
+  if TextGutterAction.Checked then begin
+    ObjectDBEdit.Margins.Left               := 35;
+    ObjectTitleLabel.Margins.Left           := 35;
+    ObjectTitleDBEdit.Margins.Left          := 35;
+    ObjectSubtitleLabel.Margins.Left        := 35;
+    ObjectSubtitleDBEdit.Margins.Left       := 35;
+    ObjectDescriptionLabel.Margins.Left     := 35;
+
+    ObjectContentDBSynEdit.Margins.Left     := 0;
+    ObjectDescriptionDBSynEdit.Margins.Left := 0;
+  end else begin
+    ObjectDBEdit.Margins.Left               := 8;
+    ObjectTitleLabel.Margins.Left           := 8;
+    ObjectTitleDBEdit.Margins.Left          := 8;
+    ObjectSubtitleLabel.Margins.Left        := 8;
+    ObjectSubtitleDBEdit.Margins.Left       := 8;
+    ObjectDescriptionLabel.Margins.Left     := 8;
+
+    ObjectContentDBSynEdit.Margins.Left     := 8;
+    ObjectDescriptionDBSynEdit.Margins.Left := 8;
+  end;
 end;
 
 procedure TBaseMainForm.TextNumbersActionExecute(Sender: TObject);
